@@ -9,7 +9,7 @@ for the low-level concept/mapping importer.
 from csv_to_json_flex import ocl_csv_to_json_flex
 
 
-csv_filename = 'Mechanisms partners agencies OUS Start End.csv'
+csv_filename = 'ZenDesk-Mechanisms-2017-08-04.csv'
 output_filename = 'Mechanisms.json'
 
 csv_resource_definitions = [

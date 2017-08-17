@@ -1,6 +1,8 @@
 
 **Process**
 1) Run MER_Indicators.py - expects input file named 'MER_Indicator.csv' containing list of unique MER Indicators by uid. Results in MER_Indicator.json file
+2) Run MER_Disaggregation.py - expects input file named 'MER_Disaggregation.csv' containing list of unique MER Disaggregations by uid. Results in MER_Disaggregationr.json file
+3) Run Mechanisms.py - expects input file named 'Mechanisms partners agencies OUS Start End.csv' containing list of unique Mechanisms by uid. Results in Mechanisms.json file
 
 
 **Changes Made**

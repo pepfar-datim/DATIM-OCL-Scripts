@@ -22,9 +22,9 @@ Deviations from OCL API responses:
     - "supported_locales" response is a list, but only a comma-separated string is supported when posted
 '''
 
+
 import json
 import requests
-#import settings
 import sys
 import datetime
 import urllib
@@ -68,9 +68,8 @@ class InvalidObjectDefinition(ImportError):
         self.message = message
 
 
-
 class ocl_json_flex_import:
-    ''' Class to flexibly import multiple resource types into OCL from JSON lines files using OCL API '''
+    ''' Class to flexibly import multiple resource types into OCL from JSON lines files via the OCL API '''
 
     INTERNAL_MAPPING = 1
     EXTERNAL_MAPPING = 2
@@ -83,6 +82,7 @@ class ocl_json_flex_import:
     OBJ_TYPE_MAPPING = 'Mapping'
     OBJ_TYPE_REFERENCE = 'Reference'
 
+    # Resource type definitions
     obj_def = {
         OBJ_TYPE_ORGANIZATION: {
             "id_field": "id",
@@ -90,7 +90,7 @@ class ocl_json_flex_import:
             "has_owner": False,
             "has_source": False,
             "has_collection": False,
-            "allowed_fields": ["id", "company", "extras", "location", "name", "public_access", "website"],
+            "allowed_fields": ["id", "company", "extras", "location", "name", "public_access", "extras", "website"],
             "create_method": "POST",
             "update_method": "POST",
         },
@@ -168,6 +168,7 @@ class ocl_json_flex_import:
 
 
     def log(self, *args):
+        ''' Output log information '''
         sys.stdout.write('[' + str(datetime.datetime.now()) + '] ')
         for arg in args:
             sys.stdout.write(str(arg))

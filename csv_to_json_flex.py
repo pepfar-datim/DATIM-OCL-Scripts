@@ -2,7 +2,7 @@
 csv_to_json_flex.py -- Convert CSV to OCL-formatted JSON flex file
 Script to convert a CSV file to an OCL-formatted JSON file based on a provided
 set of CSV Resource Definitions. The resulting JSON is intended for the
-json_flex_import and is not suitable for the low-level concept/mapping importer.
+json_flex_import and does not work with the low-level concept/mapping importer.
 Definitions take the form:
     csv_resource_definitions = [
         'definition_name':'Concept',
@@ -39,7 +39,7 @@ class ocl_csv_to_json_flex:
     REPLACE_CHAR = '-'
 
 
-    def __init__(self, output_filename, csv_filename, csv_resource_definitions,
+    def __init__(self, output_filename='', csv_filename='', csv_resource_definitions=None,
                  verbose=False, include_type_attribute=True):
         ''' Initialize ocl_csv_to_json_flex object '''
         self.output_filename = output_filename
@@ -47,7 +47,7 @@ class ocl_csv_to_json_flex:
         self.csv_resource_definitions = csv_resource_definitions
         self.verbose = verbose
         self.include_type_attribute = include_type_attribute
-        
+
 
     def process_by_row(self):
         ''' Processes the CSV file applying all definitions to each row before moving to the next row '''
@@ -58,6 +58,7 @@ class ocl_csv_to_json_flex:
                     if 'is_active' not in csv_resource_def or csv_resource_def['is_active']:
                         self.process_csv_row_with_definition(csv_row, csv_resource_def)
 
+
     def process_by_definition(self):
         ''' Processes the CSV file by looping through it entirely once for each definition '''
         for csv_resource_def in self.csv_resource_definitions:
@@ -66,6 +67,7 @@ class ocl_csv_to_json_flex:
                     csv_reader = csv.DictReader(csvfile)
                     for csv_row in csv_reader:
                         self.process_csv_row_with_definition(csv_row, csv_resource_def)
+
 
     def process_csv_row_with_definition(self, csv_row, csv_resource_def):
         ''' Process individual CSV row with the provided CSV resource definition '''
@@ -173,9 +175,11 @@ class ocl_csv_to_json_flex:
                     ocl_resource[group_name][key] = value
 
         # Output
-        F = open(self.output_filename,'a')
-        F.write(json.dumps(ocl_resource))
-        print (json.dumps(ocl_resource))
+        if self.output_filename:
+            output_file = open(self.output_filename,'a')
+            output_file.write(json.dumps(ocl_resource))
+        else:
+            print (json.dumps(ocl_resource))
 
 
     def process_reference(self, csv_row, field_def):

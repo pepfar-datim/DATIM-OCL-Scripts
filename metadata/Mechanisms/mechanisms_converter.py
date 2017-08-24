@@ -51,6 +51,7 @@ csv_resource_definitions = [
 	},
 ]
 
-csv_converter = ocl_csv_to_json_flex(output_filename, csv_filename, csv_resource_definitions, verbose=False)
+csv_converter = ocl_csv_to_json_flex(output_filename=output_filename, csv_filename=csv_filename,
+	csv_resource_definitions=csv_resource_definitions, verbose=False)
 csv_converter.process_by_row()
 

@@ -1,0 +1,82 @@
+# Fetch datasets with child resources using lastUpdatedfilter
+https://dev-de.datim.org/api/dataSets?fields=*,!organisationUnits,dataElements[id,code,name,created,lastUpdated,categoryCombo[id,code,name,lastUpdated,created,categoryOptionCombos[id,code,name,lastUpdated,created]]]&filter=dataElements.lastUpdated:gt:2017-03-01&paging=false
+
+# Fetch expanded list of indicators with lastUpdated parameter
+https://dev-de.datim.org/api/indicators?fields=*&filter=dataElements.lastUpdated:gt:2017-03-01&paging=false
+
+# Fetch all indicators
+https://dev-de.datim.org/api/indicators
+
+# Fetch list of indicators (just 2 fields) with lastUpdated parameter
+https://dev-de.datim.org/api/indicators?fields=displayName,lastUpdated&filter=lastUpdated:gt:2017-03-01&paging=false
+
+# Fetch a single categoryCombo
+https://dev-de.datim.org/api/categoryCombos/P0EDfiY8oPM
+
+# Fetching a single dataElementGroup
+https://dev-de.datim.org/api/dataElementGroups/TYAjnC2isEk?fields=*
+
+# Data Elements from a single Dataset
+https://dev-de.datim.org/api/dataElements.xml?fields=id,code,name,shortName,lastUpdated,description,dataSets[id,name,shortName],categoryCombo[id,code,name,lastUpdated,created,categoryOptionCombos[id,code,name,lastUpdated,created]]&filter=dataSets.id:eq:kkXf2zXqTM0&paging=false
+
+# Data Elements from all MER Indicator Datasets
+https://dev-de.datim.org/api/dataElements.xml?fields=id,code,name,shortName,lastUpdated,description,dataSets[id,name,shortName,lastUpdated],categoryCombo[id,code,name,lastUpdated,created,categoryOptionCombos[id,code,name,lastUpdated,created]]&paging=false&filter=dataSets.id:in:[kkXf2zXqTM0,MqNLEXmzIzr,K7FMzevlBAp,UZ2PLqSe5Ri,CGoi5wjLHDy,LWE9GdlygD5,tG2hjDIaYQD,Kxfk0KVsxDn,hgOW2BSUDaN,Awq346fnVLV,CS958XpDaUf,ovmC3HNi4LN,CGoi5wjLHDy,zTgQ3MvHYtk,KwkuZhKulqs,eAlxMKMZ9GV,PkmLpkrPdQG,zeUCqFKIBDD,AitXBHsC7RA,BuRoS9i851o,jEzgpBt5Icf,ePndtmDbOJj,AvmGbcurn4K,O8hSwgCbepv,bqiB5G6qgzn,YWZrOj5KS1c,c7Gwzm5w9DE,pTuDWXzkAkJ,OFP2PhPl8FI,O8hSwgCbepv,qRvKHvlzNdv,tCIW2VFd8uu,JXKUYJqmyDd,lbwuIo56YoG,AyFVOGbAvcH,oYO9GvA05LE,xxo1G5V1JG2,Dd5c9117ukD,rDAUgkkexU1,xJ06pxmxfU6,IOarm0ctDVL,LBSk271pP7J,VjGqATduoEX,PHyD22loBQH,TgcTZETxKlb,GEhzw3dEw05,rK7VicBNzze,ZaV4VSLstg7,sCar694kKxH,vvHCWnhULAf,j9bKklpTDBZ,gZ1FgiGUlSj,xBRAscSmemV,VWdBdkfYntI,vZaDfrR6nmF,PkmLpkrPdQG,zeUCqFKIBDD,i29foJcLY9Y,STL4izfLznL,j1i6JjOpxEq,asHh1YkxBU5,hIm0HGCKiPv,NJlAVhe4zjv,ovYEbELCknv,f6NLvRGixJV,lD9O8vQgH8R]
+
+# Data Elements from a single DataElementGroup
+https://dev-de.datim.org/api/dataElements.xml?fields=id,code,name,shortName,lastUpdated,description,dataSets%5Bid,name,shortName%5D,categoryCombo%5Bid,code,name,lastUpdated,created,categoryOptionCombos%5Bid,code,name,lastUpdated,created%5D%5D&paging=false&filter=dataElementGroups.id:eq:V4UxaezDMTK
+
+# DataElementGroups
+https://dev-de.datim.org/api/dataElementGroups?fields=id,name&filter=name:like:MER
+name	id
+2016 All MER Results	kb5IcXEXjD5
+2016 MER Results	md5HxvRCeHD
+2016 MER Results Narratives	BeQcvAfheSH
+2017 All MER Results	LjXeQE80GbM
+2017 All MER Targets	KgunNAjSN6M
+2017 MER Results	V4UxaezDMTK
+2017 MER Results Narratives	ffkYoZj4dew
+2017 MER Target Narratives	BHSHvFRr36Y
+2017 MER Targets	maz41FB7YVO
+2018 All MER Targets	z7ngogVQEkw
+2018 MER Targets	xi1U9Kd5qfc
+2018 MER Targets Narratives	WbjN2BaI2Xi
+MER Frequency (Current): APR	cuNaH99qtbT
+MER Frequency (Current): Quarterly	I9l97eSD9fR
+MER Frequency (Current): SAPR	qkK60bI78nv
+
+# Retrieving dataElements within a list of dataElementGroups
+https://dev-de.datim.org/api/dataElements.xml?fields=id,code,name,shortName,lastUpdated,description,dataSets%5Bid,name,shortName%5D,categoryCombo%5Bid,code,name,lastUpdated,created,categoryOptionCombos%5Bid,code,name,lastUpdated,created%5D%5D&paging=false&filter=dataElementGroups.id:in:[kb5IcXEXjD5,]
+
+
+# Full list of dataset ids used on ZenDesk page as of Aug 31, 2017
+kkXf2zXqTM0,MqNLEXmzIzr,K7FMzevlBAp,UZ2PLqSe5Ri,CGoi5wjLHDy,LWE9GdlygD5,tG2hjDIaYQD,Kxfk0KVsxDn,hgOW2BSUDaN,Awq346fnVLV,CS958XpDaUf,ovmC3HNi4LN,CGoi5wjLHDy,zTgQ3MvHYtk,KwkuZhKulqs,eAlxMKMZ9GV,PkmLpkrPdQG,zeUCqFKIBDD,AitXBHsC7RA,BuRoS9i851o,jEzgpBt5Icf,ePndtmDbOJj,AvmGbcurn4K,O8hSwgCbepv,bqiB5G6qgzn,YWZrOj5KS1c,c7Gwzm5w9DE,pTuDWXzkAkJ,OFP2PhPl8FI,O8hSwgCbepv,qRvKHvlzNdv,tCIW2VFd8uu,JXKUYJqmyDd,lbwuIo56YoG,AyFVOGbAvcH,oYO9GvA05LE,xxo1G5V1JG2,Dd5c9117ukD,rDAUgkkexU1,xJ06pxmxfU6,IOarm0ctDVL,LBSk271pP7J,VjGqATduoEX,PHyD22loBQH,TgcTZETxKlb,GEhzw3dEw05,rK7VicBNzze,ZaV4VSLstg7,sCar694kKxH,vvHCWnhULAf,j9bKklpTDBZ,gZ1FgiGUlSj,xBRAscSmemV,VWdBdkfYntI,vZaDfrR6nmF,PkmLpkrPdQG,zeUCqFKIBDD,i29foJcLY9Y,STL4izfLznL,j1i6JjOpxEq,asHh1YkxBU5,hIm0HGCKiPv,NJlAVhe4zjv,ovYEbELCknv,f6NLvRGixJV,lD9O8vQgH8R
+
+
+# Fetch mechanisms from the categoryCombos endpoint
+https://dev-de.datim.org/api/categoryCombos/wUpfppgjEza?fields=*,categoryOptionCombos[id,lastUpdated,name,code]&order=categoryCombo:asc
+
+
+# Fetch mechanisms from the categoryOptionCombos endpoint with all of the required fields
+# NOTE: "primeid" needs to be parsed from one the partner "code" attribute
+# NOTE: "agency" and "partner" are stored in the categoryOptionGroups and filtering needed
+https://dev-de.datim.org/api/categoryOptionCombos.xml?fields=id,code,name,lastUpdated,categoryOptions[id,endDate,startDate,categoryOptionGroups[id,name,code,categoryOptionGroupSet[id,name]],organisationUnits[code,name]]&order=code:asc&filter=categoryCombo.id:eq:wUpfppgjEza&paging=false
+
+
+# Data Elements for SIMS 3.0 assessment types
+https://dev-de.datim.org/api/dataElements/?fields=name,code,id,valueType,lastUpdated,dataElementGroups[id,name]&filter=dataElementGroups.id:in:[FZxMe3kfzYo,uMvWjOo31wt,wL1TY929jCS]&order=code:asc&paging=false
+
+# Data Elements for SIMS 2.0 assessment types
+https://dev-de.datim.org/api/dataElements/?fields=name,code,id,valueType,lastUpdated,dataElementGroups[id,name]&filter=dataElementGroups.id:in:[Run7vUuLlxd,xGbB5HNDnC0,xDFgyFbegjl]&order=code:asc&paging=false
+
+# SIMS v2 Option Sets
+https://dev-de.datim.org/api/optionSets/?fields=id,name,lastUpdated,options[id,name]&filter=name:like:SIMS%20v2&paging=false&order=name:asc
+
+
+
+https://dev-de.datim.org/api/categoryOptionCombos.xml?fields=id,code,name,lastUpdated,categoryOptions[id,endDate,startDate,lastUpdated,categoryOptionGroups[id,name,code,categoryOptionGroupSet[id,name]],organisationUnits[code,name]]&order=code:asc&filter=categoryCombo.id:eq:wUpfppgjEza&paging=false 
+
+https://dev-de.datim.org/api/categoryOptions.xml?fields=id,name,code,lastUpdated,categoryOptionCombos[*,categoryOptions[*]]
+
+https://dev-de.datim.org/api/categoryOptions.xml?fields=id,code,name,lastUpdated,categoryOptions[id,endDate,startDate,lastUpdated,categoryOptionGroups[id,name,code,categoryOptionGroupSet[id,name]],organisationUnits[code,name]]&order=code:asc&filter=categoryCombo.id:eq:wUpfppgjEza&paging=false 
+
+

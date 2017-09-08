@@ -181,6 +181,7 @@ for k in ocl_export_defs:
 
 
 # Step 5b: Prepare OCL exports for the diff
+# Concepts/mappings in OCL exports have extra attributes that should be removed before the diff
 with open(ocl_export_defs['sims_source']['jsonfilename'], 'rb') as ifile, open(ocl_export_defs['sims_source']['jsoncleanfilename'], 'wb') as ofile:
     ocl_sims_export = json.load(ifile)
     for c in ocl_sims_export['concepts']:

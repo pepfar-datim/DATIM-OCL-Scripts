@@ -6,6 +6,7 @@ import sys
 import json
 import pprint
 import tarfile
+import DeepDiff
 from requests.auth import HTTPBasicAuth
 
 __location__ = os.path.realpath(
@@ -206,13 +207,19 @@ with open(attachAbsolutePath(ocl_export_defs['sims_source']['jsonfilename']), 'r
         ofile.write(json.dumps(m))
 
 
-'''
 # Step 6: Generate import script by evaluating diff between new DHIS2 and OCL exports
 # NOTE: Many input files may be necessary, so moving configuration into a json file makes more sense
-python ocldiff-sims.py --i1=dhis2file.json --i2=oclfile.json -o importfile.json -v1 1>ocldiff-sims-stdout.log 2>ocldiff-sims-stderr.log
+# python ocldiff-sims.py --i1=dhis2file.json --i2=oclfile.json -o importfile.json -v1 1>ocldiff-sims-stdout.log 2>ocldiff-sims-stderr.log
+with open(ocl_export_defs['sims_source']['jsoncleanfilename'], 'rb') as ocl_handle, open(converted_filename, 'rb') as dhis2_handle:
+    a_ocl = json.load(input_ocl_handle)
+    b_dhis2 = json.load(input_dhis2_handle)
+    diff = DeepDiff(a_ocl, b_dhis2)
+# Process the DeepDiff result
+
 
 ## IF DATA CHECK ONLY, THEN OUTPUT RESULT OF DIFF AND END HERE
 
+'''
 if at least one diff:
 
     # Step 7: Import the update script into ocl
@@ -223,5 +230,5 @@ if at least one diff:
 
     # Step 8: Manage OCL repository versions
     # create new version (maybe delete old version)
-
 '''
+

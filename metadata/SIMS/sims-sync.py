@@ -8,7 +8,12 @@ import pprint
 import tarfile
 from requests.auth import HTTPBasicAuth
 
+__location__ = os.path.realpath(
+    os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
+def attachAbsolutePath(filename):
+    absolutefilename=os.path.join(__location__, filename)
+    return absolutefilename
 # TODO: still need authentication, oclenv parameter
 def getRepositories(url='', oclenv='', oclapitoken='', key_field='id',
                     require_external_id=True, active_attr_name='__datim_sync'):
@@ -44,13 +49,13 @@ def saveDhis2SimsAssessmentTypesToFile(str_active_dataset_ids, filename, dhis2en
     print url_dhis2_export
     r = requests.get(url_dhis2_export, auth=HTTPBasicAuth(dhis2uid, dhis2pwd))
     r.raise_for_status()
-    with open(new_dhis2_export_filename, 'wb') as handle:
+    with open(attachAbsolutePath(new_dhis2_export_filename), 'wb') as handle:
         for block in r.iter_content(1024):
             handle.write(block)
 
 
 def dhis2oj_sims(inputfile, outputfile, sims_collections):
-    with open(inputfile, "rb") as ifile, open(outputfile, 'wb') as ofile:
+    with open(attachAbsolutePath(inputfile), "rb") as ifile, open(attachAbsolutePath(outputfile), 'wb') as ofile:
         new_sims = json.load(ifile)
         for de in new_sims['dataElements']:
             #print '\n\n', de
@@ -101,28 +106,37 @@ def saveOclLatestExport(endpoint='', oclenv='', tarfilename='', jsonfilename='')
     print 'Export:', url_export
     r = requests.get(url_export)
     r.raise_for_status()
-    with open(tarfilename, 'wb') as handle:
+    with open(attachAbsolutePath(tarfilename), 'wb') as handle:
         for block in r.iter_content(1024):
             handle.write(block)
 
     # Decompress the tar and rename
-    tar = tarfile.open(tarfilename)
-    tar.extractall()
+    tar = tarfile.open(attachAbsolutePath(tarfilename))
+    tar.extractall(__location__)
     tar.close()
-    os.rename('export.json', jsonfilename)
+    os.rename(attachAbsolutePath('export.json'), attachAbsolutePath(jsonfilename))
 
 
 # Settings
 old_dhis2_export_filename = 'old_sims_export.json'
 new_dhis2_export_filename = 'new_sims_export.json'
 converted_filename = 'converted_sims_export.json'
-dhis2env = 'https://dev-de.datim.org/'
-dhis2uid = 'jonpayne'
-dhis2pwd = 'Jonpayne1'
-oclapitoken = '2da0f46b7d29aa57970c0b3a535121e8e479f881' # 
-oclenv = 'https://api.showcase.openconceptlab.org'
+if sys.argv[1] in ['true', 'True'] :
+    dhis2env = os.environ['DHIS2_ENV']
+    dhis2uid = os.environ['DHIS2_USER']
+    dhis2pwd = os.environ['DHIS2_PASS']
+    oclapitoken = os.environ['OCL_API_TOKEN'] # 
+    oclenv = os.environ['OCL_ENV']
+    compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
+else :
+    dhis2env = 'https://dev-de.datim.org/'
+    dhis2uid = 'jonpayne'
+    dhis2pwd = 'Jonpayne1'
+    oclapitoken = '2da0f46b7d29aa57970c0b3a535121e8e479f881' # 
+    oclenv = 'https://api.showcase.openconceptlab.org'
+    compare2previousexport = True
+
 url_sims_collections = oclenv + '/orgs/PEPFAR/collections/?q=SIMS&verbose=true'
-compare2previousexport = True
 ocl_export_defs = {
     'sims_source': {
         'endpoint':'/orgs/PEPFAR/sources/SIMS/',
@@ -182,7 +196,7 @@ for k in ocl_export_defs:
 
 # Step 5b: Prepare OCL exports for the diff
 # Concepts/mappings in OCL exports have extra attributes that should be removed before the diff
-with open(ocl_export_defs['sims_source']['jsonfilename'], 'rb') as ifile, open(ocl_export_defs['sims_source']['jsoncleanfilename'], 'wb') as ofile:
+with open(attachAbsolutePath(ocl_export_defs['sims_source']['jsonfilename']), 'rb') as ifile, open(attachAbsolutePath(ocl_export_defs['sims_source']['jsoncleanfilename']), 'wb') as ofile:
     ocl_sims_export = json.load(ifile)
     for c in ocl_sims_export['concepts']:
         # clean the concept and write it

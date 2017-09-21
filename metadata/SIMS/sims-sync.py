@@ -4,8 +4,8 @@ import itertools, functools, operator
 import requests
 import sys
 import json
-from pprint import pprint
 import tarfile
+from pprint import pprint
 from deepdiff import DeepDiff
 from requests.auth import HTTPBasicAuth
 
@@ -15,6 +15,7 @@ __location__ = os.path.realpath(
 
 
 def attachAbsolutePath(filename):
+    ''' Adds full absolute path to the filename '''
     absolutefilename=os.path.join(__location__, filename)
     return absolutefilename
 
@@ -67,33 +68,42 @@ def dhis2oj_sims(inputfile='', outputfile='', sims_collections=None, verbosity=0
         new_sims = json.load(ifile)
         num_concepts = 0
         num_references = 0
-        output = []
+        output = {}
 
         # Iterate through each DataElement and transform to an OCL-JSON concept
         for de in new_sims['dataElements']:
             concept_id = de['code']
+            url = '/orgs/PEPFAR/sources/SIMS/concepts/' + concept_id + '/'
             c = {
                 'type':'Concept',
-                'concept_id':concept_id,
+                'id':concept_id,
                 'concept_class':'Assessment Type',
                 'datatype':'None',
                 'owner':'PEPFAR',
                 'owner_type':'Organization',
                 'source':'SIMS',
+                'retired':False,
+                'descriptions':None,
                 'external_id':de['id'],
                 'names':[
-                    {'name':de['name'], 'name_type':'Fully Specified', 'locale':'en'}
+                    {
+                        'name':de['name'],
+                        'name_type':'Fully Specified',
+                        'locale':'en',
+                        'locale_preferred':False,
+                        'external_id':None,
+                    }
                 ],
                 'extras':{'Value Type':de['valueType']}
             }
-            #ofile.write(json.dumps(c))
-            #ofile.write(',\n')3
-            output.append(c)
+            output[url] = c
             num_concepts += 1
 
             # Iterate through each DataElementGroup and transform to an OCL-JSON reference
             for deg in de['dataElementGroups']:
                 collection_id = sims_collections[deg['id']]['id']
+                target_url = '/orgs/PEPFAR/sources/SIMS/concepts/' + concept_id + '/'
+                url = '/orgs/PEPFAR/collections/' + collection_id + '/references/?target=' + target_url
                 r = {
                     'type':'Reference',
                     'owner':'PEPFAR',
@@ -101,15 +111,15 @@ def dhis2oj_sims(inputfile='', outputfile='', sims_collections=None, verbosity=0
                     'collection':collection_id,
                     'data':{"expressions": ['/orgs/PEPFAR/sources/SIMS/concepts/' + concept_id + '/']}
                 }
-                #ofile.write(json.dumps(r))
-                #ofile.write(',\n')
-                output.append(r)
+                output[url] = r
                 num_references += 1
-        #ofile.write(']')
         ofile.write(json.dumps(output))
 
     if verbosity:
-        print 'Export successfully transformed into %s concepts and %s references' % (num_concepts, num_references)
+        print 'DHIS2 export successfully transformed and saved to "%s":' % (outputfile)
+        print '\tConcepts: %s' % (num_concepts)
+        print '\tReferences: %s' % (num_references)
+        print '\tTOTAL: %s' % (num_concepts + num_references)
     return True
 
 
@@ -151,10 +161,12 @@ def saveOclLatestExport(endpoint='', oclenv='', tarfilename='', jsonfilename='',
 
 
 # Settings
-verbosity = 1   # 0 = none, 1 = some, 2 = all
+verbosity = 2   # 0 = none, 1 = some, 2 = all
 old_dhis2_export_filename = 'old_sims_export.json'
 new_dhis2_export_filename = 'new_sims_export.json'
 converted_filename = 'converted_sims_export.json'
+new_import_script = 'sims_import_script.json'
+sims_collections_filename = 'ocl_sims_collections.json'
 if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     dhis2env = os.environ['DHIS2_ENV']
     dhis2uid = os.environ['DHIS2_USER']
@@ -168,8 +180,9 @@ else:
     dhis2pwd = 'Johnpayne1!'
     oclapitoken = '2da0f46b7d29aa57970c0b3a535121e8e479f881'
     oclenv = 'https://api.showcase.openconceptlab.org'
+    #oclapitoken = 'a61ba53ed7b8b26ece8fcfc53022b645de0ec055'
+    #oclenv = 'https://ocl-stg.openmrs.org'
     compare2previousexport = True
-
 url_sims_collections = oclenv + '/orgs/PEPFAR/collections/?q=SIMS&verbose=true'
 ocl_export_defs = {
     'sims_source': {
@@ -179,6 +192,10 @@ ocl_export_defs = {
         'jsoncleanfilename':'sims_source_ocl_export_clean.json',
     }
 }
+
+
+# Offline settings (to run locally using cached versions of dhis2/ocl exports)
+run_offline = True
 
 
 # Write settings to console
@@ -191,162 +208,206 @@ if verbosity:
     print '\told_dhis2_export_filename:', old_dhis2_export_filename
     print '\tnew_dhis2_export_filename:', new_dhis2_export_filename
     print '\tconverted_filename:', converted_filename
+    print '\tnew_import_script:', new_import_script
+    print '\tsims_collections_filename:', sims_collections_filename
+    if run_offline:
+        print '\n**** RUNNING IN OFFLINE MODE ****'
 
 
 # STEP 1: Fetch OCL Collections for SIMS Assessment Types
 # Collections that have 'SIMS' in the name, __datim_sync==true, and external_id not empty
 if verbosity:
-    print '\n**** STEP 1 of 12: Fetch OCL Collections for SIMS Assessment Types'
-sims_collections = getRepositories(url=url_sims_collections, oclenv=oclenv,
-                                   key_field='external_id', verbosity=verbosity)
+    print '\n**** STEP 1 of 13: Fetch OCL Collections for SIMS Assessment Types'
+if not run_offline:
+    if verbosity:
+        print 'Request URL:', url_sims_collections
+    sims_collections = getRepositories(url=url_sims_collections, oclenv=oclenv,
+                                       key_field='external_id', verbosity=verbosity)
+    with open(attachAbsolutePath(sims_collections_filename), 'wb') as ofile:
+        ofile.write(json.dumps(sims_collections))
+    if verbosity:
+        print 'Repositories retreived from OCL and stored in memory:', len(sims_collections)
+        print 'Repositories successfully written to "%s"' % (sims_collections_filename)
+else:
+    if verbosity:
+        print 'OFFLINE: Loading repositories from "%s"' % (sims_collections_filename)
+    with open(attachAbsolutePath(sims_collections_filename), 'rb') as handle:
+        sims_collections = json.load(handle)
+    if verbosity:
+        print 'OFFLINE: Repositories successfully loaded:', len(sims_collections)
+
+
+# STEP 2: Extract list of DHIS2 dataset IDs from collection external_id
 if verbosity:
-    print '\tCollections retreived:', len(sims_collections)
-if verbosity >= 2:
-    pprint(sims_collections)
-
-
-'''
-# STEP 1-Alternate: Use local saved copy of OCL Collections for SIMS Assessment Types
-# Save for offline use
-offline_sims_collections_filename = 'sims_collections_empty.json'
-#with open(offline_sims_collections_filename, 'wb') as handle:
-#    handle.write(json.dumps(sims_collections, indent=4))
-
-# OFFLINE: Load saved sims collections
-with open(offline_sims_collections_filename, 'rb') as handle:
-    sims_collections = json.load(handle)
-'''
-
-
-# STEP 2: Compile list of DHIS2 dataset IDs from collection external_id
-if verbosity:
-    print '\n**** STEP 2 of 12: Compile list of DHIS2 dataset IDs from collection external_id'
+    print '\n**** STEP 2 of 13: Extract list of DHIS2 dataset IDs from collection external_id'
 str_active_dataset_ids = ','.join(sims_collections.keys())
 if verbosity:
-    print '\tSIMS Assessment Type Dataset IDs:', str_active_dataset_ids
+    print 'SIMS Assessment Type Dataset IDs:', str_active_dataset_ids
 
 
 # STEP 3: Fetch new export from DATIM DHIS2
 if verbosity:
-    print '\n**** STEP 3 of 12: Fetch new export from DATIM DHIS2'
-content_length = saveDhis2SimsAssessmentTypesToFile(str_active_dataset_ids=str_active_dataset_ids,
-                                                    filename=new_dhis2_export_filename,
-                                                    dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
-                                                    verbosity=verbosity)
-if verbosity:
-    print '%s bytes retrieved and written to file "%s"' % (content_length, new_dhis2_export_filename)
+    print '\n**** STEP 3 of 13: Fetch new export from DATIM DHIS2'
+if not run_offline:
+    content_length = saveDhis2SimsAssessmentTypesToFile(str_active_dataset_ids=str_active_dataset_ids,
+                                                        filename=new_dhis2_export_filename,
+                                                        dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
+                                                        verbosity=verbosity)
+    if verbosity:
+        print '%s bytes retrieved from DHIS2 and written to file "%s"' % (content_length, new_dhis2_export_filename)
+else:
+    if verbosity:
+        print 'OFFLINE: Using local file: "%s"' % (new_dhis2_export_filename)
+    if os.path.isfile(attachAbsolutePath(new_dhis2_export_filename)):
+        if verbosity:
+            print 'OFFLINE: File "%s" found containing %s bytes. Continuing...' % (new_dhis2_export_filename, os.path.getsize(attachAbsolutePath(new_dhis2_export_filename)))
+    else:
+        print 'Could not find offline file "%s". Exiting...' % (new_dhis2_export_filename)
+        exit(1)
 
 
 # STEP 4: Quick comparison of current and previous DHIS2 exports
 # Compares new DHIS2 export to most recent previous export from a successful sync that is available
-# Copmarison first checks file size then file contents
+# Comparison consists of file size check then file content comparison
+# NOTE: This section should be skipped if doing the OCL/DHIS2 data validation check
 if verbosity:
-    print '\n**** STEP 4 of 12: Quick comparison of current and previous DHIS2 exports'
+    print '\n**** STEP 4 of 13: Quick comparison of current and previous DHIS2 exports'
 if not compare2previousexport:
-    if verbosity:
-        print "Skipping (due to settings)..."
+    if verbosity: print "Skipping (due to settings)..."
 elif not old_dhis2_export_filename:
-    if verbosity:
-        print "Skipping (no previous export filename provided)..."
+    if verbosity: print "Skipping (no previous export filename provided)..."
 else:
     if filecmp(old_dhis2_export_filename, new_dhis2_export_filename):
         print "Current and previous exports are identical, so exit without doing anything..."
         sys.exit()
     else:
-        print "Current and previous exports are different, so continue with synchronization..."
+        print "Current and previous exports are different in size and/or content, so continue..."
 
 
 # STEP 5: Transform new DHIS2 export to OCL-formatted JSON (OJ)
 # python dhis2oj-sims.py -i inputfile.xml -o outputfile.json -v1
 if verbosity:
-    print '\n**** STEP 5 of 12: Transform DHIS2 export to OCL formatted JSON'
+    print '\n**** STEP 5 of 13: Transform DHIS2 export to OCL formatted JSON'
 dhis2oj_sims(inputfile=new_dhis2_export_filename, outputfile=converted_filename,
              sims_collections=sims_collections, verbosity=verbosity)
 
 
 # STEP 6: Fetch latest versions of relevant OCL exports
 if verbosity:
-    print '\n**** STEP 6 of 12: Fetch latest versions of relevant OCL exports'
+    print '\n**** STEP 6 of 13: Fetch latest versions of relevant OCL exports'
 for k in ocl_export_defs:
     if verbosity:
         print '%s:' % (k)
     export_def = ocl_export_defs[k]
-    saveOclLatestExport(endpoint=export_def['endpoint'], tarfilename=export_def['tarfilename'],
-                        jsonfilename=export_def['jsonfilename'], oclenv=oclenv, verbosity=verbosity)
+    if not run_offline:
+        saveOclLatestExport(endpoint=export_def['endpoint'], tarfilename=export_def['tarfilename'],
+                            jsonfilename=export_def['jsonfilename'], oclenv=oclenv, verbosity=verbosity)
+    else:
+        if verbosity:
+            print '\tOFFLINE: Using local file "%s"...' % (export_def['jsonfilename'])
+        if os.path.isfile(attachAbsolutePath(export_def['jsonfilename'])):
+            if verbosity:
+                print '\tOFFLINE: File "%s" found containing %s bytes. Continuing...' % (export_def['jsonfilename'], os.path.getsize(attachAbsolutePath(export_def['jsonfilename'])))
+        else:
+            print '\tCould not find offline file "%s". Exiting...' % (export_def['jsonfilename'])
+            exit(1)
 
 
 # STEP 7: Prepare OCL exports for diff
 # Concepts/mappings in OCL exports have extra attributes that should be removed before the diff
+# TODO: Clean OCL exports
 if verbosity:
-    print '\n**** STEP 7 of 12: Prepare OCL exports for diff'
-with open(attachAbsolutePath(ocl_export_defs['sims_source']['jsonfilename']), 'rb') as ifile, open(attachAbsolutePath(ocl_export_defs['sims_source']['jsoncleanfilename']), 'wb') as ofile:
-    ocl_sims_export = json.load(ifile)
-    #if verbosity >= 2:
-    #    pprint(ocl_sims_export)
-    ocl_sims_export_clean = []
-    for c in ocl_sims_export['concepts']:
-        # clean the concept and write it
-        ocl_sims_export_clean.append[c]
-        #ofile.write(json.dumps(c))
-    for m in ocl_sims_export['mappings']:
-        # clean the mapping and write it
-        ocl_sims_export_clean.append[m]
-        #ofile.write(json.dumps(m))
-    ofile.write(json.dumps(ocl_sims_export_clean))
-if verbosity:
-    print 'Success...'
+    print '\n**** STEP 7 of 13: Prepare OCL exports for diff'
+for k in ocl_export_defs:
+    if verbosity:
+        print '%s:' % (k)
+    with open(attachAbsolutePath(ocl_export_defs[k]['jsonfilename']), 'rb') as ifile, open(attachAbsolutePath(ocl_export_defs[k]['jsoncleanfilename']), 'wb') as ofile:
+        ocl_sims_export = json.load(ifile)
+        ocl_sims_export_clean = {}
+        for c in ocl_sims_export['concepts']:
+            # clean the concept and write it
+            url = c['url']
+
+            # Remove core fields
+            core_fields_to_remove = ['version_created_by', 'created_on', 'updated_on', 'version_created_on', 'created_by', 'updated_by', 'display_name', 'display_locale', 'uuid', 'version', 'owner_url', 'source_url', 'mappings', 'url', 'version_url', 'is_latest_version', 'locale']
+            for f in core_fields_to_remove:
+                if f in c: del c[f]
+
+            # Remove name fields
+            name_fields_to_remove = ['uuid', 'type']
+            if 'names' in c:
+                for i, name in enumerate(c['names']):
+                    for f in name_fields_to_remove:
+                        if f in name: del name[f]
+
+            ocl_sims_export_clean[url] = c
+        for m in ocl_sims_export['mappings']:
+            # clean the mapping and write it
+            url = m['url']
+            core_fields_to_remove = []
+            for f in core_fields_to_remove:
+                if f in m: del m[f]
+            ocl_sims_export_clean[url] = m
+        ofile.write(json.dumps(ocl_sims_export_clean))
+        if verbosity:
+            print '\tProcessed OCL export saved to "%s"' % (ocl_export_defs[k]['jsoncleanfilename'])
 
 
 # STEP 8: Perform deep diff
 # Note that multiple deep diffs may be performed, each with their own input and output files
 if verbosity:
-    print '\n**** STEP 8 of 12: Perform deep diff'
-diff = {}
-with open(ocl_export_defs['sims_source']['jsoncleanfilename'], 'rb') as ocl_handle, open(converted_filename, 'rb') as dhis2_handle:
+    print '\n**** STEP 8 of 13: Perform deep diff'
+diff = None
+with open(attachAbsolutePath(ocl_export_defs['sims_source']['jsoncleanfilename']), 'rb') as ocl_handle, open(attachAbsolutePath(converted_filename), 'rb') as dhis2_handle:
     a_ocl = json.load(ocl_handle)
     b_dhis2 = json.load(dhis2_handle)
-    diff = DeepDiff(a_ocl, b_dhis2, ignore_order=True, verbose_level=1)
+    diff = DeepDiff(a_ocl, b_dhis2, ignore_order=True, verbose_level=2)
     if verbosity:
         print 'Diff results:'
         for k in diff:
             print '\t%s:' % (k), len(diff[k])
-    if verbosity >= 2:
-        print json.dumps(diff, indent=4)
 
 
-## IF DATA CHECK ONLY, THEN OUTPUT RESULT OF DIFF AND END HERE
-# TODO: Need to handle diff result and send the right exit code
+## STEP 9: Determine action based on diff result
+# TODO: If data check only, then output need to return Success/Failure and then exit regardless
+if verbosity:
+    print '\n**** STEP 9 of 13: Determine action based on diff result'
 if diff:
-    pass
+    print 'Deep diff identified one or more differences between DHIS2 and OCL...'
 else:
     print 'No diff, exiting...'
     exit()
 
 
-# STEP 9: Generate import script
+# STEP 10: Generate import scripts
 # Generate import script by processing the diff results
+# TODO: This currently only handles 'dictionary_item_added'
 if verbosity:
-    print '\n**** STEP 9 of 12: Generate import script'
-if 'iterable_item_added' in diff:
-    pass
-if 'value_changed' in diff:
-    pass
+    print '\n**** STEP 10 of 13: Generate import scripts'
+with open(attachAbsolutePath(new_import_script), 'wb') as ofile:
+    if 'dictionary_item_added' in diff:
+        for k in diff['dictionary_item_added']:
+            if 'type' in diff['dictionary_item_added'][k] and diff['dictionary_item_added'][k]['type'] == 'Concept':
+                ofile.write(json.dumps(diff['dictionary_item_added'][k]))
+                ofile.write('\n')
+    if verbosity:
+        print 'New import script written to file "%s"' % (new_import_script)
 
 
-# STEP 10: Import the update script into ocl
+# STEP 11: Import the update script into ocl
 # Parameters: testmode
 #python oclimport.py -i importfile.json -v1 [--testmode=true] --ocltoken=... 1>oclimport-sims-stdout.log 2>oclimport-sims-stderr.log
 if verbosity:
-    print '\n**** STEP 10 of 12: Perform the import in OCL'
+    print '\n**** STEP 11 of 13: Perform the import in OCL'
 
 
-# STEP 11: Save new DHIS2 export for the next sync attempt
+# STEP 12: Save new DHIS2 export for the next sync attempt
 if verbosity:
-    print '\n**** STEP 11 of 12: Save the DHIS2 export'
+    print '\n**** STEP 12 of 13: Save the DHIS2 export'
 
 
-# STEP 12: Manage OCL repository versions
+# STEP 13: Manage OCL repository versions
 # create new version (maybe delete old version)
 if verbosity:
-    print '\n**** STEP 12 of 12: Manage OCL repository versions'
+    print '\n**** STEP 13 of 13: Manage OCL repository versions'
 

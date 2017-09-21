@@ -186,12 +186,13 @@ class DatimSimsSync:
         '''
         Fetches the latest released export of the specified repository and saves to file
         :param endpoint: endpoint must point to the repo endpoint only, e.g. '/orgs/myorg/sources/mysource/'
-        :param tarfilename:
-        :param jsonfilename:
+        :param tarfilename: Filename to save the compressed OCL export to
+        :param jsonfilename: Filename to save the decompressed OCL-JSON export to
         :return: bool True upon success; False otherwise
         '''
 
         # Get the latest version of the repo
+        # TODO: error handling for case when no repo version is returned
         url_latest_version = self.oclenv + endpoint + 'latest/'
         if self.verbosity:
             self.log('Latest version request URL:', url_latest_version)
@@ -207,6 +208,9 @@ class DatimSimsSync:
             self.log('Export URL:', url_ocl_export)
         r = requests.get(url_ocl_export)
         r.raise_for_status()
+        if r.status_code == 204:
+            self.log('ERROR: Export does not exist for "%s"' % url_ocl_export)
+            sys.exit(1)
 
         # Write tar'd export to file
         with open(self.attachAbsolutePath(tarfilename), 'wb') as handle:
@@ -226,7 +230,7 @@ class DatimSimsSync:
         return True
 
     def logSettings(self):
-        ''' Write settings to console '''
+        """ Write settings to console """
         self.log(
             '**** SIMS Sync Script Settings:',
             'verbosity:', self.verbosity,
@@ -239,6 +243,10 @@ class DatimSimsSync:
             self.log('**** RUNNING IN OFFLINE MODE ****')
 
     def run(self):
+        """
+        Runs the entire synchronization process --
+        Recommend breaking this into smaller methods in the future
+        """
         if self.verbosity: self.logSettings()
 
         # STEP 1: Fetch OCL Collections for SIMS Assessment Types
@@ -292,7 +300,6 @@ class DatimSimsSync:
 
         # STEP 4: Quick comparison of current and previous DHIS2 exports
         # Compares new DHIS2 export to most recent previous export from a successful sync that is available
-        # Comparison consists of file size check then file content comparison
         # NOTE: This section should be skipped if doing the OCL/DHIS2 data validation check
         if self.verbosity:
             self.log('**** STEP 4 of 13: Quick comparison of current and previous DHIS2 exports')
@@ -311,7 +318,6 @@ class DatimSimsSync:
                 self.log("Current and previous exports are different in size and/or content, so continue...")
 
         # STEP 5: Transform new DHIS2 export to OCL-formatted JSON (OJ)
-        # python dhis2oj-sims.py -i inputfile.xml -o outputfile.json -v1
         if self.verbosity:
             self.log('**** STEP 5 of 13: Transform DHIS2 export to OCL formatted JSON')
         self.dhis2oj_sims(inputfile=self.new_dhis2_export_filename,
@@ -474,8 +480,8 @@ class DatimSimsSync:
 
 
 # Default Script Settings
-verbosity = 2                   # 0 = none, 1 = some, 2 = all
-import_limit = 0                # 0=all
+verbosity = 2                   # 0=none, 1=some, 2=all
+import_limit = 0                # Number of resources to import; 0=all
 import_test_mode = False        # Set to True to see which import API requests would be performed on OCL
 runoffline = False              # Set to true to use local copies of dhis2/ocl exports
 compare2previousexport = True   # Set to False to ignore the previous export
@@ -491,6 +497,7 @@ oclapitoken = ''
 
 # Set variables from environment if available
 if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
+    # Server environment settings (required for OpenHIM)
     dhis2env = os.environ['DHIS2_ENV']
     dhis2uid = os.environ['DHIS2_USER']
     dhis2pwd = os.environ['DHIS2_PASS']
@@ -498,6 +505,8 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     oclapitoken = os.environ['OCL_API_TOKEN']
     compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
 else:
+    # Local development environment settings
+    import_limit = 2
     dhis2env = 'https://dev-de.datim.org/'
     dhis2uid = 'jpayne'
     dhis2pwd = 'Johnpayne1!'
@@ -505,6 +514,7 @@ else:
     oclapitoken = '2da0f46b7d29aa57970c0b3a535121e8e479f881'
     #oclapitoken = 'a61ba53ed7b8b26ece8fcfc53022b645de0ec055'
     #oclenv = 'https://ocl-stg.openmrs.org'
+    compare2previousexport = False
 
 # Create SIMS sync object and run
 sims_sync = DatimSimsSync(oclenv=oclenv, oclapitoken=oclapitoken,

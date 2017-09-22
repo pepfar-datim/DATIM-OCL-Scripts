@@ -104,7 +104,9 @@ class DatimShowSims(DatimBase):
                 if self.verbosity:
                     self.log('Processed OCL export saved to "%s"' % (export_def['intermediatejsonfilename']))
 
-        # STEP 3: Transform to requested format
+        # STEP 3: Transform to requested format and stream
+        if self.verbosity:
+            self.log('**** STEP 3: Transform to requested format and stream')
         if export_format == self.DATIM_FORMAT_HTML:
             self.transform_to_html(sims_intermediate)
         elif export_format == self.DATIM_FORMAT_JSON:
@@ -117,7 +119,7 @@ class DatimShowSims(DatimBase):
             pass
 
     def transform_to_html(self, sims):
-        sys.stdout.write('<h3>' + sims['title'] + '</h3>\n')
+        sys.stdout.write('<div><h3>' + sims['title'] + '</h3>\n')
         sys.stdout.write('<h4>' + sims['subtitle'] + '</h4>\n')
         sys.stdout.write('<table>\n<thead><tr>')
         for h in sims['headers']:
@@ -128,7 +130,7 @@ class DatimShowSims(DatimBase):
             for h in sims['headers']:
                 sys.stdout.write('<td>' + row[h['name']] + '</td>')
         sys.stdout.write('</tr>')
-        sys.stdout.write('\n</tbody></table>')
+        sys.stdout.write('\n</tbody></table></div>')
         sys.stdout.flush()
 
     def transform_to_json(self, sims):
@@ -177,11 +179,14 @@ class DatimShowSims(DatimBase):
 
 
 # Default Script Settings
-verbosity = 2  # 0=none, 1=some, 2=all
+verbosity = 0  # 0=none, 1=some, 2=all
 runoffline = False  # Set to true to use local copies of dhis2/ocl exports
 
 # Export Format - see constants in DatimShowSims class
 export_format = DatimShowSims.DATIM_FORMAT_JSON
+
+# Requested Collection
+collection = ''
 
 # OCL Settings
 oclenv = ''
@@ -192,6 +197,7 @@ oclenv = 'https://api.showcase.openconceptlab.org'
 oclapitoken = '2da0f46b7d29aa57970c0b3a535121e8e479f881'
 
 # Create SIMS Show object and run
+# TODO: Add parameter to specify which collection
 sims_show = DatimShowSims(oclenv=oclenv, oclapitoken=oclapitoken,
                           runoffline=runoffline, verbosity=verbosity)
 sims_show.get(export_format=export_format)

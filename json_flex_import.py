@@ -26,7 +26,7 @@ Deviations from OCL API responses:
 import json
 import requests
 import sys
-import datetime
+from datetime import datetime
 import urllib
 
 
@@ -169,25 +169,26 @@ class ocl_json_flex_import:
 
     def log(self, *args):
         ''' Output log information '''
-        sys.stdout.write('[' + str(datetime.datetime.now()) + '] ')
+        sys.stdout.write('[' + str(datetime.now()) + '] ')
         for arg in args:
             sys.stdout.write(str(arg))
             sys.stdout.write(' ')
         sys.stdout.write('\n')
         sys.stdout.flush()
 
+    def logSettings(self):
+        self.log("**** OCL IMPORT SCRIPT SETTINGS ****",
+                 "API Root URL:", self.api_url_root,
+                 ", API Token:", self.api_token,
+                 ", Import File:", self.file_path,
+                 ", Test Mode:", self.test_mode,
+                 ", Update Resource if Exists: ", self.do_update_if_exists,
+                 ", Verbosity:", self.verbosity)
 
     def process(self):
         ''' Processes an import file '''
         # Display global settings
-        if self.verbosity >= 1:
-            self.log("**** GLOBAL SETTINGS ****",
-                     "API Root URL:", self.api_url_root,
-                     ", API Token:", self.api_token,
-                     ", Import File:", self.file_path,
-                     ", Test Mode:", self.test_mode,
-                     ", Update Resource if Exists: ", self.do_update_if_exists,
-                     ", Verbosity:", self.verbosity)
+        if self.verbosity: self.logSettings()
 
         # Loop through each JSON object in the file
         obj_def_keys = self.obj_def.keys()
@@ -206,6 +207,8 @@ class ocl_json_flex_import:
                 else:
                     self.log("**** SKIPPING: No 'type' attribute: " + json_line_raw)
                 count += 1
+
+        return count
 
 
     def does_object_exist(self, obj_url, use_cache=True):
@@ -516,5 +519,3 @@ class ocl_json_flex_import:
         self.log(request_post.headers)
         self.log(request_post.text)
         request_post.raise_for_status()
-
-

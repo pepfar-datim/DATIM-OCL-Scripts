@@ -3,48 +3,48 @@ import os
 import itertools, functools, operator
 import requests
 import sys
-import json
 import tarfile
-from pprint import pprint
+from datetime import datetime
+import json
+import csv
+from xml.etree.ElementTree import Element, SubElement, tostring
 from deepdiff import DeepDiff
 from requests.auth import HTTPBasicAuth
 from json_flex_import import ocl_json_flex_import
 from shutil import copyfile
-from datetime import datetime
+
+from metadata.datimbase import DatimBase
 
 
-class DatimSimsSync:
-    ''' Class to manage DATIM SIMS Synchronization '''
+class DatimSyncSims(DatimBase):
+    """ Class to manage DATIM SIMS Synchronization """
 
     # URLs
     url_sims_filtered_endpoint = '/orgs/PEPFAR/collections/?q=SIMS&verbose=true'
 
     # Filenames
-    old_dhis2_export_filename = 'old_sims_export.json'
-    new_dhis2_export_filename = 'new_sims_export.json'
-    converted_dhis2_export_filename = 'converted_sims_export.json'
-    new_import_script_filename = 'sims_import_script.json'
-    sims_collections_filename = 'ocl_sims_collections.json'
+    old_dhis2_export_filename = 'old_dhis2_sims_export_raw.json'
+    new_dhis2_export_filename = 'new_dhis2_sims_export_raw.json'
+    converted_dhis2_export_filename = 'new_dhis2_sims_export_converted.json'
+    new_import_script_filename = 'sims_dhis2ocl_import_script.json'
+    sims_collections_filename = 'ocl_sims_collections_export.json'
 
     # OCL Export Definitions
-    ocl_export_defs = {
+    OCL_EXPORT_DEFS = {
         'sims_source': {
             'endpoint': '/orgs/PEPFAR/sources/SIMS/',
-            'tarfilename': 'sims_source_ocl_export.tar',
-            'jsonfilename': 'sims_source_ocl_export.json',
-            'jsoncleanfilename': 'sims_source_ocl_export_clean.json',
+            'tarfilename': 'ocl_sims_source_export.tar',
+            'jsonfilename': 'ocl_sims_source_export_raw.json',
+            'jsoncleanfilename': 'ocl_sims_source_export_clean.json',
         }
     }
 
-    sims_concept_fields_to_remove = ['version_created_by', 'created_on', 'updated_on',
+    SIMS_CONCEPT_FIELDS_TO_REMOVE = ['version_created_by', 'created_on', 'updated_on',
                                      'version_created_on', 'created_by', 'updated_by', 'display_name',
                                      'display_locale', 'uuid', 'version', 'owner_url', 'source_url',
                                      'mappings', 'url', 'version_url', 'is_latest_version', 'locale']
-    sims_mapping_fields_to_remove = []
-    sims_name_fields_to_remove = ['uuid', 'type']
-
-    __location__ = os.path.realpath(
-        os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    SIMS_MAPPING_FIELDS_TO_REMOVE = []
+    SIMS_NAME_FIELDS_TO_REMOVE = ['uuid', 'type']
 
     def __init__(self, oclenv='', oclapitoken='',
                  dhis2env='', dhis2uid='', dhis2pwd='',
@@ -66,49 +66,6 @@ class DatimSimsSync:
             'Authorization': 'Token ' + self.oclapitoken,
             'Content-Type': 'application/json'
         }
-
-    def log(self, *args):
-        ''' Output log information '''
-        sys.stdout.write('[' + str(datetime.now()) + '] ')
-        for arg in args:
-            sys.stdout.write(str(arg))
-            sys.stdout.write(' ')
-        sys.stdout.write('\n')
-        sys.stdout.flush()
-
-    def attachAbsolutePath(self, filename):
-        ''' Adds full absolute path to the filename '''
-        return os.path.join(self.__location__, filename)
-
-    def getRepositories(self, url='', key_field='id', require_external_id=True,
-                        active_attr_name='__datim_sync'):
-        '''
-        Gets repositories from OCL using the provided URL, optionally filtering
-        by external_id and a custom attribute indicating active status
-        '''
-        r = requests.get(url, headers=self.oclapiheaders)
-        r.raise_for_status()
-        repos = r.json()
-        filtered_repos = {}
-        for r in repos:
-            if (not require_external_id or ('external_id' in r and r['external_id'])) and (not active_attr_name or (r['extras'] and active_attr_name in r['extras'] and r['extras'][active_attr_name])):
-                filtered_repos[r[key_field]] = r
-        return filtered_repos
-
-    # Perform quick comparison of two files to determine if they have exactly the same size and contents
-    def filecmp(self, filename1, filename2):
-        ''' Do the two files have exactly the same size and contents? '''
-        try:
-            with open(filename1, "rb") as fp1, open(filename2, "rb") as fp2:
-                if os.fstat(fp1.fileno()).st_size != os.fstat(fp2.fileno()).st_size:
-                    return False # different sizes therefore not equal
-                fp1_reader = functools.partial(fp1.read, 4096)
-                fp2_reader = functools.partial(fp2.read, 4096)
-                cmp_pairs = itertools.izip(iter(fp1_reader, ''), iter(fp2_reader, ''))
-                inequalities = itertools.starmap(operator.ne, cmp_pairs)
-                return not any(inequalities)
-        except:
-            return False
 
     def saveDhis2SimsAssessmentTypesToFile(self, str_active_dataset_ids='', outputfile=''):
         url_dhis2_export = self.dhis2env + 'api/dataElements.json?fields=name,code,id,valueType,lastUpdated,dataElementGroups[id,name]&order=code:asc&paging=false&filter=dataElementGroups.id:in:[' + str_active_dataset_ids + ']'
@@ -179,56 +136,6 @@ class DatimSimsSync:
             self.log('DHIS2 export successfully transformed and saved to "%s": %s concepts + %s references = %s total' % (outputfile, num_concepts, num_references, num_concepts + num_references))
         return True
 
-    # endpoint must point to the repo endpoint only, e.g. '/orgs/myorg/sources/mysource/'
-    # Note that atleast version of the repo must be released and the export for that version already created
-    # Todo: Still needs to implement OCL authentication
-    def getOclLatestExport(self, endpoint='', tarfilename='', jsonfilename=''):
-        '''
-        Fetches the latest released export of the specified repository and saves to file
-        :param endpoint: endpoint must point to the repo endpoint only, e.g. '/orgs/myorg/sources/mysource/'
-        :param tarfilename: Filename to save the compressed OCL export to
-        :param jsonfilename: Filename to save the decompressed OCL-JSON export to
-        :return: bool True upon success; False otherwise
-        '''
-
-        # Get the latest version of the repo
-        # TODO: error handling for case when no repo version is returned
-        url_latest_version = self.oclenv + endpoint + 'latest/'
-        if self.verbosity:
-            self.log('Latest version request URL:', url_latest_version)
-        r = requests.get(url_latest_version)
-        r.raise_for_status()
-        latest_version_attr = r.json()
-        if self.verbosity:
-            self.log('Latest version ID:', latest_version_attr['id'])
-
-        # Get the export
-        url_ocl_export = self.oclenv + endpoint + latest_version_attr['id'] + '/export/'
-        if self.verbosity:
-            self.log('Export URL:', url_ocl_export)
-        r = requests.get(url_ocl_export)
-        r.raise_for_status()
-        if r.status_code == 204:
-            self.log('ERROR: Export does not exist for "%s"' % url_ocl_export)
-            sys.exit(1)
-
-        # Write tar'd export to file
-        with open(self.attachAbsolutePath(tarfilename), 'wb') as handle:
-            for block in r.iter_content(1024):
-                handle.write(block)
-        if self.verbosity:
-            self.log('%s bytes saved to "%s"' % (r.headers['Content-Length'], tarfilename))
-
-        # Decompress the tar and rename
-        tar = tarfile.open(self.attachAbsolutePath(tarfilename))
-        tar.extractall(self.__location__)
-        tar.close()
-        os.rename(self.attachAbsolutePath('export.json'), self.attachAbsolutePath(jsonfilename))
-        if self.verbosity:
-            self.log('Export decompressed to "%s"' % (jsonfilename))
-
-        return True
-
     def logSettings(self):
         """ Write settings to console """
         self.log(
@@ -257,7 +164,7 @@ class DatimSimsSync:
             url_sims_collections = self.oclenv + self.url_sims_filtered_endpoint
             if self.verbosity:
                 self.log('Request URL:', url_sims_collections)
-            sims_collections = self.getRepositories(url=url_sims_collections, key_field='external_id')
+            sims_collections = self.getOclRepositories(url=url_sims_collections, key_field='external_id')
             with open(self.attachAbsolutePath(self.sims_collections_filename), 'wb') as ofile:
                 ofile.write(json.dumps(sims_collections))
             if self.verbosity:
@@ -327,14 +234,16 @@ class DatimSimsSync:
         # STEP 6: Fetch latest versions of relevant OCL exports
         if self.verbosity:
             self.log('**** STEP 6 of 13: Fetch latest versions of relevant OCL exports')
-        for ocl_export_def_key in self.ocl_export_defs:
+        for ocl_export_def_key in self.OCL_EXPORT_DEFS:
             if self.verbosity:
                 self.log('%s:' % (ocl_export_def_key))
-            export_def = self.ocl_export_defs[ocl_export_def_key]
+            export_def = self.OCL_EXPORT_DEFS[ocl_export_def_key]
             if not self.runoffline:
-                self.getOclLatestExport(endpoint=export_def['endpoint'],
-                                        tarfilename=export_def['tarfilename'],
-                                        jsonfilename=export_def['jsonfilename'])
+                self.getOclRepositoryVersionExport(
+                    endpoint=export_def['endpoint'],
+                    version='latest',
+                    tarfilename=export_def['tarfilename'],
+                    jsonfilename=export_def['jsonfilename'])
             else:
                 if self.verbosity:
                     self.log('OFFLINE: Using local file "%s"...' % (export_def['jsonfilename']))
@@ -350,10 +259,10 @@ class DatimSimsSync:
         # Concepts/mappings in OCL exports have extra attributes that should be removed before the diff
         if self.verbosity:
             self.log('**** STEP 7 of 13: Prepare OCL exports for diff')
-        for ocl_export_def_key in self.ocl_export_defs:
+        for ocl_export_def_key in self.OCL_EXPORT_DEFS:
             if self.verbosity:
                 self.log('%s:' % (ocl_export_def_key))
-            export_def = self.ocl_export_defs[ocl_export_def_key]
+            export_def = self.OCL_EXPORT_DEFS[ocl_export_def_key]
             with open(self.attachAbsolutePath(export_def['jsonfilename']), 'rb') as ifile, open(
                     self.attachAbsolutePath(export_def['jsoncleanfilename']), 'wb') as ofile:
                 ocl_sims_export = json.load(ifile)
@@ -363,12 +272,12 @@ class DatimSimsSync:
                 for c in ocl_sims_export['concepts']:
                     url = c['url']
                     # Remove core fields
-                    for f in self.sims_concept_fields_to_remove:
+                    for f in self.SIMS_CONCEPT_FIELDS_TO_REMOVE:
                         if f in c: del c[f]
                     # Remove name fields
                     if 'names' in c:
                         for i, name in enumerate(c['names']):
-                            for f in self.sims_name_fields_to_remove:
+                            for f in self.SIMS_NAME_FIELDS_TO_REMOVE:
                                 if f in name: del name[f]
                     ocl_sims_export_clean[url] = c
 
@@ -376,7 +285,7 @@ class DatimSimsSync:
                 for m in ocl_sims_export['mappings']:
                     url = m['url']
                     core_fields_to_remove = []
-                    for f in self.sims_mapping_fields_to_remove:
+                    for f in self.SIMS_MAPPING_FIELDS_TO_REMOVE:
                         if f in m: del m[f]
                     ocl_sims_export_clean[url] = m
                 ofile.write(json.dumps(ocl_sims_export_clean))
@@ -388,7 +297,7 @@ class DatimSimsSync:
         if self.verbosity:
             self.log('**** STEP 8 of 13: Perform deep diff')
         diff = None
-        with open(self.attachAbsolutePath(self.ocl_export_defs['sims_source']['jsoncleanfilename']), 'rb') as ocl_handle,\
+        with open(self.attachAbsolutePath(self.OCL_EXPORT_DEFS['sims_source']['jsoncleanfilename']), 'rb') as ocl_handle,\
                 open(self.attachAbsolutePath(self.converted_dhis2_export_filename), 'rb') as dhis2_handle:
             a_ocl = json.load(ocl_handle)
             b_dhis2 = json.load(dhis2_handle)
@@ -480,11 +389,11 @@ class DatimSimsSync:
 
 
 # Default Script Settings
-verbosity = 2                   # 0=none, 1=some, 2=all
-import_limit = 0                # Number of resources to import; 0=all
-import_test_mode = False        # Set to True to see which import API requests would be performed on OCL
-runoffline = False              # Set to true to use local copies of dhis2/ocl exports
-compare2previousexport = True   # Set to False to ignore the previous export
+verbosity = 2  # 0=none, 1=some, 2=all
+import_limit = 0  # Number of resources to import; 0=all
+import_test_mode = False  # Set to True to see which import API requests would be performed on OCL
+runoffline = False  # Set to true to use local copies of dhis2/ocl exports
+compare2previousexport = True  # Set to False to ignore the previous export
 
 # DATIM DHIS2 Settings
 dhis2env = ''
@@ -506,7 +415,10 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
 else:
     # Local development environment settings
-    import_limit = 2
+    import_limit = 10
+    import_test_mode = True
+    compare2previousexport = False
+    runoffline = False
     dhis2env = 'https://dev-de.datim.org/'
     dhis2uid = 'jpayne'
     dhis2pwd = 'Johnpayne1!'
@@ -514,12 +426,12 @@ else:
     oclapitoken = '2da0f46b7d29aa57970c0b3a535121e8e479f881'
     #oclapitoken = 'a61ba53ed7b8b26ece8fcfc53022b645de0ec055'
     #oclenv = 'https://ocl-stg.openmrs.org'
-    compare2previousexport = False
 
 # Create SIMS sync object and run
-sims_sync = DatimSimsSync(oclenv=oclenv, oclapitoken=oclapitoken,
+sims_sync = DatimSyncSims(oclenv=oclenv, oclapitoken=oclapitoken,
                           dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
                           compare2previousexport=compare2previousexport,
                           runoffline=runoffline, verbosity=verbosity,
-                          import_test_mode=import_test_mode, import_limit=import_limit)
+                          import_test_mode=import_test_mode,
+                          import_limit=import_limit)
 sims_sync.run()

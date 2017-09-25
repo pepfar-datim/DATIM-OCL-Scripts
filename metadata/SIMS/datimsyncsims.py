@@ -1,20 +1,14 @@
 from __future__ import with_statement
 import os
-import itertools, functools, operator
 import requests
 import sys
-import tarfile
 from datetime import datetime
 import json
-import csv
-from xml.etree.ElementTree import Element, SubElement, tostring
 from deepdiff import DeepDiff
 from requests.auth import HTTPBasicAuth
 from json_flex_import import ocl_json_flex_import
 from shutil import copyfile
-
 from metadata.datimbase import DatimBase
-
 
 class DatimSyncSims(DatimBase):
     """ Class to manage DATIM SIMS Synchronization """
@@ -36,7 +30,50 @@ class DatimSyncSims(DatimBase):
             'tarfilename': 'ocl_sims_source_export.tar',
             'jsonfilename': 'ocl_sims_source_export_raw.json',
             'jsoncleanfilename': 'ocl_sims_source_export_clean.json',
-        }
+            'cleaningmethod': 'cleanOclExportSimsSource'
+        },
+        'sims2_above_site': {
+            'endpoint': '/orgs/PEPFAR/collections/SIMS2-Above-Site/',
+            'tarfilename': 'ocl_pepfar_sims2_above_site_export.tar',
+            'jsonfilename': 'ocl_pepfar_sims2_above_site_export_raw.json',
+            'jsoncleanfilename': 'ocl_pepfar_sims2_above_site_export_clean.json',
+            'cleaningmethod': 'cleanOclExportSimsCollection'
+        },
+        'sims2_community': {
+            'endpoint': '/orgs/PEPFAR/collections/SIMS2-Community/',
+            'tarfilename': 'ocl_pepfar_sims2_community_export.tar',
+            'jsonfilename': 'ocl_pepfar_sims2_community_export_raw.json',
+            'jsoncleanfilename': 'ocl_pepfar_sims2_community_export_clean.json',
+            'cleaningmethod': 'cleanOclExportSimsCollection'
+        },
+        'sims2_facility': {
+            'endpoint': '/orgs/PEPFAR/collections/SIMS2-Facility/',
+            'tarfilename': 'ocl_pepfar_sims2_facility_export.tar',
+            'jsonfilename': 'ocl_pepfar_sims2_facility_export_raw.json',
+            'jsoncleanfilename': 'ocl_pepfar_sims2_facility_export_clean.json',
+            'cleaningmethod': 'cleanOclExportSimsCollection'
+        },
+        'sims3_above_site': {
+            'endpoint': '/orgs/PEPFAR/collections/SIMS3-Above-Site/',
+            'tarfilename': 'ocl_pepfar_sims3_above_site_export.tar',
+            'jsonfilename': 'ocl_pepfar_sims3_above_site_export_raw.json',
+            'jsoncleanfilename': 'ocl_pepfar_sims3_above_site_export_clean.json',
+            'cleaningmethod': 'cleanOclExportSimsCollection'
+        },
+        'sims3_community': {
+            'endpoint': '/orgs/PEPFAR/collections/SIMS3-Community/',
+            'tarfilename': 'ocl_pepfar_sims3_community_export.tar',
+            'jsonfilename': 'ocl_pepfar_sims3_community_export_raw.json',
+            'jsoncleanfilename': 'ocl_pepfar_sims3_community_export_clean.json',
+            'cleaningmethod': 'cleanOclExportSimsCollection'
+        },
+        'sims3_facility': {
+            'endpoint': '/orgs/PEPFAR/collections/SIMS3-Facility/',
+            'tarfilename': 'ocl_pepfar_sims3_facility_export.tar',
+            'jsonfilename': 'ocl_pepfar_sims3_facility_export_raw.json',
+            'jsoncleanfilename': 'ocl_pepfar_sims3_facility_export_clean.json',
+            'cleaningmethod': 'cleanOclExportSimsCollection'
+        },
     }
 
     SIMS_CONCEPT_FIELDS_TO_REMOVE = ['version_created_by', 'created_on', 'updated_on',
@@ -186,6 +223,7 @@ class DatimSyncSims(DatimBase):
             self.log('SIMS Assessment Type Dataset IDs:', str_active_dataset_ids)
 
         # STEP 3: Fetch new export from DATIM DHIS2
+        # Note that this currently only supports a single DHIS2 export
         if verbosity:
             self.log('**** STEP 3 of 13: Fetch new export from DATIM DHIS2')
         if not runoffline:
@@ -386,6 +424,12 @@ class DatimSyncSims(DatimBase):
         else:
             if self.verbosity:
                 self.log('Skipping because no records imported...')
+
+    def cleanOclExportSimsSource(self):
+        pass
+
+    def cleanOclExportSimsCollection(self):
+        pass
 
 
 # Default Script Settings

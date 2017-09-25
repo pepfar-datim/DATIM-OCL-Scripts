@@ -1,18 +1,9 @@
 from __future__ import with_statement
 import os
-import itertools, functools, operator
-import requests
 import sys
-import tarfile
-from datetime import datetime
 import json
 import csv
 from xml.etree.ElementTree import Element, SubElement, tostring
-from deepdiff import DeepDiff
-from requests.auth import HTTPBasicAuth
-from json_flex_import import ocl_json_flex_import
-from shutil import copyfile
-
 from metadata.datimbase import DatimBase
 
 class DatimShowSims(DatimBase):

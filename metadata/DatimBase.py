@@ -35,10 +35,10 @@ class DatimBase:
 
     def getOclRepositories(self, url='', key_field='id', require_external_id=True,
                         active_attr_name='__datim_sync'):
-        '''
+        """
         Gets repositories from OCL using the provided URL, optionally filtering
         by external_id and a custom attribute indicating active status
-        '''
+        """
         r = requests.get(url, headers=self.oclapiheaders)
         r.raise_for_status()
         repos = r.json()
@@ -48,9 +48,72 @@ class DatimBase:
                 filtered_repos[r[key_field]] = r
         return filtered_repos
 
-    # Perform quick comparison of two files to determine if they have exactly the same size and contents
+    def transform_dhis2_exports(self, conversion_attr=None):
+        """
+        Transforms DHIS2 exports into the diff format
+        :param conversion_attr: Optional conversion attributes that are made available to each conversion method
+        :return: None
+        """
+        for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
+            if self.verbosity: self.log('%s:' % (dhis2_query_key))
+            getattr(self, dhis2_query_def['conversion_method'])(dhis2_query_def, conversion_attr=conversion_attr)
+        with open(self.attachAbsolutePath(self.dhis2_converted_export_filename), 'wb') as output_file:
+            output_file.write(json.dumps(self.dhis2_diff))
+            if self.verbosity:
+                self.log('Transformed DHIS2 exports successfully written to "%s"' % (
+                    self.dhis2_converted_export_filename))
+
+    def prepare_ocl_exports(self, cleaning_attr=None):
+        """
+        Convert OCL exports into the diff format
+        :param cleaning_attr: Optional cleaning attributes that are made available to each cleaning method
+        :return: None
+        """
+        for ocl_export_def_key, export_def in self.OCL_EXPORT_DEFS.iteritems():
+            if self.verbosity: self.log('%s:' % (ocl_export_def_key))
+            getattr(self, export_def['cleaning_method'])(export_def, cleaning_attr=cleaning_attr)
+        with open(self.attachAbsolutePath(export_def['jsoncleanfilename']), 'wb') as output_file:
+            output_file.write(json.dumps(self.ocl_diff))
+            if self.verbosity:
+                self.log('Cleaned OCL exports successfully written to "%s"' % (
+                    self.ocl_cleaned_export_filename))
+
+        '''
+        with open(self.attachAbsolutePath(export_def['jsonfilename']), 'rb') as ifile, open(
+                self.attachAbsolutePath(export_def['jsoncleanfilename']), 'wb') as ofile:
+            ocl_export_raw = json.load(ifile)
+            ocl_export_clean = getattr(self, export_def['cleaning_method'])(ocl_export_raw)
+            ofile.write(json.dumps(ocl_export_clean))
+            if self.verbosity:
+                self.log('Cleaned OCL export and saved to "%s"' % (export_def['jsoncleanfilename']))
+        '''
+
+    def saveDhis2QueryToFile(self, query='', query_attr=None, outputfilename=''):
+        """ Execute DHIS2 query and save to file """
+
+        # Replace query attribute names with values and build the query URL
+        if query_attr:
+            for attr_name in query_attr:
+                query = query.replace('{{'+attr_name+'}}', query_attr[attr_name])
+        url_dhis2_query = self.dhis2env + query
+
+        # Execute the query
+        if self.verbosity:
+            self.log('Request URL:', url_dhis2_query)
+        r = requests.get(url_dhis2_query, auth=HTTPBasicAuth(self.dhis2uid, self.dhis2pwd))
+        r.raise_for_status()
+        with open(self.attachAbsolutePath(outputfilename), 'wb') as handle:
+            for block in r.iter_content(1024):
+                handle.write(block)
+        return r.headers['Content-Length']
+
     def filecmp(self, filename1, filename2):
-        ''' Do the two files have exactly the same size and contents? '''
+        """
+        Do the two files have exactly the same size and contents?
+        :param filename1:
+        :param filename2:
+        :return: Boolean
+        """
         try:
             with open(filename1, "rb") as fp1, open(filename2, "rb") as fp2:
                 if os.fstat(fp1.fileno()).st_size != os.fstat(fp2.fileno()).st_size:
@@ -64,7 +127,7 @@ class DatimBase:
             return False
 
     def getOclRepositoryVersionExport(self, endpoint='', version='', tarfilename='', jsonfilename=''):
-        '''
+        """
         Fetches an export of the specified repository version and saves to file.
         Use version="latest" to fetch the most recent released repo version.
         Note that the export must already exist before using this method.
@@ -73,8 +136,7 @@ class DatimBase:
         :param tarfilename: Filename to save the compressed OCL export to
         :param jsonfilename: Filename to save the decompressed OCL-JSON export to
         :return: bool True upon success; False otherwise
-        '''
-
+        """
         # Get the latest version of the repo
         # TODO: error handling for case when no repo version is returned
         if version == 'latest':

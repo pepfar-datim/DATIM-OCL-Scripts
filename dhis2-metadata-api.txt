@@ -66,17 +66,12 @@ https://dev-de.datim.org/api/categoryOptionCombos.xml?fields=id,code,name,lastUp
 https://dev-de.datim.org/api/dataElements/?fields=name,code,id,valueType,lastUpdated,dataElementGroups[id,name]&filter=dataElementGroups.id:in:[FZxMe3kfzYo,uMvWjOo31wt,wL1TY929jCS]&order=code:asc&paging=false
 
 # Data Elements for SIMS 2.0 assessment types
-https://dev-de.datim.org/api/dataElements/?fields=name,code,id,valueType,lastUpdated,dataElementGroups[id,name]&filter=dataElementGroups.id:in:[Run7vUuLlxd,xGbB5HNDnC0,xDFgyFbegjl]&order=code:asc&paging=false
+https://dev-de.datim.org/api/dataElements.xml?fields=name,code,id,valueType,lastUpdated,dataElementGroups[id,name]&order=code:asc&paging=false&filter=dataElementGroups.id:in:[Run7vUuLlxd,xGbB5HNDnC0,xDFgyFbegjl]
 
 # SIMS v2 Option Sets
 https://dev-de.datim.org/api/optionSets/?fields=id,name,lastUpdated,options[id,name]&filter=name:like:SIMS%20v2&paging=false&order=name:asc
 
 
 
-https://dev-de.datim.org/api/categoryOptionCombos.xml?fields=id,code,name,lastUpdated,categoryOptions[id,endDate,startDate,lastUpdated,categoryOptionGroups[id,name,code,categoryOptionGroupSet[id,name]],organisationUnits[code,name]]&order=code:asc&filter=categoryCombo.id:eq:wUpfppgjEza&paging=false 
 
-https://dev-de.datim.org/api/categoryOptions.xml?fields=id,name,code,lastUpdated,categoryOptionCombos[*,categoryOptions[*]]
-
-https://dev-de.datim.org/api/categoryOptions.xml?fields=id,code,name,lastUpdated,categoryOptions[id,endDate,startDate,lastUpdated,categoryOptionGroups[id,name,code,categoryOptionGroupSet[id,name]],organisationUnits[code,name]]&order=code:asc&filter=categoryCombo.id:eq:wUpfppgjEza&paging=false 
-
-
+https://dev-de.datim.org/api/dataElements.xml?fields=id,code,name,shortName,lastUpdated,description,dataSets[id,name,shortName,lastUpdated],categoryCombo[id,code,name,lastUpdated,created,categoryOptionCombos[id,code,name,lastUpdated,created]]&paging=false&filter=dataSets.id:in:[kkXf2zXqTM0,MqNLEXmzIzr,K7FMzevlBAp,UZ2PLqSe5Ri,CGoi5wjLHDy,LWE9GdlygD5,tG2hjDIaYQD,Kxfk0KVsxDn,hgOW2BSUDaN,Awq346fnVLV,CS958XpDaUf,ovmC3HNi4LN,CGoi5wjLHDy,zTgQ3MvHYtk,KwkuZhKulqs,eAlxMKMZ9GV,PkmLpkrPdQG,zeUCqFKIBDD,AitXBHsC7RA,BuRoS9i851o,jEzgpBt5Icf,ePndtmDbOJj,AvmGbcurn4K,O8hSwgCbepv,bqiB5G6qgzn,YWZrOj5KS1c,c7Gwzm5w9DE,pTuDWXzkAkJ,OFP2PhPl8FI,O8hSwgCbepv,qRvKHvlzNdv,tCIW2VFd8uu,JXKUYJqmyDd,lbwuIo56YoG,AyFVOGbAvcH,oYO9GvA05LE,xxo1G5V1JG2,Dd5c9117ukD,rDAUgkkexU1,xJ06pxmxfU6,IOarm0ctDVL,LBSk271pP7J,VjGqATduoEX,PHyD22loBQH,TgcTZETxKlb,GEhzw3dEw05,rK7VicBNzze,ZaV4VSLstg7,sCar694kKxH,vvHCWnhULAf,j9bKklpTDBZ,gZ1FgiGUlSj,xBRAscSmemV,VWdBdkfYntI,vZaDfrR6nmF,PkmLpkrPdQG,zeUCqFKIBDD,i29foJcLY9Y,STL4izfLznL,j1i6JjOpxEq,asHh1YkxBU5,hIm0HGCKiPv,NJlAVhe4zjv,ovYEbELCknv,f6NLvRGixJV,lD9O8vQgH8R

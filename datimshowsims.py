@@ -3,8 +3,11 @@ import os
 import sys
 import json
 import csv
-from xml.etree.ElementTree import Element, SubElement, tostring
-from metadata.datimbase import DatimBase
+from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import SubElement
+from xml.etree.ElementTree import tostring
+from datimbase import DatimBase
+
 
 class DatimShowSims(DatimBase):
     """ Class to manage DATIM SIMS Presentation """
@@ -37,10 +40,10 @@ class DatimShowSims(DatimBase):
             self.log('**** STEP 1: Fetch latest versions of relevant OCL exports')
         for ocl_export_def_key in self.OCL_EXPORT_DEFS:
             if self.verbosity:
-                self.log('%s:' % (ocl_export_def_key))
+                self.log('%s:' % ocl_export_def_key)
             export_def = self.OCL_EXPORT_DEFS[ocl_export_def_key]
             if not self.runoffline:
-                self.getOclRepositoryVersionExport(
+                self.get_ocl_export(
                     endpoint=export_def['endpoint'],
                     version='latest',
                     tarfilename=export_def['tarfilename'],
@@ -48,10 +51,10 @@ class DatimShowSims(DatimBase):
             else:
                 if self.verbosity:
                     self.log('OFFLINE: Using local file "%s"...' % (export_def['jsonfilename']))
-                if os.path.isfile(self.attachAbsolutePath(export_def['jsonfilename'])):
+                if os.path.isfile(self.attach_absolute_path(export_def['jsonfilename'])):
                     if self.verbosity:
                         self.log('OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
-                            export_def['jsonfilename'], os.path.getsize(self.attachAbsolutePath(export_def['jsonfilename']))))
+                            export_def['jsonfilename'], os.path.getsize(self.attach_absolute_path(export_def['jsonfilename']))))
                 else:
                     self.log('Could not find offline file "%s". Exiting...' % (export_def['jsonfilename']))
                     sys.exit(1)
@@ -59,23 +62,25 @@ class DatimShowSims(DatimBase):
         # STEP 2: Transform OCL export to intermediary state
         if self.verbosity:
             self.log('**** STEP 2: Transform to intermediary state')
+        sims_intermediate = {}
         for ocl_export_def_key in self.OCL_EXPORT_DEFS:
             if self.verbosity:
-                self.log('%s:' % (ocl_export_def_key))
+                self.log('%s:' % ocl_export_def_key)
             export_def = self.OCL_EXPORT_DEFS[ocl_export_def_key]
-            with open(self.attachAbsolutePath(export_def['jsonfilename']), 'rb') as ifile, open(
-                    self.attachAbsolutePath(export_def['intermediatejsonfilename']), 'wb') as ofile:
+            with open(self.attach_absolute_path(export_def['jsonfilename']), 'rb') as ifile, open(
+                    self.attach_absolute_path(export_def['intermediatejsonfilename']), 'wb') as ofile:
                 ocl_sims_export = json.load(ifile)
                 sims_intermediate = {
                     'title': 'SIMS v3: Facility Based Data Elements',
-                    'subtitle': 'This view shows the name and code for data elements belonging to the SIMS v3 Data Element Group (UID = FZxMe3kfzYo)',
+                    'subtitle': 'This view shows the name and code for data elements belonging to the SIMS v3 '
+                                'Data Element Group (UID = FZxMe3kfzYo)',
                     'width': 4,
                     'height': 0,
                     'headers': [
                         {"name": "name", "column": "name", "type": "java.lang.String", "hidden": False, "meta": False},
                         {"name": "code", "column": "code", "type": "java.lang.String", "hidden": False, "meta": False},
                         {"name": "uid", "column": "uid", "type": "java.lang.String", "hidden": False, "meta": False},
-                        {"name": "valuetype","column": "valuetype", "type": "java.lang.String", "hidden": False, "meta": False}
+                        {"name": "valuetype", "column": "valuetype", "type": "java.lang.String", "hidden": False, "meta": False}
                     ],
                     'rows': []
                 }
@@ -128,9 +133,9 @@ class DatimShowSims(DatimBase):
         sys.stdout.write(json.dumps(sims, indent=4))
         sys.stdout.flush()
 
-    def xml_dict_clean(self, dict):
+    def xml_dict_clean(self, intermediate_data):
         new_dict = {}
-        for k, v in dict.iteritems():
+        for k, v in intermediate_data.iteritems():
             if isinstance(v, bool):
                 if v:
                     v = "true"
@@ -180,8 +185,8 @@ export_format = DatimShowSims.DATIM_FORMAT_JSON
 collection = ''
 
 # OCL Settings
-oclenv = ''
-oclapitoken = ''
+#oclenv = ''
+#oclapitoken = ''
 
 # Local configuration
 oclenv = 'https://api.showcase.openconceptlab.org'

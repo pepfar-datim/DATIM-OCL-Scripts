@@ -31,14 +31,11 @@ Import batches should be structured as follows:
 """
 from __future__ import with_statement
 import os
-import requests
 import sys
-from datetime import datetime
 import json
-from deepdiff import DeepDiff
-from json_flex_import import ocl_json_flex_import
-from shutil import copyfile
-from metadata.datimbase import DatimBase
+from oclfleximporter import OclFlexImporter
+from datimbase import DatimBase
+
 
 class DatimSyncSims(DatimBase):
     """ Class to manage DATIM SIMS Synchronization """
@@ -47,29 +44,25 @@ class DatimSyncSims(DatimBase):
     url_sims_filtered_endpoint = '/orgs/PEPFAR/collections/?q=SIMS&verbose=true'
 
     # Filenames
-    new_import_script_filename = 'sims_dhis2ocl_import_script.json'
     sims_collections_filename = 'ocl_sims_collections_export.json'
+    new_import_script_filename = 'sims_dhis2ocl_import_script.json'
     dhis2_converted_export_filename = 'dhis2_sims_converted_export.json'
     ocl_cleaned_export_filename = 'ocl_sims_cleaned_export.json'
 
     # Import batches
-    IMPORT_BATCH_SIMS = 'sims'
-
-    # Resource type constants
-    RESOURCE_TYPE_CONCEPT = 'concept'
-    RESOURCE_TYPE_MAPPING = 'mapping'
-    RESOURCE_TYPE_CONCEPT_REF = 'concept_ref'
-    RESOURCE_TYPE_MAPPING_REF = 'mapping_ref'
+    IMPORT_BATCH_SIMS = 'SIMS'
+    IMPORT_BATCHES = [IMPORT_BATCH_SIMS]
 
     # DATIM DHIS2 Query Definitions
     DHIS2_QUERIES = {
         'SimsAssessmentTypes': {
             'name': 'DATIM-DHIS2 SIMS Assessment Types',
-            'query': 'api/dataElements.json?fields=name,code,id,valueType,lastUpdated,dataElementGroups[id,name]&order=code:asc&paging=false&filter=dataElementGroups.id:in:[{{active_dataset_ids}}]',
+            'query': 'api/dataElements.json?fields=name,code,id,valueType,lastUpdated,dataElementGroups[id,name]&'
+                     'order=code:asc&paging=false&filter=dataElementGroups.id:in:[{{active_dataset_ids}}]',
             'new_export_filename': 'new_dhis2_sims_export_raw.json',
             'old_export_filename': 'old_dhis2_sims_export_raw.json',
             'converted_export_filename': 'new_dhis2_sims_export_converted.json',
-            'conversion_method': 'dhis2diff_simsAssessmentTypes'
+            'conversion_method': 'dhis2diff_sims_assessment_types'
         }
     }
     DHIS2_QUERIES_INACTIVE = {
@@ -79,7 +72,7 @@ class DatimSyncSims(DatimBase):
             'new_export_filename': 'new_dhis2_sims_options_export_raw.json',
             'old_export_filename': 'old_dhis2_sims_options_export_raw.json',
             'converted_export_filename': 'new_dhis2_sims_options_export_converted.json',
-            'conversion_method': 'dhis2diff_simsOptions'
+            'conversion_method': 'dhis2diff_sims_options'
         }
     }
 
@@ -159,23 +152,30 @@ class DatimSyncSims(DatimBase):
         self.compare2previousexport = compare2previousexport
         self.import_test_mode = import_test_mode
         self.import_limit = import_limit
-
+        self.dhis2_diff = {}
+        self.ocl_diff = {}
         self.oclapiheaders = {
             'Authorization': 'Token ' + self.oclapitoken,
             'Content-Type': 'application/json'
         }
 
-    def dhis2diff_simsOptions(self, dhis2_query_def=None, conversion_attr=None):
+    def dhis2diff_sims_options(self, dhis2_query_def=None, conversion_attr=None):
+        """
+        Convert new DHIS2 SIMS Options export to the diff format
+        :param dhis2_query_def:
+        :param conversion_attr:
+        :return:
+        """
         pass
 
-    def dhis2diff_simsAssessmentTypes(self, dhis2_query_def=None, conversion_attr=None):
+    def dhis2diff_sims_assessment_types(self, dhis2_query_def=None, conversion_attr=None):
         """
-        Convert new DHIS2 export to the diff format
+        Convert new DHIS2 SIMS Assessment Types export to the diff format
         :param dhis2_query_def: DHIS2 query definition
         :param conversion_attr: Optional dictionary of attributes to pass to the conversion method
         :return: Boolean
         """
-        with open(self.attachAbsolutePath(dhis2_query_def['new_export_filename']), "rb") as ifile:
+        with open(self.attach_absolute_path(dhis2_query_def['new_export_filename']), "rb") as ifile:
             new_sims = json.load(ifile)
             sims_collections = conversion_attr['sims_collections']
             num_concepts = 0
@@ -186,26 +186,26 @@ class DatimSyncSims(DatimBase):
                 concept_id = de['code']
                 concept_key = '/orgs/PEPFAR/sources/SIMS/concepts/' + concept_id + '/'
                 c = {
-                    'type':'Concept',
-                    'id':concept_id,
-                    'concept_class':'Assessment Type',
-                    'datatype':'None',
-                    'owner':'PEPFAR',
-                    'owner_type':'Organization',
-                    'source':'SIMS',
-                    'retired':False,
-                    'descriptions':None,
-                    'external_id':de['id'],
-                    'names':[
+                    'type': 'Concept',
+                    'id': concept_id,
+                    'concept_class': 'Assessment Type',
+                    'datatype': 'None',
+                    'owner': 'PEPFAR',
+                    'owner_type': 'Organization',
+                    'source': 'SIMS',
+                    'retired': False,
+                    'descriptions': None,
+                    'external_id': de['id'],
+                    'names': [
                         {
-                            'name':de['name'],
-                            'name_type':'Fully Specified',
-                            'locale':'en',
-                            'locale_preferred':False,
-                            'external_id':None,
+                            'name': de['name'],
+                            'name_type': 'Fully Specified',
+                            'locale': 'en',
+                            'locale_preferred': False,
+                            'external_id': None,
                         }
                     ],
-                    'extras':{'Value Type':de['valueType']}
+                    'extras': {'Value Type': de['valueType']}
                 }
                 self.dhis2_diff[self.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT][concept_key] = c
                 num_concepts += 1
@@ -214,7 +214,8 @@ class DatimSyncSims(DatimBase):
                 for deg in de['dataElementGroups']:
                     collection_id = sims_collections[deg['id']]['id']
                     concept_url = '/orgs/PEPFAR/sources/SIMS/concepts/' + concept_id + '/'
-                    concept_ref_key = '/orgs/PEPFAR/collections/' + collection_id + '/references/?concept=' + concept_url
+                    concept_ref_key = ('/orgs/PEPFAR/collections/' + collection_id +
+                                       '/references/?concept=' + concept_url)
                     r = {
                         'type': 'Reference',
                         'owner': 'PEPFAR',
@@ -225,80 +226,11 @@ class DatimSyncSims(DatimBase):
                     self.dhis2_diff[self.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT_REF][concept_ref_key] = r
                     num_references += 1
 
-        if self.verbosity:
-            self.log('DHIS2 export "%s" successfully transformed to %s concepts + %s references (%s total)' % (
-                dhis2_query_def['new_export_filename'], num_concepts, num_references, num_concepts + num_references))
-        return True
-
-    def dhis2oj_sims(self, inputfile='', outputfile='', sims_collections=None):
-        ''' Transform each DataElement to an OCL concept and each DataElementGroup to an OCL reference '''
-        with open(self.attachAbsolutePath(inputfile), "rb") as ifile,\
-                open(self.attachAbsolutePath(outputfile), 'wb') as ofile:
-            new_sims = json.load(ifile)
-            num_concepts = 0
-            num_references = 0
-
-            # Initialize output dictionary formatted like this:
-            # { 1_ordered_import_batch: {
-            #     'concepts': { concept_relative_url: { resource_field_1: value, ... },
-            #     'mappings': { mapping_unique_url: { resource_field_1: value, ... },
-            #     'references': { reference_unique_url: {resource_field_1: value, ...}
-            #   },
-            #   2_ordered_import_batch: { ... } }
-            # Batches are imported in alphabetical order.
-            # Within a batch, resources are imported in this order: concepts, mappings, references.
-            output = {
-                'sims': { 'concepts': {}, 'references': {} }
-            }
-
-            # Iterate through each DataElement and transform to an OCL-JSON concept
-            for de in new_sims['dataElements']:
-                concept_id = de['code']
-                url = '/orgs/PEPFAR/sources/SIMS/concepts/' + concept_id + '/'
-                c = {
-                    'type':'Concept',
-                    'id':concept_id,
-                    'concept_class':'Assessment Type',
-                    'datatype':'None',
-                    'owner':'PEPFAR',
-                    'owner_type':'Organization',
-                    'source':'SIMS',
-                    'retired':False,
-                    'descriptions':None,
-                    'external_id':de['id'],
-                    'names':[
-                        {
-                            'name':de['name'],
-                            'name_type':'Fully Specified',
-                            'locale':'en',
-                            'locale_preferred':False,
-                            'external_id':None,
-                        }
-                    ],
-                    'extras':{'Value Type':de['valueType']}
-                }
-                output['sims']['concepts'][url] = c
-                num_concepts += 1
-
-                # Iterate through each DataElementGroup and transform to an OCL-JSON reference
-                for deg in de['dataElementGroups']:
-                    collection_id = sims_collections[deg['id']]['id']
-                    target_url = '/orgs/PEPFAR/sources/SIMS/concepts/' + concept_id + '/'
-                    url = '/orgs/PEPFAR/collections/' + collection_id + '/references/?target=' + target_url
-                    r = {
-                        'type':'Reference',
-                        'owner':'PEPFAR',
-                        'owner_type':'Organization',
-                        'collection':collection_id,
-                        'data':{"expressions": ['/orgs/PEPFAR/sources/SIMS/concepts/' + concept_id + '/']}
-                    }
-                    output['sims']['references'][url] = r
-                    num_references += 1
-            ofile.write(json.dumps(output))
-
-        if self.verbosity:
-            self.log('DHIS2 export successfully transformed and saved to "%s": %s concepts + %s references = %s total' % (outputfile, num_concepts, num_references, num_concepts + num_references))
-        return True
+            if self.verbosity:
+                self.log('DHIS2 export "%s" successfully transformed to %s concepts + %s references (%s total)' % (
+                    dhis2_query_def['new_export_filename'], num_concepts,
+                    num_references, num_concepts + num_references))
+            return True
 
     def clean_ocl_export_sims_source(self, ocl_export_def, cleaning_attr=None):
         """
@@ -307,22 +239,24 @@ class DatimSyncSims(DatimBase):
         :param cleaning_attr:
         :return:
         """
-        with open(self.attachAbsolutePath(ocl_export_def['jsonfilename']), 'rb') as input_file:
+        with open(self.attach_absolute_path(ocl_export_def['jsonfilename']), 'rb') as input_file:
             ocl_export_raw = json.load(input_file)
             num_concepts = 0
             for c in ocl_export_raw['concepts']:
                 concept_key = c['url']
                 # Remove core fields not involved in the diff
                 for f in self.SIMS_CONCEPT_FIELDS_TO_REMOVE:
-                    if f in c: del c[f]
+                    if f in c:
+                        del c[f]
                 # Remove name fields
                 if 'names' in c:
                     for i, name in enumerate(c['names']):
                         for f in self.SIMS_NAME_FIELDS_TO_REMOVE:
-                            if f in name: del name[f]
+                            if f in name:
+                                del name[f]
                 self.ocl_diff[self.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT][concept_key] = c
                 num_concepts += 1
-            self.log('Cleaned %s concepts' % (num_concepts))
+            self.log('Cleaned %s concepts' % num_concepts)
 
     def clean_ocl_export_sims_collection(self, ocl_export_def, cleaning_attr=None):
         """
@@ -331,16 +265,16 @@ class DatimSyncSims(DatimBase):
         :param cleaning_attr:
         :return:
         """
-        with open(self.attachAbsolutePath(ocl_export_def['jsonfilename']), 'rb') as input_file:
+        with open(self.attach_absolute_path(ocl_export_def['jsonfilename']), 'rb') as input_file:
             ocl_export_raw = json.load(input_file)
             num_concept_refs = 0
             for r in ocl_export_raw['references']:
                 concept_ref_key = r['url']
-                self.ocl_diff[self.self.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT_REF][concept_ref_key] = r
+                self.ocl_diff[self.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT_REF][concept_ref_key] = r
                 num_concept_refs += 1
-            self.log('Cleaned %s concept references' % (num_concept_refs))
+            self.log('Cleaned %s concept references' % num_concept_refs)
 
-    def logSettings(self):
+    def log_settings(self):
         """ Write settings to console """
         self.log(
             '**** SIMS Sync Script Settings:',
@@ -355,7 +289,8 @@ class DatimSyncSims(DatimBase):
 
     def run(self):
         """ Runs the entire synchronization process """
-        if self.verbosity: self.logSettings()
+        if self.verbosity:
+            self.log_settings()
 
         # STEP 1: Fetch OCL Collections for SIMS Assessment Types
         # Collections that have 'SIMS' in the name, __datim_sync==true, and external_id not empty
@@ -365,16 +300,16 @@ class DatimSyncSims(DatimBase):
             url_sims_collections = self.oclenv + self.url_sims_filtered_endpoint
             if self.verbosity:
                 self.log('Request URL:', url_sims_collections)
-            sims_collections = self.getOclRepositories(url=url_sims_collections, key_field='external_id')
-            with open(self.attachAbsolutePath(self.sims_collections_filename), 'wb') as ofile:
-                ofile.write(json.dumps(sims_collections))
+            sims_collections = self.get_ocl_repositories(url=url_sims_collections, key_field='external_id')
+            with open(self.attach_absolute_path(self.sims_collections_filename), 'wb') as output_file:
+                output_file.write(json.dumps(sims_collections))
             if self.verbosity:
                 self.log('Repositories retrieved from OCL and stored in memory:', len(sims_collections))
-                self.log('Repositories successfully written to "%s"' % (self.sims_collections_filename))
+                self.log('Repositories successfully written to "%s"' % self.sims_collections_filename)
         else:
             if self.verbosity:
-                self.log('OFFLINE: Loading repositories from "%s"' % (self.sims_collections_filename))
-            with open(self.attachAbsolutePath(self.sims_collections_filename), 'rb') as handle:
+                self.log('OFFLINE: Loading repositories from "%s"' % self.sims_collections_filename)
+            with open(self.attach_absolute_path(self.sims_collections_filename), 'rb') as handle:
                 sims_collections = json.load(handle)
             if self.verbosity:
                 self.log('OFFLINE: Repositories successfully loaded:', len(sims_collections))
@@ -389,26 +324,27 @@ class DatimSyncSims(DatimBase):
             sys.exit(1)
 
         # STEP 2: Fetch new exports from DATIM-DHIS2
-        if verbosity:
+        if self.verbosity:
             self.log('**** STEP 2 of 12: Fetch new exports from DATIM DHIS2')
         for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
-            if self.verbosity: self.log(dhis2_query_key + ':')
+            if self.verbosity:
+                self.log(dhis2_query_key + ':')
             if not self.runoffline:
                 query_attr = {'active_dataset_ids': str_active_dataset_ids}
-                content_length = self.saveDhis2QueryToFile(query=dhis2_query_def['query'],
-                                                           query_attr=query_attr,
-                                                           outputfilename=dhis2_query_def['new_export_filename'])
+                content_length = self.save_dhis2_query_to_file(
+                    query=dhis2_query_def['query'], query_attr=query_attr,
+                    outputfilename=dhis2_query_def['new_export_filename'])
                 if self.verbosity:
                     self.log('%s bytes retrieved from DHIS2 and written to file "%s"' % (
                         content_length, dhis2_query_def['new_export_filename']))
             else:
                 if self.verbosity:
                     self.log('OFFLINE: Using local file: "%s"' % (dhis2_query_def['new_export_filename']))
-                if os.path.isfile(self.attachAbsolutePath(dhis2_query_def['new_export_filename'])):
+                if os.path.isfile(self.attach_absolute_path(dhis2_query_def['new_export_filename'])):
                     if self.verbosity:
                         self.log('OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
                             dhis2_query_def['new_export_filename'],
-                            os.path.getsize(self.attachAbsolutePath(dhis2_query_def['new_export_filename']))))
+                            os.path.getsize(self.attach_absolute_path(dhis2_query_def['new_export_filename']))))
                 else:
                     self.log('Could not find offline file "%s". Exiting...' % (dhis2_query_def['new_export_filename']))
                     sys.exit(1)
@@ -422,9 +358,10 @@ class DatimSyncSims(DatimBase):
         if self.compare2previousexport:
             # Compare files for each of the DHIS2 queries
             for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
-                if self.verbosity: self.log(dhis2_query_key + ':')
-                if self.filecmp(self.attachAbsolutePath(dhis2_query_def['old_export_filename']),
-                                self.attachAbsolutePath(dhis2_query_def['new_export_filename'])):
+                if self.verbosity:
+                    self.log(dhis2_query_key + ':')
+                if self.filecmp(self.attach_absolute_path(dhis2_query_def['old_export_filename']),
+                                self.attach_absolute_path(dhis2_query_def['new_export_filename'])):
                     if self.verbosity:
                         self.log('"%s" and "%s" are identical' % (
                             dhis2_query_def['old_export_filename'], dhis2_query_def['new_export_filename']))
@@ -451,21 +388,20 @@ class DatimSyncSims(DatimBase):
             self.log('**** STEP 4 of 12: Fetch latest versions of relevant OCL exports')
         for ocl_export_def_key in self.OCL_EXPORT_DEFS:
             if self.verbosity:
-                self.log('%s:' % (ocl_export_def_key))
+                self.log('%s:' % ocl_export_def_key)
             export_def = self.OCL_EXPORT_DEFS[ocl_export_def_key]
             if not self.runoffline:
-                self.getOclRepositoryVersionExport(
-                    endpoint=export_def['endpoint'],
-                    version='latest',
-                    tarfilename=export_def['tarfilename'],
-                    jsonfilename=export_def['jsonfilename'])
+                self.get_ocl_export(
+                    endpoint=export_def['endpoint'], version='latest',
+                    tarfilename=export_def['tarfilename'], jsonfilename=export_def['jsonfilename'])
             else:
                 if self.verbosity:
                     self.log('OFFLINE: Using local file "%s"...' % (export_def['jsonfilename']))
-                if os.path.isfile(self.attachAbsolutePath(export_def['jsonfilename'])):
+                if os.path.isfile(self.attach_absolute_path(export_def['jsonfilename'])):
                     if self.verbosity:
                         self.log('OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
-                            export_def['jsonfilename'], os.path.getsize(self.attachAbsolutePath(export_def['jsonfilename']))))
+                            export_def['jsonfilename'], os.path.getsize(
+                                self.attach_absolute_path(export_def['jsonfilename']))))
                 else:
                     self.log('Could not find offline file "%s". Exiting...' % (export_def['jsonfilename']))
                     sys.exit(1)
@@ -484,52 +420,37 @@ class DatimSyncSims(DatimBase):
         self.ocl_diff = {self.IMPORT_BATCH_SIMS: {self.RESOURCE_TYPE_CONCEPT: {}, self.RESOURCE_TYPE_CONCEPT_REF: {}}}
         self.prepare_ocl_exports(cleaning_attr={})
 
-        exit()
-
         # STEP 7: Perform deep diff
-        # Note that multiple deep diffs may be performed, each with their own input and output files
+        # One deep diff is performed per resource type in each import batch
+        # OCL/DHIS2 exports reloaded from file to eliminate unicode type_change diff -- but that may be short sighted!
         if self.verbosity:
             self.log('**** STEP 7 of 12: Perform deep diff')
-        diff = None
-        with open(self.attachAbsolutePath(self.OCL_EXPORT_DEFS['sims_source']['jsoncleanfilename']), 'rb') as ocl_handle,\
-                open(self.attachAbsolutePath(self.converted_dhis2_export_filename), 'rb') as dhis2_handle:
-            a_ocl = json.load(ocl_handle)
-            b_dhis2 = json.load(dhis2_handle)
-            diff = DeepDiff(a_ocl, b_dhis2, ignore_order=True, verbose_level=2)
-            if self.verbosity:
-                str_log = 'Diff results: '
-                for k in diff:
-                    str_log += '%s: %s; ' % (k, len(diff[k]))
-                self.log(str_log)
+        with open(self.attach_absolute_path(self.ocl_cleaned_export_filename), 'rb') as file_sims_ocl,\
+                open(self.attach_absolute_path(self.dhis2_converted_export_filename), 'rb') as file_sims_dhis2:
+            sims_ocl = json.load(file_sims_ocl)
+            sims_dhis2 = json.load(file_sims_dhis2)
+            diff = self.perform_diff(ocl_diff=sims_ocl, dhis2_diff=sims_dhis2)
 
         # STEP 8: Determine action based on diff result
-        # TODO: If data check only, then output need to return Success/Failure and then exit regardless
         if self.verbosity:
             self.log('**** STEP 8 of 12: Determine action based on diff result')
         if diff:
-            self.log('Deep diff identified one or more differences between DHIS2 and OCL...')
+            self.log('One or more differences identified between DHIS2 and OCL...')
         else:
             self.log('No diff, exiting...')
             exit()
 
-        # STEP 9: Generate import scripts by processing the diff results
-        # TODO: This currently only handles 'dictionary_item_added'
+        # STEP 9: Generate one OCL import script per import batch by processing the diff results
+        # Note that OCL import scripts are JSON-lines files
         if self.verbosity:
             self.log('**** STEP 9 of 12: Generate import scripts')
-        with open(self.attachAbsolutePath(self.new_import_script_filename), 'wb') as ofile:
-            if 'dictionary_item_added' in diff:
-                for k in diff['dictionary_item_added']:
-                    if 'type' in diff['dictionary_item_added'][k] and diff['dictionary_item_added'][k]['type'] == 'Concept':
-                        ofile.write(json.dumps(diff['dictionary_item_added'][k]))
-                        ofile.write('\n')
-            if self.verbosity:
-                self.log('New import script written to file "%s"' % (self.new_import_script_filename))
+        self.generate_import_scripts(diff)
 
         # STEP 10: Perform the import in OCL
         if self.verbosity:
             self.log('**** STEP 10 of 12: Perform the import in OCL')
-        ocl_importer = ocl_json_flex_import(
-            file_path=self.attachAbsolutePath(self.new_import_script_filename),
+        ocl_importer = OclFlexImporter(
+            file_path=self.attach_absolute_path(self.new_import_script_filename),
             api_token=self.oclapitoken, api_url_root=self.oclenv, test_mode=self.import_test_mode,
             do_update_if_exists=False, verbosity=self.verbosity, limit=self.import_limit)
         import_result = ocl_importer.process()
@@ -538,16 +459,9 @@ class DatimSyncSims(DatimBase):
 
         # STEP 11: Save new DHIS2 export for the next sync attempt
         if self.verbosity:
-            self.log('**** STEP 11 of 12: Save the DHIS2 export if import successful')
+            self.log('**** STEP 11 of 12: Save the DHIS2 export')
         if import_result and not self.import_test_mode:
-            # Delete the old cache if it is there
-            if os.path.isfile(self.attachAbsolutePath(self.old_dhis2_export_filename)):
-                os.remove(self.attachAbsolutePath(self.old_dhis2_export_filename))
-            # Copy the new dhis2 export
-            copyfile(self.attachAbsolutePath(self.new_dhis2_export_filename),
-                     self.attachAbsolutePath(self.old_dhis2_export_filename))
-            if self.verbosity:
-                self.log('DHIS2 export successfully copied to "%s"' % (self.old_dhis2_export_filename))
+            self.cache_dhis2_exports()
         else:
             if self.verbosity:
                 self.log('Skipping, because import failed or import test mode enabled...')
@@ -559,24 +473,7 @@ class DatimSyncSims(DatimBase):
             if self.verbosity:
                 self.log('Skipping, because import test mode enabled...')
         elif import_result:
-            # SIMS source
-            dt = datetime.utcnow()
-            new_source_version_data = {
-                'id': 'v' + dt.strftime('%Y-%m-%dT%H%M%S.%f'),
-                'description': 'Automatically generated by DATIM-Sync - %s import record(s) processed' % (import_result),
-                'released': True,
-            }
-            new_source_version_url = oclenv + '/orgs/PEPFAR/sources/SIMS/versions/'
-            if self.verbosity:
-                self.log('Create new version request URL:', new_source_version_url)
-                self.log(json.dumps(new_source_version_data))
-            r = requests.post(new_source_version_url,
-                          data=json.dumps(new_source_version_data),
-                          headers=self.oclapiheaders)
-            r.raise_for_status()
-
-            # TODO: SIMS collections
-
+            self.increment_ocl_versions()
         else:
             if self.verbosity:
                 self.log('Skipping because no records imported...')
@@ -609,8 +506,8 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
 else:
     # Local development environment settings
-    import_limit = 10
-    import_test_mode = True
+    import_limit = 1
+    import_test_mode = False
     compare2previousexport = False
     runoffline = False
     dhis2env = 'https://dev-de.datim.org/'
@@ -618,8 +515,8 @@ else:
     dhis2pwd = 'Johnpayne1!'
     oclenv = 'https://api.showcase.openconceptlab.org'
     oclapitoken = '2da0f46b7d29aa57970c0b3a535121e8e479f881'
-    #oclapitoken = 'a61ba53ed7b8b26ece8fcfc53022b645de0ec055'
-    #oclenv = 'https://ocl-stg.openmrs.org'
+    # oclapitoken = 'a61ba53ed7b8b26ece8fcfc53022b645de0ec055'
+    # oclenv = 'https://ocl-stg.openmrs.org'
 
 # Create SIMS sync object and run
 sims_sync = DatimSyncSims(oclenv=oclenv, oclapitoken=oclapitoken,

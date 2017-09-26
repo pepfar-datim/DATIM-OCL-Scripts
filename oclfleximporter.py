@@ -1,7 +1,7 @@
-'''
-OCL Flexible JSON Importer -- 
+"""
+OCL Flexible Importer --
 Script that uses the OCL API to import multiple resource types from a JSON lines file.
-Configuration for individual resources can generally be set inline in the JSON.
+Configuration for individual resources can be set inline in the JSON.
 
 Resources currently supported:
 * Organizations
@@ -14,14 +14,14 @@ Resources currently supported:
 Verbosity settings:
 * 0 = show only responses from server
 * 1 = show responses from server and all POSTs
-* 2 = show everything
+* 2 = show everything minus debug output
 * 3 = show everything plus debug output
 
 Deviations from OCL API responses:
 * Sources/Collections:
-    - "supported_locales" response is a list, but only a comma-separated string is supported when posted
-'''
-
+    - "supported_locales" response is a list in OCL, but only a comma-separated string
+      is supported when posted here
+"""
 
 import json
 import requests
@@ -35,41 +35,41 @@ import urllib
 # Concept/Mapping fieldS: ( id ) OR ( url )
 
 
-class ImportError(Exception):
+class OclImportError(Exception):
     """ Base exception for this module """
     pass
 
 
-class UnexpectedStatusCodeError(ImportError):
+class UnexpectedStatusCodeError(OclImportError):
     """ Exception raised for unexpected status code """
     def __init__(self, expression, message):
         self.expression = expression
         self.message = message
 
 
-class InvalidOwnerError(ImportError):
+class InvalidOwnerError(OclImportError):
     """ Exception raised when owner information is invalid """
     def __init__(self, expression, message):
         self.expression = expression
         self.message = message
 
 
-class InvalidRepositoryError(ImportError):
+class InvalidRepositoryError(OclImportError):
     """ Exception raised when repository information is invalid """
     def __init__(self, expression, message):
         self.expression = expression
         self.message = message
 
 
-class InvalidObjectDefinition(ImportError):
+class InvalidObjectDefinition(OclImportError):
     """ Exception raised when object definition invalid """
     def __init__(self, expression, message):
         self.expression = expression
         self.message = message
 
 
-class ocl_json_flex_import:
-    ''' Class to flexibly import multiple resource types into OCL from JSON lines files via the OCL API '''
+class OclFlexImporter:
+    """ Class to flexibly import multiple resource types into OCL from JSON lines files via the OCL API """
 
     INTERNAL_MAPPING = 1
     EXTERNAL_MAPPING = 2
@@ -145,10 +145,9 @@ class ocl_json_flex_import:
         },
     }
 
-
     def __init__(self, file_path='', api_url_root='', api_token='', limit=0,
                  test_mode=False, verbosity=1, do_update_if_exists=False):
-        ''' Initialize the ocl_json_flex_import object '''
+        """ Initialize this object """
 
         self.file_path = file_path
         self.api_token = api_token
@@ -158,6 +157,7 @@ class ocl_json_flex_import:
         self.verbosity = verbosity
         self.limit = limit
 
+        self.results = {}
         self.cache_obj_exists = {}
 
         # Prepare the headers
@@ -166,9 +166,8 @@ class ocl_json_flex_import:
             'Content-Type': 'application/json'
         }
 
-
     def log(self, *args):
-        ''' Output log information '''
+        """ Output log information """
         sys.stdout.write('[' + str(datetime.now()) + '] ')
         for arg in args:
             sys.stdout.write(str(arg))
@@ -176,7 +175,8 @@ class ocl_json_flex_import:
         sys.stdout.write('\n')
         sys.stdout.flush()
 
-    def logSettings(self):
+    def log_settings(self):
+        """ Output log of the object settings """
         self.log("**** OCL IMPORT SCRIPT SETTINGS ****",
                  "API Root URL:", self.api_url_root,
                  ", API Token:", self.api_token,
@@ -186,9 +186,11 @@ class ocl_json_flex_import:
                  ", Verbosity:", self.verbosity)
 
     def process(self):
-        ''' Processes an import file '''
+        """ Processes an import file """
+
         # Display global settings
-        if self.verbosity: self.logSettings()
+        if self.verbosity:
+            self.log_settings()
 
         # Loop through each JSON object in the file
         obj_def_keys = self.obj_def.keys()
@@ -210,9 +212,8 @@ class ocl_json_flex_import:
 
         return count
 
-
     def does_object_exist(self, obj_url, use_cache=True):
-        ''' Returns whether an object at the specified URL already exists '''
+        """ Returns whether an object at the specified URL already exists """
 
         # If obj existence cached, then just return True
         if use_cache and obj_url in self.cache_obj_exists and self.cache_obj_exists[obj_url]:
@@ -230,12 +231,11 @@ class ocl_json_flex_import:
                 "GET " + self.api_url_root + obj_url,
                 "Unexpected status code returned: " + str(request_existence.status_code))
 
-
     def does_mapping_exist(self, obj_url, obj):
-        '''
+        """
         Returns whether the specified mapping already exists --
         Equivalent mapping must have matching source, from_concept, to_concept, and map_type
-        '''
+        """
 
         '''
         # Return false if correct fields not set
@@ -287,9 +287,8 @@ class ocl_json_flex_import:
 
         return False
 
-
     def does_reference_exist(self, obj_url, obj):
-        ''' Returns whether the specified reference already exists '''
+        """ Returns whether the specified reference already exists """
 
         '''
         # Return false if no expression
@@ -315,9 +314,8 @@ class ocl_json_flex_import:
 
         return False
 
-
     def process_object(self, obj_type, obj):
-        ''' Processes an individual document in the import file '''
+        """ Processes an individual document in the import file """
 
         # Grab the ID
         obj_id = ''
@@ -476,13 +474,12 @@ class ocl_json_flex_import:
         except requests.exceptions.HTTPError as e:
             self.log("ERROR: ", e)
 
-
     def update_or_create(self, obj_type='', obj_id='', obj_owner_url='',
                          obj_repo_url='', obj_url='', new_obj_url='',
                          obj_already_exists=False,
                          obj=None, obj_not_allowed=None,
                          query_params=None):
-        ''' Posts an object to the OCL API as either an update or create '''
+        """ Posts an object to the OCL API as either an update or create """
 
         # Determine which URL to use based on whether or not object already exists
         if obj_already_exists:

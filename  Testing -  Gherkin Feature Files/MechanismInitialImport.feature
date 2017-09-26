@@ -1,4 +1,4 @@
-Feature: Mechanism Metadata Update
+Feature: Mechanism Metadata Initial import
   This test is designed to verify the initial import 
 
 Scenario: 
@@ -7,4 +7,4 @@ Scenario:
 	When mechanism metadata sync  to OCL is triggered
 		Then the metadata sync successfully completes 
         And the mechanism metadata is present in OCL
-        And the OCL system and the DHIS2 system have the same mechanism data when compared
+        And the OCL system and the DHIS2 system have the same mechanism metadatadata when compared

@@ -41,13 +41,13 @@ class DatimSyncSims(DatimBase):
     """ Class to manage DATIM SIMS Synchronization """
 
     # URLs
-    url_sims_filtered_endpoint = '/orgs/PEPFAR/collections/?q=SIMS&verbose=true'
+    URL_SIMS_FILTERED_ENDPOINT = '/orgs/PEPFAR/collections/?q=SIMS&verbose=true'
 
     # Filenames
-    sims_collections_filename = 'ocl_sims_collections_export.json'
-    new_import_script_filename = 'sims_dhis2ocl_import_script.json'
-    dhis2_converted_export_filename = 'dhis2_sims_converted_export.json'
-    ocl_cleaned_export_filename = 'ocl_sims_cleaned_export.json'
+    SIMS_COLLECTIONS_FILENAME = 'ocl_sims_collections_export.json'
+    NEW_IMPORT_SCRIPT_FILENAME = 'sims_dhis2ocl_import_script.json'
+    DHIS2_CONVERTED_EXPORT_FILENAME = 'dhis2_sims_converted_export.json'
+    OCL_CLEANED_EXPORT_FILENAME = 'ocl_sims_cleaned_export.json'
 
     # Import batches
     IMPORT_BATCH_SIMS = 'SIMS'
@@ -137,11 +137,10 @@ class DatimSyncSims(DatimBase):
     SIMS_MAPPING_FIELDS_TO_REMOVE = []
     SIMS_NAME_FIELDS_TO_REMOVE = ['uuid', 'type']
 
-    def __init__(self, oclenv='', oclapitoken='',
-                 dhis2env='', dhis2uid='', dhis2pwd='',
-                 compare2previousexport=True,
-                 runoffline=False, verbosity=0,
-                 import_test_mode=False, import_limit=0):
+    def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='', compare2previousexport=True,
+                 runoffline=False, verbosity=0, data_check_only=False, import_test_mode=False, import_limit=0):
+        DatimBase.__init__(self)
+
         self.oclenv = oclenv
         self.oclapitoken = oclapitoken
         self.dhis2env = dhis2env
@@ -152,8 +151,13 @@ class DatimSyncSims(DatimBase):
         self.compare2previousexport = compare2previousexport
         self.import_test_mode = import_test_mode
         self.import_limit = import_limit
+        self.data_check_only = data_check_only
+
         self.dhis2_diff = {}
         self.ocl_diff = {}
+        self.ocl_collections = []
+        self.str_dataset_ids = ''
+
         self.oclapiheaders = {
             'Authorization': 'Token ' + self.oclapitoken,
             'Content-Type': 'application/json'
@@ -287,32 +291,37 @@ class DatimSyncSims(DatimBase):
         if self.runoffline:
             self.log('**** RUNNING IN OFFLINE MODE ****')
 
+    def data_check(self):
+        self.data_check_only = True
+        return self.run()
+
     def run(self):
         """ Runs the entire synchronization process """
         if self.verbosity:
             self.log_settings()
 
-        # STEP 1: Fetch OCL Collections for SIMS Assessment Types
-        # Collections that have 'SIMS' in the name, __datim_sync==true, and external_id not empty
+        # STEP 1: Fetch OCL Collections for Dataset IDs
+        # Fetches collections with 'SIMS' in the name, __datim_sync==true, and external_id not empty
         if self.verbosity:
-            self.log('**** STEP 1 of 12: Fetch OCL Collections for SIMS Assessment Types')
+            self.log('**** STEP 1 of 12: Fetch OCL Collections for Dataset IDs')
         if not self.runoffline:
-            url_sims_collections = self.oclenv + self.url_sims_filtered_endpoint
+            url_sims_collections = self.oclenv + self.URL_SIMS_FILTERED_ENDPOINT
             if self.verbosity:
                 self.log('Request URL:', url_sims_collections)
             sims_collections = self.get_ocl_repositories(url=url_sims_collections, key_field='external_id')
-            with open(self.attach_absolute_path(self.sims_collections_filename), 'wb') as output_file:
+            with open(self.attach_absolute_path(self.SIMS_COLLECTIONS_FILENAME), 'wb') as output_file:
                 output_file.write(json.dumps(sims_collections))
             if self.verbosity:
                 self.log('Repositories retrieved from OCL and stored in memory:', len(sims_collections))
-                self.log('Repositories successfully written to "%s"' % self.sims_collections_filename)
+                self.log('Repositories successfully written to "%s"' % self.SIMS_COLLECTIONS_FILENAME)
         else:
             if self.verbosity:
-                self.log('OFFLINE: Loading repositories from "%s"' % self.sims_collections_filename)
-            with open(self.attach_absolute_path(self.sims_collections_filename), 'rb') as handle:
+                self.log('OFFLINE: Loading repositories from "%s"' % self.SIMS_COLLECTIONS_FILENAME)
+            with open(self.attach_absolute_path(self.SIMS_COLLECTIONS_FILENAME), 'rb') as handle:
                 sims_collections = json.load(handle)
             if self.verbosity:
                 self.log('OFFLINE: Repositories successfully loaded:', len(sims_collections))
+
         # Extract list of DHIS2 dataset IDs from collection external_id
         if sims_collections:
             str_active_dataset_ids = ','.join(sims_collections.keys())
@@ -355,7 +364,7 @@ class DatimSyncSims(DatimBase):
         if self.verbosity:
             self.log('**** STEP 3 of 12: Quick comparison of current and previous DHIS2 exports')
         complete_match = True
-        if self.compare2previousexport:
+        if self.compare2previousexport and not self.data_check_only:
             # Compare files for each of the DHIS2 queries
             for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
                 if self.verbosity:
@@ -379,9 +388,12 @@ class DatimSyncSims(DatimBase):
             else:
                 if self.verbosity:
                     self.log('At least one DHIS2 export does not match, so continue...')
+        elif self.data_check_only:
+            if self.verbosity:
+                self.log("Skipping: data check only...")
         else:
             if self.verbosity:
-                self.log("Skipping (due to settings)...")
+                self.log("Skipping: compare2previousexport == false")
 
         # STEP 4: Fetch latest versions of relevant OCL exports
         if self.verbosity:
@@ -425,55 +437,64 @@ class DatimSyncSims(DatimBase):
         # OCL/DHIS2 exports reloaded from file to eliminate unicode type_change diff -- but that may be short sighted!
         if self.verbosity:
             self.log('**** STEP 7 of 12: Perform deep diff')
-        with open(self.attach_absolute_path(self.ocl_cleaned_export_filename), 'rb') as file_sims_ocl,\
-                open(self.attach_absolute_path(self.dhis2_converted_export_filename), 'rb') as file_sims_dhis2:
+        with open(self.attach_absolute_path(self.OCL_CLEANED_EXPORT_FILENAME), 'rb') as file_sims_ocl,\
+                open(self.attach_absolute_path(self.DHIS2_CONVERTED_EXPORT_FILENAME), 'rb') as file_sims_dhis2:
             sims_ocl = json.load(file_sims_ocl)
             sims_dhis2 = json.load(file_sims_dhis2)
-            diff = self.perform_diff(ocl_diff=sims_ocl, dhis2_diff=sims_dhis2)
+            self.diff_result = self.perform_diff(ocl_diff=sims_ocl, dhis2_diff=sims_dhis2)
 
         # STEP 8: Determine action based on diff result
         if self.verbosity:
             self.log('**** STEP 8 of 12: Determine action based on diff result')
-        if diff:
+        if self.diff_result:
             self.log('One or more differences identified between DHIS2 and OCL...')
         else:
-            self.log('No diff, exiting...')
-            exit()
+            self.log('No diff between DHIS2 and OCL...')
+            return
 
         # STEP 9: Generate one OCL import script per import batch by processing the diff results
         # Note that OCL import scripts are JSON-lines files
         if self.verbosity:
             self.log('**** STEP 9 of 12: Generate import scripts')
-        self.generate_import_scripts(diff)
+        self.generate_import_scripts(self.diff_result)
 
         # STEP 10: Perform the import in OCL
         if self.verbosity:
             self.log('**** STEP 10 of 12: Perform the import in OCL')
-        ocl_importer = OclFlexImporter(
-            file_path=self.attach_absolute_path(self.new_import_script_filename),
-            api_token=self.oclapitoken, api_url_root=self.oclenv, test_mode=self.import_test_mode,
-            do_update_if_exists=False, verbosity=self.verbosity, limit=self.import_limit)
-        import_result = ocl_importer.process()
-        if self.verbosity:
-            self.log('Import records processed:', import_result)
+        num_import_rows_processed = 0
+        if self.data_check_only:
+            self.log('Skipping: data check only...')
+        else:
+            ocl_importer = OclFlexImporter(
+                file_path=self.attach_absolute_path(self.NEW_IMPORT_SCRIPT_FILENAME),
+                api_token=self.oclapitoken, api_url_root=self.oclenv, test_mode=self.import_test_mode,
+                do_update_if_exists=False, verbosity=self.verbosity, limit=self.import_limit)
+            num_import_rows_processed = ocl_importer.process()
+            if self.verbosity:
+                self.log('Import records processed:', num_import_rows_processed)
 
         # STEP 11: Save new DHIS2 export for the next sync attempt
         if self.verbosity:
             self.log('**** STEP 11 of 12: Save the DHIS2 export')
-        if import_result and not self.import_test_mode:
-            self.cache_dhis2_exports()
+        if self.data_check_only:
+            self.log('Skipping: data check only...')
         else:
-            if self.verbosity:
-                self.log('Skipping, because import failed or import test mode enabled...')
+            if num_import_rows_processed and not self.import_test_mode:
+                self.cache_dhis2_exports()
+            else:
+                if self.verbosity:
+                    self.log('Skipping, because import failed or import test mode enabled...')
 
         # STEP 12: Manage OCL repository versions
         if self.verbosity:
             self.log('**** STEP 12 of 12: Manage OCL repository versions')
-        if self.import_test_mode:
+        if self.data_check_only:
+            self.log('Skipping: data check only...')
+        elif self.import_test_mode:
             if self.verbosity:
                 self.log('Skipping, because import test mode enabled...')
-        elif import_result:
-            self.increment_ocl_versions()
+        elif num_import_rows_processed:
+            self.increment_ocl_versions(import_results=ocl_importer.results)
         else:
             if self.verbosity:
                 self.log('Skipping because no records imported...')
@@ -506,7 +527,7 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
 else:
     # Local development environment settings
-    import_limit = 1
+    import_limit = 810
     import_test_mode = False
     compare2previousexport = False
     runoffline = False
@@ -526,3 +547,4 @@ sims_sync = DatimSyncSims(oclenv=oclenv, oclapitoken=oclapitoken,
                           import_test_mode=import_test_mode,
                           import_limit=import_limit)
 sims_sync.run()
+# sims_sync.data_check()

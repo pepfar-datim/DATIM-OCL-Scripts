@@ -82,6 +82,12 @@ class OclFlexImporter:
     OBJ_TYPE_MAPPING = 'Mapping'
     OBJ_TYPE_REFERENCE = 'Reference'
 
+    ACTION_TYPE_NEW = 'new'
+    ACTION_TYPE_UPDATE = 'udpate'
+    ACTION_TYPE_RETIRE = 'retire'
+    ACTION_TYPE_DELETE = 'delete'
+    ACTION_TYPE_OTHER = 'other'
+
     # Resource type definitions
     obj_def = {
         OBJ_TYPE_ORGANIZATION: {
@@ -186,7 +192,10 @@ class OclFlexImporter:
                  ", Verbosity:", self.verbosity)
 
     def process(self):
-        """ Processes an import file """
+        """
+        Imports a JSON-lines file using OCL API
+        :return: int Number of JSON lines processed
+        """
 
         # Display global settings
         if self.verbosity:
@@ -482,12 +491,15 @@ class OclFlexImporter:
         """ Posts an object to the OCL API as either an update or create """
 
         # Determine which URL to use based on whether or not object already exists
+        action_type = None
         if obj_already_exists:
             method = self.obj_def[obj_type]['update_method']
             url = obj_url
+            action_type = self.ACTION_TYPE_UPDATE
         else:
             method = self.obj_def[obj_type]['create_method']
             url = new_obj_url
+            action_type = self.ACTION_TYPE_NEW
 
         # Add query parameters (if provided)
         if query_params:
@@ -507,12 +519,40 @@ class OclFlexImporter:
         # Create or update the object
         self.log(method, " ", self.api_url_root + url + '  ', json.dumps(obj))
         if method == 'POST':
-            request_post = requests.post(self.api_url_root + url, headers=self.api_headers,
+            request_result = requests.post(self.api_url_root + url, headers=self.api_headers,
                                          data=json.dumps(obj))
         elif method == 'PUT':
-            request_post = requests.put(self.api_url_root + url, headers=self.api_headers,
+            request_result = requests.put(self.api_url_root + url, headers=self.api_headers,
                                          data=json.dumps(obj))
-        self.log("STATUS CODE:", request_post.status_code)
-        self.log(request_post.headers)
-        self.log(request_post.text)
-        request_post.raise_for_status()
+        self.log("STATUS CODE:", request_result.status_code)
+        self.log(request_result.headers)
+        self.log(request_result.text)
+        request_result.raise_for_status()
+
+        # Store the results if successful
+        # TODO: This could be improved significantly!
+        if int(request_result.status_code) > 200 and int(request_result.status_code) < 300:
+            if obj_type in [self.OBJ_TYPE_CONCEPT, self.OBJ_TYPE_MAPPING, self.OBJ_TYPE_REFERENCE]:
+                if obj_repo_url not in self.results:
+                    self.results[obj_repo_url] = {}
+                if action_type not in self.results[obj_repo_url]:
+                    self.results[obj_repo_url][action_type] = []
+                self.results[obj_repo_url][action_type].append(obj_url)
+            elif obj_type in [self.OBJ_TYPE_SOURCE, self.OBJ_TYPE_COLLECTION]:
+                if obj_owner_url not in self.results:
+                    self.results[obj_owner_url] = {}
+                if action_type not in self.results[obj_owner_url]:
+                    self.results[obj_owner_url][action_type] = []
+                self.results[obj_owner_url][action_type].append(obj_url)
+            elif obj_type == [self.OBJ_TYPE_ORGANIZATION]:
+                if '/orgs/' not in self.results:
+                    self.results['/orgs/'] = {}
+                if action_type not in self.results['/orgs/']:
+                    self.results['/orgs/'][action_type] = []
+                self.results['/orgs/'][action_type].append(obj_url)
+            elif obj_type == [self.OBJ_TYPE_USER]:
+                if '/users/' not in self.results:
+                    self.results['/users/'] = {}
+                if action_type not in self.results['/users/']:
+                    self.results['/users/'][action_type] = []
+                self.results['/users/'][action_type].append(obj_url)

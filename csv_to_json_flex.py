@@ -168,7 +168,9 @@ class ocl_csv_to_json_flex:
                         raise Exception('Expected "value" or "value_column" key in key_value_pair definition, but neither found: %s' % kvp_def)
 
                     # Set the key-value pair
-                    if value == '' and 'omit_if_empty_value' in kvp_def and kvp_def['omit_if_empty_value']:
+                    if not key:
+                        pass
+                    elif value == '' and 'omit_if_empty_value' in kvp_def and kvp_def['omit_if_empty_value']:
                         pass
                     else:
                         ocl_resource[group_name][key] = value

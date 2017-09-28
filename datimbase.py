@@ -19,8 +19,8 @@ class DatimBase:
     # Resource type constants
     RESOURCE_TYPE_CONCEPT = 'Concept'
     RESOURCE_TYPE_MAPPING = 'Mapping'
-    RESOURCE_TYPE_CONCEPT_REF = 'concept_ref'
-    RESOURCE_TYPE_MAPPING_REF = 'mapping_ref'
+    RESOURCE_TYPE_CONCEPT_REF = 'Concept_Ref'
+    RESOURCE_TYPE_MAPPING_REF = 'Mapping_Ref'
     RESOURCE_TYPE_REFERENCE = 'Reference'
     RESOURCE_TYPES = [
         RESOURCE_TYPE_CONCEPT,
@@ -36,6 +36,8 @@ class DatimBase:
         self.verbosity = 1
         self.oclenv = ''
         self.dhis2env = ''
+        self.ocl_dataset_repos = None
+        self.str_active_dataset_ids = ''
 
     def log(self, *args):
         """ Output log information """
@@ -50,20 +52,56 @@ class DatimBase:
         """ Adds full absolute path to the filename """
         return os.path.join(self.__location__, filename)
 
-    def get_ocl_repositories(self, url='', key_field='id', require_external_id=True,
+    def get_ocl_repositories(self, endpoint=None, key_field='id', require_external_id=True,
                              active_attr_name='__datim_sync'):
         """
         Gets repositories from OCL using the provided URL, optionally filtering
         by external_id and a custom attribute indicating active status
         """
-        r = requests.get(url, headers=self.oclapiheaders)
-        r.raise_for_status()
-        repos = r.json()
         filtered_repos = {}
-        for r in repos:
-            if (not require_external_id or ('external_id' in r and r['external_id'])) and (not active_attr_name or (r['extras'] and active_attr_name in r['extras'] and r['extras'][active_attr_name])):
-                filtered_repos[r[key_field]] = r
+        next_url = self.oclenv + endpoint
+        while next_url:
+            response = requests.get(next_url, headers=self.oclapiheaders)
+            response.raise_for_status()
+            repos = response.json()
+            for repo in repos:
+                if (not require_external_id or ('external_id' in repo and repo['external_id'])) and (not active_attr_name or (repo['extras'] and active_attr_name in repo['extras'] and repo['extras'][active_attr_name])):
+                    filtered_repos[repo[key_field]] = repo
+            next_url = ''
+            if 'next' in response.headers and response.headers['next'] and response.headers['next'] != 'None':
+                next_url = response.headers['next']
         return filtered_repos
+
+    def load_datasets_from_ocl(self):
+        # Fetch the repositories from OCL
+        if not self.runoffline:
+            if self.verbosity:
+                self.log('Request URL:', self.oclenv + self.OCL_DATASET_ENDPOINT)
+            self.ocl_dataset_repos = self.get_ocl_repositories(endpoint=self.OCL_DATASET_ENDPOINT,
+                                                               key_field='external_id',
+                                                               active_attr_name=self.REPO_ACTIVE_ATTR)
+            with open(self.attach_absolute_path(self.DATASET_REPOSITORIES_FILENAME), 'wb') as output_file:
+                output_file.write(json.dumps(self.ocl_dataset_repos))
+            if self.verbosity:
+                self.log('Repositories retrieved from OCL and stored in memory:', len(self.ocl_dataset_repos))
+                self.log('Repositories successfully written to "%s"' % self.DATASET_REPOSITORIES_FILENAME)
+        else:
+            if self.verbosity:
+                self.log('OFFLINE: Loading repositories from "%s"' % self.DATASET_REPOSITORIES_FILENAME)
+            with open(self.attach_absolute_path(self.DATASET_REPOSITORIES_FILENAME), 'rb') as handle:
+                self.ocl_dataset_repos = json.load(handle)
+            if self.verbosity:
+                self.log('OFFLINE: Repositories successfully loaded:', len(self.ocl_dataset_repos))
+
+        # Extract list of DHIS2 dataset IDs from the repository attributes
+        if self.ocl_dataset_repos:
+            self.str_active_dataset_ids = ','.join(self.ocl_dataset_repos.keys())
+            if self.verbosity:
+                self.log('Dataset IDs returned from OCL:', self.str_active_dataset_ids)
+        else:
+            if self.verbosity:
+                self.log('No dataset IDs returned from OCL. Exiting...')
+            sys.exit(1)
 
     def transform_dhis2_exports(self, conversion_attr=None):
         """
@@ -80,22 +118,6 @@ class DatimBase:
             if self.verbosity:
                 self.log('Transformed DHIS2 exports successfully written to "%s"' % (
                     self.DHIS2_CONVERTED_EXPORT_FILENAME))
-
-    def prepare_ocl_exports(self, cleaning_attr=None):
-        """
-        Convert OCL exports into the diff format
-        :param cleaning_attr: Optional cleaning attributes that are made available to each cleaning method
-        :return: None
-        """
-        for ocl_export_def_key, export_def in self.OCL_EXPORT_DEFS.iteritems():
-            if self.verbosity:
-                self.log('%s:' % ocl_export_def_key)
-            getattr(self, export_def['cleaning_method'])(export_def, cleaning_attr=cleaning_attr)
-        with open(self.attach_absolute_path(self.OCL_CLEANED_EXPORT_FILENAME), 'wb') as output_file:
-            output_file.write(json.dumps(self.ocl_diff))
-            if self.verbosity:
-                self.log('Cleaned OCL exports successfully written to "%s"' % (
-                    self.OCL_CLEANED_EXPORT_FILENAME))
 
     def save_dhis2_query_to_file(self, query='', query_attr=None, outputfilename=''):
         """ Execute DHIS2 query and save to file """

@@ -9,8 +9,6 @@ import tarfile
 from datetime import datetime
 import json
 from deepdiff import DeepDiff
-from requests.auth import HTTPBasicAuth
-from shutil import copyfile
 
 
 class DatimBase:
@@ -35,7 +33,10 @@ class DatimBase:
     def __init__(self):
         self.verbosity = 1
         self.oclenv = ''
+        self.oclapitoken = ''
         self.dhis2env = ''
+        self.dhis2uid = ''
+        self.dhis2pwd = ''
         self.ocl_dataset_repos = None
         self.str_active_dataset_ids = ''
 
@@ -103,41 +104,6 @@ class DatimBase:
                 self.log('No dataset IDs returned from OCL. Exiting...')
             sys.exit(1)
 
-    def transform_dhis2_exports(self, conversion_attr=None):
-        """
-        Transforms DHIS2 exports into the diff format
-        :param conversion_attr: Optional conversion attributes that are made available to each conversion method
-        :return: None
-        """
-        for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
-            if self.verbosity:
-                self.log('%s:' % dhis2_query_key)
-            getattr(self, dhis2_query_def['conversion_method'])(dhis2_query_def, conversion_attr=conversion_attr)
-        with open(self.attach_absolute_path(self.DHIS2_CONVERTED_EXPORT_FILENAME), 'wb') as output_file:
-            output_file.write(json.dumps(self.dhis2_diff))
-            if self.verbosity:
-                self.log('Transformed DHIS2 exports successfully written to "%s"' % (
-                    self.DHIS2_CONVERTED_EXPORT_FILENAME))
-
-    def save_dhis2_query_to_file(self, query='', query_attr=None, outputfilename=''):
-        """ Execute DHIS2 query and save to file """
-
-        # Replace query attribute names with values and build the query URL
-        if query_attr:
-            for attr_name in query_attr:
-                query = query.replace('{{'+attr_name+'}}', query_attr[attr_name])
-        url_dhis2_query = self.dhis2env + query
-
-        # Execute the query
-        if self.verbosity:
-            self.log('Request URL:', url_dhis2_query)
-        r = requests.get(url_dhis2_query, auth=HTTPBasicAuth(self.dhis2uid, self.dhis2pwd))
-        r.raise_for_status()
-        with open(self.attach_absolute_path(outputfilename), 'wb') as handle:
-            for block in r.iter_content(1024):
-                handle.write(block)
-        return r.headers['Content-Length']
-
     def filecmp(self, filename1, filename2):
         """
         Do the two files have exactly the same size and contents?
@@ -156,23 +122,6 @@ class DatimBase:
                 return not any(inequalities)
         except:
             return False
-
-    def cache_dhis2_exports(self):
-        """
-        Delete old DHIS2 cached files if there
-        :return: None
-        """
-        for dhis2_query_key in self.DHIS2_QUERIES:
-            # Delete old file if it exists
-            if 'old_export_filename' not in self.DHIS2_QUERIES[dhis2_query_key]:
-                continue
-            if os.path.isfile(self.attach_absolute_path(self.DHIS2_QUERIES[dhis2_query_key]['old_export_filename'])):
-                os.remove(self.attach_absolute_path(self.DHIS2_QUERIES[dhis2_query_key]['old_export_filename']))
-            copyfile(self.attach_absolute_path(self.DHIS2_QUERIES[dhis2_query_key]['new_export_filename']),
-                     self.attach_absolute_path(self.DHIS2_QUERIES[dhis2_query_key]['old_export_filename']))
-            if self.verbosity:
-                self.log('DHIS2 export successfully copied to "%s"' %
-                         self.DHIS2_QUERIES[dhis2_query_key]['old_export_filename'])
 
     def increment_ocl_versions(self, import_results=None):
         """
@@ -310,22 +259,45 @@ class DatimBase:
                                 output_file.write(json.dumps(r))
                                 output_file.write('\n')
                             elif resource_type == self.RESOURCE_TYPE_MAPPING and r['type'] == self.RESOURCE_TYPE_MAPPING:
-                                self.log('oh shit! havent implemented mappings')
+                                output_file.write(json.dumps(r))
+                                output_file.write('\n')
                             elif resource_type == self.RESOURCE_TYPE_CONCEPT_REF and r['type'] == self.RESOURCE_TYPE_REFERENCE:
                                 output_file.write(json.dumps(r))
                                 output_file.write('\n')
                             elif resource_type == self.RESOURCE_TYPE_MAPPING_REF and r['type'] == self.RESOURCE_TYPE_REFERENCE:
-                                self.log('oh shit! havent implemented mapping refs')
+                                output_file.write(json.dumps(r))
+                                output_file.write('\n')
                             else:
-                                self.log('oh shit! what is this? resource_type:"%s" and resource:{%s}' % (resource_type, str(r)))
+                                self.log('ERROR: Unrecognized resource_type "%s": {%s}' % (resource_type, str(r)))
+                                sys.exit(1)
 
                     # Process updated items
                     if 'value_changed' in diff[import_batch][resource_type]:
-                        self.log('oh shit! havent implemented value_changed')
+                        self.log('WARNING: Updates are not yet supported. Skipping %s updates...' % len(diff[import_batch][resource_type]))
 
                     # Process deleted items
                     if 'dictionary_item_removed' in diff[import_batch][resource_type]:
-                        self.log('oh shit! havent implemented dictionary_item_removed')
+                        self.log('WARNING: Retiring and deletes are not yet supported. Skipping %s removals...' % len(diff[import_batch][resource_type]))
 
         if self.verbosity:
             self.log('New import script written to file "%s"' % self.NEW_IMPORT_SCRIPT_FILENAME)
+
+    def get_concept_reference_json(self, owner_id='', owner_type='Organization', collection_id='', concept_url=''):
+        # Build the reference key
+        if owner_type == 'User':
+            owner_stem = 'users'
+        elif owner_type == 'Organization':
+            owner_stem = 'orgs'
+        else:
+            print 'Invalid owner_type "%s"' % owner_type
+            exit(1)
+        reference_key = ('/' + owner_stem + '/' + owner_id + '/collections/' + collection_id +
+                         '/references/?concept=' + concept_url)
+        reference_json = {
+            'type': 'Reference',
+            'owner': owner_id,
+            'owner_type': owner_type,
+            'collection': collection_id,
+            'data': {"expressions": [concept_url]}
+        }
+        return reference_key, reference_json

@@ -21,7 +21,6 @@ from __future__ import with_statement
 import os
 import sys
 import json
-from oclfleximporter import OclFlexImporter
 from datimsync import DatimSync
 
 
@@ -45,22 +44,18 @@ class DatimSyncSims(DatimSync):
     # DATIM DHIS2 Query Definitions
     DHIS2_QUERIES = {
         'SimsAssessmentTypes': {
+            'id': 'SimsAssessmentTypes',
             'name': 'DATIM-DHIS2 SIMS Assessment Types',
             'query': 'api/dataElements.json?fields=name,code,id,valueType,lastUpdated,dataElementGroups[id,name]&'
                      'order=code:asc&paging=false&filter=dataElementGroups.id:in:[{{active_dataset_ids}}]',
-            'new_export_filename': 'new_dhis2_sims_export_raw.json',
-            'old_export_filename': 'old_dhis2_sims_export_raw.json',
-            'converted_export_filename': 'new_dhis2_sims_export_converted.json',
             'conversion_method': 'dhis2diff_sims_assessment_types'
         }
     }
     DHIS2_QUERIES_INACTIVE = {
         'SimsOptions': {
+            'id': 'SimsOptions',
             'name': 'DATIM-DHIS2 SIMS Options',
             'query': '',
-            'new_export_filename': 'new_dhis2_sims_options_export_raw.json',
-            'old_export_filename': 'old_dhis2_sims_options_export_raw.json',
-            'converted_export_filename': 'new_dhis2_sims_options_export_converted.json',
             'conversion_method': 'dhis2diff_sims_options'
         }
     }
@@ -112,7 +107,8 @@ class DatimSyncSims(DatimSync):
         :param conversion_attr: Optional dictionary of attributes to pass to the conversion method
         :return: Boolean
         """
-        with open(self.attach_absolute_path(dhis2_query_def['new_export_filename']), "rb") as input_file:
+        dhis2filename_export_new = self.dhis2filename_export_new(dhis2_query_def['id'])
+        with open(self.attach_absolute_path(dhis2filename_export_new), "rb") as input_file:
             new_dhis2_export = json.load(input_file)
             ocl_dataset_repos = conversion_attr['ocl_dataset_repos']
             num_concepts = 0
@@ -165,8 +161,7 @@ class DatimSyncSims(DatimSync):
 
             if self.verbosity:
                 self.log('DHIS2 export "%s" successfully transformed to %s concepts + %s references (%s total)' % (
-                    dhis2_query_def['new_export_filename'], num_concepts,
-                    num_references, num_concepts + num_references))
+                    dhis2filename_export_new, num_concepts, num_references, num_concepts + num_references))
             return True
 
 
@@ -197,8 +192,8 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
 else:
     # Local development environment settings
-    import_limit = 0
-    import_test_mode = False
+    import_limit = 1
+    import_test_mode = True
     compare2previousexport = False
     runoffline = False
     dhis2env = 'https://dev-de.datim.org/'

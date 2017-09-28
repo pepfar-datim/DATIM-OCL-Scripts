@@ -13,13 +13,20 @@ Import batches should be structured as follows:
     2_ordered_import_batch: { ... }
 }
 """
-from datimbase import DatimBase
 import json
+import requests
+import os
+from requests.auth import HTTPBasicAuth
+from shutil import copyfile
+from datimbase import DatimBase
+from oclfleximporter import OclFlexImporter
 
 
 class DatimSync(DatimBase):
 
     OCL_EXPORT_DEFS = {}
+    DHIS2_QUERIES = {}
+    IMPORT_BATCHES = []
 
     DEFAULT_OCL_EXPORT_CLEANING_METHOD = 'clean_ocl_export'
 
@@ -39,6 +46,10 @@ class DatimSync(DatimBase):
         self.ocl_collections = []
         self.str_dataset_ids = ''
         self.data_check_only = False
+        self.runoffline = False
+        self.compare2previousexport = True
+        self.import_test_mode = False
+        self.import_limit = 0
 
     def log_settings(self):
         """ Write settings to console """
@@ -69,6 +80,15 @@ class DatimSync(DatimBase):
 
     def endpoint2filename_ocl_export_cleaned(self, endpoint):
         return 'ocl-' + self._convert_endpoint_to_filename_fmt(endpoint) + '-cleaned.json'
+
+    def dhis2filename_export_new(self, dhis2_query_id):
+        return 'dhis2-' + dhis2_query_id + '-export-new-raw.json'
+
+    def dhis2filename_export_old(self, dhis2_query_id):
+        return 'dhis2-' + dhis2_query_id + '-export-old-raw.json'
+
+    def dhis2filename_export_converted(self, dhis2_query_id):
+        return 'dhis2-' + dhis2_query_id + '-export-converted.json'
 
     def prepare_ocl_exports(self, cleaning_attr=None):
         """
@@ -124,6 +144,57 @@ class DatimSync(DatimBase):
                     num_concept_refs += 1
                 self.log('Cleaned %s concept references' % num_concept_refs)
 
+    def cache_dhis2_exports(self):
+        """
+        Delete old DHIS2 cached files if there
+        :return: None
+        """
+        for dhis2_query_key in self.DHIS2_QUERIES:
+            # Delete old file if it exists
+            dhis2filename_export_new = self.dhis2filename_export_new(self.DHIS2_QUERIES[dhis2_query_key]['id'])
+            dhis2filename_export_old = self.dhis2filename_export_old(self.DHIS2_QUERIES[dhis2_query_key]['id'])
+            if os.path.isfile(self.attach_absolute_path(dhis2filename_export_old)):
+                os.remove(self.attach_absolute_path(dhis2filename_export_old))
+            copyfile(self.attach_absolute_path(dhis2filename_export_new),
+                     self.attach_absolute_path(dhis2filename_export_old))
+            if self.verbosity:
+                self.log('DHIS2 export successfully copied to "%s"' % dhis2filename_export_old)
+
+    def transform_dhis2_exports(self, conversion_attr=None):
+        """
+        Transforms DHIS2 exports into the diff format
+        :param conversion_attr: Optional conversion attributes that are made available to each conversion method
+        :return: None
+        """
+        for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
+            if self.verbosity:
+                self.log('%s:' % dhis2_query_key)
+            getattr(self, dhis2_query_def['conversion_method'])(dhis2_query_def, conversion_attr=conversion_attr)
+        with open(self.attach_absolute_path(self.DHIS2_CONVERTED_EXPORT_FILENAME), 'wb') as output_file:
+            output_file.write(json.dumps(self.dhis2_diff))
+            if self.verbosity:
+                self.log('Transformed DHIS2 exports successfully written to "%s"' % (
+                    self.DHIS2_CONVERTED_EXPORT_FILENAME))
+
+    def save_dhis2_query_to_file(self, query='', query_attr=None, outputfilename=''):
+        """ Execute DHIS2 query and save to file """
+
+        # Replace query attribute names with values and build the query URL
+        if query_attr:
+            for attr_name in query_attr:
+                query = query.replace('{{'+attr_name+'}}', query_attr[attr_name])
+        url_dhis2_query = self.dhis2env + query
+
+        # Execute the query
+        if self.verbosity:
+            self.log('Request URL:', url_dhis2_query)
+        r = requests.get(url_dhis2_query, auth=HTTPBasicAuth(self.dhis2uid, self.dhis2pwd))
+        r.raise_for_status()
+        with open(self.attach_absolute_path(outputfilename), 'wb') as handle:
+            for block in r.iter_content(1024):
+                handle.write(block)
+        return r.headers['Content-Length']
+
     def data_check(self):
         self.data_check_only = True
         return self.run()
@@ -144,24 +215,25 @@ class DatimSync(DatimBase):
         for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
             if self.verbosity:
                 self.log(dhis2_query_key + ':')
+            dhis2filename_export_new = self.dhis2filename_export_new(dhis2_query_def['id'])
             if not self.runoffline:
                 query_attr = {'active_dataset_ids': self.str_active_dataset_ids}
                 content_length = self.save_dhis2_query_to_file(
                     query=dhis2_query_def['query'], query_attr=query_attr,
-                    outputfilename=dhis2_query_def['new_export_filename'])
+                    outputfilename=dhis2filename_export_new)
                 if self.verbosity:
                     self.log('%s bytes retrieved from DHIS2 and written to file "%s"' % (
-                        content_length, dhis2_query_def['new_export_filename']))
+                        content_length, dhis2filename_export_new))
             else:
                 if self.verbosity:
-                    self.log('OFFLINE: Using local file: "%s"' % (dhis2_query_def['new_export_filename']))
-                if os.path.isfile(self.attach_absolute_path(dhis2_query_def['new_export_filename'])):
+                    self.log('OFFLINE: Using local file: "%s"' % dhis2filename_export_new)
+                if os.path.isfile(self.attach_absolute_path(dhis2filename_export_new)):
                     if self.verbosity:
                         self.log('OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
-                            dhis2_query_def['new_export_filename'],
-                            os.path.getsize(self.attach_absolute_path(dhis2_query_def['new_export_filename']))))
+                            dhis2filename_export_new,
+                            os.path.getsize(self.attach_absolute_path(dhis2filename_export_new))))
                 else:
-                    self.log('Could not find offline file "%s". Exiting...' % (dhis2_query_def['new_export_filename']))
+                    self.log('Could not find offline file "%s". Exiting...' % dhis2filename_export_new)
                     sys.exit(1)
 
         # STEP 3: Quick comparison of current and previous DHIS2 exports
@@ -174,16 +246,18 @@ class DatimSync(DatimBase):
             for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
                 if self.verbosity:
                     self.log(dhis2_query_key + ':')
-                if self.filecmp(self.attach_absolute_path(dhis2_query_def['old_export_filename']),
-                                self.attach_absolute_path(dhis2_query_def['new_export_filename'])):
+                dhis2filename_export_new = self.dhis2filename_export_new(dhis2_query_def['id'])
+                dhis2filename_export_old = self.dhis2filename_export_old(dhis2_query_def['id'])
+                if self.filecmp(self.attach_absolute_path(dhis2filename_export_old),
+                                self.attach_absolute_path(dhis2filename_export_new)):
                     if self.verbosity:
                         self.log('"%s" and "%s" are identical' % (
-                            dhis2_query_def['old_export_filename'], dhis2_query_def['new_export_filename']))
+                            dhis2filename_export_old, dhis2filename_export_new))
                 else:
                     complete_match = True
                     if self.verbosity:
                         self.log('"%s" and "%s" are NOT identical' % (
-                            dhis2_query_def['old_export_filename'], dhis2_query_def['new_export_filename']))
+                            dhis2filename_export_old, dhis2filename_export_new))
 
             # Exit if complete match, because there is no import to perform
             if complete_match:
@@ -239,8 +313,6 @@ class DatimSync(DatimBase):
                 self.RESOURCE_TYPE_MAPPING_REF: {},
             }
         self.transform_dhis2_exports(conversion_attr={'ocl_dataset_repos': self.ocl_dataset_repos})
-
-        exit()
 
         # STEP 6: Prepare OCL exports for diff
         # Concepts/mappings in OCL exports have extra attributes that should be removed before the diff

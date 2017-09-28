@@ -1,21 +1,15 @@
 """
-Class to synchronize DATIM-DHIS2 SIMS definitions with OCL
+Class to synchronize DATIM DHIS2 MER Indicator definitions with OCL
 The script runs 1 import batch, which consists of two queries to DHIS2, which are
 synchronized with repositories in OCL as described below.
-|-------------|-------------------------|--------------------------------------------|
-| ImportBatch | DHIS2                   | OCL                                        |
-|-------------|-------------------------|--------------------------------------------|
-| sims        | SimsAssessmentTypeQuery | /orgs/PEPFAR/sources/SIMS/                 |
-|             |                         | /orgs/PEPFAR/collections/SIMS3-Facility/   |
-|             |                         | /orgs/PEPFAR/collections/SIMS3-Community/  |
-|             |                         | /orgs/PEPFAR/collections/SIMS3-Above-Site/ |
-|             |                         | /orgs/PEPFAR/collections/SIMS2-Facility/   |
-|             |                         | /orgs/PEPFAR/collections/SIMS2-Community/  |
-|             |                         | /orgs/PEPFAR/collections/SIMS2-Above-Site/ |
-|             |-------------------------|--------------------------------------------|
-|             | SimsOptionsQuery        | /orgs/PEPFAR/sources/SIMS/                 |
-|             |                         | /orgs/PEPFAR/collections/SIMS-Options/     |
-|-------------|-------------------------|--------------------------------------------|
+|-------------|--------|-------------------------------------------------|
+| ImportBatch | DHIS2  | OCL                                             |
+|-------------|--------|-------------------------------------------------|
+| MER         | MER    | /orgs/PEPFAR/sources/MER/                       |
+|             |        | /orgs/PEPFAR/collections/MER-*/                 |
+|             |        | /orgs/PEPFAR/collections/HC-*/                  |
+|             |        | /orgs/PEPFAR/collections/Planning-Attributes-*/ |
+|-------------|--------|-------------------------------------------------|
 """
 from __future__ import with_statement
 import os
@@ -25,55 +19,43 @@ from oclfleximporter import OclFlexImporter
 from datimsync import DatimSync
 
 
-class DatimSyncSims(DatimSync):
-    """ Class to manage DATIM SIMS Synchronization """
+class DatimSyncMer(DatimSync):
+    """ Class to manage DATIM MER Indicators Synchronization """
 
     # Dataset ID settings
-    OCL_DATASET_ENDPOINT = '/orgs/PEPFAR/collections/?q=SIMS&verbose=true&limit=200'
-    REPO_ACTIVE_ATTR = 'datim_sync_sims'
+    OCL_DATASET_ENDPOINT = '/orgs/PEPFAR/collections/?verbose=true&limit=200'
+    REPO_ACTIVE_ATTR = 'datim_sync_mer'
     DATASET_REPOSITORIES_FILENAME = 'ocl_dataset_repos_export.json'
 
-    # Filenames
-    NEW_IMPORT_SCRIPT_FILENAME = 'sims_dhis2ocl_import_script.json'
-    DHIS2_CONVERTED_EXPORT_FILENAME = 'sims_dhis2_converted_export.json'
-    OCL_CLEANED_EXPORT_FILENAME = 'sims_ocl_cleaned_export.json'
+    # File names
+    NEW_IMPORT_SCRIPT_FILENAME = 'mer_dhis2ocl_import_script.json'
+    DHIS2_CONVERTED_EXPORT_FILENAME = 'mer_dhis2_converted_export.json'
+    OCL_CLEANED_EXPORT_FILENAME = 'mer_ocl_cleaned_export.json'
 
     # Import batches
-    IMPORT_BATCH_SIMS = 'SIMS'
-    IMPORT_BATCHES = [IMPORT_BATCH_SIMS]
+    IMPORT_BATCH_MER = 'MER'
+    IMPORT_BATCHES = [IMPORT_BATCH_MER]
 
     # DATIM DHIS2 Query Definitions
     DHIS2_QUERIES = {
-        'SimsAssessmentTypes': {
-            'name': 'DATIM-DHIS2 SIMS Assessment Types',
-            'query': 'api/dataElements.json?fields=name,code,id,valueType,lastUpdated,dataElementGroups[id,name]&'
-                     'order=code:asc&paging=false&filter=dataElementGroups.id:in:[{{active_dataset_ids}}]',
-            'new_export_filename': 'new_dhis2_sims_export_raw.json',
-            'old_export_filename': 'old_dhis2_sims_export_raw.json',
-            'converted_export_filename': 'new_dhis2_sims_export_converted.json',
-            'conversion_method': 'dhis2diff_sims_assessment_types'
-        }
-    }
-    DHIS2_QUERIES_INACTIVE = {
-        'SimsOptions': {
-            'name': 'DATIM-DHIS2 SIMS Options',
-            'query': '',
-            'new_export_filename': 'new_dhis2_sims_options_export_raw.json',
-            'old_export_filename': 'old_dhis2_sims_options_export_raw.json',
-            'converted_export_filename': 'new_dhis2_sims_options_export_converted.json',
-            'conversion_method': 'dhis2diff_sims_options'
+        'MER': {
+            'name': 'DATIM-DHIS2 MER Indicators',
+            'query': '/api/dataElements.xml?fields=id,code,name,shortName,lastUpdated,description,'
+                     'categoryCombo[id,code,name,lastUpdated,created,'
+                     'categoryOptionCombos[id,code,name,lastUpdated,created]],'
+                     'dataSetElements[*,dataSet[id,name,shortName]]&'
+                     'paging=false&filter=dataSetElements.dataSet.id:in:[{{active_dataset_ids}}]',
+            'new_export_filename': 'new_dhis2_mer_export_raw.json',
+            'old_export_filename': 'old_dhis2_mer_export_raw.json',
+            'converted_export_filename': 'new_dhis2_mer_export_converted.json',
+            'conversion_method': 'dhis2diff_mer'
         }
     }
 
     # OCL Export Definitions
     OCL_EXPORT_DEFS = {
-        'sims_source': {'endpoint': '/orgs/PEPFAR/sources/SIMS/'},
-        'sims2_above_site': {'endpoint': '/orgs/PEPFAR/collections/SIMS2-Above-Site/'},
-        'sims2_community': {'endpoint': '/orgs/PEPFAR/collections/SIMS2-Community/'},
-        'sims2_facility': {'endpoint': '/orgs/PEPFAR/collections/SIMS2-Facility/'},
-        'sims3_above_site': {'endpoint': '/orgs/PEPFAR/collections/SIMS3-Above-Site/'},
-        'sims3_community': {'endpoint': '/orgs/PEPFAR/collections/SIMS3-Community/'},
-        'sims3_facility': {'endpoint': '/orgs/PEPFAR/collections/SIMS3-Facility/'},
+        'MER': {'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY17Q1/'},
+        'MER-R-Facility-DoD-FY17Q1': {'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY17Q1/'},
     }
 
     def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='', compare2previousexport=True,
@@ -96,18 +78,9 @@ class DatimSyncSims(DatimSync):
             'Content-Type': 'application/json'
         }
 
-    def dhis2diff_sims_options(self, dhis2_query_def=None, conversion_attr=None):
+    def dhis2diff_mer(self, dhis2_query_def=None, conversion_attr=None):
         """
-        Convert new DHIS2 SIMS Options export to the diff format
-        :param dhis2_query_def:
-        :param conversion_attr:
-        :return:
-        """
-        pass
-
-    def dhis2diff_sims_assessment_types(self, dhis2_query_def=None, conversion_attr=None):
-        """
-        Convert new DHIS2 SIMS Assessment Types export to the diff format
+        Convert new DHIS2 MER export to the diff format
         :param dhis2_query_def: DHIS2 query definition
         :param conversion_attr: Optional dictionary of attributes to pass to the conversion method
         :return: Boolean
@@ -121,15 +94,15 @@ class DatimSyncSims(DatimSync):
             # Iterate through each DataElement and transform to an OCL-JSON concept
             for de in new_dhis2_export['dataElements']:
                 concept_id = de['code']
-                concept_key = '/orgs/PEPFAR/sources/SIMS/concepts/' + concept_id + '/'
+                concept_key = '/orgs/PEPFAR/sources/MER/concepts/' + concept_id + '/'
                 c = {
                     'type': 'Concept',
                     'id': concept_id,
-                    'concept_class': 'Assessment Type',
-                    'datatype': 'None',
+                    'concept_class': 'Indicator',
+                    'datatype': 'Varies',
                     'owner': 'PEPFAR',
                     'owner_type': 'Organization',
-                    'source': 'SIMS',
+                    'source': 'MER Indicators',
                     'retired': False,
                     'descriptions': None,
                     'external_id': de['id'],
@@ -140,17 +113,24 @@ class DatimSyncSims(DatimSync):
                             'locale': 'en',
                             'locale_preferred': False,
                             'external_id': None,
+                        },
+                        {
+                            'name': de['shortName'],
+                            'name_type': 'Short Name',
+                            'locale': 'en',
+                            'locale_preferred': False,
+                            'external_id': None,
                         }
                     ],
-                    'extras': {'Value Type': de['valueType']}
+                    'extras': {'Dataset':''}
                 }
-                self.dhis2_diff[self.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT][concept_key] = c
+                self.dhis2_diff[self.IMPORT_BATCH_MERIndicators][self.RESOURCE_TYPE_CONCEPT][concept_key] = c
                 num_concepts += 1
 
                 # Iterate through each DataElementGroup and transform to an OCL-JSON reference
                 for deg in de['dataElementGroups']:
                     collection_id = ocl_dataset_repos[deg['id']]['id']
-                    concept_url = '/orgs/PEPFAR/sources/SIMS/concepts/' + concept_id + '/'
+                    concept_url = '/orgs/PEPFAR/sources/MERIndicators/concepts/' + concept_id + '/'
                     concept_ref_key = ('/orgs/PEPFAR/collections/' + collection_id +
                                        '/references/?concept=' + concept_url)
                     r = {
@@ -160,7 +140,8 @@ class DatimSyncSims(DatimSync):
                         'collection': collection_id,
                         'data': {"expressions": [concept_url]}
                     }
-                    self.dhis2_diff[self.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT_REF][concept_ref_key] = r
+                    self.dhis2_diff[self.IMPORT_BATCH_MERIndicators][self.RESOURCE_TYPE_CONCEPT_REF][
+                        concept_ref_key] = r
                     num_references += 1
 
             if self.verbosity:
@@ -219,11 +200,11 @@ else:
 
 
 # Create sync object and run
-sims_sync = DatimSyncSims(oclenv=oclenv, oclapitoken=oclapitoken,
-                          dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
-                          compare2previousexport=compare2previousexport,
-                          runoffline=runoffline, verbosity=verbosity,
-                          import_test_mode=import_test_mode,
-                          import_limit=import_limit)
-#sims_sync.run()
-sims_sync.data_check()
+mer_sync = DatimSyncMer(oclenv=oclenv, oclapitoken=oclapitoken,
+                         dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
+                         compare2previousexport=compare2previousexport,
+                         runoffline=runoffline, verbosity=verbosity,
+                         import_test_mode=import_test_mode,
+                         import_limit=import_limit)
+mer_sync.run()
+#mer_sync.data_check()

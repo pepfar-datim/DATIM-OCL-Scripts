@@ -531,8 +531,15 @@ class OclFlexImporter:
 
         # Store the results if successful
         # TODO: This could be improved significantly!
-        if int(request_result.status_code) > 200 and int(request_result.status_code) < 300:
-            if obj_type in [self.OBJ_TYPE_CONCEPT, self.OBJ_TYPE_MAPPING, self.OBJ_TYPE_REFERENCE]:
+        if self.OBJ_TYPE_REFERENCE:
+            # references need to be handled in a special way, but for now, treat the same as concepts/mappings
+            if obj_repo_url not in self.results:
+                self.results[obj_repo_url] = {}
+            if action_type not in self.results[obj_repo_url]:
+                self.results[obj_repo_url][action_type] = []
+            self.results[obj_repo_url][action_type].append(obj_url)
+        elif int(request_result.status_code) >= 200 and int(request_result.status_code) < 300:
+            if obj_type in [self.OBJ_TYPE_CONCEPT, self.OBJ_TYPE_MAPPING]:
                 if obj_repo_url not in self.results:
                     self.results[obj_repo_url] = {}
                 if action_type not in self.results[obj_repo_url]:

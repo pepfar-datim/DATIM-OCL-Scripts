@@ -38,19 +38,17 @@ class ocl_csv_to_json_flex:
     INVALID_CHARS = ' `~!@#$%^&*()_+-=[]{}\|;:"\',/<>?'
     REPLACE_CHAR = '-'
 
-
     def __init__(self, output_filename='', csv_filename='', csv_resource_definitions=None,
                  verbose=False, include_type_attribute=True):
-        ''' Initialize ocl_csv_to_json_flex object '''
+        """ Initialize ocl_csv_to_json_flex object """
         self.output_filename = output_filename
         self.csv_filename = csv_filename
         self.csv_resource_definitions = csv_resource_definitions
         self.verbose = verbose
         self.include_type_attribute = include_type_attribute
 
-
     def process_by_row(self):
-        ''' Processes the CSV file applying all definitions to each row before moving to the next row '''
+        """ Processes the CSV file applying all definitions to each row before moving to the next row """
         with open(self.csv_filename) as csvfile:
             csv_reader = csv.DictReader(csvfile)
             for csv_row in csv_reader:
@@ -58,9 +56,8 @@ class ocl_csv_to_json_flex:
                     if 'is_active' not in csv_resource_def or csv_resource_def['is_active']:
                         self.process_csv_row_with_definition(csv_row, csv_resource_def)
 
-
     def process_by_definition(self):
-        ''' Processes the CSV file by looping through it entirely once for each definition '''
+        """ Processes the CSV file by looping through it entirely once for each definition """
         for csv_resource_def in self.csv_resource_definitions:
             if 'is_active' not in csv_resource_def or csv_resource_def['is_active']:
                 with open(self.csv_filename) as csvfile:
@@ -68,9 +65,8 @@ class ocl_csv_to_json_flex:
                     for csv_row in csv_reader:
                         self.process_csv_row_with_definition(csv_row, csv_resource_def)
 
-
     def process_csv_row_with_definition(self, csv_row, csv_resource_def):
-        ''' Process individual CSV row with the provided CSV resource definition '''
+        """ Process individual CSV row with the provided CSV resource definition """
 
         # Check if this row should be skipped
         is_skip_row = False
@@ -172,12 +168,16 @@ class ocl_csv_to_json_flex:
                         raise Exception('Expected "value" or "value_column" key in key_value_pair definition, but neither found: %s' % kvp_def)
 
                     # Set the key-value pair
-                    ocl_resource[group_name][key] = value
+                    if value == '' and 'omit_if_empty_value' in kvp_def and kvp_def['omit_if_empty_value']:
+                        pass
+                    else:
+                        ocl_resource[group_name][key] = value
 
         # Output
         if self.output_filename:
             output_file = open(self.output_filename,'a')
             output_file.write(json.dumps(ocl_resource))
+            output_file.write('\n')
         else:
             print (json.dumps(ocl_resource))
 

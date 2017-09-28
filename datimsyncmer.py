@@ -15,7 +15,6 @@ from __future__ import with_statement
 import os
 import sys
 import json
-from oclfleximporter import OclFlexImporter
 from datimsync import DatimSync
 
 
@@ -39,15 +38,13 @@ class DatimSyncMer(DatimSync):
     # DATIM DHIS2 Query Definitions
     DHIS2_QUERIES = {
         'MER': {
+            'id': 'MER',
             'name': 'DATIM-DHIS2 MER Indicators',
-            'query': '/api/dataElements.xml?fields=id,code,name,shortName,lastUpdated,description,'
+            'query': '/api/dataElements.json?fields=id,code,name,shortName,lastUpdated,description,'
                      'categoryCombo[id,code,name,lastUpdated,created,'
                      'categoryOptionCombos[id,code,name,lastUpdated,created]],'
                      'dataSetElements[*,dataSet[id,name,shortName]]&'
                      'paging=false&filter=dataSetElements.dataSet.id:in:[{{active_dataset_ids}}]',
-            'new_export_filename': 'new_dhis2_mer_export_raw.json',
-            'old_export_filename': 'old_dhis2_mer_export_raw.json',
-            'converted_export_filename': 'new_dhis2_mer_export_converted.json',
             'conversion_method': 'dhis2diff_mer'
         }
     }
@@ -56,6 +53,9 @@ class DatimSyncMer(DatimSync):
     OCL_EXPORT_DEFS = {
         'MER': {'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY17Q1/'},
         'MER-R-Facility-DoD-FY17Q1': {'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY17Q1/'},
+        'MER-R-Facility-DoD-FY17Q2': {'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY17Q2/'},
+        'MER-R-Facility-DoD-FY16Q4': {'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY16Q4/'},
+        'MER-R-Facility-DoD-FY16Q1Q2Q3': {'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY16Q1Q2Q3/'},
     }
 
     def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='', compare2previousexport=True,
@@ -85,69 +85,147 @@ class DatimSyncMer(DatimSync):
         :param conversion_attr: Optional dictionary of attributes to pass to the conversion method
         :return: Boolean
         """
-        with open(self.attach_absolute_path(dhis2_query_def['new_export_filename']), "rb") as input_file:
+        dhis2filename_export_new = self.dhis2filename_export_new(dhis2_query_def['id'])
+        with open(self.attach_absolute_path(dhis2filename_export_new), "rb") as input_file:
+            if self.verbosity:
+                self.log('Loading new DHIS2 export "%s"...' % dhis2filename_export_new)
             new_dhis2_export = json.load(input_file)
             ocl_dataset_repos = conversion_attr['ocl_dataset_repos']
-            num_concepts = 0
-            num_references = 0
+            num_indicators = 0
+            num_disaggregates = 0
+            num_mappings = 0
+            num_indicator_refs = 0
+            num_disaggregate_refs = 0
 
-            # Iterate through each DataElement and transform to an OCL-JSON concept
+            # Iterate through each DataElement and transform to an Indicator concept
             for de in new_dhis2_export['dataElements']:
-                concept_id = de['code']
-                concept_key = '/orgs/PEPFAR/sources/MER/concepts/' + concept_id + '/'
-                c = {
+                indicator_concept_id = de['code']
+                indicator_concept_url = '/orgs/PEPFAR/sources/MER/concepts/' + indicator_concept_id + '/'
+                indicator_concept_key = indicator_concept_url
+                indicator_concept = {
                     'type': 'Concept',
-                    'id': concept_id,
+                    'id': indicator_concept_id,
                     'concept_class': 'Indicator',
-                    'datatype': 'Varies',
+                    'datatype': 'Numeric',
                     'owner': 'PEPFAR',
                     'owner_type': 'Organization',
-                    'source': 'MER Indicators',
+                    'source': 'MER',
                     'retired': False,
-                    'descriptions': None,
                     'external_id': de['id'],
+                    'descriptions': None,
                     'names': [
                         {
                             'name': de['name'],
                             'name_type': 'Fully Specified',
                             'locale': 'en',
-                            'locale_preferred': False,
+                            'locale_preferred': True,
                             'external_id': None,
                         },
                         {
                             'name': de['shortName'],
-                            'name_type': 'Short Name',
+                            'name_type': 'Short',
                             'locale': 'en',
                             'locale_preferred': False,
                             'external_id': None,
                         }
                     ],
-                    'extras': {'Dataset':''}
                 }
-                self.dhis2_diff[self.IMPORT_BATCH_MERIndicators][self.RESOURCE_TYPE_CONCEPT][concept_key] = c
-                num_concepts += 1
+                if 'description' in de and de['description']:
+                    indicator_concept['descriptions'] = [
+                        {
+                            'description': de['description'],
+                            'description_type': 'Description',
+                            'locale': 'en',
+                            'locale_preferred': True,
+                            'external_id': None,
+                        }
+                    ]
+                self.dhis2_diff[self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT][
+                    indicator_concept_key] = indicator_concept
+                num_indicators += 1
 
-                # Iterate through each DataElementGroup and transform to an OCL-JSON reference
-                for deg in de['dataElementGroups']:
-                    collection_id = ocl_dataset_repos[deg['id']]['id']
-                    concept_url = '/orgs/PEPFAR/sources/MERIndicators/concepts/' + concept_id + '/'
-                    concept_ref_key = ('/orgs/PEPFAR/collections/' + collection_id +
-                                       '/references/?concept=' + concept_url)
-                    r = {
-                        'type': 'Reference',
+                # Build disaggregates concepts and mappings
+                indicator_disaggregate_concept_urls = []
+                for coc in de['categoryCombo']['categoryOptionCombos']:
+                    disaggregate_concept_id = coc['code']
+                    disaggregate_concept_url = '/orgs/PEPFAR/sources/MER/concepts/' + disaggregate_concept_id + '/'
+                    disaggregate_concept_key = disaggregate_concept_url
+                    indicator_disaggregate_concept_urls.append(disaggregate_concept_url)
+
+                    # Only build the disaggregate concept if it has not already been defined
+                    if disaggregate_concept_key not in self.dhis2_diff[self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT]:
+                        disaggregate_concept = {
+                            'type': 'Concept',
+                            'id': disaggregate_concept_id,
+                            'concept_class': 'Disaggregate',
+                            'datatype': 'None',
+                            'owner': 'PEPFAR',
+                            'owner_type': 'Organization',
+                            'source': 'MER',
+                            'retired': False,
+                            'descriptions': None,
+                            'external_id': coc['id'],
+                            'names': [
+                                {
+                                    'name': coc['name'],
+                                    'name_type': 'Fully Specified',
+                                    'locale': 'en',
+                                    'locale_preferred': True,
+                                    'external_id': None,
+                                }
+                            ]
+                        }
+                        self.dhis2_diff[self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT][disaggregate_concept_key] = disaggregate_concept
+                        num_disaggregates += 1
+
+                    # Build the mapping
+                    map_type = 'Has Option'
+                    disaggregate_mapping_key = ('/orgs/PEPFAR/sources/MER/mappings/?from=' + indicator_concept_url +
+                                                '&maptype=' + map_type + '&to=' + disaggregate_concept_url)
+                    disaggregate_mapping = {
+                        'type': "Mapping",
                         'owner': 'PEPFAR',
                         'owner_type': 'Organization',
-                        'collection': collection_id,
-                        'data': {"expressions": [concept_url]}
+                        'source': 'MER',
+                        'map_type': map_type,
+                        'from_concept_url': indicator_concept_url,
+                        'to_concept_url': disaggregate_concept_url,
                     }
-                    self.dhis2_diff[self.IMPORT_BATCH_MERIndicators][self.RESOURCE_TYPE_CONCEPT_REF][
-                        concept_ref_key] = r
-                    num_references += 1
+                    self.dhis2_diff[self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_MAPPING][
+                        disaggregate_mapping_key] = disaggregate_mapping
+                    num_mappings += 1
+
+                # Iterate through DataSets to transform to build references
+                # NOTE: References are created for the indicator as well as each of its disaggregates and mappings
+                for dse in de['dataSetElements']:
+                    ds = dse['dataSet']
+
+                    # Confirm that this dataset is one of the ones that we're interested in
+                    if ds['id'] not in ocl_dataset_repos:
+                        continue
+                    collection_id = ocl_dataset_repos[ds['id']]['id']
+
+                    # Build the Indicator concept reference - mappings for this reference will be added automatically
+                    indicator_ref_key, indicator_ref = self.get_concept_reference_json(
+                        owner_id='PEPFAR', collection_id=collection_id, concept_url=indicator_concept_url)
+                    self.dhis2_diff[self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF][
+                        indicator_ref_key] = indicator_ref
+                    num_indicator_refs += 1
+
+                    # Build the Disaggregate concept reference
+                    for disaggregate_concept_url in indicator_disaggregate_concept_urls:
+                        disaggregate_ref_key, disaggregate_ref = self.get_concept_reference_json(
+                            owner_id='PEPFAR', collection_id=collection_id, concept_url=disaggregate_concept_url)
+                        if disaggregate_ref_key not in self.dhis2_diff[self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF]:
+                            self.dhis2_diff[self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF][
+                                disaggregate_ref_key] = disaggregate_ref
+                            num_disaggregate_refs += 1
 
             if self.verbosity:
-                self.log('DHIS2 export "%s" successfully transformed to %s concepts + %s references (%s total)' % (
-                    dhis2_query_def['new_export_filename'], num_concepts,
-                    num_references, num_concepts + num_references))
+                self.log('DHIS2 export "%s" successfully transformed to %s indicators, %s disaggregates, %s mappings, '
+                         '%s indicator references, and %s disaggregate references' % (
+                    dhis2filename_export_new, num_indicators, num_disaggregates, num_mappings,
+                    num_indicator_refs, num_disaggregate_refs))
             return True
 
 
@@ -178,8 +256,8 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
 else:
     # Local development environment settings
-    import_limit = 0
-    import_test_mode = False
+    import_limit = 1
+    import_test_mode = True
     compare2previousexport = False
     runoffline = False
     dhis2env = 'https://dev-de.datim.org/'

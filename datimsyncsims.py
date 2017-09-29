@@ -62,13 +62,20 @@ class DatimSyncSims(DatimSync):
 
     # OCL Export Definitions
     OCL_EXPORT_DEFS = {
-        'sims_source': {'endpoint': '/orgs/PEPFAR/sources/SIMS/'},
-        'sims2_above_site': {'endpoint': '/orgs/PEPFAR/collections/SIMS2-Above-Site/'},
-        'sims2_community': {'endpoint': '/orgs/PEPFAR/collections/SIMS2-Community/'},
-        'sims2_facility': {'endpoint': '/orgs/PEPFAR/collections/SIMS2-Facility/'},
-        'sims3_above_site': {'endpoint': '/orgs/PEPFAR/collections/SIMS3-Above-Site/'},
-        'sims3_community': {'endpoint': '/orgs/PEPFAR/collections/SIMS3-Community/'},
-        'sims3_facility': {'endpoint': '/orgs/PEPFAR/collections/SIMS3-Facility/'},
+        'sims_source': {'import_batch': IMPORT_BATCH_SIMS,
+                        'endpoint': '/orgs/PEPFAR/sources/SIMS/'},
+        'sims2_above_site': {'import_batch': IMPORT_BATCH_SIMS,
+                             'endpoint': '/orgs/PEPFAR/collections/SIMS2-Above-Site/'},
+        'sims2_community': {'import_batch': IMPORT_BATCH_SIMS,
+                            'endpoint': '/orgs/PEPFAR/collections/SIMS2-Community/'},
+        'sims2_facility': {'import_batch': IMPORT_BATCH_SIMS,
+                           'endpoint': '/orgs/PEPFAR/collections/SIMS2-Facility/'},
+        'sims3_above_site': {'import_batch': IMPORT_BATCH_SIMS,
+                             'endpoint': '/orgs/PEPFAR/collections/SIMS3-Above-Site/'},
+        'sims3_community': {'import_batch': IMPORT_BATCH_SIMS,
+                            'endpoint': '/orgs/PEPFAR/collections/SIMS3-Community/'},
+        'sims3_facility': {'import_batch': IMPORT_BATCH_SIMS,
+                           'endpoint': '/orgs/PEPFAR/collections/SIMS3-Facility/'},
     }
 
     def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='', compare2previousexport=True,
@@ -124,7 +131,7 @@ class DatimSyncSims(DatimSync):
                     'concept_class': 'Assessment Type',
                     'datatype': 'None',
                     'owner': 'PEPFAR',
-                    'owner_type': 'Organization',
+                    'owner_type': self.RESOURCE_TYPE_ORGANIZATION,
                     'source': 'SIMS',
                     'retired': False,
                     'descriptions': None,
@@ -152,16 +159,15 @@ class DatimSyncSims(DatimSync):
                     r = {
                         'type': 'Reference',
                         'owner': 'PEPFAR',
-                        'owner_type': 'Organization',
+                        'owner_type': self.RESOURCE_TYPE_ORGANIZATION,
                         'collection': collection_id,
                         'data': {"expressions": [concept_url]}
                     }
                     self.dhis2_diff[self.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT_REF][concept_ref_key] = r
                     num_references += 1
 
-            if self.verbosity:
-                self.log('DHIS2 export "%s" successfully transformed to %s concepts + %s references (%s total)' % (
-                    dhis2filename_export_new, num_concepts, num_references, num_concepts + num_references))
+            self.vlog(1, 'DHIS2 export "%s" successfully transformed to %s concepts + %s references (%s total)' % (
+                dhis2filename_export_new, num_concepts, num_references, num_concepts + num_references))
             return True
 
 
@@ -220,5 +226,5 @@ sims_sync = DatimSyncSims(oclenv=oclenv, oclapitoken=oclapitoken,
                           runoffline=runoffline, verbosity=verbosity,
                           import_test_mode=import_test_mode,
                           import_limit=import_limit)
-#sims_sync.run()
+# sims_sync.run()
 sims_sync.data_check()

@@ -33,6 +33,20 @@ csv_resource_definitions = [
             ]
         }
     },
+    {
+        'definition_name': 'DATIM-CollectionVersions',
+        'is_active': True,
+        'resource_type': 'Collection Version',
+        'skip_if_empty_column': 'OCL: Collection',
+        ocl_csv_to_json_flex.DEF_CORE_FIELDS: [
+            {'resource_field': 'owner', 'value': 'PEPFAR'},
+            {'resource_field': 'owner_type', 'value': 'Organization'},
+            {'resource_field': 'collection', 'column': 'OCL: Collection'},
+            {'resource_field': 'id', 'value': 'initial'},
+            {'resource_field': 'description', 'value': 'Automatically generated empty repository version'},
+            {'resource_field': 'released', 'value': True}
+        ],
+    },
 ]
 
 csv_converter = ocl_csv_to_json_flex(output_filename, csv_filename, csv_resource_definitions, verbose=0)

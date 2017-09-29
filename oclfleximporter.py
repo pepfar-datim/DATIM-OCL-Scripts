@@ -81,6 +81,8 @@ class OclFlexImporter:
     OBJ_TYPE_CONCEPT = 'Concept'
     OBJ_TYPE_MAPPING = 'Mapping'
     OBJ_TYPE_REFERENCE = 'Reference'
+    OBJ_TYPE_SOURCE_VERSION = 'Source Version'
+    OBJ_TYPE_COLLECTION_VERSION = 'Collection Version'
 
     ACTION_TYPE_NEW = 'new'
     ACTION_TYPE_UPDATE = 'udpate'
@@ -149,6 +151,28 @@ class OclFlexImporter:
             "create_method": "PUT",
             "update_method": None,
         },
+        OBJ_TYPE_SOURCE_VERSION: {
+            "id_field": "id",
+            "url_name": "versions",
+            "has_owner": True,
+            "has_source": True,
+            "has_collection": False,
+            "omit_resource_name_on_get": True,
+            "allowed_fields": ["id", "external_id", "description", "released"],
+            "create_method": "POST",
+            "update_method": "POST",
+        },
+        OBJ_TYPE_COLLECTION_VERSION: {
+            "id_field": "id",
+            "url_name": "versions",
+            "has_owner": True,
+            "has_source": False,
+            "has_collection": True,
+            "omit_resource_name_on_get": True,
+            "allowed_fields": ["id", "external_id", "description", "released"],
+            "create_method": "POST",
+            "update_method": "POST",
+        },
     }
 
     def __init__(self, file_path='', api_url_root='', api_token='', limit=0,
@@ -205,6 +229,8 @@ class OclFlexImporter:
         obj_def_keys = self.obj_def.keys()
         with open(self.file_path) as json_file:
             count = 0
+            num_processed = 0
+            num_skipped = 0
             for json_line_raw in json_file:
                 if self.limit > 0 and count >= self.limit:
                     break
@@ -212,11 +238,16 @@ class OclFlexImporter:
                 if "type" in json_line_obj:
                     obj_type = json_line_obj.pop("type")
                     if obj_type in obj_def_keys:
+                        self.log('')
                         self.process_object(obj_type, json_line_obj)
+                        num_processed += 1
+                        self.log('(%s processed and %s skipped of %s total)' % (num_processed, num_skipped, count))
                     else:
                         self.log("**** SKIPPING: Unrecognized 'type' attribute '" + obj_type + "' for object: " + json_line_raw)
+                        num_skipped += 1
                 else:
                     self.log("**** SKIPPING: No 'type' attribute: " + json_line_raw)
+                    num_skipped += 1
                 count += 1
 
         return count
@@ -383,7 +414,11 @@ class OclFlexImporter:
 
         # Build object URLs -- note that these always end with forward slashes
         if has_source or has_collection:
-            if obj_id:
+            if 'omit_resource_name_on_get' in self.obj_def[obj_type] and self.obj_def[obj_type]['omit_resource_name_on_get']:
+                # Source or collection version
+                new_obj_url = obj_repo_url + self.obj_def[obj_type]["url_name"] + "/"
+                obj_url = obj_repo_url + obj_id + "/"
+            elif obj_id:
                 # Concept
                 new_obj_url = obj_repo_url + self.obj_def[obj_type]["url_name"] + "/"
                 obj_url = new_obj_url + obj_id + "/"
@@ -531,8 +566,15 @@ class OclFlexImporter:
 
         # Store the results if successful
         # TODO: This could be improved significantly!
-        if int(request_result.status_code) > 200 and int(request_result.status_code) < 300:
-            if obj_type in [self.OBJ_TYPE_CONCEPT, self.OBJ_TYPE_MAPPING, self.OBJ_TYPE_REFERENCE]:
+        if obj_type == self.OBJ_TYPE_REFERENCE:
+            # references need to be handled in a special way, but for now, treat the same as concepts/mappings
+            if obj_repo_url not in self.results:
+                self.results[obj_repo_url] = {}
+            if action_type not in self.results[obj_repo_url]:
+                self.results[obj_repo_url][action_type] = []
+            self.results[obj_repo_url][action_type].append(obj_url)
+        elif int(request_result.status_code) >= 200 and int(request_result.status_code) < 300:
+            if obj_type in [self.OBJ_TYPE_CONCEPT, self.OBJ_TYPE_MAPPING]:
                 if obj_repo_url not in self.results:
                     self.results[obj_repo_url] = {}
                 if action_type not in self.results[obj_repo_url]:

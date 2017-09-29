@@ -6,10 +6,10 @@ import csv
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import SubElement
 from xml.etree.ElementTree import tostring
-from datimbase import DatimBase
+from datimshow import DatimShow
 
 
-class DatimShowSims(DatimBase):
+class DatimShowSims(DatimShow):
     """ Class to manage DATIM SIMS Presentation """
 
     # Formats

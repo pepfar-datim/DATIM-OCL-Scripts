@@ -29,7 +29,7 @@ csv_resource_definitions = [
             'extras': [
                 {'key': 'Period', 'value_column': 'OCL: Period', 'omit_if_empty_value': True},
                 {'key': 'DHIS2-Dataset-Code', 'value_column': 'Dataset: code', 'omit_if_empty_value': True},
-                {'key_column': 'OCL: Active Sync Attribute', 'value':True}
+                {'key_column': 'OCL: Active Sync Attribute', 'value': True}
             ]
         }
     },

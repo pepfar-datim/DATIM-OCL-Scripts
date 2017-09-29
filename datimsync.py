@@ -16,13 +16,20 @@ Import batches should be structured as follows:
 import json
 import requests
 import os
+import sys
 from requests.auth import HTTPBasicAuth
 from shutil import copyfile
 from datimbase import DatimBase
 from oclfleximporter import OclFlexImporter
+from pprint import pprint
+from deepdiff import DeepDiff
 
 
 class DatimSync(DatimBase):
+
+    # Data check return values
+    DATIM_SYNC_NO_DIFF = 0
+    DATIM_SYNC_DIFF = 1
 
     OCL_EXPORT_DEFS = {}
     DHIS2_QUERIES = {}
@@ -36,7 +43,16 @@ class DatimSync(DatimBase):
                                         'display_locale', 'uuid', 'version', 'owner_url', 'source_url',
                                         'mappings', 'url', 'version_url', 'is_latest_version', 'locale']
     DEFAULT_CONCEPT_NAME_FIELDS_TO_REMOVE = ['uuid', 'type']
-    DEFAULT_MAPPING_FIELDS_TO_REMOVE = []
+    DEFAULT_CONCEPT_DESC_FIELDS_TO_REMOVE = ['uuid', 'type']
+    DEFAULT_MAPPING_ALLOWED_FIELDS = ['external_id', 'extras', 'id', 'from_source_url', 'map_type',
+                                      'owner', 'owner_type', 'retired', 'source', 'to_concept_code',
+                                      'to_source_url', 'to_concept_url', 'type', 'url']
+    DEFAULT_MAPPING_FIELDS_TO_REMOVE = ['created_at', 'created_by', 'from_concept_code', 'from_concept_name',
+                                        'from_source_name', 'from_source_owner', 'from_source_owner_type',
+                                        'from_source_url', 'is_direct_mapping', 'is_external_mapping',
+                                        'is_internal_mapping', 'is_inverse_mapping', 'updated_at', 'updated_by',
+                                        'to_concept_name', 'to_source_name', 'to_source_owner',
+                                        'to_source_owner_type']
 
     def __init__(self):
         DatimBase.__init__(self)
@@ -50,6 +66,7 @@ class DatimSync(DatimBase):
         self.compare2previousexport = True
         self.import_test_mode = False
         self.import_limit = 0
+        self.diff_result = None
 
     def log_settings(self):
         """ Write settings to console """
@@ -97,15 +114,13 @@ class DatimSync(DatimBase):
         :return: None
         """
         for ocl_export_def_key, export_def in self.OCL_EXPORT_DEFS.iteritems():
-            if self.verbosity:
-                self.log('%s:' % ocl_export_def_key)
+            self.vlog(1, '** %s:' % ocl_export_def_key)
             cleaning_method_name = export_def.get('cleaning_method', self.DEFAULT_OCL_EXPORT_CLEANING_METHOD)
             getattr(self, cleaning_method_name)(export_def, cleaning_attr=cleaning_attr)
         with open(self.attach_absolute_path(self.OCL_CLEANED_EXPORT_FILENAME), 'wb') as output_file:
             output_file.write(json.dumps(self.ocl_diff))
-            if self.verbosity:
-                self.log('Cleaned OCL exports successfully written to "%s"' % (
-                    self.OCL_CLEANED_EXPORT_FILENAME))
+            self.vlog(1, 'Cleaned OCL exports successfully written to "%s"' % (
+                self.OCL_CLEANED_EXPORT_FILENAME))
 
     def clean_ocl_export(self, ocl_export_def, cleaning_attr=None):
         """
@@ -114,11 +129,12 @@ class DatimSync(DatimBase):
         :param cleaning_attr:
         :return:
         """
+        import_batch_key = ocl_export_def['import_batch']
         jsonfilename = self.endpoint2filename_ocl_export_json(ocl_export_def['endpoint'])
         with open(self.attach_absolute_path(jsonfilename), 'rb') as input_file:
             ocl_export_raw = json.load(input_file)
 
-            if ocl_export_raw['type'] == 'Source':
+            if ocl_export_raw['type'] in ['Source', 'Source Version']:
                 num_concepts = 0
                 for c in ocl_export_raw['concepts']:
                     concept_key = c['url']
@@ -127,22 +143,28 @@ class DatimSync(DatimBase):
                         if f in c:
                             del c[f]
                     # Remove name fields
-                    if 'names' in c:
+                    if 'names' in c and type(c['names']) is list:
                         for i, name in enumerate(c['names']):
                             for f in self.DEFAULT_CONCEPT_NAME_FIELDS_TO_REMOVE:
                                 if f in name:
                                     del name[f]
-                    self.ocl_diff[self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT][concept_key] = c
+                    # Remove description fields
+                    if 'descriptions' in c and type(c['descriptions']) is list:
+                        for i, description in enumerate(c['descriptions']):
+                            for f in self.DEFAULT_CONCEPT_DESC_FIELDS_TO_REMOVE:
+                                if f in description:
+                                    del description[f]
+                    self.ocl_diff[import_batch_key][self.RESOURCE_TYPE_CONCEPT][concept_key] = c
                     num_concepts += 1
-                self.log('Cleaned %s concepts' % num_concepts)
+                self.vlog(1, 'Cleaned %s concepts' % num_concepts)
 
-            elif ocl_export_raw['type'] == 'Collection':
+            elif ocl_export_raw['type'] in ['Collection', 'Collection Version']:
                 num_concept_refs = 0
                 for r in ocl_export_raw['references']:
                     concept_ref_key = r['url']
-                    self.ocl_diff[self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF][concept_ref_key] = r
+                    self.ocl_diff[import_batch_key][self.RESOURCE_TYPE_CONCEPT_REF][concept_ref_key] = r
                     num_concept_refs += 1
-                self.log('Cleaned %s concept references' % num_concept_refs)
+                self.vlog(1, 'Cleaned %s concept references' % num_concept_refs)
 
     def cache_dhis2_exports(self):
         """
@@ -157,8 +179,7 @@ class DatimSync(DatimBase):
                 os.remove(self.attach_absolute_path(dhis2filename_export_old))
             copyfile(self.attach_absolute_path(dhis2filename_export_new),
                      self.attach_absolute_path(dhis2filename_export_old))
-            if self.verbosity:
-                self.log('DHIS2 export successfully copied to "%s"' % dhis2filename_export_old)
+            self.vlog(1, 'DHIS2 export successfully copied to "%s"' % dhis2filename_export_old)
 
     def transform_dhis2_exports(self, conversion_attr=None):
         """
@@ -167,14 +188,12 @@ class DatimSync(DatimBase):
         :return: None
         """
         for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
-            if self.verbosity:
-                self.log('%s:' % dhis2_query_key)
+            self.vlog(1, '** %s:' % dhis2_query_key)
             getattr(self, dhis2_query_def['conversion_method'])(dhis2_query_def, conversion_attr=conversion_attr)
         with open(self.attach_absolute_path(self.DHIS2_CONVERTED_EXPORT_FILENAME), 'wb') as output_file:
             output_file.write(json.dumps(self.dhis2_diff))
-            if self.verbosity:
-                self.log('Transformed DHIS2 exports successfully written to "%s"' % (
-                    self.DHIS2_CONVERTED_EXPORT_FILENAME))
+            self.vlog(1, 'Transformed DHIS2 exports successfully written to "%s"' % (
+                self.DHIS2_CONVERTED_EXPORT_FILENAME))
 
     def save_dhis2_query_to_file(self, query='', query_attr=None, outputfilename=''):
         """ Execute DHIS2 query and save to file """
@@ -186,14 +205,103 @@ class DatimSync(DatimBase):
         url_dhis2_query = self.dhis2env + query
 
         # Execute the query
-        if self.verbosity:
-            self.log('Request URL:', url_dhis2_query)
+        self.vlog(1, 'Request URL:', url_dhis2_query)
         r = requests.get(url_dhis2_query, auth=HTTPBasicAuth(self.dhis2uid, self.dhis2pwd))
         r.raise_for_status()
         with open(self.attach_absolute_path(outputfilename), 'wb') as handle:
             for block in r.iter_content(1024):
                 handle.write(block)
         return r.headers['Content-Length']
+
+    def perform_diff(self, ocl_diff=None, dhis2_diff=None):
+        """
+        Performs deep diff on the prepared OCL and DHIS2 resources
+        :param ocl_diff:
+        :param dhis2_diff:
+        :return:
+        """
+        diff = {}
+        for import_batch_key in self.IMPORT_BATCHES:
+            diff[import_batch_key] = {}
+            for resource_type in self.RESOURCE_TYPES:
+                if resource_type in ocl_diff[import_batch_key] and resource_type in dhis2_diff[import_batch_key]:
+                    diff[import_batch_key][resource_type] = DeepDiff(
+                        ocl_diff[import_batch_key][resource_type],
+                        dhis2_diff[import_batch_key][resource_type],
+                        ignore_order=True, verbose_level=2)
+                    if self.verbosity:
+                        str_log = 'IMPORT_BATCH["%s"]["%s"]: ' % (import_batch_key, resource_type)
+                        for k in diff[import_batch_key][resource_type]:
+                            str_log += '%s: %s; ' % (k, len(diff[import_batch_key][resource_type][k]))
+                        self.log(str_log)
+        return diff
+
+    def generate_import_scripts(self, diff):
+        """
+        Generate import scripts
+        :param diff:
+        :return:
+        """
+        with open(self.attach_absolute_path(self.NEW_IMPORT_SCRIPT_FILENAME), 'wb') as output_file:
+            for import_batch in self.IMPORT_BATCHES:
+                for resource_type in self.RESOURCE_TYPES:
+                    if resource_type not in diff[import_batch]:
+                        continue
+
+                    # Process new items
+                    if 'dictionary_item_added' in diff[import_batch][resource_type]:
+                        for k, r in diff[import_batch][resource_type]['dictionary_item_added'].iteritems():
+                            if resource_type == self.RESOURCE_TYPE_CONCEPT and r['type'] == self.RESOURCE_TYPE_CONCEPT:
+                                output_file.write(json.dumps(r))
+                                output_file.write('\n')
+                            elif resource_type == self.RESOURCE_TYPE_MAPPING and r['type'] == self.RESOURCE_TYPE_MAPPING:
+                                output_file.write(json.dumps(r))
+                                output_file.write('\n')
+                            elif resource_type == self.RESOURCE_TYPE_CONCEPT_REF and r['type'] == self.RESOURCE_TYPE_REFERENCE:
+                                output_file.write(json.dumps(r))
+                                output_file.write('\n')
+                            elif resource_type == self.RESOURCE_TYPE_MAPPING_REF and r['type'] == self.RESOURCE_TYPE_REFERENCE:
+                                output_file.write(json.dumps(r))
+                                output_file.write('\n')
+                            else:
+                                self.log('ERROR: Unrecognized resource_type "%s": {%s}' % (resource_type, str(r)))
+                                sys.exit(1)
+
+                    # Process updated items
+                    if 'value_changed' in diff[import_batch][resource_type]:
+                        self.vlog(1, 'WARNING: Updates are not yet supported. Skipping %s updates...' % len(
+                            diff[import_batch][resource_type]))
+
+                    # Process deleted items
+                    if 'dictionary_item_removed' in diff[import_batch][resource_type]:
+                        self.vlog(
+                            1, 'WARNING: Retiring and deletes are not yet supported. Skipping %s removals...' % len(
+                                diff[import_batch][resource_type]))
+
+        self.vlog(1, 'New import script written to file "%s"' % self.NEW_IMPORT_SCRIPT_FILENAME)
+
+    def get_concept_reference_json(self, owner_id='', owner_type='',
+                                   collection_id='', concept_url=''):
+        """ Returns an "importable" python dictionary for an OCL Reference with the specified attributes """
+        if not owner_type:
+            owner_type = self.RESOURCE_TYPE_ORGANIZATION
+        if owner_type == self.RESOURCE_TYPE_USER:
+            owner_stem = 'users'
+        elif owner_type == self.RESOURCE_TYPE_ORGANIZATION:
+            owner_stem = 'orgs'
+        else:
+            self.log('ERROR: Invalid owner_type "%s"' % owner_type)
+            sys.exit(1)
+        reference_key = '/%s/%s/collections/%s/references/?concept=%s' % (
+            owner_stem, owner_id, collection_id, concept_url)
+        reference_json = {
+            'type': 'Reference',
+            'owner': owner_id,
+            'owner_type': owner_type,
+            'collection': collection_id,
+            'data': {"expressions": [concept_url]}
+        }
+        return reference_key, reference_json
 
     def data_check(self):
         self.data_check_only = True
@@ -205,81 +313,65 @@ class DatimSync(DatimBase):
             self.log_settings()
 
         # STEP 1: Load OCL Collections for Dataset IDs
-        if self.verbosity:
-            self.log('**** STEP 1 of 12: Load OCL Collections for Dataset IDs')
+        self.vlog(1, '**** STEP 1 of 12: Load OCL Collections for Dataset IDs')
         self.load_datasets_from_ocl()
 
         # STEP 2: Load new exports from DATIM-DHIS2
-        if self.verbosity:
-            self.log('**** STEP 2 of 12: Load new exports from DATIM DHIS2')
+        self.vlog(1, '**** STEP 2 of 12: Load new exports from DATIM DHIS2')
         for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
-            if self.verbosity:
-                self.log(dhis2_query_key + ':')
+            self.vlog(1, '** %s:' % dhis2_query_key)
             dhis2filename_export_new = self.dhis2filename_export_new(dhis2_query_def['id'])
             if not self.runoffline:
                 query_attr = {'active_dataset_ids': self.str_active_dataset_ids}
                 content_length = self.save_dhis2_query_to_file(
                     query=dhis2_query_def['query'], query_attr=query_attr,
                     outputfilename=dhis2filename_export_new)
-                if self.verbosity:
-                    self.log('%s bytes retrieved from DHIS2 and written to file "%s"' % (
-                        content_length, dhis2filename_export_new))
+                self.vlog(1, '%s bytes retrieved from DHIS2 and written to file "%s"' % (
+                    content_length, dhis2filename_export_new))
             else:
-                if self.verbosity:
-                    self.log('OFFLINE: Using local file: "%s"' % dhis2filename_export_new)
+                self.vlog(1, 'OFFLINE: Using local file: "%s"' % dhis2filename_export_new)
                 if os.path.isfile(self.attach_absolute_path(dhis2filename_export_new)):
-                    if self.verbosity:
-                        self.log('OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
-                            dhis2filename_export_new,
-                            os.path.getsize(self.attach_absolute_path(dhis2filename_export_new))))
+                    self.vlog(1, 'OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
+                        dhis2filename_export_new,
+                        os.path.getsize(self.attach_absolute_path(dhis2filename_export_new))))
                 else:
-                    self.log('Could not find offline file "%s". Exiting...' % dhis2filename_export_new)
+                    self.log('ERROR: Could not find offline file "%s". Exiting...' % dhis2filename_export_new)
                     sys.exit(1)
 
         # STEP 3: Quick comparison of current and previous DHIS2 exports
         # Compares new DHIS2 export to most recent previous export from a successful sync that is available
-        if self.verbosity:
-            self.log('**** STEP 3 of 12: Quick comparison of current and previous DHIS2 exports')
+        self.vlog(1, '**** STEP 3 of 12: Quick comparison of current and previous DHIS2 exports')
         complete_match = True
         if self.compare2previousexport and not self.data_check_only:
             # Compare files for each of the DHIS2 queries
             for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
-                if self.verbosity:
-                    self.log(dhis2_query_key + ':')
+                self.vlog(1, dhis2_query_key + ':')
                 dhis2filename_export_new = self.dhis2filename_export_new(dhis2_query_def['id'])
                 dhis2filename_export_old = self.dhis2filename_export_old(dhis2_query_def['id'])
                 if self.filecmp(self.attach_absolute_path(dhis2filename_export_old),
                                 self.attach_absolute_path(dhis2filename_export_new)):
-                    if self.verbosity:
-                        self.log('"%s" and "%s" are identical' % (
-                            dhis2filename_export_old, dhis2filename_export_new))
+                    self.vlog(1, '"%s" and "%s" are identical' % (
+                        dhis2filename_export_old, dhis2filename_export_new))
                 else:
                     complete_match = True
-                    if self.verbosity:
-                        self.log('"%s" and "%s" are NOT identical' % (
-                            dhis2filename_export_old, dhis2filename_export_new))
+                    self.vlog(1, '"%s" and "%s" are NOT identical' % (
+                        dhis2filename_export_old, dhis2filename_export_new))
 
             # Exit if complete match, because there is no import to perform
             if complete_match:
-                if self.verbosity:
-                    self.log('All old and new DHIS2 exports are identical so there is no import to perform. Exiting...')
+                self.vlog(1, 'All old and new DHIS2 exports are identical so there is no import to perform. Exiting...')
                 sys.exit()
             else:
-                if self.verbosity:
-                    self.log('At least one DHIS2 export does not match, so continue...')
+                self.vlog(1, 'At least one DHIS2 export does not match, so continue...')
         elif self.data_check_only:
-            if self.verbosity:
-                self.log("Skipping: data check only...")
+            self.vlog(1, "SKIPPING: Data check only...")
         else:
-            if self.verbosity:
-                self.log("Skipping: compare2previousexport == false")
+            self.vlog(1, "SKIPPING: compare2previousexport == false")
 
         # STEP 4: Fetch latest versions of relevant OCL exports
-        if self.verbosity:
-            self.log('**** STEP 4 of 12: Fetch latest versions of relevant OCL exports')
+        self.vlog(1, '**** STEP 4 of 12: Fetch latest versions of relevant OCL exports')
         for ocl_export_def_key in self.OCL_EXPORT_DEFS:
-            if self.verbosity:
-                self.log('%s:' % ocl_export_def_key)
+            self.vlog(1, '** %s:' % ocl_export_def_key)
             export_def = self.OCL_EXPORT_DEFS[ocl_export_def_key]
             tarfilename = self.endpoint2filename_ocl_export_tar(export_def['endpoint'])
             jsonfilename = self.endpoint2filename_ocl_export_json(export_def['endpoint'])
@@ -290,20 +382,17 @@ class DatimSync(DatimBase):
                     tarfilename=tarfilename,
                     jsonfilename=jsonfilename)
             else:
-                if self.verbosity:
-                    self.log('OFFLINE: Using local file "%s"...' % jsonfilename)
+                self.vlog(1, 'OFFLINE: Using local file "%s"...' % jsonfilename)
                 if os.path.isfile(self.attach_absolute_path(jsonfilename)):
-                    if self.verbosity:
-                        self.log('OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
-                            jsonfilename, os.path.getsize(self.attach_absolute_path(jsonfilename))))
+                    self.vlog(1, 'OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
+                        jsonfilename, os.path.getsize(self.attach_absolute_path(jsonfilename))))
                 else:
-                    self.log('Could not find offline file "%s". Exiting...' % jsonfilename)
+                    self.log('ERROR: Could not find offline file "%s". Exiting...' % jsonfilename)
                     sys.exit(1)
 
         # STEP 5: Transform new DHIS2 export to diff format
         # Diff format is OCL-Formatted JSON for concepts and mappings, list of unique URLs for references
-        if self.verbosity:
-            self.log('**** STEP 5 of 12: Transform DHIS2 exports to OCL-formatted JSON')
+        self.vlog(1, '**** STEP 5 of 12: Transform DHIS2 exports to OCL-formatted JSON')
         self.dhis2_diff = {}
         for import_batch_key in self.IMPORT_BATCHES:
             self.dhis2_diff[import_batch_key] = {
@@ -316,8 +405,7 @@ class DatimSync(DatimBase):
 
         # STEP 6: Prepare OCL exports for diff
         # Concepts/mappings in OCL exports have extra attributes that should be removed before the diff
-        if self.verbosity:
-            self.log('**** STEP 6 of 12: Prepare OCL exports for diff')
+        self.vlog(1, '**** STEP 6 of 12: Prepare OCL exports for diff')
         for import_batch_key in self.IMPORT_BATCHES:
             self.ocl_diff[import_batch_key] = {
                 self.RESOURCE_TYPE_CONCEPT: {},
@@ -330,8 +418,7 @@ class DatimSync(DatimBase):
         # STEP 7: Perform deep diff
         # One deep diff is performed per resource type in each import batch
         # OCL/DHIS2 exports reloaded from file to eliminate unicode type_change diff -- but that may be short sighted!
-        if self.verbosity:
-            self.log('**** STEP 7 of 12: Perform deep diff')
+        self.vlog(1, '**** STEP 7 of 12: Perform deep diff')
         with open(self.attach_absolute_path(self.OCL_CLEANED_EXPORT_FILENAME), 'rb') as file_ocl_diff,\
                 open(self.attach_absolute_path(self.DHIS2_CONVERTED_EXPORT_FILENAME), 'rb') as file_dhis2_diff:
             ocl_diff = json.load(file_ocl_diff)
@@ -339,57 +426,59 @@ class DatimSync(DatimBase):
             self.diff_result = self.perform_diff(ocl_diff=ocl_diff, dhis2_diff=dhis2_diff)
 
         # STEP 8: Determine action based on diff result
-        if self.verbosity:
-            self.log('**** STEP 8 of 12: Determine action based on diff result')
+        self.vlog(1, '**** STEP 8 of 12: Determine action based on diff result')
         if self.diff_result:
-            self.log('One or more differences identified between DHIS2 and OCL...')
+            self.vlog(1, 'One or more differences identified between DHIS2 and OCL...')
+            if self.data_check_only:
+                return self.DATIM_SYNC_DIFF
         else:
-            self.log('No diff between DHIS2 and OCL...')
-            return
+            self.vlog(1, 'No diff between DHIS2 and OCL...')
+            return self.DATIM_SYNC_NO_DIFF
 
         # STEP 9: Generate one OCL import script per import batch by processing the diff results
         # Note that OCL import scripts are JSON-lines files
-        if self.verbosity:
-            self.log('**** STEP 9 of 12: Generate import scripts')
+        self.vlog(1, '**** STEP 9 of 12: Generate import scripts')
         self.generate_import_scripts(self.diff_result)
 
         # STEP 10: Perform the import in OCL
-        if self.verbosity:
-            self.log('**** STEP 10 of 12: Perform the import in OCL')
+        self.vlog(1, '**** STEP 10 of 12: Perform the import in OCL')
         num_import_rows_processed = 0
+        ocl_importer = None
         if self.data_check_only:
-            self.log('Skipping: data check only...')
+            self.vlog(1, 'SKIPPING: Data check only...')
         else:
             ocl_importer = OclFlexImporter(
                 file_path=self.attach_absolute_path(self.NEW_IMPORT_SCRIPT_FILENAME),
-                api_token=self.oclapitoken, api_url_root=self.oclenv,test_mode=self.import_test_mode,
+                api_token=self.oclapitoken, api_url_root=self.oclenv, test_mode=self.import_test_mode,
                 do_update_if_exists=False, verbosity=self.verbosity, limit=self.import_limit)
             num_import_rows_processed = ocl_importer.process()
-            if self.verbosity:
-                self.log('Import records processed:', num_import_rows_processed)
+            self.vlog(1, 'Import records processed:', num_import_rows_processed)
 
         # STEP 11: Save new DHIS2 export for the next sync attempt
-        if self.verbosity:
-            self.log('**** STEP 11 of 12: Save the DHIS2 export')
+        self.vlog(1, '**** STEP 11 of 12: Save the DHIS2 export')
         if self.data_check_only:
-            self.log('Skipping: data check only...')
+            self.vlog(1, 'SKIPPING: Data check only...')
+        elif self.import_test_mode:
+            self.vlog(1, 'SKIPPING: Import test mode enabled...')
+        elif num_import_rows_processed:
+            self.cache_dhis2_exports()
         else:
-            if num_import_rows_processed and not self.import_test_mode:
-                self.cache_dhis2_exports()
-            else:
-                if self.verbosity:
-                    self.log('Skipping, because import failed or import test mode enabled...')
+            self.vlog(1, 'SKIPPING: No records imported (possibly due to error)...')
 
         # STEP 12: Manage OCL repository versions
-        if self.verbosity:
-            self.log('**** STEP 12 of 12: Manage OCL repository versions')
+        self.vlog(1, '**** STEP 12 of 12: Manage OCL repository versions')
         if self.data_check_only:
-            self.log('Skipping: data check only...')
+            self.vlog(1, 'SKIPPING: Data check only...')
         elif self.import_test_mode:
-            if self.verbosity:
-                self.log('Skipping, because import test mode enabled...')
+            self.vlog(1, 'SKIPPING: Import test mode enabled...')
         elif num_import_rows_processed:
             self.increment_ocl_versions(import_results=ocl_importer.results)
         else:
-            if self.verbosity:
-                self.log('Skipping because no records imported...')
+            self.vlog(1, 'Skipping because no records imported...')
+
+        # Display debug info
+        if self.verbosity >= 2:
+            self.log('**** DEBUG INFO')
+            if ocl_importer:
+                print('ocl_importer.results:')
+                pprint(ocl_importer.results)

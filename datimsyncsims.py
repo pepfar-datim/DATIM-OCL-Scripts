@@ -79,7 +79,8 @@ class DatimSyncSims(DatimSync):
     }
 
     def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='', compare2previousexport=True,
-                 runoffline=False, verbosity=0, data_check_only=False, import_test_mode=False, import_limit=0):
+                 run_dhis2_offline=False, run_ocl_offline=False,
+                 verbosity=0, data_check_only=False, import_test_mode=False, import_limit=0):
         DatimSync.__init__(self)
 
         self.oclenv = oclenv
@@ -87,7 +88,8 @@ class DatimSyncSims(DatimSync):
         self.dhis2env = dhis2env
         self.dhis2uid = dhis2uid
         self.dhis2pwd = dhis2pwd
-        self.runoffline = runoffline
+        self.run_dhis2_offline = run_dhis2_offline
+        self.run_ocl_offline = run_ocl_offline
         self.verbosity = verbosity
         self.compare2previousexport = compare2previousexport
         self.import_test_mode = import_test_mode
@@ -175,7 +177,8 @@ class DatimSyncSims(DatimSync):
 verbosity = 2  # 0=none, 1=some, 2=all
 import_limit = 0  # Number of resources to import; 0=all
 import_test_mode = False  # Set to True to see which import API requests would be performed on OCL
-runoffline = False  # Set to true to use local copies of dhis2/ocl exports
+run_dhis2_offline = True  # Set to true to use local copies of dhis2 exports
+run_ocl_offline = True  # Set to true to use local copies of ocl exports
 compare2previousexport = True  # Set to False to ignore the previous export
 
 # DATIM DHIS2 Settings
@@ -201,10 +204,11 @@ else:
     import_limit = 1
     import_test_mode = True
     compare2previousexport = False
-    runoffline = False
+    run_dhis2_offline = True
+    run_ocl_offline = True
     dhis2env = 'https://dev-de.datim.org/'
-    dhis2uid = 'jpayne'
-    dhis2pwd = 'Johnpayne1!'
+    dhis2uid = 'paynejd'
+    dhis2pwd = 'Jonpayne1!'
 
     # Digital Ocean Showcase - user=paynejd99
     # oclenv = 'https://api.showcase.openconceptlab.org'
@@ -223,7 +227,8 @@ else:
 sims_sync = DatimSyncSims(oclenv=oclenv, oclapitoken=oclapitoken,
                           dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
                           compare2previousexport=compare2previousexport,
-                          runoffline=runoffline, verbosity=verbosity,
+                          run_dhis2_offline=run_dhis2_offline, run_ocl_offline=run_ocl_offline,
+                          verbosity=verbosity,
                           import_test_mode=import_test_mode,
                           import_limit=import_limit)
 # sims_sync.run()

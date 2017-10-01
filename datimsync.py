@@ -46,13 +46,14 @@ class DatimSync(DatimBase):
     DEFAULT_CONCEPT_DESC_FIELDS_TO_REMOVE = ['uuid', 'type']
     DEFAULT_MAPPING_ALLOWED_FIELDS = ['external_id', 'extras', 'id', 'from_source_url', 'map_type',
                                       'owner', 'owner_type', 'retired', 'source', 'to_concept_code',
-                                      'to_source_url', 'to_concept_url', 'type', 'url']
-    DEFAULT_MAPPING_FIELDS_TO_REMOVE = ['created_at', 'created_by', 'from_concept_code', 'from_concept_name',
+                                      'to_source_url', 'to_concept_url', 'url', 'type']
+    DEFAULT_MAPPING_FIELDS_TO_REMOVE = ['id', 'created_at', 'created_by', 'from_concept_code', 'from_concept_name',
                                         'from_source_name', 'from_source_owner', 'from_source_owner_type',
                                         'from_source_url', 'is_direct_mapping', 'is_external_mapping',
                                         'is_internal_mapping', 'is_inverse_mapping', 'updated_at', 'updated_by',
                                         'to_concept_name', 'to_source_name', 'to_source_owner',
-                                        'to_source_owner_type']
+                                        'to_source_owner_type', 'is_latest_version', 'update_comment', 'url',
+                                        'version', 'versioned_object_id', 'versioned_object_url']
 
     def __init__(self):
         DatimBase.__init__(self)
@@ -62,11 +63,13 @@ class DatimSync(DatimBase):
         self.ocl_collections = []
         self.str_dataset_ids = ''
         self.data_check_only = False
-        self.runoffline = False
+        self.run_dhis2_offline = False
+        self.run_ocl_offline = False
         self.compare2previousexport = True
         self.import_test_mode = False
         self.import_limit = 0
         self.diff_result = None
+        self.sync_resource_types = None
 
     def log_settings(self):
         """ Write settings to console """
@@ -78,10 +81,12 @@ class DatimSync(DatimBase):
             ', oclenv:', self.oclenv,
             ', oclapitoken: <hidden>',
             ', compare2previousexport:', self.compare2previousexport)
-        if self.runoffline:
-            self.log('**** RUNNING IN OFFLINE MODE ****')
+        if self.run_dhis2_offline:
+            self.log('**** RUNNING DHIS2 IN OFFLINE MODE ****')
+        if self.run_ocl_offline:
+            self.log('**** RUNNING OCL IN OFFLINE MODE ****')
 
-    def _convert_endpoint_to_filename_fmt(self, endpoint):
+    def _convert_endpoint_to_filename_fmt(seld, endpoint):
         filename = endpoint.replace('/', '-')
         if filename[0] == '-':
             filename = filename[1:]
@@ -122,6 +127,16 @@ class DatimSync(DatimBase):
             self.vlog(1, 'Cleaned OCL exports successfully written to "%s"' % (
                 self.OCL_CLEANED_EXPORT_FILENAME))
 
+    def get_mapping_key(self, from_concept_url, map_type, to_concept_url='',
+                        to_source_url='', to_concept_code=''):
+        if to_concept_url:
+            key = ('/orgs/PEPFAR/sources/MER/mappings/?from=%s&maptype=%s&to=%s' % (
+                from_concept_url, map_type, to_concept_url))
+        else:
+            key = ('/orgs/PEPFAR/sources/MER/mappings/?from=%s&maptype=%s&to=%s%s/' % (
+                from_concept_url, map_type, to_source_url, to_concept_code))
+        return key
+
     def clean_ocl_export(self, ocl_export_def, cleaning_attr=None):
         """
         Default method for cleaning an OCL export to prepare it for a diff
@@ -135,10 +150,12 @@ class DatimSync(DatimBase):
             ocl_export_raw = json.load(input_file)
 
             if ocl_export_raw['type'] in ['Source', 'Source Version']:
+
+                # Concepts
                 num_concepts = 0
                 for c in ocl_export_raw['concepts']:
                     concept_key = c['url']
-                    # Remove core fields not involved in the diff
+                    # Remove core concept fields not involved in the diff
                     for f in self.DEFAULT_CONCEPT_FIELDS_TO_REMOVE:
                         if f in c:
                             del c[f]
@@ -156,15 +173,44 @@ class DatimSync(DatimBase):
                                     del description[f]
                     self.ocl_diff[import_batch_key][self.RESOURCE_TYPE_CONCEPT][concept_key] = c
                     num_concepts += 1
-                self.vlog(1, 'Cleaned %s concepts' % num_concepts)
+
+                # Mappings
+                num_mappings = 0
+                for m in ocl_export_raw['mappings']:
+                    mapping_key = self.get_mapping_key(
+                        from_concept_url=m['from_concept_url'], map_type=m['map_type'],
+                        to_concept_url=m['to_concept_url'], to_source_url=m['to_source_url'],
+                        to_concept_code=m['to_concept_code'])
+                    # Remove core mapping fields not involved in the diff
+                    for f in self.DEFAULT_MAPPING_FIELDS_TO_REMOVE:
+                        if f in m:
+                            del m[f]
+                    # Transform some fields
+                    if m['type'] == 'MappingVersion':
+                        # Note that this is an error in
+                        m['type'] = 'Mapping'
+                    if m['to_concept_url']:
+                        # Internal mapping, so remove to_concept_code and to_source_url
+                        del m['to_source_url']
+                        del m['to_concept_code']
+                    else:
+                        # External mapping, so remove to_concept_url
+                        del m['to_concept_url']
+                    self.ocl_diff[import_batch_key][self.RESOURCE_TYPE_MAPPING][mapping_key] = m
+                    num_mappings += 1
+
+                self.vlog(1, 'Cleaned %s concepts and %s mappings' % (num_concepts, num_mappings))
 
             elif ocl_export_raw['type'] in ['Collection', 'Collection Version']:
-                num_concept_refs = 0
+
+                # References
+                # TODO: Need to differentiate between concept and mapping references
+                num_refs = 0
                 for r in ocl_export_raw['references']:
                     concept_ref_key = r['url']
                     self.ocl_diff[import_batch_key][self.RESOURCE_TYPE_CONCEPT_REF][concept_ref_key] = r
-                    num_concept_refs += 1
-                self.vlog(1, 'Cleaned %s concept references' % num_concept_refs)
+                    num_refs += 1
+                self.vlog(1, 'Cleaned %s references' % num_refs)
 
     def cache_dhis2_exports(self):
         """
@@ -223,7 +269,7 @@ class DatimSync(DatimBase):
         diff = {}
         for import_batch_key in self.IMPORT_BATCHES:
             diff[import_batch_key] = {}
-            for resource_type in self.RESOURCE_TYPES:
+            for resource_type in self.sync_resource_types:
                 if resource_type in ocl_diff[import_batch_key] and resource_type in dhis2_diff[import_batch_key]:
                     diff[import_batch_key][resource_type] = DeepDiff(
                         ocl_diff[import_batch_key][resource_type],
@@ -244,7 +290,7 @@ class DatimSync(DatimBase):
         """
         with open(self.attach_absolute_path(self.NEW_IMPORT_SCRIPT_FILENAME), 'wb') as output_file:
             for import_batch in self.IMPORT_BATCHES:
-                for resource_type in self.RESOURCE_TYPES:
+                for resource_type in self.sync_resource_types:
                     if resource_type not in diff[import_batch]:
                         continue
 
@@ -303,12 +349,20 @@ class DatimSync(DatimBase):
         }
         return reference_key, reference_json
 
-    def data_check(self):
+    def data_check(self, resource_types=None):
         self.data_check_only = True
-        return self.run()
+        return self.run(resource_types=resource_types)
 
-    def run(self):
+    def run(self, resource_types=None):
         """ Runs the entire synchronization process """
+
+        # Handle the resource types
+        if resource_types:
+            self.sync_resource_types = resource_types
+        else:
+            self.sync_resource_types = self.DEFAULT_SYNC_RESOURCE_TYPES
+
+        # Log the settings
         if self.verbosity:
             self.log_settings()
 
@@ -321,7 +375,7 @@ class DatimSync(DatimBase):
         for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
             self.vlog(1, '** %s:' % dhis2_query_key)
             dhis2filename_export_new = self.dhis2filename_export_new(dhis2_query_def['id'])
-            if not self.runoffline:
+            if not self.run_dhis2_offline:
                 query_attr = {'active_dataset_ids': self.str_active_dataset_ids}
                 content_length = self.save_dhis2_query_to_file(
                     query=dhis2_query_def['query'], query_attr=query_attr,
@@ -329,13 +383,13 @@ class DatimSync(DatimBase):
                 self.vlog(1, '%s bytes retrieved from DHIS2 and written to file "%s"' % (
                     content_length, dhis2filename_export_new))
             else:
-                self.vlog(1, 'OFFLINE: Using local file: "%s"' % dhis2filename_export_new)
+                self.vlog(1, 'DHIS2-OFFLINE: Using local file: "%s"' % dhis2filename_export_new)
                 if os.path.isfile(self.attach_absolute_path(dhis2filename_export_new)):
-                    self.vlog(1, 'OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
+                    self.vlog(1, 'DHIS2-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
                         dhis2filename_export_new,
                         os.path.getsize(self.attach_absolute_path(dhis2filename_export_new))))
                 else:
-                    self.log('ERROR: Could not find offline file "%s". Exiting...' % dhis2filename_export_new)
+                    self.log('ERROR: Could not find offline dhis2 file "%s". Exiting...' % dhis2filename_export_new)
                     sys.exit(1)
 
         # STEP 3: Quick comparison of current and previous DHIS2 exports
@@ -375,19 +429,19 @@ class DatimSync(DatimBase):
             export_def = self.OCL_EXPORT_DEFS[ocl_export_def_key]
             tarfilename = self.endpoint2filename_ocl_export_tar(export_def['endpoint'])
             jsonfilename = self.endpoint2filename_ocl_export_json(export_def['endpoint'])
-            if not self.runoffline:
+            if not self.run_ocl_offline:
                 self.get_ocl_export(
                     endpoint=export_def['endpoint'],
                     version='latest',
                     tarfilename=tarfilename,
                     jsonfilename=jsonfilename)
             else:
-                self.vlog(1, 'OFFLINE: Using local file "%s"...' % jsonfilename)
+                self.vlog(1, 'OCL-OFFLINE: Using local file "%s"...' % jsonfilename)
                 if os.path.isfile(self.attach_absolute_path(jsonfilename)):
-                    self.vlog(1, 'OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
+                    self.vlog(1, 'OCL-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
                         jsonfilename, os.path.getsize(self.attach_absolute_path(jsonfilename))))
                 else:
-                    self.log('ERROR: Could not find offline file "%s". Exiting...' % jsonfilename)
+                    self.log('ERROR: Could not find offline OCL file "%s". Exiting...' % jsonfilename)
                     sys.exit(1)
 
         # STEP 5: Transform new DHIS2 export to diff format
@@ -395,24 +449,18 @@ class DatimSync(DatimBase):
         self.vlog(1, '**** STEP 5 of 12: Transform DHIS2 exports to OCL-formatted JSON')
         self.dhis2_diff = {}
         for import_batch_key in self.IMPORT_BATCHES:
-            self.dhis2_diff[import_batch_key] = {
-                self.RESOURCE_TYPE_CONCEPT: {},
-                self.RESOURCE_TYPE_MAPPING: {},
-                self.RESOURCE_TYPE_CONCEPT_REF: {},
-                self.RESOURCE_TYPE_MAPPING_REF: {},
-            }
+            self.dhis2_diff[import_batch_key] = {}
+            for resource_type in self.DEFAULT_SYNC_RESOURCE_TYPES:
+                self.dhis2_diff[import_batch_key][resource_type] = {}
         self.transform_dhis2_exports(conversion_attr={'ocl_dataset_repos': self.ocl_dataset_repos})
 
         # STEP 6: Prepare OCL exports for diff
         # Concepts/mappings in OCL exports have extra attributes that should be removed before the diff
         self.vlog(1, '**** STEP 6 of 12: Prepare OCL exports for diff')
         for import_batch_key in self.IMPORT_BATCHES:
-            self.ocl_diff[import_batch_key] = {
-                self.RESOURCE_TYPE_CONCEPT: {},
-                self.RESOURCE_TYPE_MAPPING: {},
-                self.RESOURCE_TYPE_CONCEPT_REF: {},
-                self.RESOURCE_TYPE_MAPPING_REF: {},
-            }
+            self.ocl_diff[import_batch_key] = {}
+            for resource_type in self.DEFAULT_SYNC_RESOURCE_TYPES:
+                self.ocl_diff[import_batch_key][resource_type] = {}
         self.prepare_ocl_exports(cleaning_attr={})
 
         # STEP 7: Perform deep diff

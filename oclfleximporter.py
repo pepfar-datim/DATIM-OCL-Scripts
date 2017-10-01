@@ -234,6 +234,7 @@ class OclFlexImporter:
             for json_line_raw in json_file:
                 if self.limit > 0 and count >= self.limit:
                     break
+                count += 1
                 json_line_obj = json.loads(json_line_raw)
                 if "type" in json_line_obj:
                     obj_type = json_line_obj.pop("type")
@@ -241,14 +242,13 @@ class OclFlexImporter:
                         self.log('')
                         self.process_object(obj_type, json_line_obj)
                         num_processed += 1
-                        self.log('(%s processed and %s skipped of %s total)' % (num_processed, num_skipped, count))
+                        self.log('(Attempted import on %s resource(s) and skipped %s of %s processed so far)' % (num_processed, num_skipped, count))
                     else:
                         self.log("**** SKIPPING: Unrecognized 'type' attribute '" + obj_type + "' for object: " + json_line_raw)
                         num_skipped += 1
                 else:
                     self.log("**** SKIPPING: No 'type' attribute: " + json_line_raw)
                     num_skipped += 1
-                count += 1
 
         return count
 

@@ -240,7 +240,8 @@ class DatimSyncMer(DatimSync):
     }
 
     def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='', compare2previousexport=True,
-                 runoffline=False, verbosity=0, data_check_only=False, import_test_mode=False, import_limit=0):
+                 run_dhis2_offline=False, run_ocl_offline=False,
+                 verbosity=0, data_check_only=False, import_test_mode=False, import_limit=0):
         DatimSync.__init__(self)
 
         self.oclenv = oclenv
@@ -248,7 +249,8 @@ class DatimSyncMer(DatimSync):
         self.dhis2env = dhis2env
         self.dhis2uid = dhis2uid
         self.dhis2pwd = dhis2pwd
-        self.runoffline = runoffline
+        self.run_dhis2_offline = run_dhis2_offline
+        self.run_ocl_offline = run_ocl_offline
         self.verbosity = verbosity
         self.compare2previousexport = compare2previousexport
         self.import_test_mode = import_test_mode
@@ -374,6 +376,9 @@ class DatimSyncMer(DatimSync):
                         'map_type': map_type,
                         'from_concept_url': indicator_concept_url,
                         'to_concept_url': disaggregate_concept_url,
+                        'external_id': None,
+                        'extras': None,
+                        'retired': False,
                     }
                     self.dhis2_diff[self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_MAPPING][
                         disaggregate_mapping_key] = disaggregate_mapping
@@ -417,7 +422,8 @@ class DatimSyncMer(DatimSync):
 verbosity = 2  # 0=none, 1=some, 2=all
 import_limit = 0  # Number of resources to import; 0=all
 import_test_mode = False  # Set to True to see which import API requests would be performed on OCL
-runoffline = False  # Set to true to use local copies of dhis2/ocl exports
+run_dhis2_offline = True  # Set to true to use local copies of dhis2 exports
+run_ocl_offline = True  # Set to true to use local copies of ocl exports
 compare2previousexport = True  # Set to False to ignore the previous export
 
 # DATIM DHIS2 Settings
@@ -440,17 +446,14 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
 else:
     # Local development environment settings
-    import_limit = 2592
+    import_limit = 0
     import_test_mode = False
     compare2previousexport = False
-    runoffline = False
+    run_dhis2_offline = True
+    run_ocl_offline = False
     dhis2env = 'https://dev-de.datim.org/'
-    dhis2uid = 'jpayne'
-    dhis2pwd = 'Johnpayne1!'
-
-    # Digital Ocean Showcase - user=paynejd99
-    # oclenv = 'https://api.showcase.openconceptlab.org'
-    # oclapitoken = '2da0f46b7d29aa57970c0b3a535121e8e479f881'
+    dhis2uid = 'paynejd'
+    dhis2pwd = 'Jonpayne1!'
 
     # JetStream Staging - user=paynejd
     # oclenv = 'https://oclapi-stg.openmrs.org'
@@ -468,8 +471,9 @@ else:
 mer_sync = DatimSyncMer(oclenv=oclenv, oclapitoken=oclapitoken,
                         dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
                         compare2previousexport=compare2previousexport,
-                        runoffline=runoffline, verbosity=verbosity,
+                        run_dhis2_offline=run_dhis2_offline, run_ocl_offline=run_ocl_offline,
+                        verbosity=verbosity,
                         import_test_mode=import_test_mode,
                         import_limit=import_limit)
-mer_sync.run()
+mer_sync.run(resource_types=[DatimSyncMer.RESOURCE_TYPE_MAPPING])
 # mer_sync.data_check()

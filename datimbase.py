@@ -24,7 +24,7 @@ class DatimBase:
     RESOURCE_TYPE_REFERENCE = 'Reference'
     RESOURCE_TYPE_SOURCE_VERSION = 'Source Version'
     RESOURCE_TYPE_COLLECTION_VERSION = 'Collection Version'
-    RESOURCE_TYPES = [
+    DEFAULT_SYNC_RESOURCE_TYPES = [
         RESOURCE_TYPE_CONCEPT,
         RESOURCE_TYPE_MAPPING,
         RESOURCE_TYPE_CONCEPT_REF,
@@ -93,7 +93,7 @@ class DatimBase:
 
     def load_datasets_from_ocl(self):
         # Fetch the repositories from OCL
-        if not self.runoffline:
+        if not self.run_ocl_offline:
             self.vlog(1, 'Request URL:', self.oclenv + self.OCL_DATASET_ENDPOINT)
             self.ocl_dataset_repos = self.get_ocl_repositories(endpoint=self.OCL_DATASET_ENDPOINT,
                                                                key_field='external_id',
@@ -103,10 +103,10 @@ class DatimBase:
             self.vlog(1, 'Repositories retrieved from OCL and stored in memory:', len(self.ocl_dataset_repos))
             self.vlog(1, 'Repositories successfully written to "%s"' % self.DATASET_REPOSITORIES_FILENAME)
         else:
-            self.vlog(1, 'OFFLINE: Loading repositories from "%s"' % self.DATASET_REPOSITORIES_FILENAME)
+            self.vlog(1, 'OCL-OFFLINE: Loading repositories from "%s"' % self.DATASET_REPOSITORIES_FILENAME)
             with open(self.attach_absolute_path(self.DATASET_REPOSITORIES_FILENAME), 'rb') as handle:
                 self.ocl_dataset_repos = json.load(handle)
-            self.vlog(1, 'OFFLINE: Repositories successfully loaded:', len(self.ocl_dataset_repos))
+            self.vlog(1, 'OCL-OFFLINE: Repositories successfully loaded:', len(self.ocl_dataset_repos))
 
         # Extract list of DHIS2 dataset IDs from the repository attributes
         if self.ocl_dataset_repos:

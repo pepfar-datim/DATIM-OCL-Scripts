@@ -28,10 +28,10 @@ class DatimShowSims(DatimShow):
     }
 
     def __init__(self, oclenv='', oclapitoken='',
-                 runoffline=False, verbosity=0):
+                 run_ocl_offline=False, verbosity=0):
         self.oclenv = oclenv
         self.oclapitoken = oclapitoken
-        self.runoffline = runoffline
+        self.run_ocl_offline = run_ocl_offline
         self.verbosity = verbosity
 
     def get(self, export_format=DATIM_FORMAT_HTML):
@@ -42,7 +42,7 @@ class DatimShowSims(DatimShow):
             if self.verbosity:
                 self.log('%s:' % ocl_export_def_key)
             export_def = self.OCL_EXPORT_DEFS[ocl_export_def_key]
-            if not self.runoffline:
+            if not self.run_ocl_offline:
                 self.get_ocl_export(
                     endpoint=export_def['endpoint'],
                     version='latest',
@@ -50,13 +50,13 @@ class DatimShowSims(DatimShow):
                     jsonfilename=export_def['jsonfilename'])
             else:
                 if self.verbosity:
-                    self.log('OFFLINE: Using local file "%s"...' % (export_def['jsonfilename']))
+                    self.log('OCL-OFFLINE: Using local file "%s"...' % (export_def['jsonfilename']))
                 if os.path.isfile(self.attach_absolute_path(export_def['jsonfilename'])):
                     if self.verbosity:
-                        self.log('OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
+                        self.log('OCL-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
                             export_def['jsonfilename'], os.path.getsize(self.attach_absolute_path(export_def['jsonfilename']))))
                 else:
-                    self.log('Could not find offline file "%s". Exiting...' % (export_def['jsonfilename']))
+                    self.log('Could not find offline OCL file "%s". Exiting...' % (export_def['jsonfilename']))
                     sys.exit(1)
 
         # STEP 2: Transform OCL export to intermediary state
@@ -176,7 +176,7 @@ class DatimShowSims(DatimShow):
 
 # Default Script Settings
 verbosity = 0  # 0=none, 1=some, 2=all
-runoffline = False  # Set to true to use local copies of dhis2/ocl exports
+run_ocl_offline = False  # Set to true to use local copies of dhis2/ocl exports
 
 # Export Format - see constants in DatimShowSims class
 export_format = DatimShowSims.DATIM_FORMAT_JSON
@@ -195,5 +195,5 @@ oclapitoken = '2da0f46b7d29aa57970c0b3a535121e8e479f881'
 # Create SIMS Show object and run
 # TODO: Add parameter to specify which collection
 sims_show = DatimShowSims(oclenv=oclenv, oclapitoken=oclapitoken,
-                          runoffline=runoffline, verbosity=verbosity)
+                          run_ocl_offline=run_ocl_offline, verbosity=verbosity)
 sims_show.get(export_format=export_format)

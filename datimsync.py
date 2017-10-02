@@ -20,6 +20,7 @@ import sys
 from requests.auth import HTTPBasicAuth
 from shutil import copyfile
 from datimbase import DatimBase
+from datimbase import DatimConstants
 from oclfleximporter import OclFlexImporter
 from pprint import pprint
 from deepdiff import DeepDiff
@@ -36,6 +37,9 @@ class DatimSync(DatimBase):
     IMPORT_BATCHES = []
 
     DEFAULT_OCL_EXPORT_CLEANING_METHOD = 'clean_ocl_export'
+
+    # Sets an upper limit for the number of concept references to include in a single API request
+    CONSOLIDATED_REFERENCE_BATCH_LIMIT = 25
 
     # Default fields to strip from OCL exports before performing deep diffs
     DEFAULT_CONCEPT_FIELDS_TO_REMOVE = ['version_created_by', 'created_on', 'updated_on',
@@ -68,8 +72,13 @@ class DatimSync(DatimBase):
         self.compare2previousexport = True
         self.import_test_mode = False
         self.import_limit = 0
+        self.import_delay = 0
         self.diff_result = None
         self.sync_resource_types = None
+
+        # Instructs the sync script to combine reference imports to the same source and within the same
+        # import batch to a single API request. This results in a significant increase in performance.
+        self.consolidate_references = False
 
     def log_settings(self):
         """ Write settings to console """
@@ -86,32 +95,6 @@ class DatimSync(DatimBase):
         if self.run_ocl_offline:
             self.log('**** RUNNING OCL IN OFFLINE MODE ****')
 
-    def _convert_endpoint_to_filename_fmt(seld, endpoint):
-        filename = endpoint.replace('/', '-')
-        if filename[0] == '-':
-            filename = filename[1:]
-        if filename[-1] == '-':
-            filename = filename[:-1]
-        return filename
-
-    def endpoint2filename_ocl_export_tar(self, endpoint):
-        return 'ocl-' + self._convert_endpoint_to_filename_fmt(endpoint) + '.tar'
-
-    def endpoint2filename_ocl_export_json(self, endpoint):
-        return 'ocl-' + self._convert_endpoint_to_filename_fmt(endpoint) + '-raw.json'
-
-    def endpoint2filename_ocl_export_cleaned(self, endpoint):
-        return 'ocl-' + self._convert_endpoint_to_filename_fmt(endpoint) + '-cleaned.json'
-
-    def dhis2filename_export_new(self, dhis2_query_id):
-        return 'dhis2-' + dhis2_query_id + '-export-new-raw.json'
-
-    def dhis2filename_export_old(self, dhis2_query_id):
-        return 'dhis2-' + dhis2_query_id + '-export-old-raw.json'
-
-    def dhis2filename_export_converted(self, dhis2_query_id):
-        return 'dhis2-' + dhis2_query_id + '-export-converted.json'
-
     def prepare_ocl_exports(self, cleaning_attr=None):
         """
         Convert OCL exports into the diff format
@@ -127,14 +110,22 @@ class DatimSync(DatimBase):
             self.vlog(1, 'Cleaned OCL exports successfully written to "%s"' % (
                 self.OCL_CLEANED_EXPORT_FILENAME))
 
-    def get_mapping_key(self, from_concept_url, map_type, to_concept_url='',
+    def get_mapping_key(self, mapping_source_url='', mapping_owner_type='', mapping_owner_id='', mapping_source_id='',
+                        from_concept_url='', map_type='', to_concept_url='',
                         to_source_url='', to_concept_code=''):
-        if to_concept_url:
-            key = ('/orgs/PEPFAR/sources/MER/mappings/?from=%s&maptype=%s&to=%s' % (
-                from_concept_url, map_type, to_concept_url))
-        else:
-            key = ('/orgs/PEPFAR/sources/MER/mappings/?from=%s&maptype=%s&to=%s%s/' % (
-                from_concept_url, map_type, to_source_url, to_concept_code))
+        # Handle the source url
+        if not mapping_source_url:
+            mapping_owner_stem = self.owner_type_to_stem(mapping_owner_type)
+            if not mapping_owner_stem:
+                self.log('ERROR: Invalid mapping_owner_type "%s"' % mapping_owner_type)
+                sys.exit(1)
+            mapping_source_url = '/%s/%s/sources/%s/' % (mapping_owner_stem, mapping_owner_id, mapping_source_id)
+
+        # Build the key
+        if not to_concept_url:
+            to_concept_url = '%s%s' % (to_source_url, to_concept_code)
+        key = ('%smappings/?from=%s&maptype=%s&to=%s' % (
+            mapping_source_url, from_concept_url, map_type, to_concept_url))
         return key
 
     def clean_ocl_export(self, ocl_export_def, cleaning_attr=None):
@@ -147,13 +138,13 @@ class DatimSync(DatimBase):
         import_batch_key = ocl_export_def['import_batch']
         jsonfilename = self.endpoint2filename_ocl_export_json(ocl_export_def['endpoint'])
         with open(self.attach_absolute_path(jsonfilename), 'rb') as input_file:
-            ocl_export_raw = json.load(input_file)
+            ocl_repo_export_raw = json.load(input_file)
 
-            if ocl_export_raw['type'] in ['Source', 'Source Version']:
+            if ocl_repo_export_raw['type'] in ['Source', 'Source Version']:
 
                 # Concepts
                 num_concepts = 0
-                for c in ocl_export_raw['concepts']:
+                for c in ocl_repo_export_raw['concepts']:
                     concept_key = c['url']
                     # Remove core concept fields not involved in the diff
                     for f in self.DEFAULT_CONCEPT_FIELDS_TO_REMOVE:
@@ -176,8 +167,9 @@ class DatimSync(DatimBase):
 
                 # Mappings
                 num_mappings = 0
-                for m in ocl_export_raw['mappings']:
+                for m in ocl_repo_export_raw['mappings']:
                     mapping_key = self.get_mapping_key(
+                        mapping_owner_type=m['owner_type'], mapping_owner_id=m['owner'], mapping_source_id=m['source'],
                         from_concept_url=m['from_concept_url'], map_type=m['map_type'],
                         to_concept_url=m['to_concept_url'], to_source_url=m['to_source_url'],
                         to_concept_code=m['to_concept_code'])
@@ -201,16 +193,28 @@ class DatimSync(DatimBase):
 
                 self.vlog(1, 'Cleaned %s concepts and %s mappings' % (num_concepts, num_mappings))
 
-            elif ocl_export_raw['type'] in ['Collection', 'Collection Version']:
+            elif ocl_repo_export_raw['type'] in ['Collection', 'Collection Version']:
 
-                # References
-                # TODO: Need to differentiate between concept and mapping references
-                num_refs = 0
-                for r in ocl_export_raw['references']:
-                    concept_ref_key = r['url']
-                    self.ocl_diff[import_batch_key][self.RESOURCE_TYPE_CONCEPT_REF][concept_ref_key] = r
-                    num_refs += 1
-                self.vlog(1, 'Cleaned %s references' % num_refs)
+                # References for concepts and mappings
+                num_concept_refs = 0
+                num_mapping_refs = 0
+                for ref in ocl_repo_export_raw['references']:
+                    collection_url = ocl_export_def['endpoint']
+                    if ref['reference_type'] == 'concepts':
+                        concept_ref_key, concept_ref_json = self.get_concept_reference_json(
+                            collection_url=collection_url, concept_url=ref['expression'], strip_concept_version=True)
+                        self.ocl_diff[import_batch_key][self.RESOURCE_TYPE_CONCEPT_REF][concept_ref_key] = concept_ref_json
+                        num_concept_refs += 1
+                    elif ref['reference_type'] == 'mappings':
+                        mapping_ref_key, mapping_ref_json = self.get_mapping_reference_json_from_export(
+                            full_collection_export_dict=ocl_repo_export_raw, collection_url=collection_url,
+                            mapping_url=ref['expression'], strip_mapping_version=True)
+                        self.ocl_diff[import_batch_key][self.RESOURCE_TYPE_MAPPING_REF][mapping_ref_key] = mapping_ref_json
+                        num_mapping_refs += 1
+                        pass
+
+                self.vlog(1, 'Cleaned %s concept references and skipped %s mapping references' % (
+                    num_concept_refs, num_mapping_refs))
 
     def cache_dhis2_exports(self):
         """
@@ -295,6 +299,8 @@ class DatimSync(DatimBase):
                         continue
 
                     # Process new items
+                    consolidated_concept_refs = {}
+                    consolidated_mapping_refs = {}
                     if 'dictionary_item_added' in diff[import_batch][resource_type]:
                         for k, r in diff[import_batch][resource_type]['dictionary_item_added'].iteritems():
                             if resource_type == self.RESOURCE_TYPE_CONCEPT and r['type'] == self.RESOURCE_TYPE_CONCEPT:
@@ -304,14 +310,44 @@ class DatimSync(DatimBase):
                                 output_file.write(json.dumps(r))
                                 output_file.write('\n')
                             elif resource_type == self.RESOURCE_TYPE_CONCEPT_REF and r['type'] == self.RESOURCE_TYPE_REFERENCE:
-                                output_file.write(json.dumps(r))
-                                output_file.write('\n')
+                                r['__cascade'] = 'sourcemappings'
+                                if self.consolidate_references:
+                                    if r['collection_url'] in consolidated_concept_refs:
+                                        consolidated_concept_refs[r['collection_url']]['data']['expressions'].append(
+                                            r['data']['expressions'][0])
+                                        # Go ahead and write if reached the reference limit
+                                        if len(consolidated_concept_refs[r['collection_url']]['data']['expressions']) >= self.CONSOLIDATED_REFERENCE_BATCH_LIMIT:
+                                            output_file.write(json.dumps(consolidated_concept_refs[r['collection_url']]))
+                                            output_file.write('\n')
+                                            del(consolidated_concept_refs[r['collection_url']])
+                                    else:
+                                        consolidated_concept_refs[r['collection_url']] = r.copy()
+                                else:
+                                    output_file.write(json.dumps(r))
+                                    output_file.write('\n')
                             elif resource_type == self.RESOURCE_TYPE_MAPPING_REF and r['type'] == self.RESOURCE_TYPE_REFERENCE:
-                                output_file.write(json.dumps(r))
-                                output_file.write('\n')
+                                r['__cascade'] = 'sourcemappings'
+                                if self.consolidate_references:
+                                    if r['collection_url'] in consolidated_mapping_refs:
+                                        consolidated_mapping_refs[r['collection_url']]['data']['expressions'].append(
+                                            r['data']['expressions'][0])
+                                    else:
+                                        consolidated_mapping_refs[r['collection_url']] = r.copy()
+                                else:
+                                    output_file.write(json.dumps(r))
+                                    output_file.write('\n')
                             else:
                                 self.log('ERROR: Unrecognized resource_type "%s": {%s}' % (resource_type, str(r)))
                                 sys.exit(1)
+
+                    # Write consolidated references for new items
+                    if self.consolidate_references:
+                        for collection_url in consolidated_concept_refs:
+                            output_file.write(json.dumps(consolidated_concept_refs[collection_url]))
+                            output_file.write('\n')
+                        for collection_url in consolidated_mapping_refs:
+                            output_file.write(json.dumps(consolidated_mapping_refs[collection_url]))
+                            output_file.write('\n')
 
                     # Process updated items
                     if 'value_changed' in diff[import_batch][resource_type]:
@@ -326,52 +362,91 @@ class DatimSync(DatimBase):
 
         self.vlog(1, 'New import script written to file "%s"' % self.NEW_IMPORT_SCRIPT_FILENAME)
 
-    def get_concept_reference_json(self, owner_id='', owner_type='',
-                                   collection_id='', concept_url=''):
-        """ Returns an "importable" python dictionary for an OCL Reference with the specified attributes """
-        if not owner_type:
-            owner_type = self.RESOURCE_TYPE_ORGANIZATION
-        if owner_type == self.RESOURCE_TYPE_USER:
-            owner_stem = 'users'
-        elif owner_type == self.RESOURCE_TYPE_ORGANIZATION:
-            owner_stem = 'orgs'
+    def get_mapping_reference_json_from_export(
+            self, full_collection_export_dict=None, collection_url='', collection_owner_id='',
+            collection_owner_type='', collection_id='', mapping_url='', strip_mapping_version=False):
+
+        # Build the collection_url
+        if collection_url:
+            # all good...
+            pass
+        elif collection_owner_id and collection_id:
+            collection_owner_stem = self.owner_type_to_stem(collection_owner_type, self.OWNER_STEM_ORGS)
+            collection_url = '/%s/%s/collections/%s/' % (collection_owner_stem, collection_owner_id, collection_id)
         else:
-            self.log('ERROR: Invalid owner_type "%s"' % owner_type)
+            self.log('ERROR: Must provide "collection_owner_type", "collection_owner_id", and "collection_id" '
+                     'parameters or "collection_url" parameter for get_mapping_reference_json()')
             sys.exit(1)
-        reference_key = '/%s/%s/collections/%s/references/?concept=%s' % (
-            owner_stem, owner_id, collection_id, concept_url)
+
+        # Optionally strip the mapping version
+        # Ex: '/orgs/PEPFAR/sources/MER/mappings/59d10e440855590040f0e528/1/' ==>
+        # '/orgs/PEPFAR/sources/MER/mappings/59d10e440855590040f0e528/'
+        if strip_mapping_version and mapping_url.count('/') == 8:
+            mapping_url = mapping_url[:self.find_nth(mapping_url, '/', 7)+1]
+
+        # Find the related mapping from the full collection export
+        mapping_from_export = (item for item in full_collection_export_dict['mappings'] if str(
+            item["versioned_object_url"]) == str(mapping_url)).next()
+        if not mapping_from_export:
+            self.log('something really wrong happened here...')
+            sys.exit(1)
+        mapping_owner_stem = self.owner_type_to_stem(mapping_from_export['owner_type'])
+        mapping_owner = mapping_from_export['owner']
+        mapping_source = mapping_from_export['source']
+        mapping_source_url = '/%s/%s/sources/%s/' % (mapping_owner_stem, mapping_owner, mapping_source)
+        from_concept_url = mapping_from_export['from_concept_url']
+        map_type = mapping_from_export['map_type']
+        if mapping_from_export['to_concept_url']:
+            to_concept_url = mapping_from_export['to_concept_url']
+        else:
+            to_concept_url = '%s%s/' % (mapping_from_export['to_source_url'], mapping_from_export['to_concept_code'])
+
+        # Build the mapping reference key and reference object
+        key = ('%smappings/?from=%s&maptype=%s&to=%s' % (
+            mapping_source_url, from_concept_url, map_type, to_concept_url))
+        reference_key = '%sreferences/?source=%s&from=%s&maptype=%s&to=%s' % (
+            collection_url, mapping_source_url, from_concept_url, map_type, to_concept_url)
         reference_json = {
             'type': 'Reference',
-            'owner': owner_id,
-            'owner_type': owner_type,
-            'collection': collection_id,
+            'collection_url': collection_url,
+            'data': {"expressions": [mapping_url]}
+        }
+
+        return reference_key, reference_json
+
+    def get_concept_reference_json(self, collection_owner_id='', collection_owner_type='', collection_id='',
+                                   collection_url='', concept_url='', strip_concept_version=False):
+        """ Returns an "importable" python dictionary for an OCL Reference with the specified attributes """
+
+        # Build the collection_url
+        if collection_url:
+            # all good...
+            pass
+        elif collection_owner_id and collection_id:
+            collection_owner_stem = self.owner_type_to_stem(collection_owner_type, self.OWNER_STEM_ORGS)
+            collection_url = '/%s/%s/collections/%s/' % (collection_owner_stem, collection_owner_id, collection_id)
+        else:
+            self.log('ERROR: Must provide "collection_owner_type", "collection_owner_id", and "collection_id" '
+                     'parameters or "collection_url" parameter for get_concept_reference_json()')
+            sys.exit(1)
+
+        # Optionally strip the concept version
+        # Ex: '/orgs/PEPFAR/sources/MER/concepts/T4GeVmTlku0/59ce97540855590040f0aaf6/' ==>
+        # '/orgs/PEPFAR/sources/MER/concepts/T4GeVmTlku0/'
+        if strip_concept_version and concept_url.count('/') == 8:
+            concept_url = concept_url[:self.find_nth(concept_url, '/', 7)+1]
+
+        # Build the concept reference key and reference object
+        reference_key = '%sreferences/?concept=%s' % (collection_url, concept_url)
+        reference_json = {
+            'type': 'Reference',
+            'collection_url': collection_url,
             'data': {"expressions": [concept_url]}
         }
         return reference_key, reference_json
 
-    def data_check(self, resource_types=None):
-        self.data_check_only = True
-        return self.run(resource_types=resource_types)
-
-    def run(self, resource_types=None):
-        """ Runs the entire synchronization process """
-
-        # Handle the resource types
-        if resource_types:
-            self.sync_resource_types = resource_types
-        else:
-            self.sync_resource_types = self.DEFAULT_SYNC_RESOURCE_TYPES
-
-        # Log the settings
-        if self.verbosity:
-            self.log_settings()
-
-        # STEP 1: Load OCL Collections for Dataset IDs
-        self.vlog(1, '**** STEP 1 of 12: Load OCL Collections for Dataset IDs')
-        self.load_datasets_from_ocl()
-
-        # STEP 2: Load new exports from DATIM-DHIS2
-        self.vlog(1, '**** STEP 2 of 12: Load new exports from DATIM DHIS2')
+    def load_dhis2_exports(self):
+        """ Load the DHIS2 export files """
         for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
             self.vlog(1, '** %s:' % dhis2_query_key)
             dhis2filename_export_new = self.dhis2filename_export_new(dhis2_query_def['id'])
@@ -391,6 +466,37 @@ class DatimSync(DatimBase):
                 else:
                     self.log('ERROR: Could not find offline dhis2 file "%s". Exiting...' % dhis2filename_export_new)
                     sys.exit(1)
+
+    def bulk_import_references(self):
+        self.consolidate_references = True
+        self.compare2previousexport = False
+        return self.run(resource_types=[self.RESOURCE_TYPE_CONCEPT_REF])
+
+    def data_check(self, resource_types=None):
+        self.data_check_only = True
+        self.compare2previousexport = False
+        return self.run(resource_types=resource_types)
+
+    def run(self, resource_types=None):
+        """ Runs the entire synchronization process """
+
+        # Determine which resource types will be processed during this run
+        if resource_types:
+            self.sync_resource_types = resource_types
+        else:
+            self.sync_resource_types = self.DEFAULT_SYNC_RESOURCE_TYPES
+
+        # Log the settings
+        if self.verbosity:
+            self.log_settings()
+
+        # STEP 1: Load OCL Collections for Dataset IDs
+        self.vlog(1, '**** STEP 1 of 12: Load OCL Collections for Dataset IDs')
+        self.load_datasets_from_ocl()
+
+        # STEP 2: Load new exports from DATIM-DHIS2
+        self.vlog(1, '**** STEP 2 of 12: Load new exports from DATIM DHIS2')
+        self.load_dhis2_exports()
 
         # STEP 3: Quick comparison of current and previous DHIS2 exports
         # Compares new DHIS2 export to most recent previous export from a successful sync that is available
@@ -430,11 +536,8 @@ class DatimSync(DatimBase):
             tarfilename = self.endpoint2filename_ocl_export_tar(export_def['endpoint'])
             jsonfilename = self.endpoint2filename_ocl_export_json(export_def['endpoint'])
             if not self.run_ocl_offline:
-                self.get_ocl_export(
-                    endpoint=export_def['endpoint'],
-                    version='latest',
-                    tarfilename=tarfilename,
-                    jsonfilename=jsonfilename)
+                self.get_ocl_export(endpoint=export_def['endpoint'], version='latest', tarfilename=tarfilename,
+                                    jsonfilename=jsonfilename)
             else:
                 self.vlog(1, 'OCL-OFFLINE: Using local file "%s"...' % jsonfilename)
                 if os.path.isfile(self.attach_absolute_path(jsonfilename)):
@@ -498,7 +601,8 @@ class DatimSync(DatimBase):
             ocl_importer = OclFlexImporter(
                 file_path=self.attach_absolute_path(self.NEW_IMPORT_SCRIPT_FILENAME),
                 api_token=self.oclapitoken, api_url_root=self.oclenv, test_mode=self.import_test_mode,
-                do_update_if_exists=False, verbosity=self.verbosity, limit=self.import_limit)
+                do_update_if_exists=False, verbosity=self.verbosity, limit=self.import_limit,
+                import_delay=self.import_delay)
             num_import_rows_processed = ocl_importer.process()
             self.vlog(1, 'Import records processed:', num_import_rows_processed)
 

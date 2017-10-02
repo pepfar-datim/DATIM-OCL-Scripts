@@ -26,6 +26,7 @@ Deviations from OCL API responses:
 import json
 import requests
 import sys
+import time
 from datetime import datetime
 import urllib
 
@@ -176,7 +177,7 @@ class OclFlexImporter:
     }
 
     def __init__(self, file_path='', api_url_root='', api_token='', limit=0,
-                 test_mode=False, verbosity=1, do_update_if_exists=False):
+                 test_mode=False, verbosity=1, do_update_if_exists=False, import_delay=0):
         """ Initialize this object """
 
         self.file_path = file_path
@@ -186,6 +187,7 @@ class OclFlexImporter:
         self.do_update_if_exists = do_update_if_exists
         self.verbosity = verbosity
         self.limit = limit
+        self.import_delay = import_delay
 
         self.results = {}
         self.cache_obj_exists = {}
@@ -213,7 +215,8 @@ class OclFlexImporter:
                  ", Import File:", self.file_path,
                  ", Test Mode:", self.test_mode,
                  ", Update Resource if Exists: ", self.do_update_if_exists,
-                 ", Verbosity:", self.verbosity)
+                 ", Verbosity:", self.verbosity,
+                 ", Import Delay: ", self.import_delay)
 
     def process(self):
         """
@@ -249,6 +252,8 @@ class OclFlexImporter:
                 else:
                     self.log("**** SKIPPING: No 'type' attribute: " + json_line_raw)
                     num_skipped += 1
+                if self.import_delay and not self.test_mode:
+                    time.sleep(self.import_delay)
 
         return count
 
@@ -362,13 +367,24 @@ class OclFlexImporter:
         if 'id_field' in self.obj_def[obj_type] and self.obj_def[obj_type]['id_field'] in obj:
             obj_id = obj[self.obj_def[obj_type]['id_field']]
 
+        # Determine whether this resource has an owner, source, or collection
+        has_owner = False
+        has_source = False
+        has_collection = False
+        if self.obj_def[obj_type]["has_owner"]:
+            has_owner = True
+        if self.obj_def[obj_type]["has_source"] and self.obj_def[obj_type]["has_collection"]:
+            raise InvalidObjectDefinition(obj, "Object definition for '" + obj_type + "' must not have both 'has_source' and 'has_collection' set to True")
+        elif self.obj_def[obj_type]["has_source"]:
+            has_source = True
+        elif self.obj_def[obj_type]["has_collection"]:
+            has_collection = True
+
         # Set owner URL using ("owner_url") OR ("owner" AND "owner_type")
         # e.g. /users/johndoe/ OR /orgs/MyOrganization/
         # NOTE: Owner URL always ends with a forward slash
-        has_owner = False
         obj_owner_url = None
-        if self.obj_def[obj_type]["has_owner"]:
-            has_owner = True
+        if has_owner:
             if "owner_url" in obj:
                 obj_owner_url = obj.pop("owner_url")
                 obj.pop("owner", None)
@@ -382,19 +398,20 @@ class OclFlexImporter:
                     obj_owner_url = "/" + self.obj_def[self.OBJ_TYPE_USER]["url_name"] + "/" + obj_owner + "/"
                 else:
                     raise InvalidOwnerError(obj, "Valid owner information required for object of type '" + obj_type + "'")
+            elif has_source and 'source_url' in obj and obj['source_url']:
+                # Extract owner info from the source URL
+                obj_owner_url = obj['source_url'][:self.find_nth(obj['source_url'], '/', 3) + 1]
+            elif has_collection and 'collection_url' in obj and obj['collection_url']:
+                # Extract owner info from the collection URL
+                obj_owner_url = obj['collection_url'][:self.find_nth(obj['collection_url'], '/', 3) + 1]
             else:
                 raise InvalidOwnerError(obj, "Valid owner information required for object of type '" + obj_type + "'")
 
         # Set repository URL using ("source_url" OR "source") OR ("collection_url" OR "collection")
         # e.g. /orgs/MyOrganization/sources/MySource/ OR /orgs/CIEL/collections/StarterSet/
         # NOTE: Repository URL always ends with a forward slash
-        has_source = False
-        has_collection = False
         obj_repo_url = None
-        if self.obj_def[obj_type]["has_source"] and self.obj_def[obj_type]["has_collection"]:
-            raise InvalidObjectDefinition(obj, "Object definition for '" + obj_type + "' must not have both 'has_source' and 'has_collection' set to True")
-        elif self.obj_def[obj_type]["has_source"]:
-            has_source = True
+        if has_source:
             if "source_url" in obj:
                 obj_repo_url = obj.pop("source_url")
                 obj.pop("source", None)
@@ -402,8 +419,7 @@ class OclFlexImporter:
                 obj_repo_url = obj_owner_url + 'sources/' + obj.pop("source") + "/"
             else:
                 raise InvalidRepositoryError(obj, "Valid source information required for object of type '" + obj_type + "'")
-        elif self.obj_def[obj_type]["has_collection"]:
-            has_collection = True
+        elif has_collection:
             if "collection_url" in obj:
                 obj_repo_url = obj.pop("collection_url")
                 obj.pop("collection", None)
@@ -415,7 +431,7 @@ class OclFlexImporter:
         # Build object URLs -- note that these always end with forward slashes
         if has_source or has_collection:
             if 'omit_resource_name_on_get' in self.obj_def[obj_type] and self.obj_def[obj_type]['omit_resource_name_on_get']:
-                # Source or collection version
+                # Source or collection version does not use 'versions' in endpoint
                 new_obj_url = obj_repo_url + self.obj_def[obj_type]["url_name"] + "/"
                 obj_url = obj_repo_url + obj_id + "/"
             elif obj_id:
@@ -598,3 +614,11 @@ class OclFlexImporter:
                 if action_type not in self.results['/users/']:
                     self.results['/users/'][action_type] = []
                 self.results['/users/'][action_type].append(obj_url)
+
+    def find_nth(self, haystack, needle, n):
+        """ Find nth occurence of a substring within a string """
+        start = haystack.find(needle)
+        while start >= 0 and n > 1:
+            start = haystack.find(needle, start+len(needle))
+            n -= 1
+        return start

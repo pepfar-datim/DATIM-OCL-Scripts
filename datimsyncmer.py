@@ -16,6 +16,7 @@ import os
 import sys
 import json
 from datimsync import DatimSync
+from datimbase import DatimConstants
 
 
 class DatimSyncMer(DatimSync):
@@ -32,8 +33,7 @@ class DatimSyncMer(DatimSync):
     OCL_CLEANED_EXPORT_FILENAME = 'mer_ocl_cleaned_export.json'
 
     # Import batches
-    IMPORT_BATCH_MER = 'MER'
-    IMPORT_BATCHES = [IMPORT_BATCH_MER]
+    IMPORT_BATCHES = [DatimConstants.IMPORT_BATCH_MER]
 
     # DATIM DHIS2 Query Definitions
     DHIS2_QUERIES = {
@@ -50,194 +50,7 @@ class DatimSyncMer(DatimSync):
     }
 
     # OCL Export Definitions
-    OCL_EXPORT_DEFS = {
-        'MER': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/sources/MER/'},
-        'MER-R-Facility-DoD-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY17Q1/'},
-        'MER-R-Facility-DoD-FY17Q2': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY17Q2/'},
-        'MER-R-Facility-DoD-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY16Q4/'},
-        'MER-R-Facility-DoD-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY16Q1Q2Q3/'},
-        'HC-R-COP-Prioritization-SNU-USG-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-R-COP-Prioritization-SNU-USG-FY16Q4/'},
-        'HC-R-Narratives-USG-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-R-Narratives-USG-FY16Q1Q2Q3/'},
-        'HC-R-Narratives-USG-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-R-Narratives-USG-FY16Q4/'},
-        'HC-R-Narratives-USG-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-R-Narratives-USG-FY17Q1/'},
-        'HC-R-Narratives-USG-FY17Q2': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-R-Narratives-USG-FY17Q2/'},
-        'HC-R-Operating-Unit-Level-USG-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-R-Operating-Unit-Level-USG-FY16Q1Q2Q3/'},
-        'HC-R-Operating-Unit-Level-USG-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-R-Operating-Unit-Level-USG-FY16Q4/'},
-        'HC-T-COP-Prioritization-SNU-USG-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-T-COP-Prioritization-SNU-USG-FY17/'},
-        'HC-T-COP-Prioritization-SNU-USG-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-T-COP-Prioritization-SNU-USG-FY18/'},
-        'HC-T-Narratives-USG-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-T-Narratives-USG-FY16/'},
-        'HC-T-Narratives-USG-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-T-Narratives-USG-FY17/'},
-        'HC-T-Operating-Unit-Level-USG-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-T-Operating-Unit-Level-USG-FY16/'},
-        'HC-T-Operating-Unit-Level-USG-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-T-Operating-Unit-Level-USG-FY17/'},
-        'HC-T-Operating-Unit-Level-USG-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-T-Operating-Unit-Level-USG-FY18/'},
-        'MER-R-Community-DoD-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-DoD-FY16Q1Q2Q3/'},
-        'MER-R-Community-DoD-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-DoD-FY16Q4/'},
-        'MER-R-Community-DoD-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-DoD-FY17Q1/'},
-        'MER-R-Community-DoD-FY17Q2': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-DoD-FY17Q2/'},
-        'MER-R-Community-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-FY16Q1Q2Q3/'},
-        'MER-R-Community-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-FY16Q4/'},
-        'MER-R-Community-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-FY17Q1/'},
-        'MER-R-Community-FY17Q2': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-FY17Q2/'},
-        'MER-R-Facility-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-FY16Q1Q2Q3/'},
-        'MER-R-Facility-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-FY16Q4/'},
-        'MER-R-Facility-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-FY17Q1/'},
-        'MER-R-Facility-FY17Q2': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-FY17Q2/'},
-        'MER-R-Medical-Store-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Medical-Store-FY16Q1Q2Q3/'},
-        'MER-R-Medical-Store-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Medical-Store-FY16Q4/'},
-        'MER-R-Medical-Store-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Medical-Store-FY17Q1/'},
-        'MER-R-Narratives-IM-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Narratives-IM-FY16Q1Q2Q3/'},
-        'MER-R-Narratives-IM-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Narratives-IM-FY16Q4/'},
-        'MER-R-Narratives-IM-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Narratives-IM-FY17Q1/'},
-        'MER-R-Narratives-IM-FY17Q2': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Narratives-IM-FY17Q2/'},
-        'MER-R-Operating-Unit-Level-IM-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Operating-Unit-Level-IM-FY16Q1Q2Q3/'},
-        'MER-R-Operating-Unit-Level-IM-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Operating-Unit-Level-IM-FY16Q4/'},
-        'MER-R-Operating-Unit-Level-IM-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Operating-Unit-Level-IM-FY17Q1/'},
-        'MER-R-Operating-Unit-Level-IM-FY17Q2': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Operating-Unit-Level-IM-FY17Q2/'},
-        'MER-T-Community-DoD-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-DoD-FY16/'},
-        'MER-T-Community-DoD-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-DoD-FY17/'},
-        'MER-T-Community-DoD-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-DoD-FY18/'},
-        'MER-T-Community-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-FY16/'},
-        'MER-T-Community-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-FY17/'},
-        'MER-T-Community-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-FY18/'},
-        'MER-T-Facility-DoD-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Facility-DoD-FY16/'},
-        'MER-T-Facility-DoD-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Facility-DoD-FY17/'},
-        'MER-T-Facility-DoD-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Facility-DoD-FY18/'},
-        'MER-T-Facility-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Facility-FY16/'},
-        'MER-T-Facility-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Facility-FY17/'},
-        'MER-T-Facility-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Facility-FY18/'},
-        'MER-T-Narratives-IM-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Narratives-IM-FY16/'},
-        'MER-T-Narratives-IM-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Narratives-IM-FY17/'},
-        'MER-T-Narratives-IM-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Narratives-IM-FY18/'},
-        'MER-T-Operating-Unit-Level-IM-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Operating-Unit-Level-IM-FY16/'},
-        'MER-T-Operating-Unit-Level-IM-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Operating-Unit-Level-IM-FY17/'},
-        'MER-T-Operating-Unit-Level-IM-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Operating-Unit-Level-IM-FY18/'},
-        'Planning-Attributes-COP-Prioritization-National-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/Planning-Attributes-COP-Prioritization-National-FY18/'},
-        'Planning-Attributes-COP-Prioritization-SNU-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/Planning-Attributes-COP-Prioritization-SNU-FY18/'}
-    }
+    OCL_EXPORT_DEFS = DatimConstants.MER_OCL_EXPORT_DEFS
 
     def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='', compare2previousexport=True,
                  run_dhis2_offline=False, run_ocl_offline=False,
@@ -323,7 +136,7 @@ class DatimSyncMer(DatimSync):
                             'external_id': None,
                         }
                     ]
-                self.dhis2_diff[self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT][
+                self.dhis2_diff[DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT][
                     indicator_concept_key] = indicator_concept
                 num_indicators += 1
 
@@ -337,7 +150,7 @@ class DatimSyncMer(DatimSync):
 
                     # Only build the disaggregate concept if it has not already been defined
                     if disaggregate_concept_key not in self.dhis2_diff[
-                            self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT]:
+                            DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT]:
                         disaggregate_concept = {
                             'type': 'Concept',
                             'id': disaggregate_concept_id,
@@ -360,16 +173,18 @@ class DatimSyncMer(DatimSync):
                                 }
                             ]
                         }
-                        self.dhis2_diff[self.IMPORT_BATCH_MER][
+                        self.dhis2_diff[DatimConstants.IMPORT_BATCH_MER][
                             self.RESOURCE_TYPE_CONCEPT][disaggregate_concept_key] = disaggregate_concept
                         num_disaggregates += 1
 
                     # Build the mapping
                     map_type = 'Has Option'
-                    disaggregate_mapping_key = ('/orgs/PEPFAR/sources/MER/mappings/?from=' + indicator_concept_url +
-                                                '&maptype=' + map_type + '&to=' + disaggregate_concept_url)
+                    disaggregate_mapping_key = self.get_mapping_key(
+                        mapping_owner_type=self.RESOURCE_TYPE_ORGANIZATION, mapping_owner_id='PEPFAR',
+                        mapping_source_id='MER', from_concept_url=indicator_concept_url, map_type=map_type,
+                        to_concept_url=disaggregate_concept_url)
                     disaggregate_mapping = {
-                        'type': "Mapping",
+                        'type': 'Mapping',
                         'owner': 'PEPFAR',
                         'owner_type': self.RESOURCE_TYPE_ORGANIZATION,
                         'source': 'MER',
@@ -380,7 +195,7 @@ class DatimSyncMer(DatimSync):
                         'extras': None,
                         'retired': False,
                     }
-                    self.dhis2_diff[self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_MAPPING][
+                    self.dhis2_diff[DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_MAPPING][
                         disaggregate_mapping_key] = disaggregate_mapping
                     num_mappings += 1
 
@@ -396,23 +211,26 @@ class DatimSyncMer(DatimSync):
 
                     # Build the Indicator concept reference - mappings for this reference will be added automatically
                     indicator_ref_key, indicator_ref = self.get_concept_reference_json(
-                        owner_id='PEPFAR', collection_id=collection_id, concept_url=indicator_concept_url)
-                    self.dhis2_diff[self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF][
+                        collection_owner_id='PEPFAR', collection_owner_type=self.RESOURCE_TYPE_ORGANIZATION,
+                        collection_id=collection_id, concept_url=indicator_concept_url)
+                    self.dhis2_diff[DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF][
                         indicator_ref_key] = indicator_ref
                     num_indicator_refs += 1
 
                     # Build the Disaggregate concept reference
                     for disaggregate_concept_url in indicator_disaggregate_concept_urls:
                         disaggregate_ref_key, disaggregate_ref = self.get_concept_reference_json(
-                            owner_id='PEPFAR', collection_id=collection_id, concept_url=disaggregate_concept_url)
+                            collection_owner_id='PEPFAR', collection_owner_type=self.RESOURCE_TYPE_ORGANIZATION,
+                            collection_id=collection_id, concept_url=disaggregate_concept_url)
                         if disaggregate_ref_key not in self.dhis2_diff[
-                                self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF]:
-                            self.dhis2_diff[self.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF][
+                                DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF]:
+                            self.dhis2_diff[DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF][
                                 disaggregate_ref_key] = disaggregate_ref
                             num_disaggregate_refs += 1
 
-            self.vlog(1, 'DHIS2 export "%s" successfully transformed to %s indicators, '
-                         '%s disaggregates, %s mappings, %s indicator references, and %s disaggregate references' % (
+            self.vlog(1, 'DHIS2 export "%s" successfully transformed to %s indicator concepts, '
+                         '%s disaggregate concepts, %s mappings from indicators to disaggregates, '
+                         '%s indicator concept references, and %s disaggregate concept references' % (
                             dhis2filename_export_new, num_indicators, num_disaggregates, num_mappings,
                             num_indicator_refs, num_disaggregate_refs))
             return True
@@ -468,12 +286,11 @@ else:
     oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
 
 # Create sync object and run
-mer_sync = DatimSyncMer(oclenv=oclenv, oclapitoken=oclapitoken,
-                        dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
-                        compare2previousexport=compare2previousexport,
-                        run_dhis2_offline=run_dhis2_offline, run_ocl_offline=run_ocl_offline,
-                        verbosity=verbosity,
-                        import_test_mode=import_test_mode,
+mer_sync = DatimSyncMer(oclenv=oclenv, oclapitoken=oclapitoken, dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
+                        compare2previousexport=compare2previousexport, run_dhis2_offline=run_dhis2_offline,
+                        run_ocl_offline=run_ocl_offline, verbosity=verbosity, import_test_mode=import_test_mode,
                         import_limit=import_limit)
-mer_sync.run(resource_types=[DatimSyncMer.RESOURCE_TYPE_MAPPING])
-# mer_sync.data_check()
+mer_sync.consolidate_references = True
+mer_sync.import_delay = 3
+# mer_sync.run(resource_types=[DatimSyncMer.RESOURCE_TYPE_CONCEPT_REF])
+mer_sync.data_check()

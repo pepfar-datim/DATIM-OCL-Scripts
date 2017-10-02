@@ -209,11 +209,19 @@ verbosity = 0  # 0=none, 1=some, 2=all
 run_ocl_offline = False  # Set to true to use local copies of dhis2/ocl exports
 
 # Export Format - see constants in DatimShow class
-export_format = DatimShow.DATIM_FORMAT_CSV
+#export_format = DatimShow.DATIM_FORMAT_CSV
+if sys.argv[1] in ['html', 'HTML']:
+    export_format = DatimShow.DATIM_FORMAT_HTML
+if sys.argv[1] in ['xml', 'XML']:
+    export_format = DatimShow.DATIM_FORMAT_XML
+if sys.argv[1] in ['json', 'JSON']:
+    export_format = DatimShow.DATIM_FORMAT_JSON
+if sys.argv[1] in ['csv', 'CSV']:
+    export_format = DatimShow.DATIM_FORMAT_CSV
 
 # Requested Collection
-collection_id = 'MER-R-Facility-DoD-FY17Q2'
-
+#collection_id = 'MER-R-Operating-Unit-Level-IM-FY17Q2'
+collection_id = sys.argv[2]
 # OCL Settings
 #oclenv = ''
 #oclapitoken = ''

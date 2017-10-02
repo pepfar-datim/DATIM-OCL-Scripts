@@ -145,9 +145,14 @@ class DatimShowMer(DatimShow):
             self.transform_to_csv(intermediate)
 
     def transform_to_html(self, content):
-        sys.stdout.write('<div><h3>%s</h3>\n' % content['title'])
+        css = ('<style tye="text/css">.gridDiv {font-family:sans-serif, arial;}'
+               'table.gridTable {border-collapse: collapse; font-size: 11pt;}'
+               '.gridTable th,.gridTable td {padding: 8px 4px 7px 4px; border: 1px solid #e7e7e7;}'
+               '.gridTable th {background-color: #f3f3f3; font-weight: bold;}</style>\n')
+        sys.stdout.write(css)
+        sys.stdout.write('<div class="gridDiv"><h3>%s</h3>\n' % content['title'])
         sys.stdout.write('<h4>%s</h4>\n' % content['subtitle'])
-        sys.stdout.write('<table>\n<thead><tr>')
+        sys.stdout.write('<table class="gridTable">\n<thead><tr>')
         for h in content['headers']:
             sys.stdout.write('<th>%s</th>' % str(h['name']))
         sys.stdout.write('</tr></thead>\n<tbody>')
@@ -188,9 +193,9 @@ class DatimShowMer(DatimShow):
         rows = SubElement(top, 'rows')
         for row_values in content['rows']:
             row = SubElement(rows, 'row')
-            for value in row_values:
+            for field_name in row_values:
                 field = SubElement(row, 'field')
-                field.text = value
+                field.text = row_values[field_name].encode('utf-8')
         print(tostring(top))
 
     def transform_to_csv(self, content):
@@ -208,20 +213,25 @@ class DatimShowMer(DatimShow):
 verbosity = 0  # 0=none, 1=some, 2=all
 run_ocl_offline = False  # Set to true to use local copies of dhis2/ocl exports
 
-# Export Format - see constants in DatimShow class
-#export_format = DatimShow.DATIM_FORMAT_CSV
-if sys.argv[1] in ['html', 'HTML']:
-    export_format = DatimShow.DATIM_FORMAT_HTML
-if sys.argv[1] in ['xml', 'XML']:
-    export_format = DatimShow.DATIM_FORMAT_XML
-if sys.argv[1] in ['json', 'JSON']:
-    export_format = DatimShow.DATIM_FORMAT_JSON
-if sys.argv[1] in ['csv', 'CSV']:
-    export_format = DatimShow.DATIM_FORMAT_CSV
+# Set some defaults
+export_format = DatimShow.DATIM_FORMAT_XML
+collection_id = 'MER-R-Operating-Unit-Level-IM-FY17Q2'
 
-# Requested Collection
-#collection_id = 'MER-R-Operating-Unit-Level-IM-FY17Q2'
-collection_id = sys.argv[2]
+# Set arguments from the command line
+if sys.argv and len(sys.argv) > 2:
+    # Export Format - see constants in DatimShow class
+    if sys.argv[1] in ['html', 'HTML']:
+        export_format = DatimShow.DATIM_FORMAT_HTML
+    if sys.argv[1] in ['xml', 'XML']:
+        export_format = DatimShow.DATIM_FORMAT_XML
+    if sys.argv[1] in ['json', 'JSON']:
+        export_format = DatimShow.DATIM_FORMAT_JSON
+    if sys.argv[1] in ['csv', 'CSV']:
+        export_format = DatimShow.DATIM_FORMAT_CSV
+
+    # Requested Collection
+    collection_id = sys.argv[2]
+
 # OCL Settings
 #oclenv = ''
 #oclapitoken = ''

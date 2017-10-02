@@ -450,8 +450,10 @@ class DatimSync(DatimBase):
 
     def load_dhis2_exports(self):
         """ Load the DHIS2 export files """
+        cnt = 0
         for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
-            self.vlog(1, '** %s:' % dhis2_query_key)
+            cnt += 1
+            self.vlog(1, '[%s of %s] ** %s:' % (cnt, len(self.DHIS2_QUERIES), dhis2_query_key))
             dhis2filename_export_new = self.dhis2filename_export_new(dhis2_query_def['id'])
             if not self.run_dhis2_offline:
                 query_attr = {'active_dataset_ids': self.str_active_dataset_ids}

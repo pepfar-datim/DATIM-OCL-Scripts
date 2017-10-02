@@ -31,9 +31,6 @@ class DatimConstants:
         'MER-R-Facility-DoD-FY16Q4': {
             'import_batch': IMPORT_BATCH_MER,
             'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY16Q4/'},
-        'MER-R-Facility-DoD-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY16Q1Q2Q3/'},
         'HC-R-COP-Prioritization-SNU-USG-FY16Q4': {
             'import_batch': IMPORT_BATCH_MER,
             'endpoint': '/orgs/PEPFAR/collections/HC-R-COP-Prioritization-SNU-USG-FY16Q4/'},
@@ -154,9 +151,6 @@ class DatimConstants:
         'MER-T-Community-DoD-FY18': {
             'import_batch': IMPORT_BATCH_MER,
             'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-DoD-FY18/'},
-        'MER-T-Community-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-FY16/'},
         'MER-T-Community-FY17': {
             'import_batch': IMPORT_BATCH_MER,
             'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-FY17/'},
@@ -205,6 +199,14 @@ class DatimConstants:
         'Planning-Attributes-COP-Prioritization-SNU-FY18': {
             'import_batch': IMPORT_BATCH_MER,
             'endpoint': '/orgs/PEPFAR/collections/Planning-Attributes-COP-Prioritization-SNU-FY18/'}
+    }
+    INACTIVE = {
+        'MER-R-Facility-DoD-FY16Q1Q2Q3': {
+            'import_batch': IMPORT_BATCH_MER,
+            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY16Q1Q2Q3/'},
+        'MER-T-Community-FY16': {
+            'import_batch': IMPORT_BATCH_MER,
+            'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-FY16/'},
     }
 
     # SIMS OCL Export Definitions

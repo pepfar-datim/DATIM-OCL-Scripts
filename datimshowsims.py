@@ -7,17 +7,13 @@ from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import SubElement
 from xml.etree.ElementTree import tostring
 from datimshow import DatimShow
+from datimbase import DatimConstants
 
 
 class DatimShowSims(DatimShow):
     """ Class to manage DATIM SIMS Presentation """
 
-    # Formats
-    DATIM_FORMAT_HTML = 'html'
-    DATIM_FORMAT_XML = 'xml'
-    DATIM_FORMAT_JSON = 'json'
-    DATIM_FORMAT_CSV = 'csv'
-
+    # OCL Export Definitions
     OCL_EXPORT_DEFS = {
         'sims_source': {
             'endpoint': '/orgs/PEPFAR/sources/SIMS/',
@@ -34,13 +30,16 @@ class DatimShowSims(DatimShow):
         self.run_ocl_offline = run_ocl_offline
         self.verbosity = verbosity
 
-    def get(self, export_format=DATIM_FORMAT_HTML):
+    def get(self, export_format):
+        """
+
+        :param export_format:
+        :return:
+        """
         # STEP 1. Fetch latest versions of relevant OCL exports
-        if self.verbosity:
-            self.log('**** STEP 1: Fetch latest versions of relevant OCL exports')
+        self.vlog(1, '**** STEP 1: Fetch latest versions of relevant OCL exports')
         for ocl_export_def_key in self.OCL_EXPORT_DEFS:
-            if self.verbosity:
-                self.log('%s:' % ocl_export_def_key)
+            self.log(1, '%s:' % ocl_export_def_key)
             export_def = self.OCL_EXPORT_DEFS[ocl_export_def_key]
             if not self.run_ocl_offline:
                 self.get_ocl_export(
@@ -49,23 +48,19 @@ class DatimShowSims(DatimShow):
                     tarfilename=export_def['tarfilename'],
                     jsonfilename=export_def['jsonfilename'])
             else:
-                if self.verbosity:
-                    self.log('OCL-OFFLINE: Using local file "%s"...' % (export_def['jsonfilename']))
+                self.vlog(1, 'OCL-OFFLINE: Using local file "%s"...' % (export_def['jsonfilename']))
                 if os.path.isfile(self.attach_absolute_path(export_def['jsonfilename'])):
-                    if self.verbosity:
-                        self.log('OCL-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
-                            export_def['jsonfilename'], os.path.getsize(self.attach_absolute_path(export_def['jsonfilename']))))
+                    self.vlog(1, 'OCL-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
+                        export_def['jsonfilename'], os.path.getsize(self.attach_absolute_path(export_def['jsonfilename']))))
                 else:
                     self.log('Could not find offline OCL file "%s". Exiting...' % (export_def['jsonfilename']))
                     sys.exit(1)
 
         # STEP 2: Transform OCL export to intermediary state
-        if self.verbosity:
-            self.log('**** STEP 2: Transform to intermediary state')
+        self.vlog(1, '**** STEP 2: Transform to intermediary state')
         sims_intermediate = {}
         for ocl_export_def_key in self.OCL_EXPORT_DEFS:
-            if self.verbosity:
-                self.log('%s:' % ocl_export_def_key)
+            self.vlog(1, '%s:' % ocl_export_def_key)
             export_def = self.OCL_EXPORT_DEFS[ocl_export_def_key]
             with open(self.attach_absolute_path(export_def['jsonfilename']), 'rb') as ifile, open(
                     self.attach_absolute_path(export_def['intermediatejsonfilename']), 'wb') as ofile:
@@ -97,12 +92,10 @@ class DatimShowSims(DatimShow):
 
                 # Write intermediate state as a file (for future caching)
                 ofile.write(json.dumps(sims_intermediate))
-                if self.verbosity:
-                    self.log('Processed OCL export saved to "%s"' % (export_def['intermediatejsonfilename']))
+                self.vlog(1, 'Processed OCL export saved to "%s"' % (export_def['intermediatejsonfilename']))
 
         # STEP 3: Transform to requested format and stream
-        if self.verbosity:
-            self.log('**** STEP 3: Transform to requested format and stream')
+        self.vlog(1, '**** STEP 3: Transform to requested format and stream')
         if export_format == self.DATIM_FORMAT_HTML:
             self.transform_to_html(sims_intermediate)
         elif export_format == self.DATIM_FORMAT_JSON:

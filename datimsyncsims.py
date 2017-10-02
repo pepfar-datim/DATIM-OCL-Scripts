@@ -22,6 +22,7 @@ import os
 import sys
 import json
 from datimsync import DatimSync
+from datimbase import DatimConstants
 
 
 class DatimSyncSims(DatimSync):
@@ -38,8 +39,7 @@ class DatimSyncSims(DatimSync):
     OCL_CLEANED_EXPORT_FILENAME = 'sims_ocl_cleaned_export.json'
 
     # Import batches
-    IMPORT_BATCH_SIMS = 'SIMS'
-    IMPORT_BATCHES = [IMPORT_BATCH_SIMS]
+    IMPORT_BATCHES = [DatimConstants.IMPORT_BATCH_SIMS]
 
     # DATIM DHIS2 Query Definitions
     DHIS2_QUERIES = {
@@ -61,22 +61,7 @@ class DatimSyncSims(DatimSync):
     }
 
     # OCL Export Definitions
-    OCL_EXPORT_DEFS = {
-        'sims_source': {'import_batch': IMPORT_BATCH_SIMS,
-                        'endpoint': '/orgs/PEPFAR/sources/SIMS/'},
-        'sims2_above_site': {'import_batch': IMPORT_BATCH_SIMS,
-                             'endpoint': '/orgs/PEPFAR/collections/SIMS2-Above-Site/'},
-        'sims2_community': {'import_batch': IMPORT_BATCH_SIMS,
-                            'endpoint': '/orgs/PEPFAR/collections/SIMS2-Community/'},
-        'sims2_facility': {'import_batch': IMPORT_BATCH_SIMS,
-                           'endpoint': '/orgs/PEPFAR/collections/SIMS2-Facility/'},
-        'sims3_above_site': {'import_batch': IMPORT_BATCH_SIMS,
-                             'endpoint': '/orgs/PEPFAR/collections/SIMS3-Above-Site/'},
-        'sims3_community': {'import_batch': IMPORT_BATCH_SIMS,
-                            'endpoint': '/orgs/PEPFAR/collections/SIMS3-Community/'},
-        'sims3_facility': {'import_batch': IMPORT_BATCH_SIMS,
-                           'endpoint': '/orgs/PEPFAR/collections/SIMS3-Facility/'},
-    }
+    OCL_EXPORT_DEFS = DatimConstants.SIMS_OCL_EXPORT_DEFS
 
     def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='', compare2previousexport=True,
                  run_dhis2_offline=False, run_ocl_offline=False,
@@ -149,7 +134,7 @@ class DatimSyncSims(DatimSync):
                     ],
                     'extras': {'Value Type': de['valueType']}
                 }
-                self.dhis2_diff[self.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT][concept_key] = c
+                self.dhis2_diff[DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT][concept_key] = c
                 num_concepts += 1
 
                 # Iterate through each DataElementGroup and transform to an OCL-JSON reference
@@ -165,7 +150,7 @@ class DatimSyncSims(DatimSync):
                         'collection': collection_id,
                         'data': {"expressions": [concept_url]}
                     }
-                    self.dhis2_diff[self.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT_REF][concept_ref_key] = r
+                    self.dhis2_diff[DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT_REF][concept_ref_key] = r
                     num_references += 1
 
             self.vlog(1, 'DHIS2 export "%s" successfully transformed to %s concepts + %s references (%s total)' % (

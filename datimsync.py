@@ -101,8 +101,11 @@ class DatimSync(DatimBase):
         :param cleaning_attr: Optional cleaning attributes that are made available to each cleaning method
         :return: None
         """
+        cnt = 0
+        num_total = len(self.OCL_EXPORT_DEFS)
         for ocl_export_def_key, export_def in self.OCL_EXPORT_DEFS.iteritems():
-            self.vlog(1, '** %s:' % ocl_export_def_key)
+            cnt += 1
+            self.vlog(1, '** [%s of %s] %s:' % (cnt, num_total, ocl_export_def_key))
             cleaning_method_name = export_def.get('cleaning_method', self.DEFAULT_OCL_EXPORT_CLEANING_METHOD)
             getattr(self, cleaning_method_name)(export_def, cleaning_attr=cleaning_attr)
         with open(self.attach_absolute_path(self.OCL_CLEANED_EXPORT_FILENAME), 'wb') as output_file:
@@ -530,8 +533,11 @@ class DatimSync(DatimBase):
 
         # STEP 4: Fetch latest versions of relevant OCL exports
         self.vlog(1, '**** STEP 4 of 12: Fetch latest versions of relevant OCL exports')
+        cnt = 0
+        num_total = len(self.OCL_EXPORT_DEFS)
         for ocl_export_def_key in self.OCL_EXPORT_DEFS:
-            self.vlog(1, '** %s:' % ocl_export_def_key)
+            cnt += 1
+            self.vlog(1, '** [%s of %s] %s:' % (cnt, num_total, ocl_export_def_key))
             export_def = self.OCL_EXPORT_DEFS[ocl_export_def_key]
             tarfilename = self.endpoint2filename_ocl_export_tar(export_def['endpoint'])
             jsonfilename = self.endpoint2filename_ocl_export_json(export_def['endpoint'])

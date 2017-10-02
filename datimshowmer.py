@@ -84,26 +84,50 @@ class DatimShowMer(DatimShow):
                 'width': 4,
                 'height': 0,
                 'headers': [
-                    {"name": "name", "column": "name", "type": "java.lang.String", "hidden": False, "meta": False},
+                    {"name": "dataset", "column": "dataset", "type": "java.lang.String", "hidden": False, "meta": False},
+                    {"name": "dataelement", "column": "dataelement", "type": "java.lang.String", "hidden": False, "meta": False},
+                    {"name": "shortname", "column": "shortname", "type": "java.lang.String", "hidden": False, "meta": False},
                     {"name": "code", "column": "code", "type": "java.lang.String", "hidden": False, "meta": False},
-                    {"name": "uid", "column": "uid", "type": "java.lang.String", "hidden": False, "meta": False},
-                    {"name": "valuetype", "column": "valuetype", "type": "java.lang.String", "hidden": False, "meta": False}
+                    {"name": "dataelementuid", "column": "dataelementuid", "type": "java.lang.String", "hidden": False, "meta": False},
+                    {"name": "dataelementdesc", "column": "dataelementdesc","type": "java.lang.String", "hidden": False, "meta": False},
+                    {"name": "categoryoptioncombo", "column": "categoryoptioncombo", "type": "java.lang.String", "hidden": False, "meta": False},
+                    {"name": "categoryoptioncombocode", "column": "categoryoptioncombocode", "type": "java.lang.String", "hidden": False, "meta": False},
+                    {"name": "categoryoptioncombouid", "column": "categoryoptioncombouid", "type": "java.lang.String", "hidden": False, "meta": False}
                 ],
                 'rows': []
             }
 
             # Iterate through concepts, clean, then write
             for c in ocl_export_raw['concepts']:
-                new_row = {
-                    'name': c['names'][0]['name'],
-                    'code': c['id'],
-                    'uid': c['external_id'],
-                    'valuetype': ''
-                }
-                if 'extras' in c and c['extras'] and 'Value Type' in c['extras']:
-                    new_row['valuetype'] = c['extras']['Value Type']
-                intermediate['rows'].append(new_row)
-                intermediate['height'] = len(intermediate['rows'])
+                if c['concept_class'] == 'Indicator':
+                    # Build the indicator
+                    concept_description = ''
+                    if c['descriptions']:
+                        concept_description = c['descriptions'][0]['description']
+                    output_concept = {
+                        'dataset': collection_title.encode('utf-8'),
+                        'dataelement': c['names'][0]['name'].encode('utf-8'),
+                        'shortname': c['names'][1]['name'].encode('utf-8'),
+                        'code': c['id'].encode('utf-8'),
+                        'dataelementuid': c['external_id'].encode('utf-8'),
+                        'dataelementdesc': concept_description.encode('utf-8'),
+                        'categoryoptioncombo': '',
+                        'categoryoptioncombocode': '',
+                        'categoryoptioncombouid': '',
+                    }
+
+                    # Find all the relevant mappings
+                    mappings = [item for item in ocl_export_raw['mappings'] if str(
+                        item["from_concept_url"]) == c['url']]
+                    if mappings:
+                        for m in mappings:
+                            output_concept['categoryoptioncombo'] = m['to_concept_name'].encode('utf-8')
+                            output_concept['categoryoptioncombocode'] = m['to_concept_code'].encode('utf-8')
+                            output_concept['categoryoptioncombouid'] = m['to_concept_code'].encode('utf-8')
+                            intermediate['rows'].append(output_concept.copy())
+                    if not mappings:
+                        intermediate['rows'].append(output_concept.copy())
+            intermediate['height'] = len(intermediate['rows'])
 
             # Write intermediate state as a file (for future caching)
             ofile.write(json.dumps(intermediate))
@@ -121,16 +145,16 @@ class DatimShowMer(DatimShow):
             self.transform_to_csv(intermediate)
 
     def transform_to_html(self, content):
-        sys.stdout.write('<div><h3>' + content['title'] + '</h3>\n')
-        sys.stdout.write('<h4>' + content['subtitle'] + '</h4>\n')
+        sys.stdout.write('<div><h3>%s</h3>\n' % content['title'])
+        sys.stdout.write('<h4>%s</h4>\n' % content['subtitle'])
         sys.stdout.write('<table>\n<thead><tr>')
         for h in content['headers']:
-            sys.stdout.write('<th>' + h['name'] + '</th>')
+            sys.stdout.write('<th>%s</th>' % str(h['name']))
         sys.stdout.write('</tr></thead>\n<tbody>')
         for row in content['rows']:
             sys.stdout.write('\n<tr>')
             for h in content['headers']:
-                sys.stdout.write('<td>' + row[h['name']] + '</td>')
+                sys.stdout.write('<td>%s</td>' % str(row[h['name']]))
         sys.stdout.write('</tr>')
         sys.stdout.write('\n</tbody></table></div>')
         sys.stdout.flush()
@@ -181,14 +205,14 @@ class DatimShowMer(DatimShow):
 
 
 # Default Script Settings
-verbosity = 1  # 0=none, 1=some, 2=all
+verbosity = 0  # 0=none, 1=some, 2=all
 run_ocl_offline = False  # Set to true to use local copies of dhis2/ocl exports
 
 # Export Format - see constants in DatimShow class
-export_format = DatimShow.DATIM_FORMAT_HTML
+export_format = DatimShow.DATIM_FORMAT_CSV
 
 # Requested Collection
-collection_id = 'MER-R-Operating-Unit-Level-IM-FY17Q2'
+collection_id = 'MER-R-Facility-DoD-FY17Q2'
 
 # OCL Settings
 #oclenv = ''

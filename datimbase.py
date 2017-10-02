@@ -465,7 +465,8 @@ class DatimBase:
             new_export_request = requests.post(url_ocl_export, headers=self.oclapiheaders)
             if new_export_request.status_code == 202:
                 # Wait for export to be processed then try to fetch it
-                time.sleep(5)
+                self.log('INFO: Waiting 30 seconds while export is being generated...')
+                time.sleep(30)
                 r = requests.get(url_ocl_export, headers=self.oclapiheaders)
                 r.raise_for_status()
             else:

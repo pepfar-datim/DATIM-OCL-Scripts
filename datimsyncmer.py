@@ -86,6 +86,8 @@ class DatimSyncMer(DatimSync):
             self.vlog(1, 'Loading new DHIS2 export "%s"...' % dhis2filename_export_new)
             new_dhis2_export = json.load(input_file)
             ocl_dataset_repos = conversion_attr['ocl_dataset_repos']
+
+            # Counts
             num_indicators = 0
             num_disaggregates = 0
             num_mappings = 0
@@ -268,7 +270,7 @@ else:
     import_test_mode = False
     compare2previousexport = False
     run_dhis2_offline = True
-    run_ocl_offline = False
+    run_ocl_offline = True
     dhis2env = 'https://dev-de.datim.org/'
     dhis2uid = 'paynejd'
     dhis2pwd = 'Jonpayne1!'
@@ -286,11 +288,11 @@ else:
     oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
 
 # Create sync object and run
-mer_sync = DatimSyncMer(oclenv=oclenv, oclapitoken=oclapitoken, dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
-                        compare2previousexport=compare2previousexport, run_dhis2_offline=run_dhis2_offline,
-                        run_ocl_offline=run_ocl_offline, verbosity=verbosity, import_test_mode=import_test_mode,
-                        import_limit=import_limit)
-mer_sync.consolidate_references = True
-mer_sync.import_delay = 3
-# mer_sync.run(resource_types=[DatimSyncMer.RESOURCE_TYPE_CONCEPT_REF])
-mer_sync.data_check()
+datim_sync = DatimSyncMer(oclenv=oclenv, oclapitoken=oclapitoken, dhis2env=dhis2env, dhis2uid=dhis2uid,
+                          dhis2pwd=dhis2pwd, compare2previousexport=compare2previousexport,
+                          run_dhis2_offline=run_dhis2_offline, run_ocl_offline=run_ocl_offline, verbosity=verbosity,
+                          import_test_mode=import_test_mode, import_limit=import_limit)
+datim_sync.consolidate_references = True
+datim_sync.import_delay = 3
+# datim_sync.run(resource_types=[DatimSyncMer.RESOURCE_TYPE_CONCEPT])
+datim_sync.data_check()

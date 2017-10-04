@@ -229,8 +229,9 @@ class DatimConstants:
 
     # Mechanisms OCL Export Definitions
     MECHANISMS_OCL_EXPORT_DEFS = {
-        'mechanisms_source': {
+        'Mechanisms': {
             'import_batch': IMPORT_BATCH_MECHANISMS,
+            'subtitle': 'View of mechanisms, partners, agencies, OUs and start and end dates for each mechanism',
             'endpoint': '/orgs/PEPFAR/sources/Mechanisms/'},
     }
 
@@ -240,6 +241,8 @@ class DatimBase:
     # Resource type constants
     RESOURCE_TYPE_USER = 'User'
     RESOURCE_TYPE_ORGANIZATION = 'Organization'
+    RESOURCE_TYPE_SOURCE = 'Source'
+    RESOURCE_TYPE_COLLECTION = 'Collection'
     RESOURCE_TYPE_CONCEPT = 'Concept'
     RESOURCE_TYPE_MAPPING = 'Mapping'
     RESOURCE_TYPE_CONCEPT_REF = 'Concept_Ref'
@@ -255,6 +258,8 @@ class DatimBase:
     ]
     OWNER_STEM_USERS = 'users'
     OWNER_STEM_ORGS = 'orgs'
+    REPO_STEM_SOURCES = 'sources'
+    REPO_STEM_COLLECTIONS = 'collections'
 
     __location__ = os.path.realpath(
         os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -318,6 +323,14 @@ class DatimBase:
 
     def dhis2filename_export_converted(self, dhis2_query_id):
         return 'dhis2-' + dhis2_query_id + '-export-converted.json'
+
+    def repo_type_to_stem(self, repo_type, default_repo_stem=None):
+        if repo_type == self.RESOURCE_TYPE_SOURCE:
+            return self.REPO_STEM_SOURCES
+        elif repo_type == self.RESOURCE_TYPE_COLLECTION:
+            return self.REPO_STEM_COLLECTIONS
+        else:
+            return default_repo_stem
 
     def owner_type_to_stem(self, owner_type, default_owner_stem=None):
         if owner_type == self.RESOURCE_TYPE_USER:

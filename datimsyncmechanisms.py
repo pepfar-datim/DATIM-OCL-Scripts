@@ -114,7 +114,7 @@ class DatimSyncMechanisms(DatimSync):
                                 'type': 'Concept',
                                 'id': concept_id,
                                 'concept_class': 'Funding Mechanism',
-                                'datatype': 'Text',
+                                'datatype': 'None',
                                 'owner': 'PEPFAR',
                                 'owner_type': 'Organization',
                                 'source': 'Mechanisms',

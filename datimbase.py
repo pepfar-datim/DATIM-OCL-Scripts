@@ -200,7 +200,7 @@ class DatimConstants:
             'import_batch': IMPORT_BATCH_MER,
             'endpoint': '/orgs/PEPFAR/collections/Planning-Attributes-COP-Prioritization-SNU-FY18/'}
     }
-    INACTIVE = {
+    INACTIVE_MER_OCL_EXPORT_DEFS = {
         'MER-R-Facility-DoD-FY16Q1Q2Q3': {
             'import_batch': IMPORT_BATCH_MER,
             'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY16Q1Q2Q3/'},

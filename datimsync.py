@@ -36,6 +36,8 @@ class DatimSync(DatimBase):
     DHIS2_QUERIES = {}
     IMPORT_BATCHES = []
 
+    SYNC_LOAD_DATASETS = True
+
     DEFAULT_OCL_EXPORT_CLEANING_METHOD = 'clean_ocl_export'
 
     # Sets an upper limit for the number of concept references to include in a single API request
@@ -105,7 +107,7 @@ class DatimSync(DatimBase):
         num_total = len(self.OCL_EXPORT_DEFS)
         for ocl_export_def_key, export_def in self.OCL_EXPORT_DEFS.iteritems():
             cnt += 1
-            self.vlog(1, '** [%s of %s] %s:' % (cnt, num_total, ocl_export_def_key))
+            self.vlog(1, '** [OCL Export %s of %s] %s:' % (cnt, num_total, ocl_export_def_key))
             cleaning_method_name = export_def.get('cleaning_method', self.DEFAULT_OCL_EXPORT_CLEANING_METHOD)
             getattr(self, cleaning_method_name)(export_def, cleaning_attr=cleaning_attr)
         with open(self.attach_absolute_path(self.OCL_CLEANED_EXPORT_FILENAME), 'wb') as output_file:
@@ -240,8 +242,10 @@ class DatimSync(DatimBase):
         :param conversion_attr: Optional conversion attributes that are made available to each conversion method
         :return: None
         """
+        cnt = 0
         for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
-            self.vlog(1, '** %s:' % dhis2_query_key)
+            cnt += 1
+            self.vlog(1, '** [DHIS2 Export %s of %s] %s:' % (cnt, len(self.DHIS2_QUERIES), dhis2_query_key))
             getattr(self, dhis2_query_def['conversion_method'])(dhis2_query_def, conversion_attr=conversion_attr)
         with open(self.attach_absolute_path(self.DHIS2_CONVERTED_EXPORT_FILENAME), 'wb') as output_file:
             output_file.write(json.dumps(self.dhis2_diff))
@@ -453,7 +457,7 @@ class DatimSync(DatimBase):
         cnt = 0
         for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
             cnt += 1
-            self.vlog(1, '[%s of %s] ** %s:' % (cnt, len(self.DHIS2_QUERIES), dhis2_query_key))
+            self.vlog(1, '** [DHIS2 Export %s of %s] %s:' % (cnt, len(self.DHIS2_QUERIES), dhis2_query_key))
             dhis2filename_export_new = self.dhis2filename_export_new(dhis2_query_def['id'])
             if not self.run_dhis2_offline:
                 query_attr = {'active_dataset_ids': self.str_active_dataset_ids}
@@ -496,8 +500,12 @@ class DatimSync(DatimBase):
             self.log_settings()
 
         # STEP 1: Load OCL Collections for Dataset IDs
+        # TODO: Skip if no dataset IDs to load
         self.vlog(1, '**** STEP 1 of 12: Load OCL Collections for Dataset IDs')
-        self.load_datasets_from_ocl()
+        if self.SYNC_LOAD_DATASETS:
+            self.load_datasets_from_ocl()
+        else:
+            self.vlog(1, 'SKIPPING: SYNC_LOAD_DATASETS set to "False"')
 
         # STEP 2: Load new exports from DATIM-DHIS2
         self.vlog(1, '**** STEP 2 of 12: Load new exports from DATIM DHIS2')
@@ -539,7 +547,7 @@ class DatimSync(DatimBase):
         num_total = len(self.OCL_EXPORT_DEFS)
         for ocl_export_def_key in self.OCL_EXPORT_DEFS:
             cnt += 1
-            self.vlog(1, '** [%s of %s] %s:' % (cnt, num_total, ocl_export_def_key))
+            self.vlog(1, '** [OCL Export %s of %s] %s:' % (cnt, num_total, ocl_export_def_key))
             export_def = self.OCL_EXPORT_DEFS[ocl_export_def_key]
             tarfilename = self.endpoint2filename_ocl_export_tar(export_def['endpoint'])
             jsonfilename = self.endpoint2filename_ocl_export_json(export_def['endpoint'])
@@ -568,6 +576,7 @@ class DatimSync(DatimBase):
         # STEP 6: Prepare OCL exports for diff
         # Concepts/mappings in OCL exports have extra attributes that should be removed before the diff
         self.vlog(1, '**** STEP 6 of 12: Prepare OCL exports for diff')
+        self.ocl_diff = {}
         for import_batch_key in self.IMPORT_BATCHES:
             self.ocl_diff[import_batch_key] = {}
             for resource_type in self.DEFAULT_SYNC_RESOURCE_TYPES:
@@ -580,9 +589,9 @@ class DatimSync(DatimBase):
         self.vlog(1, '**** STEP 7 of 12: Perform deep diff')
         with open(self.attach_absolute_path(self.OCL_CLEANED_EXPORT_FILENAME), 'rb') as file_ocl_diff,\
                 open(self.attach_absolute_path(self.DHIS2_CONVERTED_EXPORT_FILENAME), 'rb') as file_dhis2_diff:
-            ocl_diff = json.load(file_ocl_diff)
-            dhis2_diff = json.load(file_dhis2_diff)
-            self.diff_result = self.perform_diff(ocl_diff=ocl_diff, dhis2_diff=dhis2_diff)
+            local_ocl_diff = json.load(file_ocl_diff)
+            local_dhis2_diff = json.load(file_dhis2_diff)
+            self.diff_result = self.perform_diff(ocl_diff=local_ocl_diff, dhis2_diff=local_dhis2_diff)
 
         # STEP 8: Determine action based on diff result
         self.vlog(1, '**** STEP 8 of 12: Determine action based on diff result')

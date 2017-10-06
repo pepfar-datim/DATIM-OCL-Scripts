@@ -31,9 +31,9 @@ class DatimSyncSims(DatimSync):
     # Dataset ID settings
     OCL_DATASET_ENDPOINT = '/orgs/PEPFAR/collections/?q=SIMS&verbose=true&limit=200'
     REPO_ACTIVE_ATTR = 'datim_sync_sims'
-    DATASET_REPOSITORIES_FILENAME = 'ocl_dataset_repos_export.json'
 
-    # Filenames
+    # File names
+    DATASET_REPOSITORIES_FILENAME = 'ocl_dataset_repos_export.json'
     NEW_IMPORT_SCRIPT_FILENAME = 'sims_dhis2ocl_import_script.json'
     DHIS2_CONVERTED_EXPORT_FILENAME = 'sims_dhis2_converted_export.json'
     OCL_CLEANED_EXPORT_FILENAME = 'sims_ocl_cleaned_export.json'
@@ -42,31 +42,14 @@ class DatimSyncSims(DatimSync):
     IMPORT_BATCHES = [DatimConstants.IMPORT_BATCH_SIMS]
 
     # DATIM DHIS2 Query Definitions
-    DHIS2_QUERIES = {
-        'SimsAssessmentTypes': {
-            'id': 'SimsAssessmentTypes',
-            'name': 'DATIM-DHIS2 SIMS Assessment Types',
-            'query': 'api/dataElements.json?fields=name,code,id,valueType,lastUpdated,dataElementGroups[id,name]&'
-                     'order=code:asc&paging=false&filter=dataElementGroups.id:in:[{{active_dataset_ids}}]',
-            'conversion_method': 'dhis2diff_sims_assessment_types'
-        },
-        'SimsOptionSets': {
-            'id': 'SimsOptionSets',
-            'name': 'DATIM-DHIS2 SIMS Option Sets',
-            'query': 'api/optionSets/?fields=id,name,lastUpdated,options[id,code,name]&'
-                     'filter=name:like:SIMS%20v2&paging=false&order=name:asc',
-            'conversion_method': 'dhis2diff_sims_option_sets'
-        }
-    }
+    DHIS2_QUERIES = DatimConstants.SIMS_DHIS2_QUERIES
 
     # OCL Export Definitions
     OCL_EXPORT_DEFS = DatimConstants.SIMS_OCL_EXPORT_DEFS
 
     def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='', compare2previousexport=True,
-                 run_dhis2_offline=False, run_ocl_offline=False,
-                 verbosity=0, data_check_only=False, import_test_mode=False, import_limit=0):
+                 run_dhis2_offline=False, run_ocl_offline=False, verbosity=0, import_limit=0):
         DatimSync.__init__(self)
-
         self.oclenv = oclenv
         self.oclapitoken = oclapitoken
         self.dhis2env = dhis2env
@@ -76,9 +59,7 @@ class DatimSyncSims(DatimSync):
         self.run_ocl_offline = run_ocl_offline
         self.verbosity = verbosity
         self.compare2previousexport = compare2previousexport
-        self.import_test_mode = import_test_mode
         self.import_limit = import_limit
-        self.data_check_only = data_check_only
         self.oclapiheaders = {
             'Authorization': 'Token ' + self.oclapitoken,
             'Content-Type': 'application/json'
@@ -209,8 +190,8 @@ class DatimSyncSims(DatimSync):
 
 # Default Script Settings
 verbosity = 2  # 0=none, 1=some, 2=all
+import_delay = 0  # Number of seconds to delay between each import request
 import_limit = 0  # Number of resources to import; 0=all
-import_test_mode = False  # Set to True to see which import API requests would be performed on OCL
 run_dhis2_offline = True  # Set to true to use local copies of dhis2 exports
 run_ocl_offline = True  # Set to true to use local copies of ocl exports
 compare2previousexport = True  # Set to False to ignore the previous export
@@ -235,26 +216,26 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
 else:
     # Local development environment settings
-    import_limit = 10
-    import_test_mode = False
+    import_limit = 5
     compare2previousexport = False
     run_dhis2_offline = False
     run_ocl_offline = False
     dhis2env = 'https://dev-de.datim.org/'
     dhis2uid = 'paynejd'
     dhis2pwd = 'Jonpayne1!'
+    import_delay = 3
 
-# JetStream Staging user=datim-admin
-oclenv = 'https://api.staging.openconceptlab.org'
-oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
+    # JetStream Staging user=datim-admin
+    oclenv = 'https://api.staging.openconceptlab.org'
+    oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
+
+# Set the sync mode
+sync_mode = DatimSync.SYNC_MODE_DIFF_ONLY
 
 # Create sync object and run
 datim_sync = DatimSyncSims(
     oclenv=oclenv, oclapitoken=oclapitoken, dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
     compare2previousexport=compare2previousexport, run_dhis2_offline=run_dhis2_offline,
-    run_ocl_offline=run_ocl_offline, verbosity=verbosity, import_test_mode=import_test_mode,
-    import_limit=import_limit)
-datim_sync.consolidate_references = True
-datim_sync.import_delay = 3
-# datim_sync.run()
-datim_sync.data_check()
+    run_ocl_offline=run_ocl_offline, verbosity=verbosity, import_limit=import_limit)
+datim_sync.import_delay = import_delay
+datim_sync.run(sync_mode=sync_mode)

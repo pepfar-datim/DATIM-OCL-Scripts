@@ -27,6 +27,12 @@ from deepdiff import DeepDiff
 
 class DatimSync(DatimBase):
 
+    # Mode constants
+    SYNC_MODE_DIFF_ONLY = 'diff'
+    SYNC_MODE_BUILD_IMPORT_SCRIPT = 'script-only'
+    SYNC_MODE_TEST_IMPORT = 'test'
+    SYNC_MODE_FULL_IMPORT = 'full'
+
     # Data check return values
     DATIM_SYNC_NO_DIFF = 0
     DATIM_SYNC_DIFF = 1
@@ -35,6 +41,7 @@ class DatimSync(DatimBase):
     DHIS2_QUERIES = {}
     IMPORT_BATCHES = []
 
+    # Set this to false if no OCL repositories are loaded initially to get dataset_ids
     SYNC_LOAD_DATASETS = True
 
     DEFAULT_OCL_EXPORT_CLEANING_METHOD = 'clean_ocl_export'
@@ -67,11 +74,9 @@ class DatimSync(DatimBase):
         self.ocl_diff = {}
         self.ocl_collections = []
         self.str_dataset_ids = ''
-        self.data_check_only = False
         self.run_dhis2_offline = False
         self.run_ocl_offline = False
         self.compare2previousexport = True
-        self.import_test_mode = False
         self.import_limit = 0
         self.import_delay = 0
         self.diff_result = None
@@ -79,7 +84,7 @@ class DatimSync(DatimBase):
 
         # Instructs the sync script to combine reference imports to the same source and within the same
         # import batch to a single API request. This results in a significant increase in performance.
-        self.consolidate_references = False
+        self.consolidate_references = True
 
     def log_settings(self):
         """ Write settings to console """
@@ -480,13 +485,13 @@ class DatimSync(DatimBase):
         self.compare2previousexport = False
         return self.run(resource_types=[self.RESOURCE_TYPE_CONCEPT_REF])
 
-    def data_check(self, resource_types=None):
-        self.data_check_only = True
-        self.compare2previousexport = False
-        return self.run(resource_types=resource_types)
+    def run(self, sync_mode=None, resource_types=None):
+        """
 
-    def run(self, resource_types=None):
-        """ Runs the entire synchronization process """
+        :param sync_mode:
+        :param resource_types:
+        :return:
+        """
 
         # Determine which resource types will be processed during this run
         if resource_types:
@@ -499,7 +504,7 @@ class DatimSync(DatimBase):
             self.log_settings()
 
         # STEP 1: Load OCL Collections for Dataset IDs
-        # TODO: Skip if no dataset IDs to load
+        # NOTE: This step occurs regardless of sync mode
         self.vlog(1, '**** STEP 1 of 12: Load OCL Collections for Dataset IDs')
         if self.SYNC_LOAD_DATASETS:
             self.load_datasets_from_ocl()
@@ -507,14 +512,16 @@ class DatimSync(DatimBase):
             self.vlog(1, 'SKIPPING: SYNC_LOAD_DATASETS set to "False"')
 
         # STEP 2: Load new exports from DATIM-DHIS2
+        # NOTE: This step occurs regardless of sync mode
         self.vlog(1, '**** STEP 2 of 12: Load new exports from DATIM DHIS2')
         self.load_dhis2_exports()
 
         # STEP 3: Quick comparison of current and previous DHIS2 exports
         # Compares new DHIS2 export to most recent previous export from a successful sync that is available
+        # NOTE: This step is skipped if in DIFF mode or compare2previousexport is set to False
         self.vlog(1, '**** STEP 3 of 12: Quick comparison of current and previous DHIS2 exports')
         complete_match = True
-        if self.compare2previousexport and not self.data_check_only:
+        if self.compare2previousexport and sync_mode != DatimSync.SYNC_MODE_DIFF_ONLY:
             # Compare files for each of the DHIS2 queries
             for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
                 self.vlog(1, dhis2_query_key + ':')
@@ -535,12 +542,13 @@ class DatimSync(DatimBase):
                 sys.exit()
             else:
                 self.vlog(1, 'At least one DHIS2 export does not match, so continue...')
-        elif self.data_check_only:
-            self.vlog(1, "SKIPPING: Data check only...")
+        elif sync_mode == DatimSync.SYNC_MODE_DIFF_ONLY:
+            self.vlog(1, "SKIPPING: Diff check only...")
         else:
             self.vlog(1, "SKIPPING: compare2previousexport == false")
 
         # STEP 4: Fetch latest versions of relevant OCL exports
+        # NOTE: This step occurs regardless of sync mode
         self.vlog(1, '**** STEP 4 of 12: Fetch latest versions of relevant OCL exports')
         cnt = 0
         num_total = len(self.OCL_EXPORT_DEFS)
@@ -563,7 +571,7 @@ class DatimSync(DatimBase):
                     sys.exit(1)
 
         # STEP 5: Transform new DHIS2 export to diff format
-        # Diff format is OCL-Formatted JSON for concepts and mappings, list of unique URLs for references
+        # NOTE: This step occurs regardless of sync mode
         self.vlog(1, '**** STEP 5 of 12: Transform DHIS2 exports to OCL-formatted JSON')
         self.dhis2_diff = {}
         for import_batch_key in self.IMPORT_BATCHES:
@@ -573,7 +581,7 @@ class DatimSync(DatimBase):
         self.transform_dhis2_exports(conversion_attr={'ocl_dataset_repos': self.ocl_dataset_repos})
 
         # STEP 6: Prepare OCL exports for diff
-        # Concepts/mappings in OCL exports have extra attributes that should be removed before the diff
+        # NOTE: This step occurs regardless of sync mode
         self.vlog(1, '**** STEP 6 of 12: Prepare OCL exports for diff')
         self.ocl_diff = {}
         for import_batch_key in self.IMPORT_BATCHES:
@@ -585,6 +593,7 @@ class DatimSync(DatimBase):
         # STEP 7: Perform deep diff
         # One deep diff is performed per resource type in each import batch
         # OCL/DHIS2 exports reloaded from file to eliminate unicode type_change diff -- but that may be short sighted!
+        # NOTE: This step occurs regardless of sync mode
         self.vlog(1, '**** STEP 7 of 12: Perform deep diff')
         with open(self.attach_absolute_path(self.OCL_CLEANED_EXPORT_FILENAME), 'rb') as file_ocl_diff,\
                 open(self.attach_absolute_path(self.DHIS2_CONVERTED_EXPORT_FILENAME), 'rb') as file_dhis2_diff:
@@ -593,56 +602,68 @@ class DatimSync(DatimBase):
             self.diff_result = self.perform_diff(ocl_diff=local_ocl_diff, dhis2_diff=local_dhis2_diff)
 
         # STEP 8: Determine action based on diff result
+        # NOTE: This step occurs regardless of sync mode -- processing terminates here if DIFF mode
         self.vlog(1, '**** STEP 8 of 12: Determine action based on diff result')
         if self.diff_result:
             self.vlog(1, 'One or more differences identified between DHIS2 and OCL...')
-            if self.data_check_only:
-                return self.DATIM_SYNC_DIFF
         else:
             self.vlog(1, 'No diff between DHIS2 and OCL...')
-            return self.DATIM_SYNC_NO_DIFF
 
         # STEP 9: Generate one OCL import script per import batch by processing the diff results
         # Note that OCL import scripts are JSON-lines files
+        # NOTE: This step occurs unless in DIFF mode
         self.vlog(1, '**** STEP 9 of 12: Generate import scripts')
-        self.generate_import_scripts(self.diff_result)
+        if sync_mode != DatimSync.SYNC_MODE_DIFF_ONLY:
+            self.generate_import_scripts(self.diff_result)
+        else:
+            self.vlog(1, 'SKIPPING: Diff check only')
 
         # STEP 10: Perform the import in OCL
+        # NOTE: This step occurs regardless of sync mode
         self.vlog(1, '**** STEP 10 of 12: Perform the import in OCL')
         num_import_rows_processed = 0
         ocl_importer = None
-        if self.data_check_only:
-            self.vlog(1, 'SKIPPING: Data check only...')
-        else:
+        if sync_mode in [DatimSync.SYNC_MODE_TEST_IMPORT, DatimSync.SYNC_MODE_FULL_IMPORT]:
+            test_mode = False
+            if sync_mode == DatimSync.SYNC_MODE_TEST_IMPORT:
+                test_mode = True
             ocl_importer = OclFlexImporter(
                 file_path=self.attach_absolute_path(self.NEW_IMPORT_SCRIPT_FILENAME),
-                api_token=self.oclapitoken, api_url_root=self.oclenv, test_mode=self.import_test_mode,
+                api_token=self.oclapitoken, api_url_root=self.oclenv, test_mode=test_mode,
                 do_update_if_exists=False, verbosity=self.verbosity, limit=self.import_limit,
                 import_delay=self.import_delay)
             num_import_rows_processed = ocl_importer.process()
             self.vlog(1, 'Import records processed:', num_import_rows_processed)
+        elif sync_mode == DatimSync.SYNC_MODE_DIFF_ONLY:
+            self.vlog(1, 'SKIPPING: Diff check only...')
+        elif sync_mode == DatimSync.SYNC_MODE_BUILD_IMPORT_SCRIPT:
+            self.vlog(1, 'SKIPPING: Building import script only...')
 
         # STEP 11: Save new DHIS2 export for the next sync attempt
         self.vlog(1, '**** STEP 11 of 12: Save the DHIS2 export')
-        if self.data_check_only:
-            self.vlog(1, 'SKIPPING: Data check only...')
-        elif self.import_test_mode:
+        if sync_mode == DatimSync.SYNC_MODE_FULL_IMPORT:
+            if num_import_rows_processed:
+                self.cache_dhis2_exports()
+            else:
+                self.vlog(1, 'SKIPPING: No records imported (possibly due to error)...')
+        elif sync_mode == DatimSync.SYNC_MODE_DIFF_ONLY:
+            self.vlog(1, 'SKIPPING: Diff check only...')
+        elif sync_mode == DatimSync.SYNC_MODE_BUILD_IMPORT_SCRIPT:
+            self.vlog(1, 'SKIPPING: Building import script only...')
+        elif sync_mode == DatimSync.SYNC_MODE_TEST_IMPORT:
             self.vlog(1, 'SKIPPING: Import test mode enabled...')
-        elif num_import_rows_processed:
-            self.cache_dhis2_exports()
-        else:
-            self.vlog(1, 'SKIPPING: No records imported (possibly due to error)...')
 
         # STEP 12: Manage OCL repository versions
         self.vlog(1, '**** STEP 12 of 12: Manage OCL repository versions')
-        if self.data_check_only:
-            self.vlog(1, 'SKIPPING: Data check only...')
-        elif self.import_test_mode:
+        if sync_mode == DatimSync.SYNC_MODE_FULL_IMPORT:
+            if num_import_rows_processed:
+                self.increment_ocl_versions(import_results=ocl_importer.results)
+            else:
+                self.vlog(1, 'Skipping because no records imported...')
+        elif sync_mode == DatimSync.SYNC_MODE_DIFF_ONLY:
+            self.vlog(1, 'SKIPPING: Diff check only...')
+        elif sync_mode == DatimSync.SYNC_MODE_TEST_IMPORT:
             self.vlog(1, 'SKIPPING: Import test mode enabled...')
-        elif num_import_rows_processed:
-            self.increment_ocl_versions(import_results=ocl_importer.results)
-        else:
-            self.vlog(1, 'Skipping because no records imported...')
 
         # Display debug info
         if self.verbosity >= 2:
@@ -650,3 +671,9 @@ class DatimSync(DatimBase):
             if ocl_importer:
                 print('ocl_importer.results:')
                 pprint(ocl_importer.results)
+
+        # Return the diff result (may return something else in the end)
+        if self.diff_result:
+            return self.DATIM_SYNC_DIFF
+        else:
+            return self.DATIM_SYNC_NO_DIFF

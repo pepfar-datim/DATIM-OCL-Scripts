@@ -20,7 +20,6 @@ import sys
 from requests.auth import HTTPBasicAuth
 from shutil import copyfile
 from datimbase import DatimBase
-from datimbase import DatimConstants
 from oclfleximporter import OclFlexImporter
 from pprint import pprint
 from deepdiff import DeepDiff

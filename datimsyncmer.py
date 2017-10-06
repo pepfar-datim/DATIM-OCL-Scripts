@@ -16,7 +16,7 @@ import os
 import sys
 import json
 from datimsync import DatimSync
-from datimbase import DatimConstants
+from datimconstants import DatimConstants
 
 
 class DatimSyncMer(DatimSync):
@@ -274,10 +274,6 @@ else:
     dhis2env = 'https://dev-de.datim.org/'
     dhis2uid = 'paynejd'
     dhis2pwd = 'Jonpayne1!'
-
-    # JetStream Staging - user=paynejd
-    # oclenv = 'https://oclapi-stg.openmrs.org'
-    # oclapitoken = 'a61ba53ed7b8b26ece8fcfc53022b645de0ec055'
 
     # JetStream QA - user=paynejd
     # oclenv = 'https://api.qa.openconceptlab.org'

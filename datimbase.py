@@ -10,230 +10,6 @@ import time
 from datetime import datetime
 import json
 
-class DatimConstants:
-
-    # Import batch IDs
-    IMPORT_BATCH_MER = 'MER'
-    IMPORT_BATCH_SIMS = 'SIMS'
-    IMPORT_BATCH_MECHANISMS = 'Mechanisms'
-
-    # MER OCL Export Definitions
-    MER_OCL_EXPORT_DEFS = {
-        'MER': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/sources/MER/'},
-        'MER-R-Facility-DoD-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY17Q1/'},
-        'MER-R-Facility-DoD-FY17Q2': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY17Q2/'},
-        'MER-R-Facility-DoD-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY16Q4/'},
-        'HC-R-COP-Prioritization-SNU-USG-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-R-COP-Prioritization-SNU-USG-FY16Q4/'},
-        'HC-R-Narratives-USG-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-R-Narratives-USG-FY16Q1Q2Q3/'},
-        'HC-R-Narratives-USG-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-R-Narratives-USG-FY16Q4/'},
-        'HC-R-Narratives-USG-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-R-Narratives-USG-FY17Q1/'},
-        'HC-R-Narratives-USG-FY17Q2': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-R-Narratives-USG-FY17Q2/'},
-        'HC-R-Operating-Unit-Level-USG-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-R-Operating-Unit-Level-USG-FY16Q1Q2Q3/'},
-        'HC-R-Operating-Unit-Level-USG-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-R-Operating-Unit-Level-USG-FY16Q4/'},
-        'HC-T-COP-Prioritization-SNU-USG-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-T-COP-Prioritization-SNU-USG-FY17/'},
-        'HC-T-COP-Prioritization-SNU-USG-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-T-COP-Prioritization-SNU-USG-FY18/'},
-        'HC-T-Narratives-USG-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-T-Narratives-USG-FY16/'},
-        'HC-T-Narratives-USG-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-T-Narratives-USG-FY17/'},
-        'HC-T-Operating-Unit-Level-USG-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-T-Operating-Unit-Level-USG-FY16/'},
-        'HC-T-Operating-Unit-Level-USG-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-T-Operating-Unit-Level-USG-FY17/'},
-        'HC-T-Operating-Unit-Level-USG-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/HC-T-Operating-Unit-Level-USG-FY18/'},
-        'MER-R-Community-DoD-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-DoD-FY16Q1Q2Q3/'},
-        'MER-R-Community-DoD-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-DoD-FY16Q4/'},
-        'MER-R-Community-DoD-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-DoD-FY17Q1/'},
-        'MER-R-Community-DoD-FY17Q2': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-DoD-FY17Q2/'},
-        'MER-R-Community-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-FY16Q1Q2Q3/'},
-        'MER-R-Community-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-FY16Q4/'},
-        'MER-R-Community-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-FY17Q1/'},
-        'MER-R-Community-FY17Q2': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-FY17Q2/'},
-        'MER-R-Facility-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-FY16Q1Q2Q3/'},
-        'MER-R-Facility-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-FY16Q4/'},
-        'MER-R-Facility-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-FY17Q1/'},
-        'MER-R-Facility-FY17Q2': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-FY17Q2/'},
-        'MER-R-Medical-Store-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Medical-Store-FY16Q1Q2Q3/'},
-        'MER-R-Medical-Store-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Medical-Store-FY16Q4/'},
-        'MER-R-Medical-Store-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Medical-Store-FY17Q1/'},
-        'MER-R-Narratives-IM-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Narratives-IM-FY16Q1Q2Q3/'},
-        'MER-R-Narratives-IM-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Narratives-IM-FY16Q4/'},
-        'MER-R-Narratives-IM-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Narratives-IM-FY17Q1/'},
-        'MER-R-Narratives-IM-FY17Q2': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Narratives-IM-FY17Q2/'},
-        'MER-R-Operating-Unit-Level-IM-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Operating-Unit-Level-IM-FY16Q1Q2Q3/'},
-        'MER-R-Operating-Unit-Level-IM-FY16Q4': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Operating-Unit-Level-IM-FY16Q4/'},
-        'MER-R-Operating-Unit-Level-IM-FY17Q1': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Operating-Unit-Level-IM-FY17Q1/'},
-        'MER-R-Operating-Unit-Level-IM-FY17Q2': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Operating-Unit-Level-IM-FY17Q2/'},
-        'MER-T-Community-DoD-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-DoD-FY16/'},
-        'MER-T-Community-DoD-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-DoD-FY17/'},
-        'MER-T-Community-DoD-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-DoD-FY18/'},
-        'MER-T-Community-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-FY17/'},
-        'MER-T-Community-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-FY18/'},
-        'MER-T-Facility-DoD-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Facility-DoD-FY16/'},
-        'MER-T-Facility-DoD-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Facility-DoD-FY17/'},
-        'MER-T-Facility-DoD-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Facility-DoD-FY18/'},
-        'MER-T-Facility-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Facility-FY16/'},
-        'MER-T-Facility-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Facility-FY17/'},
-        'MER-T-Facility-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Facility-FY18/'},
-        'MER-T-Narratives-IM-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Narratives-IM-FY16/'},
-        'MER-T-Narratives-IM-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Narratives-IM-FY17/'},
-        'MER-T-Narratives-IM-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Narratives-IM-FY18/'},
-        'MER-T-Operating-Unit-Level-IM-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Operating-Unit-Level-IM-FY16/'},
-        'MER-T-Operating-Unit-Level-IM-FY17': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Operating-Unit-Level-IM-FY17/'},
-        'MER-T-Operating-Unit-Level-IM-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Operating-Unit-Level-IM-FY18/'},
-        'Planning-Attributes-COP-Prioritization-National-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/Planning-Attributes-COP-Prioritization-National-FY18/'},
-        'Planning-Attributes-COP-Prioritization-SNU-FY18': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/Planning-Attributes-COP-Prioritization-SNU-FY18/'}
-    }
-    INACTIVE_MER_OCL_EXPORT_DEFS = {
-        'MER-R-Facility-DoD-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY16Q1Q2Q3/'},
-        'MER-T-Community-FY16': {
-            'import_batch': IMPORT_BATCH_MER,
-            'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-FY16/'},
-    }
-
-    # SIMS OCL Export Definitions
-    SIMS_OCL_EXPORT_DEFS = {
-        'sims_source': {'import_batch': IMPORT_BATCH_SIMS,
-                        'endpoint': '/orgs/PEPFAR/sources/SIMS/'},
-        'sims2_above_site': {'import_batch': IMPORT_BATCH_SIMS,
-                             'endpoint': '/orgs/PEPFAR/collections/SIMS2-Above-Site/'},
-        'sims2_community': {'import_batch': IMPORT_BATCH_SIMS,
-                            'endpoint': '/orgs/PEPFAR/collections/SIMS2-Community/'},
-        'sims2_facility': {'import_batch': IMPORT_BATCH_SIMS,
-                           'endpoint': '/orgs/PEPFAR/collections/SIMS2-Facility/'},
-        'sims3_above_site': {'import_batch': IMPORT_BATCH_SIMS,
-                             'endpoint': '/orgs/PEPFAR/collections/SIMS3-Above-Site/'},
-        'sims3_community': {'import_batch': IMPORT_BATCH_SIMS,
-                            'endpoint': '/orgs/PEPFAR/collections/SIMS3-Community/'},
-        'sims3_facility': {'import_batch': IMPORT_BATCH_SIMS,
-                           'endpoint': '/orgs/PEPFAR/collections/SIMS3-Facility/'},
-    }
-
-    # Mechanisms OCL Export Definitions
-    MECHANISMS_OCL_EXPORT_DEFS = {
-        'Mechanisms': {
-            'import_batch': IMPORT_BATCH_MECHANISMS,
-            'subtitle': 'View of mechanisms, partners, agencies, OUs and start and end dates for each mechanism',
-            'endpoint': '/orgs/PEPFAR/sources/Mechanisms/'},
-    }
 
 class DatimBase:
     """ Shared base class for DATIM synchronization and presentation """
@@ -417,7 +193,10 @@ class DatimBase:
         :return:
         """
         dt = datetime.utcnow()
+        cnt = 0
         for ocl_export_key, ocl_export_def in self.OCL_EXPORT_DEFS.iteritems():
+            cnt += 1
+
             # First check if any changes were made to the repository
             str_import_results = ''
             ocl_export_endpoint = self.OCL_EXPORT_DEFS[ocl_export_key]['endpoint']
@@ -426,7 +205,8 @@ class DatimBase:
                     str_import_results += '(%s) %s,' % (
                         len(import_results[ocl_export_endpoint][action_type]), action_type)
             else:
-                self.vlog(1, '%s: No changes to this repository...' % ocl_export_key)
+                self.vlog(1, '[OCL Export %s of %s] %s: No changes to this repository...' % (
+                    cnt, len(self.OCL_EXPORT_DEFS), ocl_export_key))
                 continue
 
             # Prepare to create new version
@@ -444,7 +224,8 @@ class DatimBase:
                               headers=self.oclapiheaders)
             r.raise_for_status()
             repo_version_endpoint = str(ocl_export_def['endpoint']) + str(new_repo_version_data['id']) + '/'
-            self.vlog(1, '%s: Created new repository version "%s"' % (ocl_export_key, repo_version_endpoint))
+            self.vlog(1, '[OCL Export %s of %s] %s: Created new repository version "%s"' % (
+                cnt, len(self.OCL_EXPORT_DEFS), ocl_export_key, repo_version_endpoint))
 
     def get_ocl_export(self, endpoint='', version='', tarfilename='', jsonfilename=''):
         """

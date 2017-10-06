@@ -36,25 +36,14 @@ class DatimSyncMechanisms(DatimSync):
     SYNC_LOAD_DATASETS = False
 
     # DATIM DHIS2 Query Definitions
-    DHIS2_QUERIES = {
-        'Mechanisms': {
-            'id': 'Mechanisms',
-            'name': 'DATIM-DHIS2 Funding Mechanisms',
-            'query': 'api/categoryOptionCombos.json?fields=id,code,name,created,lastUpdated,'
-                     'categoryOptions[id,endDate,startDate,organisationUnits[code,name],'
-                     'categoryOptionGroups[id,name,code,groupSets[id,name]]]&order=code:asc&filter=categoryCombo.id:eq:wUpfppgjEza&paging=false',
-            'conversion_method': 'dhis2diff_mechanisms'
-        }
-    }
+    DHIS2_QUERIES = DatimConstants.MECHANISMS_DHIS2_QUERIES
 
     # OCL Export Definitions
     OCL_EXPORT_DEFS = DatimConstants.MECHANISMS_OCL_EXPORT_DEFS
 
     def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='', compare2previousexport=True,
-                 run_dhis2_offline=False, run_ocl_offline=False,
-                 verbosity=0, data_check_only=False, import_test_mode=False, import_limit=0):
+                 run_dhis2_offline=False, run_ocl_offline=False, verbosity=0, import_limit=0):
         DatimSync.__init__(self)
-
         self.oclenv = oclenv
         self.oclapitoken = oclapitoken
         self.dhis2env = dhis2env
@@ -64,9 +53,7 @@ class DatimSyncMechanisms(DatimSync):
         self.run_ocl_offline = run_ocl_offline
         self.verbosity = verbosity
         self.compare2previousexport = compare2previousexport
-        self.import_test_mode = import_test_mode
         self.import_limit = import_limit
-        self.data_check_only = data_check_only
         self.oclapiheaders = {
             'Authorization': 'Token ' + self.oclapitoken,
             'Content-Type': 'application/json'
@@ -156,8 +143,8 @@ class DatimSyncMechanisms(DatimSync):
 
 # Default Script Settings
 verbosity = 2  # 0=none, 1=some, 2=all
+import_delay = 0  # Number of seconds to delay between each import request
 import_limit = 0  # Number of resources to import; 0=all
-import_test_mode = False  # Set to True to see which import API requests would be performed on OCL
 run_dhis2_offline = True  # Set to true to use local copies of dhis2 exports
 run_ocl_offline = True  # Set to true to use local copies of ocl exports
 compare2previousexport = True  # Set to False to ignore the previous export
@@ -183,26 +170,25 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
 else:
     # Local development environment settings
     import_limit = 10
-    import_test_mode = False
     compare2previousexport = False
     run_dhis2_offline = False
     run_ocl_offline = False
     dhis2env = 'https://dev-de.datim.org/'
     dhis2uid = 'paynejd'
     dhis2pwd = 'Jonpayne1!'
+    import_delay = 3
 
     # JetStream Staging user=datim-admin
     oclenv = 'https://api.staging.openconceptlab.org'
     oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
 
+# Set the sync mode
+sync_mode = DatimSync.SYNC_MODE_DIFF_ONLY
+
 # Create sync object and run
-datim_sync = DatimSyncMechanisms(oclenv=oclenv, oclapitoken=oclapitoken,
-                                 dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
-                                 compare2previousexport=compare2previousexport,
-                                 run_dhis2_offline=run_dhis2_offline, run_ocl_offline=run_ocl_offline,
-                                 verbosity=verbosity,
-                                 import_test_mode=import_test_mode,
-                                 import_limit=import_limit)
-datim_sync.import_delay = 3
-datim_sync.run()
-# datim_sync.data_check()
+datim_sync = DatimSyncMechanisms(
+    oclenv=oclenv, oclapitoken=oclapitoken, dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
+    compare2previousexport=compare2previousexport, run_dhis2_offline=run_dhis2_offline,
+    run_ocl_offline=run_ocl_offline, verbosity=verbosity, import_limit=import_limit)
+datim_sync.import_delay = import_delay
+datim_sync.run(sync_mode=sync_mode)

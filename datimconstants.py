@@ -6,6 +6,45 @@ class DatimConstants:
     IMPORT_BATCH_MECHANISMS = 'Mechanisms'
     IMPORT_BATCH_TIERED_SUPPORT = 'Tiered-Support'  # Tiered Support is imported with init scripts, not a sync script
 
+    SIMS_DHIS2_QUERIES = {
+        'SimsAssessmentTypes': {
+            'id': 'SimsAssessmentTypes',
+            'name': 'DATIM-DHIS2 SIMS Assessment Types',
+            'query': 'api/dataElements.json?fields=name,code,id,valueType,lastUpdated,dataElementGroups[id,name]&'
+                     'order=code:asc&paging=false&filter=dataElementGroups.id:in:[{{active_dataset_ids}}]',
+            'conversion_method': 'dhis2diff_sims_assessment_types'
+        },
+        'SimsOptionSets': {
+            'id': 'SimsOptionSets',
+            'name': 'DATIM-DHIS2 SIMS Option Sets',
+            'query': 'api/optionSets/?fields=id,name,lastUpdated,options[id,code,name]&'
+                     'filter=name:like:SIMS%20v2&paging=false&order=name:asc',
+            'conversion_method': 'dhis2diff_sims_option_sets'
+        }
+    }
+    MER_DHIS2_QUERIES = {
+        'MER': {
+            'id': 'MER',
+            'name': 'DATIM-DHIS2 MER Indicators',
+            'query': '/api/dataElements.json?fields=id,code,name,shortName,lastUpdated,description,'
+                     'categoryCombo[id,code,name,lastUpdated,created,'
+                     'categoryOptionCombos[id,code,name,lastUpdated,created]],'
+                     'dataSetElements[*,dataSet[id,name,shortName]]&'
+                     'paging=false&filter=dataSetElements.dataSet.id:in:[{{active_dataset_ids}}]',
+            'conversion_method': 'dhis2diff_mer'
+        }
+    }
+    MECHANISMS_DHIS2_QUERIES = {
+        'Mechanisms': {
+            'id': 'Mechanisms',
+            'name': 'DATIM-DHIS2 Funding Mechanisms',
+            'query': 'api/categoryOptionCombos.json?fields=id,code,name,created,lastUpdated,'
+                     'categoryOptions[id,endDate,startDate,organisationUnits[code,name],'
+                     'categoryOptionGroups[id,name,code,groupSets[id,name]]]&order=code:asc&filter=categoryCombo.id:eq:wUpfppgjEza&paging=false',
+            'conversion_method': 'dhis2diff_mechanisms'
+        }
+    }
+
     # MER OCL Export Definitions
     MER_OCL_EXPORT_DEFS = {
         'MER': {

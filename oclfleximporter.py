@@ -188,6 +188,7 @@ class OclFlexImporter:
         self.verbosity = verbosity
         self.limit = limit
         self.import_delay = import_delay
+        self.skip_line_count = False
 
         self.results = {}
         self.cache_obj_exists = {}
@@ -228,6 +229,13 @@ class OclFlexImporter:
         if self.verbosity:
             self.log_settings()
 
+        # Count lines (unless settings indicate skipping this for better performance)
+        num_lines = 0
+        if not self.skip_line_count:
+            with open(self.file_path) as json_file:
+                for line in json_file:
+                    num_lines += 1
+
         # Loop through each JSON object in the file
         obj_def_keys = self.obj_def.keys()
         with open(self.file_path) as json_file:
@@ -245,7 +253,11 @@ class OclFlexImporter:
                         self.log('')
                         self.process_object(obj_type, json_line_obj)
                         num_processed += 1
-                        self.log('(Attempted import on %s resource(s) and skipped %s of %s processed so far)' % (num_processed, num_skipped, count))
+                        if self.skip_line_count:
+                            self.log('[Attempted import on %s resource(s) and skipped %s of %s processed so far]' % (num_processed, num_skipped, count))
+                        else:
+                            self.log('[%s of %s] Attempted import on %s resource(s) and skipped %s]' % (
+                            count, num_lines, num_processed, num_skipped))
                     else:
                         self.log("**** SKIPPING: Unrecognized 'type' attribute '" + obj_type + "' for object: " + json_line_raw)
                         num_skipped += 1

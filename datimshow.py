@@ -1,6 +1,7 @@
 import csv
 import sys
 import json
+import os
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import SubElement
 from xml.etree.ElementTree import tostring
@@ -21,8 +22,48 @@ class DatimShow(DatimBase):
         DATIM_FORMAT_CSV
     ]
 
+    # Set to True to only allow presentation of OCL repositories that have been explicitly defined in the code
+    REQUIRE_OCL_EXPORT_DEFINITION = False
+
+    # Set the default presentation row building method
+    DEFAULT_SHOW_BUILD_ROW_METHOD = 'default_show_build_row'
+
     def __init__(self):
         DatimBase.__init__(self)
+
+    def build_show_grid(self, repo_title='', repo_subtitle='', headers='', input_filename='', show_build_row_method=''):
+        # Setup the headers
+        intermediate = {
+            'title': repo_title,
+            'subtitle': repo_subtitle,
+            'height': 0,
+            'headers': headers,
+            'rows': []
+        }
+        intermediate['width'] = len(intermediate['headers'])
+
+        # Read in the content
+        with open(self.attach_absolute_path(input_filename), 'rb') as ifile:
+            ocl_export_raw = json.load(ifile)
+            for c in ocl_export_raw['concepts']:
+                direct_mappings = [item for item in ocl_export_raw['mappings'] if str(
+                    item["from_concept_url"]) == c['url']]
+                result = getattr(self, show_build_row_method)(
+                    c, headers=headers, direct_mappings=direct_mappings, repo_title=repo_title,
+                    repo_subtitle=repo_subtitle)
+                if result:
+                    if type(result) is dict:
+                        intermediate['rows'].append(result)
+                    elif type(result) is list:
+                        for item in result:
+                            intermediate['rows'].append(item)
+            intermediate['height'] = len(intermediate['rows'])
+        return intermediate
+
+    def default_show_build_row(self, concept, headers):
+        row = {}
+        row[headers[0]['column']] = str(concept)
+        return row
 
     def transform_to_format(self, content, export_format):
         """
@@ -51,7 +92,7 @@ class DatimShow(DatimBase):
             sys.stdout.write('<h4>%s</h4>\n' % content['subtitle'].encode('utf-8'))
         sys.stdout.write('<table class="gridTable">\n<thead><tr>')
         for h in content['headers']:
-            sys.stdout.write('<th>%s</th>' % str(h['name'].encode('utf-8')))
+            sys.stdout.write('<th>%s</th>' % str(h['name']))
         sys.stdout.write('</tr></thead>\n<tbody>')
         for row in content['rows']:
             sys.stdout.write('\n<tr>')
@@ -108,3 +149,79 @@ class DatimShow(DatimBase):
                 row_utf8[k] = row[k].encode('utf-8')
             w.writerow(row_utf8)
         sys.stdout.flush()
+
+    @staticmethod
+    def get_format_from_string(format_string, default_fmt='html'):
+        for fmt in DatimShow.PRESENTATION_FORMATS:
+            if format_string.lower() == fmt:
+                return fmt
+        return default_fmt
+
+    def get(self, repo_id='', export_format=''):
+        """
+        Get some stuff
+        :param repo_id:
+        :param repo_type:
+        :param export_format:
+        :return:
+        """
+
+        # Setup the export
+        repo_title = ''
+        repo_subtitle = ''
+        repo_endpoint = ''
+        show_build_row_method = ''
+        show_headers_key = ''
+        if export_format not in self.PRESENTATION_FORMATS:
+            export_format = self.DATIM_FORMAT_HTML
+        if repo_id in self.OCL_EXPORT_DEFS:
+            repo_endpoint = self.OCL_EXPORT_DEFS[repo_id]['endpoint']
+            repo_title = self.OCL_EXPORT_DEFS[repo_id].get('title')
+            repo_subtitle = self.OCL_EXPORT_DEFS[repo_id].get('subtitle', '')
+            show_build_row_method = self.OCL_EXPORT_DEFS[repo_id].get('show_build_row_method', '')
+            show_headers_key = self.OCL_EXPORT_DEFS[repo_id].get('show_headers_key', '')
+        elif not self.REQUIRE_OCL_EXPORT_DEFINITION:
+            repo_endpoint = '%s%s/' % (self.DEFAULT_REPO_LIST_ENDPOINT, repo_id)
+            show_build_row_method = self.DEFAULT_SHOW_BUILD_ROW_METHOD
+        if not repo_title:
+            repo_title = repo_id
+        if not show_headers_key:
+            show_headers_key = self.headers.items()[0][0]
+
+        # STEP 1 of 4: Fetch latest version of relevant OCL repository export
+        self.vlog(1, '**** STEP 1 of 4: Fetch latest version of relevant OCL repository export')
+        self.vlog(1, '%s:' % repo_endpoint)
+        tarfilename = self.endpoint2filename_ocl_export_tar(repo_endpoint)
+        jsonfilename = self.endpoint2filename_ocl_export_json(repo_endpoint)
+        if not self.run_ocl_offline:
+            self.get_ocl_export(endpoint=repo_endpoint, version='latest', tarfilename=tarfilename,
+                                jsonfilename=jsonfilename)
+        else:
+            self.vlog(1, 'OCL-OFFLINE: Using local file "%s"...' % jsonfilename)
+            if os.path.isfile(self.attach_absolute_path(jsonfilename)):
+                self.vlog(1, 'OCL-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
+                    jsonfilename, os.path.getsize(self.attach_absolute_path(jsonfilename))))
+            else:
+                self.log('ERROR: Could not find offline OCL file "%s". Exiting...' % jsonfilename)
+                sys.exit(1)
+
+        # STEP 2 of 4: Transform OCL export to intermediary state
+        self.vlog(1, '**** STEP 2 of 4: Transform to intermediary state')
+        jsonfilename = self.endpoint2filename_ocl_export_json(repo_endpoint)
+        intermediate = self.build_show_grid(
+            repo_title=repo_title, repo_subtitle=repo_subtitle, headers=self.headers[show_headers_key],
+            input_filename=jsonfilename, show_build_row_method=show_build_row_method)
+
+        # STEP 3 of 4: Cache the intermediate output
+        self.vlog(1, '**** STEP 3 of 4: Cache the intermediate output')
+        if self.cache_intermediate:
+            intermediate_json_filename = self.endpoint2filename_ocl_export_intermediate_json(repo_endpoint)
+            with open(self.attach_absolute_path(intermediate_json_filename), 'wb') as ofile:
+                ofile.write(json.dumps(intermediate))
+                self.vlog(1, 'Processed OCL export saved to "%s"' % intermediate_json_filename)
+        else:
+            self.vlog(1, 'SKIPPING: "cache_intermediate" set to "false"')
+
+        # STEP 4 of 4: Transform to requested format and stream
+        self.vlog(1, '**** STEP 4 of 4: Transform to requested format and stream')
+        self.transform_to_format(intermediate, export_format)

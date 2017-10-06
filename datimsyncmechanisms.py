@@ -13,7 +13,7 @@ import os
 import sys
 import json
 from datimsync import DatimSync
-from datimbase import DatimConstants
+from datimconstants import DatimConstants
 
 
 class DatimSyncMechanisms(DatimSync):

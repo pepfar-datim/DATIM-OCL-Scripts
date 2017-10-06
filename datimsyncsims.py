@@ -22,7 +22,7 @@ import os
 import sys
 import json
 from datimsync import DatimSync
-from datimbase import DatimConstants
+from datimconstants import DatimConstants
 
 
 class DatimSyncSims(DatimSync):
@@ -49,14 +49,13 @@ class DatimSyncSims(DatimSync):
             'query': 'api/dataElements.json?fields=name,code,id,valueType,lastUpdated,dataElementGroups[id,name]&'
                      'order=code:asc&paging=false&filter=dataElementGroups.id:in:[{{active_dataset_ids}}]',
             'conversion_method': 'dhis2diff_sims_assessment_types'
-        }
-    }
-    DHIS2_QUERIES_INACTIVE = {
-        'SimsOptions': {
-            'id': 'SimsOptions',
-            'name': 'DATIM-DHIS2 SIMS Options',
-            'query': '',
-            'conversion_method': 'dhis2diff_sims_options'
+        },
+        'SimsOptionSets': {
+            'id': 'SimsOptionSets',
+            'name': 'DATIM-DHIS2 SIMS Option Sets',
+            'query': 'api/optionSets/?fields=id,name,lastUpdated,options[id,code,name]&'
+                     'filter=name:like:SIMS%20v2&paging=false&order=name:asc',
+            'conversion_method': 'dhis2diff_sims_option_sets'
         }
     }
 
@@ -85,14 +84,68 @@ class DatimSyncSims(DatimSync):
             'Content-Type': 'application/json'
         }
 
-    def dhis2diff_sims_options(self, dhis2_query_def=None, conversion_attr=None):
+    def dhis2diff_sims_option_sets(self, dhis2_query_def=None, conversion_attr=None):
         """
         Convert new DHIS2 SIMS Options export to the diff format
         :param dhis2_query_def:
         :param conversion_attr:
         :return:
         """
-        pass
+        dhis2filename_export_new = self.dhis2filename_export_new(dhis2_query_def['id'])
+        with open(self.attach_absolute_path(dhis2filename_export_new), "rb") as input_file:
+            new_dhis2_export = json.load(input_file)
+            ocl_dataset_repos = conversion_attr['ocl_dataset_repos']
+            num_concepts = 0
+            num_references = 0
+
+            # Iterate through each OptionSet and transform to an OCL-JSON concept
+            for option_set in new_dhis2_export['optionSets']:
+                for option in option_set['options']:
+                    option_concept_id = option['id']
+                    option_concept_url = '/orgs/PEPFAR/sources/SIMS/concepts/%s/' % option_concept_id
+                    option_concept_key = option_concept_url
+                    option_concept = {
+                        'type': 'Concept',
+                        'id': option_concept_id,
+                        'concept_class': 'Option',
+                        'datatype': 'None',
+                        'owner': 'PEPFAR',
+                        'owner_type': self.RESOURCE_TYPE_ORGANIZATION,
+                        'source': 'SIMS',
+                        'retired': False,
+                        'descriptions': None,
+                        'external_id': None,
+                        'names': [
+                            {
+                                'name': option['name'],
+                                'name_type': 'Fully Specified',
+                                'locale': 'en',
+                                'locale_preferred': True,
+                                'external_id': None,
+                            }
+                        ],
+                        'extras': {
+                            'Option Set Name': option_set['name'],
+                            'Option Set ID': option_set['id'],
+                            'Option Code': option['code'],
+                        }
+                    }
+                    self.dhis2_diff[DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT][
+                        option_concept_key] = option_concept
+                    num_concepts += 1
+
+                    # Add the concept to SIMS-Option-Sets collection
+                    ocl_collection_id = 'SIMS-Option-Sets'
+                    option_ref_key, option_ref = self.get_concept_reference_json(
+                        collection_owner_id='PEPFAR', collection_owner_type=self.RESOURCE_TYPE_ORGANIZATION,
+                        collection_id=ocl_collection_id, concept_url=option_concept_url)
+                    self.dhis2_diff[DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT_REF][
+                        option_ref_key] = option_ref
+                    num_references += 1
+
+            self.vlog(1, 'DHIS2 export "%s" successfully transformed to %s option concepts and %s references' % (
+                dhis2filename_export_new, num_concepts, num_references))
+            return True
 
     def dhis2diff_sims_assessment_types(self, dhis2_query_def=None, conversion_attr=None):
         """
@@ -109,12 +162,13 @@ class DatimSyncSims(DatimSync):
             num_references = 0
 
             # Iterate through each DataElement and transform to an OCL-JSON concept
-            for de in new_dhis2_export['dataElements']:
-                concept_id = de['code']
-                concept_key = '/orgs/PEPFAR/sources/SIMS/concepts/' + concept_id + '/'
-                c = {
+            for data_element in new_dhis2_export['dataElements']:
+                sims_concept_id = data_element['code']
+                sims_concept_url = '/orgs/PEPFAR/sources/SIMS/concepts/%s/' % sims_concept_id
+                sims_concept_key = sims_concept_url
+                sims_concept = {
                     'type': 'Concept',
-                    'id': concept_id,
+                    'id': sims_concept_id,
                     'concept_class': 'Assessment Type',
                     'datatype': 'None',
                     'owner': 'PEPFAR',
@@ -122,35 +176,30 @@ class DatimSyncSims(DatimSync):
                     'source': 'SIMS',
                     'retired': False,
                     'descriptions': None,
-                    'external_id': de['id'],
+                    'external_id': data_element['id'],
                     'names': [
                         {
-                            'name': de['name'],
+                            'name': data_element['name'],
                             'name_type': 'Fully Specified',
                             'locale': 'en',
-                            'locale_preferred': False,
+                            'locale_preferred': True,
                             'external_id': None,
                         }
                     ],
-                    'extras': {'Value Type': de['valueType']}
+                    'extras': {'Value Type': data_element['valueType']}
                 }
-                self.dhis2_diff[DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT][concept_key] = c
+                self.dhis2_diff[DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT][
+                    sims_concept_key] = sims_concept
                 num_concepts += 1
 
-                # Iterate through each DataElementGroup and transform to an OCL-JSON reference
-                for deg in de['dataElementGroups']:
-                    collection_id = ocl_dataset_repos[deg['id']]['id']
-                    concept_url = '/orgs/PEPFAR/sources/SIMS/concepts/' + concept_id + '/'
-                    concept_ref_key = ('/orgs/PEPFAR/collections/' + collection_id +
-                                       '/references/?concept=' + concept_url)
-                    r = {
-                        'type': 'Reference',
-                        'owner': 'PEPFAR',
-                        'owner_type': self.RESOURCE_TYPE_ORGANIZATION,
-                        'collection': collection_id,
-                        'data': {"expressions": [concept_url]}
-                    }
-                    self.dhis2_diff[DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT_REF][concept_ref_key] = r
+                # Iterate through each DataElementGroup and transform to an OCL-JSON concept references
+                for data_element_group in data_element['dataElementGroups']:
+                    ocl_collection_id = ocl_dataset_repos[data_element_group['id']]['id']
+                    sims_concept_ref_key, sims_concept_ref = self.get_concept_reference_json(
+                        collection_owner_id='PEPFAR', collection_owner_type=self.RESOURCE_TYPE_ORGANIZATION,
+                        collection_id=ocl_collection_id, concept_url=sims_concept_url)
+                    self.dhis2_diff[DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT_REF][
+                        sims_concept_ref_key] = sims_concept_ref
                     num_references += 1
 
             self.vlog(1, 'DHIS2 export "%s" successfully transformed to %s concepts + %s references (%s total)' % (
@@ -186,35 +235,26 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
 else:
     # Local development environment settings
-    import_limit = 1
-    import_test_mode = True
+    import_limit = 10
+    import_test_mode = False
     compare2previousexport = False
-    run_dhis2_offline = True
-    run_ocl_offline = True
+    run_dhis2_offline = False
+    run_ocl_offline = False
     dhis2env = 'https://dev-de.datim.org/'
     dhis2uid = 'paynejd'
     dhis2pwd = 'Jonpayne1!'
 
-    # Digital Ocean Showcase - user=paynejd99
-    # oclenv = 'https://api.showcase.openconceptlab.org'
-    # oclapitoken = '2da0f46b7d29aa57970c0b3a535121e8e479f881'
-
-    # JetStream Staging - user=paynejd
-    # oclenv = 'https://oclapi-stg.openmrs.org'
-    # oclapitoken = 'a61ba53ed7b8b26ece8fcfc53022b645de0ec055'
-
-    # JetStream QA - user=paynejd
-    oclenv = 'https://oclapi-qa.openmrs.org'
-    oclapitoken = 'a5678e5f7971f3003e7be563ee4b90297b841f05'
-
+# JetStream Staging user=datim-admin
+oclenv = 'https://api.staging.openconceptlab.org'
+oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
 
 # Create sync object and run
-sims_sync = DatimSyncSims(oclenv=oclenv, oclapitoken=oclapitoken,
-                          dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
-                          compare2previousexport=compare2previousexport,
-                          run_dhis2_offline=run_dhis2_offline, run_ocl_offline=run_ocl_offline,
-                          verbosity=verbosity,
-                          import_test_mode=import_test_mode,
-                          import_limit=import_limit)
-# sims_sync.run()
-sims_sync.data_check()
+datim_sync = DatimSyncSims(
+    oclenv=oclenv, oclapitoken=oclapitoken, dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
+    compare2previousexport=compare2previousexport, run_dhis2_offline=run_dhis2_offline,
+    run_ocl_offline=run_ocl_offline, verbosity=verbosity, import_test_mode=import_test_mode,
+    import_limit=import_limit)
+datim_sync.consolidate_references = True
+datim_sync.import_delay = 3
+# datim_sync.run()
+datim_sync.data_check()

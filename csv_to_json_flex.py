@@ -115,11 +115,11 @@ class ocl_csv_to_json_flex:
                     ocl_resource[field_def['resource_field']] = csv_row[field_def['column']]
                 elif 'value' in field_def:
                     ocl_resource[field_def['resource_field']] = field_def['value']
-                elif 'csv_to_json_processor' in field_def and 'data_column' in field_def:
+                elif 'csv_to_json_processor' in field_def:
                     methodToCall = getattr(self, field_def['csv_to_json_processor'])
                     ocl_resource[field_def['resource_field']] = methodToCall(csv_row, field_def)
                 else:
-                    raise Exception('Expected "column" or "value" key in standard column definition, but none found: %s' % field_def)
+                    raise Exception('Expected "column", "value", or "csv_to_json_processor" key in standard column definition, but none found: %s' % field_def)
 
         # Dictionary columns
         if self.DEF_SUB_RESOURCES in csv_resource_def and csv_resource_def[self.DEF_SUB_RESOURCES]:

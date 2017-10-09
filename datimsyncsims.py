@@ -214,6 +214,9 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     oclenv = os.environ['OCL_ENV']
     oclapitoken = os.environ['OCL_API_TOKEN']
     compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
+    sync_mode = os.environ['SYNC_MODE']
+    run_dhis2_offline =  os.environ['RUN_DHIS2_OFFLINE'] in ['true', 'True']
+    run_ocl_offline =  os.environ['RUN_OCL_OFFLINE'] in ['true', 'True']
 else:
     # Local development environment settings
     import_limit = 5
@@ -229,8 +232,8 @@ else:
     oclenv = 'https://api.staging.openconceptlab.org'
     oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
 
-# Set the sync mode
-sync_mode = DatimSync.SYNC_MODE_DIFF_ONLY
+    # Set the sync mode
+    sync_mode = DatimSync.SYNC_MODE_DIFF_ONLY
 
 # Create sync object and run
 datim_sync = DatimSyncSims(

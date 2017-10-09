@@ -590,45 +590,30 @@ class OclFlexImporter:
         self.log("STATUS CODE:", request_result.status_code)
         self.log(request_result.headers)
         self.log(request_result.text)
+
+        # Store the results -- even if failed
+        # TODO: Handle logging for references differently since they can be batched and always return 200
+        if obj_type in [self.OBJ_TYPE_CONCEPT, self.OBJ_TYPE_MAPPING, self.OBJ_TYPE_REFERENCE]:
+            logging_root = obj_repo_url
+        elif obj_type in [self.OBJ_TYPE_SOURCE, self.OBJ_TYPE_COLLECTION]:
+            logging_root = obj_owner_url
+        elif obj_type == [self.OBJ_TYPE_ORGANIZATION]:
+            logging_root = '/orgs/'
+        elif obj_type == [self.OBJ_TYPE_USER]:
+            logging_root = '/users/'
+        if logging_root not in self.results:
+            self.results[logging_root] = {}
+        if action_type not in self.results[logging_root]:
+            self.results[logging_root][action_type] = {}
+        if request_result.status_code not in self.results[logging_root][action_type]:
+            self.results[logging_root][action_type][request_result.status_code] = []
+        self.results[logging_root][action_type][request_result.status_code].append('%s %s' % (method, obj_url))
+
+        # Now raise for status
         request_result.raise_for_status()
 
-        # Store the results if successful
-        # TODO: This could be improved significantly!
-        if obj_type == self.OBJ_TYPE_REFERENCE:
-            # references need to be handled in a special way, but for now, treat the same as concepts/mappings
-            if obj_repo_url not in self.results:
-                self.results[obj_repo_url] = {}
-            if action_type not in self.results[obj_repo_url]:
-                self.results[obj_repo_url][action_type] = []
-            self.results[obj_repo_url][action_type].append(obj_url)
-        elif int(request_result.status_code) >= 200 and int(request_result.status_code) < 300:
-            if obj_type in [self.OBJ_TYPE_CONCEPT, self.OBJ_TYPE_MAPPING]:
-                if obj_repo_url not in self.results:
-                    self.results[obj_repo_url] = {}
-                if action_type not in self.results[obj_repo_url]:
-                    self.results[obj_repo_url][action_type] = []
-                self.results[obj_repo_url][action_type].append(obj_url)
-            elif obj_type in [self.OBJ_TYPE_SOURCE, self.OBJ_TYPE_COLLECTION]:
-                if obj_owner_url not in self.results:
-                    self.results[obj_owner_url] = {}
-                if action_type not in self.results[obj_owner_url]:
-                    self.results[obj_owner_url][action_type] = []
-                self.results[obj_owner_url][action_type].append(obj_url)
-            elif obj_type == [self.OBJ_TYPE_ORGANIZATION]:
-                if '/orgs/' not in self.results:
-                    self.results['/orgs/'] = {}
-                if action_type not in self.results['/orgs/']:
-                    self.results['/orgs/'][action_type] = []
-                self.results['/orgs/'][action_type].append(obj_url)
-            elif obj_type == [self.OBJ_TYPE_USER]:
-                if '/users/' not in self.results:
-                    self.results['/users/'] = {}
-                if action_type not in self.results['/users/']:
-                    self.results['/users/'][action_type] = []
-                self.results['/users/'][action_type].append(obj_url)
-
     def find_nth(self, haystack, needle, n):
-        """ Find nth occurence of a substring within a string """
+        """ Find nth occurrence of a substring within a string """
         start = haystack.find(needle)
         while start >= 0 and n > 1:
             start = haystack.find(needle, start+len(needle))

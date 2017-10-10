@@ -131,7 +131,7 @@ class DatimSyncMer(DatimSync):
                 # Build disaggregates concepts and mappings
                 indicator_disaggregate_concept_urls = []
                 for coc in de['categoryCombo']['categoryOptionCombos']:
-                    disaggregate_concept_id = coc['code']
+                    disaggregate_concept_id = coc['id']  # "id" is the same as "code", but "code" is sometimes missing
                     disaggregate_concept_url = '/orgs/PEPFAR/sources/MER/concepts/' + disaggregate_concept_id + '/'
                     disaggregate_concept_key = disaggregate_concept_url
                     indicator_disaggregate_concept_urls.append(disaggregate_concept_url)

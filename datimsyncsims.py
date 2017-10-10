@@ -219,7 +219,7 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     run_ocl_offline =  os.environ['RUN_OCL_OFFLINE'] in ['true', 'True']
 else:
     # Local development environment settings
-    import_limit = 5
+    import_limit = 1
     compare2previousexport = False
     run_dhis2_offline = False
     run_ocl_offline = False

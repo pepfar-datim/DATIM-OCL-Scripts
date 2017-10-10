@@ -200,10 +200,9 @@ class DatimBase:
             # First check if any changes were made to the repository
             str_import_results = ''
             ocl_export_endpoint = self.OCL_EXPORT_DEFS[ocl_export_key]['endpoint']
-            if ocl_export_endpoint in import_results:
-                for action_type in import_results[ocl_export_endpoint]:
-                    str_import_results += '(%s) %s,' % (
-                        len(import_results[ocl_export_endpoint][action_type]), action_type)
+            if import_results.has(root_key=ocl_export_endpoint, limit_to_success_codes=True):
+                str_import_results = import_results.get_detailed_summary(
+                    root_key=ocl_export_endpoint, limit_to_success_codes=True)
             else:
                 self.vlog(1, '[OCL Export %s of %s] %s: No changes to this repository...' % (
                     cnt, len(self.OCL_EXPORT_DEFS), ocl_export_key))

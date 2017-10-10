@@ -69,6 +69,130 @@ class InvalidObjectDefinition(OclImportError):
         self.message = message
 
 
+class OclImportResults:
+
+    SKIP_KEY = 'SKIPPED'
+    NO_OBJECT_TYPE_KEY = 'NO-OBJECT-TYPE'
+    ORGS_RESULTS_ROOT = '/orgs/'
+    USERS_RESULTS_ROOT = '/users/'
+
+    def __init__(self, total_lines=0):
+        self._results = {}
+        self.count = 0
+        self.total_lines = total_lines
+
+    def add(self, obj_url='', action_type='', obj_type='', obj_repo_url='', http_method='', obj_owner_url='',
+            status_code=None):
+
+        # TODO: Handle logging for references differently since they can be batched and always return 200
+
+        # Determine the first dimension (the "logging root") of the results object
+        logging_root = ''
+        if obj_type in [OclFlexImporter.OBJ_TYPE_CONCEPT,
+                        OclFlexImporter.OBJ_TYPE_MAPPING,
+                        OclFlexImporter.OBJ_TYPE_REFERENCE]:
+            logging_root = obj_repo_url
+        elif obj_type in [OclFlexImporter.OBJ_TYPE_SOURCE,
+                          OclFlexImporter.OBJ_TYPE_COLLECTION]:
+            logging_root = obj_owner_url
+        elif obj_type == OclFlexImporter.OBJ_TYPE_ORGANIZATION:
+            logging_root = self.ORGS_RESULTS_ROOT
+        elif obj_type == OclFlexImporter.OBJ_TYPE_USER:
+            logging_root = self.USERS_RESULTS_ROOT
+
+        # Add the result to the results object
+        if logging_root not in self._results:
+            self._results[logging_root] = {}
+        if action_type not in self._results[logging_root]:
+            self._results[logging_root][action_type] = {}
+        if status_code not in self._results[logging_root][action_type]:
+            self._results[logging_root][action_type][status_code] = []
+        self._results[logging_root][action_type][status_code].append('%s %s' % (http_method, obj_url))
+
+        self.count += 1
+
+    def add_skip(self, obj_type='', text=''):
+        if self.SKIP_KEY not in self._results:
+            self._results[self.SKIP_KEY] = {}
+        if not obj_type:
+            obj_type = self.NO_OBJECT_TYPE_KEY
+        if obj_type not in self._results[self.SKIP_KEY]:
+            self._results[self.SKIP_KEY][obj_type] = []
+        if self.SKIP_KEY not in self._results[self.SKIP_KEY][obj_type]:
+            self._results[self.SKIP_KEY][obj_type][self.SKIP_KEY] = []
+        self._results[self.SKIP_KEY][obj_type][self.SKIP_KEY].append(text)
+        self.count += 1
+
+    def has(self, root_key='', limit_to_success_codes=False):
+        if root_key in self._results and not limit_to_success_codes:
+            return True
+        elif root_key in self._results and limit_to_success_codes:
+            has_success_code = False
+            for action_type in self._results[root_key]:
+                for status_code in self._results[root_key][action_type]:
+                    if int(status_code) >= 200 and int(status_code) < 300:
+                        return True
+        return False
+
+    def __str__(self):
+        return self.get_summary()
+
+    def get_summary(self, root_key=None):
+        if not root_key:
+            return 'Processed %s of %s total' % (self.count, self.total_lines)
+        elif self.has(root_key=root_key):
+            num_processed = 0
+            for action_type in self._results[root_key]:
+                for status_code in self._results[root_key][action_type]:
+                    num_processed += len(self._results[root_key][action_type][status_code])
+            return 'Processed %s for key "%s"' % (num_processed, root_key)
+
+    def get_detailed_summary(self, root_key=None, limit_to_success_codes=False):
+        # Build a results summary dictionary
+        results_summary = {}
+        if root_key:
+            keys = [root_key]
+        else:
+            keys = self._results.keys()
+        total_count = 0
+        for k in keys:
+            for action_type in self._results[k]:
+                if action_type not in results_summary:
+                    results_summary[action_type] = {}
+                for status_code in self._results[k][action_type]:
+                    if limit_to_success_codes and (int(status_code) < 200 or int(status_code) >= 300):
+                        continue
+                    status_code_count = len(self._results[k][action_type][status_code])
+                    results_summary[action_type][status_code] = status_code_count
+                    total_count += status_code_count
+
+        # Turn the results summary dictionary into a string
+        output = ''
+        for action_type in results_summary:
+            if output:
+                output += '; '
+            status_code_summary = ''
+            action_type_count = 0
+            for status_code in results_summary[action_type]:
+                action_type_count += results_summary[action_type][status_code]
+                if status_code_summary:
+                    status_code_summary += ', '
+                status_code_summary += '%s: %s' % (status_code, results_summary[action_type][status_code])
+            output += '%s %s (%s)' % (action_type_count, action_type, status_code_summary)
+
+        # Polish it all off
+        if limit_to_success_codes:
+            process_str = 'Successfully processed'
+        else:
+            process_str = 'Processed'
+        if root_key:
+            output = '%s %s for key "%s"' % (process_str, output, root_key)
+        else:
+            output = '%s %s total -- %s' % (process_str, total_count, output)
+
+        return output
+
+
 class OclFlexImporter:
     """ Class to flexibly import multiple resource types into OCL from JSON lines files via the OCL API """
 
@@ -86,7 +210,7 @@ class OclFlexImporter:
     OBJ_TYPE_COLLECTION_VERSION = 'Collection Version'
 
     ACTION_TYPE_NEW = 'new'
-    ACTION_TYPE_UPDATE = 'udpate'
+    ACTION_TYPE_UPDATE = 'update'
     ACTION_TYPE_RETIRE = 'retire'
     ACTION_TYPE_DELETE = 'delete'
     ACTION_TYPE_OTHER = 'other'
@@ -190,7 +314,7 @@ class OclFlexImporter:
         self.import_delay = import_delay
         self.skip_line_count = False
 
-        self.results = {}
+        self.import_results = None
         self.cache_obj_exists = {}
 
         # Prepare the headers
@@ -237,6 +361,7 @@ class OclFlexImporter:
                     num_lines += 1
 
         # Loop through each JSON object in the file
+        self.import_results = OclImportResults(total_lines=num_lines)
         obj_def_keys = self.obj_def.keys()
         with open(self.file_path) as json_file:
             count = 0
@@ -253,15 +378,13 @@ class OclFlexImporter:
                         self.log('')
                         self.process_object(obj_type, json_line_obj)
                         num_processed += 1
-                        if self.skip_line_count:
-                            self.log('[Attempted import on %s resource(s) and skipped %s of %s processed so far]' % (num_processed, num_skipped, count))
-                        else:
-                            self.log('[%s of %s] Attempted import on %s resource(s) and skipped %s]' % (
-                            count, num_lines, num_processed, num_skipped))
+                        self.log('[%s]' % self.import_results)
                     else:
+                        self.import_results.add_skip(obj_type=obj_type, text=json_line_raw)
                         self.log("**** SKIPPING: Unrecognized 'type' attribute '" + obj_type + "' for object: " + json_line_raw)
                         num_skipped += 1
                 else:
+                    self.import_results.add_skip(text=json_line_raw)
                     self.log("**** SKIPPING: No 'type' attribute: " + json_line_raw)
                     num_skipped += 1
                 if self.import_delay and not self.test_mode:
@@ -590,26 +713,9 @@ class OclFlexImporter:
         self.log("STATUS CODE:", request_result.status_code)
         self.log(request_result.headers)
         self.log(request_result.text)
-
-        # Store the results -- even if failed
-        # TODO: Handle logging for references differently since they can be batched and always return 200
-        if obj_type in [self.OBJ_TYPE_CONCEPT, self.OBJ_TYPE_MAPPING, self.OBJ_TYPE_REFERENCE]:
-            logging_root = obj_repo_url
-        elif obj_type in [self.OBJ_TYPE_SOURCE, self.OBJ_TYPE_COLLECTION]:
-            logging_root = obj_owner_url
-        elif obj_type == [self.OBJ_TYPE_ORGANIZATION]:
-            logging_root = '/orgs/'
-        elif obj_type == [self.OBJ_TYPE_USER]:
-            logging_root = '/users/'
-        if logging_root not in self.results:
-            self.results[logging_root] = {}
-        if action_type not in self.results[logging_root]:
-            self.results[logging_root][action_type] = {}
-        if request_result.status_code not in self.results[logging_root][action_type]:
-            self.results[logging_root][action_type][request_result.status_code] = []
-        self.results[logging_root][action_type][request_result.status_code].append('%s %s' % (method, obj_url))
-
-        # Now raise for status
+        self.import_results.add(
+            obj_url=obj_url, action_type=action_type, obj_type=obj_type, obj_repo_url=obj_repo_url,
+            http_method=method, obj_owner_url=obj_owner_url, status_code=request_result.status_code)
         request_result.raise_for_status()
 
     def find_nth(self, haystack, needle, n):

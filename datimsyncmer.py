@@ -223,23 +223,23 @@ class DatimSyncMer(DatimSync):
                             num_indicator_refs, num_disaggregate_refs))
             return True
 
-
-# Default Script Settings
-verbosity = 2  # 0=none, 1=some, 2=all
-import_delay = 0  # Number of seconds to delay between each import request
-import_limit = 0  # Number of resources to import; 0=all
-run_dhis2_offline = True  # Set to true to use local copies of dhis2 exports
-run_ocl_offline = True  # Set to true to use local copies of ocl exports
-compare2previousexport = True  # Set to False to ignore the previous export
-
 # DATIM DHIS2 Settings
-dhis2env = ''
-dhis2uid = ''
-dhis2pwd = ''
+dhis2env = 'https://dev-de.datim.org/'
+dhis2uid = 'paynejd'
+dhis2pwd = 'Jonpayne1!'
 
-# OCL Settings
-oclenv = ''
-oclapitoken = ''
+# OCL Settings - JetStream Staging user=datim-admin
+oclenv = 'https://api.staging.openconceptlab.org'
+oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
+
+# Local development environment settings
+sync_mode = DatimSync.SYNC_MODE_DIFF_ONLY  # Set which operation is performed by the sync script
+verbosity = 2  # 0=none, 1=some, 2=all
+import_limit = 0  # Number of resources to import; 0=all
+import_delay = 3  # Number of seconds to delay between each import request
+compare2previousexport = False  # Set to False to ignore the previous export; set to True only after a full import
+run_dhis2_offline = False  # Set to true to use local copies of dhis2 exports
+run_ocl_offline = False  # Set to true to use local copies of ocl exports
 
 # Set variables from environment if available
 if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
@@ -249,27 +249,12 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     dhis2pwd = os.environ['DHIS2_PASS']
     oclenv = os.environ['OCL_ENV']
     oclapitoken = os.environ['OCL_API_TOKEN']
+    import_limit = os.environ['IMPORT_LIMIT']
+    import_delay = os.environ['IMPORT_DELAY']
     compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
     sync_mode = os.environ['SYNC_MODE']
     run_dhis2_offline =  os.environ['RUN_DHIS2_OFFLINE'] in ['true', 'True']
     run_ocl_offline =  os.environ['RUN_OCL_OFFLINE'] in ['true', 'True']
-else:
-    # Local development environment settings
-    import_limit = 0
-    compare2previousexport = False
-    run_dhis2_offline = True
-    run_ocl_offline = True
-    dhis2env = 'https://dev-de.datim.org/'
-    dhis2uid = 'paynejd'
-    dhis2pwd = 'Jonpayne1!'
-    import_delay = 3
-
-    # JetStream Staging user=datim-admin
-    oclenv = 'https://api.staging.openconceptlab.org'
-    oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
-
-    # Set the sync mode
-    sync_mode = DatimSync.SYNC_MODE_DIFF_ONLY
 
 # Create sync object and run
 datim_sync = DatimSyncMer(

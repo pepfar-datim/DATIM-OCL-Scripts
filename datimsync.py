@@ -657,7 +657,7 @@ class DatimSync(DatimBase):
         self.vlog(1, '**** STEP 12 of 12: Manage OCL repository versions')
         if sync_mode == DatimSync.SYNC_MODE_FULL_IMPORT:
             if num_import_rows_processed:
-                self.increment_ocl_versions(import_results=ocl_importer.results)
+                self.increment_ocl_versions(import_results=ocl_importer.import_results)
             else:
                 self.vlog(1, 'Skipping because no records imported...')
         elif sync_mode == DatimSync.SYNC_MODE_DIFF_ONLY:
@@ -668,9 +668,8 @@ class DatimSync(DatimBase):
         # Display debug info
         if self.verbosity >= 2:
             self.log('**** DEBUG INFO')
-            if ocl_importer:
-                print('ocl_importer.results:')
-                pprint(ocl_importer.results)
+            if ocl_importer and ocl_importer.import_results:
+                print(ocl_importer.import_results.get_detailed_summary())
 
         # Return the diff result (may return something else in the end)
         if self.diff_result:

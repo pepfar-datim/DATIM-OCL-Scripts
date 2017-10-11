@@ -6,6 +6,7 @@ class DatimConstants:
     IMPORT_BATCH_MECHANISMS = 'Mechanisms'
     IMPORT_BATCH_TIERED_SUPPORT = 'Tiered-Support'  # Tiered Support is imported with init scripts, not a sync script
 
+    # SIMS DHIS2 Queries
     SIMS_DHIS2_QUERIES = {
         'SimsAssessmentTypes': {
             'id': 'SimsAssessmentTypes',
@@ -22,6 +23,8 @@ class DatimConstants:
             'conversion_method': 'dhis2diff_sims_option_sets'
         }
     }
+
+    # MER DHIS2 Queries
     MER_DHIS2_QUERIES = {
         'MER': {
             'id': 'MER',
@@ -34,6 +37,8 @@ class DatimConstants:
             'conversion_method': 'dhis2diff_mer'
         }
     }
+
+    # Mechanisms DHIS2 Queries
     MECHANISMS_DHIS2_QUERIES = {
         'Mechanisms': {
             'id': 'Mechanisms',
@@ -363,42 +368,42 @@ class DatimConstants:
 
     # SIMS OCL Export Definitions
     SIMS_OCL_EXPORT_DEFS = {
-        'sims_source': {
+        'SIMS-Source': {
             'import_batch': IMPORT_BATCH_SIMS,
             'show_build_row_method': 'build_sims_row',
             'show_headers_key': 'sims',
             'endpoint': '/orgs/PEPFAR/sources/SIMS/'},
-        'sims2_above_site': {
+        'SIMS2-Above-Site': {
             'import_batch': IMPORT_BATCH_SIMS,
             'show_build_row_method': 'build_sims_row',
             'show_headers_key': 'sims',
             'endpoint': '/orgs/PEPFAR/collections/SIMS2-Above-Site/'},
-        'sims2_community': {
+        'SIMS2-Community': {
             'import_batch': IMPORT_BATCH_SIMS,
             'show_build_row_method': 'build_sims_row',
             'show_headers_key': 'sims',
             'endpoint': '/orgs/PEPFAR/collections/SIMS2-Community/'},
-        'sims2_facility': {
+        'SIMS2-Facility': {
             'import_batch': IMPORT_BATCH_SIMS,
             'show_build_row_method': 'build_sims_row',
             'show_headers_key': 'sims',
             'endpoint': '/orgs/PEPFAR/collections/SIMS2-Facility/'},
-        'sims3_above_site': {
+        'SIMS3-Above-Site': {
             'import_batch': IMPORT_BATCH_SIMS,
             'show_build_row_method': 'build_sims_row',
             'show_headers_key': 'sims',
             'endpoint': '/orgs/PEPFAR/collections/SIMS3-Above-Site/'},
-        'sims3_community': {
+        'SIMS3-Community': {
             'import_batch': IMPORT_BATCH_SIMS,
             'show_build_row_method': 'build_sims_row',
             'show_headers_key': 'sims',
             'endpoint': '/orgs/PEPFAR/collections/SIMS3-Community/'},
-        'sims3_facility': {
+        'SIMS3-Facility': {
             'import_batch': IMPORT_BATCH_SIMS,
             'show_build_row_method': 'build_sims_row',
             'show_headers_key': 'sims',
             'endpoint': '/orgs/PEPFAR/collections/SIMS3-Facility/'},
-        'sims_option_sets': {
+        'SIMS-Option-Sets': {
             'import_batch': IMPORT_BATCH_SIMS,
             'show_build_row_method': 'build_sims_option_sets_row',
             'show_headers_key': 'option_sets',

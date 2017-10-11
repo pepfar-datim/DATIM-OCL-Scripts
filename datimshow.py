@@ -60,8 +60,11 @@ class DatimShow(DatimBase):
             intermediate['height'] = len(intermediate['rows'])
         return intermediate
 
-    def default_show_build_row(self, concept, headers):
+    def default_show_build_row(self, concept, headers=None, direct_mappings=None, repo_title='', repo_subtitle=''):
+        """ Default method for building one output row in the presentation layer """
         row = {}
+        for h in headers:
+            row[h['column']] = ''
         row[headers[0]['column']] = str(concept)
         return row
 

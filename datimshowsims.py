@@ -69,24 +69,18 @@ class DatimShowSims(DatimShow):
 
 # Default Script Settings
 verbosity = 0  # 0=none, 1=some, 2=all
-run_ocl_offline = False  # Set to true to use local copies of dhis2/ocl exports
-
-# Set some defaults
+run_ocl_offline = False  # Set to true to use local copies of ocl exports
 export_format = DatimShow.DATIM_FORMAT_HTML
-repo_id = 'SIMS-Option-Sets'
+repo_id = 'SIMS3-Above-Site'
+
+# OCL Settings - JetStream Staging user=datim-admin
+oclenv = 'https://api.staging.openconceptlab.org'
+oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
 
 # Set arguments from the command line
 if sys.argv and len(sys.argv) > 1:
     export_format = DatimShow.get_format_from_string(sys.argv[1])
     repo_id = sys.argv[2]
-
-# OCL Settings
-#oclenv = ''
-#oclapitoken = ''
-
-# JetStream Staging user=datim-admin
-oclenv = 'https://api.staging.openconceptlab.org'
-oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
 
 # Create Show object and run
 datim_show = DatimShowSims(

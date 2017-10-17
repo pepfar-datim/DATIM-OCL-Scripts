@@ -216,12 +216,8 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     oclapitoken = os.environ['OCL_API_TOKEN']
     if "IMPORT_LIMIT" in os.environ:
       import_limit = os.environ['IMPORT_LIMIT']
-    else:
-      import_limit = 0
     if "IMPORT_DELAY" in os.environ:
       import_delay = os.environ['IMPORT_DELAY']
-    else:
-      import_delay = 3
     if "COMPARE_PREVIOUS_EXPORT" in os.environ:
       compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
     if "SYNC_MODE" in os.environ:

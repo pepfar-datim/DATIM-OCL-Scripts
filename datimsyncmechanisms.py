@@ -167,12 +167,18 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     dhis2pwd = os.environ['DHIS2_PASS']
     oclenv = os.environ['OCL_ENV']
     oclapitoken = os.environ['OCL_API_TOKEN']
-    import_limit = os.environ['IMPORT_LIMIT']
-    import_delay = os.environ['IMPORT_DELAY']
-    compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
-    sync_mode = os.environ['SYNC_MODE']
-    run_dhis2_offline =  os.environ['RUN_DHIS2_OFFLINE'] in ['true', 'True']
-    run_ocl_offline =  os.environ['RUN_OCL_OFFLINE'] in ['true', 'True']
+    if "IMPORT_LIMIT" in os.environ:
+      import_limit = os.environ['IMPORT_LIMIT']
+    if "IMPORT_DELAY" in os.environ:
+      import_delay = os.environ['IMPORT_DELAY']
+    if "COMPARE_PREVIOUS_EXPORT" in os.environ:
+      compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
+    if "SYNC_MODE" in os.environ:
+      sync_mode = os.environ['SYNC_MODE']
+    if "RUN_DHIS2_OFFLINE" in os.environ:
+      run_dhis2_offline =  os.environ['RUN_DHIS2_OFFLINE'] in ['true', 'True']
+    if "RUN_OCL_OFFLINE" in os.environ:
+      run_ocl_offline =  os.environ['RUN_OCL_OFFLINE'] in ['true', 'True']
 
 # Create sync object and run
 datim_sync = DatimSyncMechanisms(

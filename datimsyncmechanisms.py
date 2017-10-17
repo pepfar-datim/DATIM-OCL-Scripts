@@ -169,28 +169,16 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     oclapitoken = os.environ['OCL_API_TOKEN']
     if "IMPORT_LIMIT" in os.environ:
       import_limit = os.environ['IMPORT_LIMIT']
-    else:
-      import_limit = 0
     if "IMPORT_DELAY" in os.environ:
       import_delay = os.environ['IMPORT_DELAY']
-    else:
-      import_delay = 3
     if "COMPARE_PREVIOUS_EXPORT" in os.environ:
       compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
-    else:
-      compare2previousexport = False
     if "SYNC_MODE" in os.environ:
       sync_mode = os.environ['SYNC_MODE']
-    else:
-      sync_mode = DatimSync.SYNC_MODE_DIFF_ONLY 
     if "RUN_DHIS2_OFFLINE" in os.environ:
       run_dhis2_offline =  os.environ['RUN_DHIS2_OFFLINE'] in ['true', 'True']
-    else:
-      run_dhis2_offline = False
     if "RUN_OCL_OFFLINE" in os.environ:
       run_ocl_offline =  os.environ['RUN_OCL_OFFLINE'] in ['true', 'True']
-    else:
-      run_ocl_offline = False
 
 # Create sync object and run
 datim_sync = DatimSyncMechanisms(

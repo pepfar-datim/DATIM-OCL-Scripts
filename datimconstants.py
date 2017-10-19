@@ -182,11 +182,6 @@ class DatimConstants:
             'show_build_row_method': 'build_mer_indicator_output',
             'show_headers_key': 'mer',
             'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-FY17Q2/'},
-        'MER-R-Facility-FY16Q1Q2Q3': {
-            'import_batch': IMPORT_BATCH_MER,
-            'show_build_row_method': 'build_mer_indicator_output',
-            'show_headers_key': 'mer',
-            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-FY16Q1Q2Q3/'},
         'MER-R-Facility-FY16Q4': {
             'import_batch': IMPORT_BATCH_MER,
             'show_build_row_method': 'build_mer_indicator_output',
@@ -357,14 +352,69 @@ class DatimConstants:
             'show_build_row_method': 'build_mer_indicator_output',
             'show_headers_key': 'mer',
             'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY16Q1Q2Q3/'},
-    }
-    INACTIVE_MER_OCL_EXPORT_DEFS = {
         'MER-T-Community-FY16': {
             'import_batch': IMPORT_BATCH_MER,
             'show_build_row_method': 'build_mer_indicator_output',
             'show_headers_key': 'mer',
             'endpoint': '/orgs/PEPFAR/collections/MER-T-Community-FY16/'},
+        'MER-R-Facility-FY17Q4': {
+            'import_batch': IMPORT_BATCH_MER,
+            'show_build_row_method': 'build_mer_indicator_output',
+            'show_headers_key': 'mer',
+            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-FY17Q4/'},
+        'MER-R-Community-FY17Q4': {
+            'import_batch': IMPORT_BATCH_MER,
+            'show_build_row_method': 'build_mer_indicator_output',
+            'show_headers_key': 'mer',
+            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-FY17Q4/'},
+        'MER-R-Facility-DoD-FY17Q4': {
+            'import_batch': IMPORT_BATCH_MER,
+            'show_build_row_method': 'build_mer_indicator_output',
+            'show_headers_key': 'mer',
+            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-DoD-FY17Q4/'},
+        'MER-R-Community-DoD-FY17Q4': {
+            'import_batch': IMPORT_BATCH_MER,
+            'show_build_row_method': 'build_mer_indicator_output',
+            'show_headers_key': 'mer',
+            'endpoint': '/orgs/PEPFAR/collections/MER-R-Community-DoD-FY17Q4/'},
+        'MER-R-Medical-Store-FY17Q4': {
+            'import_batch': IMPORT_BATCH_MER,
+            'show_build_row_method': 'build_mer_indicator_output',
+            'show_headers_key': 'mer',
+            'endpoint': '/orgs/PEPFAR/collections/MER-R-Medical-Store-FY17Q4/'},
+        'MER-R-Narratives-IM-FY17Q4': {
+            'import_batch': IMPORT_BATCH_MER,
+            'show_build_row_method': 'build_mer_indicator_output',
+            'show_headers_key': 'mer',
+            'endpoint': '/orgs/PEPFAR/collections/MER-R-Narratives-IM-FY17Q4/'},
+        'MER-R-Operating-Unit-Level-IM-FY17Q4': {
+            'import_batch': IMPORT_BATCH_MER,
+            'show_build_row_method': 'build_mer_indicator_output',
+            'show_headers_key': 'mer',
+            'endpoint': '/orgs/PEPFAR/collections/MER-R-Operating-Unit-Level-IM-FY17Q4/'},
+        'HC-R-Narratives-USG-FY17Q4': {
+            'import_batch': IMPORT_BATCH_MER,
+            'show_build_row_method': 'build_mer_indicator_output',
+            'show_headers_key': 'mer',
+            'endpoint': '/orgs/PEPFAR/collections/HC-R-Narratives-USG-FY17Q4/'},
+        'HC-R-Operating-Unit-Level-USG-FY17Q4': {
+            'import_batch': IMPORT_BATCH_MER,
+            'show_build_row_method': 'build_mer_indicator_output',
+            'show_headers_key': 'mer',
+            'endpoint': '/orgs/PEPFAR/collections/HC-R-Operating-Unit-Level-USG-FY17Q4/'},
+        'HC-R-COP-Prioritization-SNU-USG-FY17Q4': {
+            'import_batch': IMPORT_BATCH_MER,
+            'show_build_row_method': 'build_mer_indicator_output',
+            'show_headers_key': 'mer',
+            'endpoint': '/orgs/PEPFAR/collections/HC-R-COP-Prioritization-SNU-USG-FY17Q4/'},
+        'MER-R-Facility-FY16Q1Q2Q3': {
+            'import_batch': IMPORT_BATCH_MER,
+            'show_build_row_method': 'build_mer_indicator_output',
+            'show_headers_key': 'mer',
+            'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-FY16Q1Q2Q3/'},
     }
+    #   }
+    # INACTIVE_MER_OCL_EXPORT_DEFS = {
 
     # SIMS OCL Export Definitions
     SIMS_OCL_EXPORT_DEFS = {

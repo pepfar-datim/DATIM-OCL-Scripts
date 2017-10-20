@@ -21,7 +21,6 @@ from requests.auth import HTTPBasicAuth
 from shutil import copyfile
 from datimbase import DatimBase
 from oclfleximporter import OclFlexImporter
-from pprint import pprint
 from deepdiff import DeepDiff
 
 
@@ -32,6 +31,12 @@ class DatimSync(DatimBase):
     SYNC_MODE_BUILD_IMPORT_SCRIPT = 'script-only'
     SYNC_MODE_TEST_IMPORT = 'test'
     SYNC_MODE_FULL_IMPORT = 'full'
+    SYNC_MODES = [
+        SYNC_MODE_DIFF_ONLY,
+        SYNC_MODE_BUILD_IMPORT_SCRIPT,
+        SYNC_MODE_TEST_IMPORT,
+        SYNC_MODE_FULL_IMPORT
+    ]
 
     # Data check return values
     DATIM_SYNC_NO_DIFF = 0
@@ -260,10 +265,7 @@ class DatimSync(DatimBase):
         """ Execute DHIS2 query and save to file """
 
         # Replace query attribute names with values and build the query URL
-        if query_attr:
-            for attr_name in query_attr:
-                query = query.replace('{{'+attr_name+'}}', query_attr[attr_name])
-        url_dhis2_query = self.dhis2env + query
+        url_dhis2_query = self.dhis2env + self.replace_attr(query, query_attr)
 
         # Execute the query
         self.vlog(1, 'Request URL:', url_dhis2_query)
@@ -277,8 +279,8 @@ class DatimSync(DatimBase):
     def perform_diff(self, ocl_diff=None, dhis2_diff=None):
         """
         Performs deep diff on the prepared OCL and DHIS2 resources
-        :param ocl_diff:
-        :param dhis2_diff:
+        :param ocl_diff: Content from OCL for the diff
+        :param dhis2_diff: Content from DHIS2 for the diff
         :return:
         """
         diff = {}
@@ -300,7 +302,7 @@ class DatimSync(DatimBase):
     def generate_import_scripts(self, diff):
         """
         Generate import scripts
-        :param diff:
+        :param diff: Diff results used to generate the import script
         :return:
         """
         with open(self.attach_absolute_path(self.NEW_IMPORT_SCRIPT_FILENAME), 'wb') as output_file:
@@ -487,11 +489,16 @@ class DatimSync(DatimBase):
 
     def run(self, sync_mode=None, resource_types=None):
         """
-
-        :param sync_mode:
-        :param resource_types:
+        Performs a diff between DATIM DHIS2 and OCL and optionally imports the differences into OCL
+        :param sync_mode: Mode to run the sync operation. See SYNC_MODE constants
+        :param resource_types: List of resource types to include in the sync operation. See RESOURCE_TYPE constants
         :return:
         """
+
+        # Make sure sync_mode is valid
+        if sync_mode not in self.SYNC_MODES:
+            self.log('ERROR: Invalid sync_mode "%s"' % sync_mode)
+            sys.exit(1)
 
         # Determine which resource types will be processed during this run
         if resource_types:

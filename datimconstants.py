@@ -6,6 +6,18 @@ class DatimConstants:
     IMPORT_BATCH_MECHANISMS = 'Mechanisms'
     IMPORT_BATCH_TIERED_SUPPORT = 'Tiered-Support'  # Tiered Support is imported with init scripts, not a sync script
 
+    # List of content categories
+    SYNC_RESOURCE_TYPES = [
+        IMPORT_BATCH_MER,
+        IMPORT_BATCH_SIMS,
+        IMPORT_BATCH_MECHANISMS,
+        IMPORT_BATCH_TIERED_SUPPORT
+    ]
+
+    # DHIS2 Presentation URLs
+    DHIS2_PRESENTATION_URL_MER = 'https://www.datim.org/api/sqlViews/DotdxKrNZxG/data.{{format}}?var=dataSets:{{dataset}}'
+    DHIS2_PRESENTATION_URL_DEFAULT = 'https://dev-de.datim.org/api/sqlViews/{{sqlview}}/data.{{format}}'
+
     # SIMS DHIS2 Queries
     SIMS_DHIS2_QUERIES = {
         'SimsAssessmentTypes': {
@@ -413,8 +425,7 @@ class DatimConstants:
             'show_headers_key': 'mer',
             'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-FY16Q1Q2Q3/'},
     }
-    #   }
-    # INACTIVE_MER_OCL_EXPORT_DEFS = {
+    # INACTIVE_MER_OCL_EXPORT_DEFS
 
     # SIMS OCL Export Definitions
     SIMS_OCL_EXPORT_DEFS = {
@@ -427,37 +438,44 @@ class DatimConstants:
             'import_batch': IMPORT_BATCH_SIMS,
             'show_build_row_method': 'build_sims_row',
             'show_headers_key': 'sims',
-            'endpoint': '/orgs/PEPFAR/collections/SIMS2-Above-Site/'},
+            'endpoint': '/orgs/PEPFAR/collections/SIMS2-Above-Site/',
+            'dhis2_sqlview_id': 'lrdLdQe630Q'},
         'SIMS2-Community': {
             'import_batch': IMPORT_BATCH_SIMS,
             'show_build_row_method': 'build_sims_row',
             'show_headers_key': 'sims',
-            'endpoint': '/orgs/PEPFAR/collections/SIMS2-Community/'},
+            'endpoint': '/orgs/PEPFAR/collections/SIMS2-Community/',
+            'dhis2_sqlview_id': 'jJLtJha39hn'},
         'SIMS2-Facility': {
             'import_batch': IMPORT_BATCH_SIMS,
             'show_build_row_method': 'build_sims_row',
             'show_headers_key': 'sims',
-            'endpoint': '/orgs/PEPFAR/collections/SIMS2-Facility/'},
+            'endpoint': '/orgs/PEPFAR/collections/SIMS2-Facility/',
+            'dhis2_sqlview_id': 'd14tCDY7CBv'},
         'SIMS3-Above-Site': {
             'import_batch': IMPORT_BATCH_SIMS,
             'show_build_row_method': 'build_sims_row',
             'show_headers_key': 'sims',
-            'endpoint': '/orgs/PEPFAR/collections/SIMS3-Above-Site/'},
+            'endpoint': '/orgs/PEPFAR/collections/SIMS3-Above-Site/',
+            'dhis2_sqlview_id': 'wL1TY929jCS'},
         'SIMS3-Community': {
             'import_batch': IMPORT_BATCH_SIMS,
             'show_build_row_method': 'build_sims_row',
             'show_headers_key': 'sims',
-            'endpoint': '/orgs/PEPFAR/collections/SIMS3-Community/'},
+            'endpoint': '/orgs/PEPFAR/collections/SIMS3-Community/',
+            'dhis2_sqlview_id': 'PB2eHiURtwS'},
         'SIMS3-Facility': {
             'import_batch': IMPORT_BATCH_SIMS,
             'show_build_row_method': 'build_sims_row',
             'show_headers_key': 'sims',
-            'endpoint': '/orgs/PEPFAR/collections/SIMS3-Facility/'},
+            'endpoint': '/orgs/PEPFAR/collections/SIMS3-Facility/',
+            'dhis2_sqlview_id': 'uMvWjOo31wt'},
         'SIMS-Option-Sets': {
             'import_batch': IMPORT_BATCH_SIMS,
             'show_build_row_method': 'build_sims_option_sets_row',
             'show_headers_key': 'option_sets',
-            'endpoint': '/orgs/PEPFAR/collections/SIMS-Option-Sets/'},
+            'endpoint': '/orgs/PEPFAR/collections/SIMS-Option-Sets/',
+            'dhis2_sqlview_id': 'JlRJO4gqiu7'},
     }
 
     # Mechanisms OCL Export Definitions
@@ -467,7 +485,8 @@ class DatimConstants:
             'show_build_row_method': 'build_mechanism_row',
             'show_headers_key': 'mechanisms',
             'subtitle': 'View of mechanisms, partners, agencies, OUs and start and end dates for each mechanism',
-            'endpoint': '/orgs/PEPFAR/sources/Mechanisms/'},
+            'endpoint': '/orgs/PEPFAR/sources/Mechanisms/',
+            'dhis2_sqlview_id': 'fgUtV6e9YIX'},
     }
 
     # Tiered Support OCL Export Definitions
@@ -476,10 +495,12 @@ class DatimConstants:
             'import_batch': IMPORT_BATCH_TIERED_SUPPORT,
             'show_build_row_method': 'build_tiered_support_data_element_row',
             'show_headers_key': 'tiered_support_data_elements',
-            'endpoint': '/orgs/PEPFAR/sources/Tiered-Site-Support/'},
+            'endpoint': '/orgs/PEPFAR/sources/Tiered-Site-Support/',
+            'dhis2_sqlview_id': 'l8pThk1VnTC'},
         'options': {
             'import_batch': IMPORT_BATCH_TIERED_SUPPORT,
             'show_build_row_method': 'build_tiered_support_option_row',
             'show_headers_key': 'tiered_support_options',
-            'endpoint': '/orgs/PEPFAR/sources/Tiered-Site-Support/'},
+            'endpoint': '/orgs/PEPFAR/sources/Tiered-Site-Support/',
+            'dhis2_sqlview_id': 'ELFCPUHushX'},
     }

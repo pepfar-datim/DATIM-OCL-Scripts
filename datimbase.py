@@ -290,3 +290,9 @@ class DatimBase:
             start = haystack.find(needle, start+len(needle))
             n -= 1
         return start
+
+    def replace_attr(self, str_input, attributes):
+        if attributes:
+            for attr_name in attributes:
+                str_input = str_input.replace('{{' + attr_name + '}}', attributes[attr_name])
+        return str_input

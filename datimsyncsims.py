@@ -218,8 +218,8 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     import_delay = os.environ['IMPORT_DELAY']
     compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
     sync_mode = os.environ['SYNC_MODE']
-    run_dhis2_offline =  os.environ['RUN_DHIS2_OFFLINE'] in ['true', 'True']
-    run_ocl_offline =  os.environ['RUN_OCL_OFFLINE'] in ['true', 'True']
+    run_dhis2_offline = os.environ['RUN_DHIS2_OFFLINE'] in ['true', 'True']
+    run_ocl_offline = os.environ['RUN_OCL_OFFLINE'] in ['true', 'True']
 
 # Create sync object and run
 datim_sync = DatimSyncSims(

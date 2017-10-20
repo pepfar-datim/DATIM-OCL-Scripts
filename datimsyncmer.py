@@ -22,6 +22,9 @@ from datimconstants import DatimConstants
 class DatimSyncMer(DatimSync):
     """ Class to manage DATIM MER Indicators Synchronization """
 
+    # Name of this sync script (used to name files and in logging)
+    SYNC_NAME = 'MER'
+
     # Dataset ID settings
     OCL_DATASET_ENDPOINT = '/orgs/PEPFAR/collections/?verbose=true&limit=200'
     REPO_ACTIVE_ATTR = 'datim_sync_mer'

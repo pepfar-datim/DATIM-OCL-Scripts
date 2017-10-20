@@ -19,6 +19,9 @@ from datimconstants import DatimConstants
 class DatimSyncMechanisms(DatimSync):
     """ Class to manage DATIM Mechanisms Synchronization """
 
+    # Name of this sync script (used to name files and in logging)
+    SYNC_NAME = 'Mechanisms'
+
     # Dataset ID settings
     OCL_DATASET_ENDPOINT = ''
     REPO_ACTIVE_ATTR = 'datim_sync_mechanisms'

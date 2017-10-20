@@ -70,6 +70,7 @@ class InvalidObjectDefinition(OclImportError):
 
 
 class OclImportResults:
+    """ Class to capture the results of processing an import script """
 
     SKIP_KEY = 'SKIPPED'
     NO_OBJECT_TYPE_KEY = 'NO-OBJECT-TYPE'
@@ -83,6 +84,17 @@ class OclImportResults:
 
     def add(self, obj_url='', action_type='', obj_type='', obj_repo_url='', http_method='', obj_owner_url='',
             status_code=None):
+        """
+        Add a result to this OclImportResults object
+        :param obj_url:
+        :param action_type:
+        :param obj_type:
+        :param obj_repo_url:
+        :param http_method:
+        :param obj_owner_url:
+        :param status_code:
+        :return:
+        """
 
         # TODO: Handle logging for references differently since they can be batched and always return 200
 
@@ -112,6 +124,12 @@ class OclImportResults:
         self.count += 1
 
     def add_skip(self, obj_type='', text=''):
+        """
+        Add a skipped resource to this OclImportResults object
+        :param obj_type:
+        :param text:
+        :return:
+        """
         if self.SKIP_KEY not in self._results:
             self._results[self.SKIP_KEY] = {}
         if not obj_type:
@@ -124,10 +142,15 @@ class OclImportResults:
         self.count += 1
 
     def has(self, root_key='', limit_to_success_codes=False):
+        """
+        Return whether this OclImportResults object contains a result matching the specified root_key
+        :param root_key: Key to match
+        :param limit_to_success_codes: Set to true to only match a successful import result
+        :return: True if a match found; False otherwise
+        """
         if root_key in self._results and not limit_to_success_codes:
             return True
         elif root_key in self._results and limit_to_success_codes:
-            has_success_code = False
             for action_type in self._results[root_key]:
                 for status_code in self._results[root_key][action_type]:
                     if int(status_code) >= 200 and int(status_code) < 300:
@@ -135,9 +158,15 @@ class OclImportResults:
         return False
 
     def __str__(self):
+        """ Get a concise summary of this results object """
         return self.get_summary()
 
     def get_summary(self, root_key=None):
+        """
+        Get a concise summary of this results object, optionally filtering by a specific root_key
+        :param root_key: Optional root_key to filter the summary results
+        :return:
+        """
         if not root_key:
             return 'Processed %s of %s total' % (self.count, self.total_lines)
         elif self.has(root_key=root_key):
@@ -188,7 +217,7 @@ class OclImportResults:
         if root_key:
             output = '%s %s for key "%s"' % (process_str, output, root_key)
         else:
-            output = '%s %s total -- %s' % (process_str, total_count, output)
+            output = '%s %s of %s total -- %s' % (process_str, total_count, self.total_lines, output)
 
         return output
 
@@ -378,7 +407,7 @@ class OclFlexImporter:
                         self.log('')
                         self.process_object(obj_type, json_line_obj)
                         num_processed += 1
-                        self.log('[%s]' % self.import_results)
+                        self.log('[%s]' % self.import_results.get_detailed_summary())
                     else:
                         self.import_results.add_skip(obj_type=obj_type, text=json_line_raw)
                         self.log("**** SKIPPING: Unrecognized 'type' attribute '" + obj_type + "' for object: " + json_line_raw)

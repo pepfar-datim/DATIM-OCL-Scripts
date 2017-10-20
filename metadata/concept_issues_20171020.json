@@ -1,0 +1,2273 @@
+{
+    "SIMS": {
+        "dictionary_item_added": {
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_01_TaS-TAS&DIFFCARE_COMM/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "fVc5tfVIqm4", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "LONG_TEXT"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_01_TaS-TAS&DIFFCARE_COMM", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_01_TaS-TAS&DIFFCARE_COMM", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_23_RegP-L&D_SCORE/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "MaUVhpXobVX", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "INTEGER_ZERO_OR_POSITIVE"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_23_RegP-L&D_SCORE", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_23_RegP-L&D_SCORE", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_24_RegE-L&D_Q3_CB1/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "lOvMxdASaHK", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_24_RegE-L&D_Q3_CB1", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_24_RegE-L&D_Q3_CB1", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_21_PITC-L&D_Q3_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "wqxoAKMKlSM", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_21_PITC-L&D_Q3_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_21_PITC-L&D_Q3_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_23_RegP-L&D_Q3_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "DfTyoDZFTeL", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_23_RegP-L&D_Q3_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_23_RegP-L&D_Q3_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB4/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "VP3PkRmuuF6", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB4", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB4", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_01_TaS-TAS&DIFFCARE_SCORE/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "NXXAjtsi1Bk", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "INTEGER_ZERO_OR_POSITIVE"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_01_TaS-TAS&DIFFCARE_SCORE", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_01_TaS-TAS&DIFFCARE_SCORE", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_23_RegP-L&D_Q3_CB1/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "utuoRYqQQI7", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_23_RegP-L&D_Q3_CB1", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_23_RegP-L&D_Q3_CB1", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_01_TaS-TAS&DIFFCARE_Q2_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "jb5kwHhNbTU", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_01_TaS-TAS&DIFFCARE_Q2_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_01_TaS-TAS&DIFFCARE_Q2_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_11_03_P&P-POCT_Q2_CB1/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "z35rDOSwxqS", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_11_03_P&P-POCT_Q2_CB1", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_11_03_P&P-POCT_Q2_CB1", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_T-NUM/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "TwgCGUsBCUq", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "INTEGER_ZERO_OR_POSITIVE"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_T-NUM", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_T-NUM", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_01_TaS-TAS&DIFFCARE_Q1_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "sj0fVQkyXML", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_01_TaS-TAS&DIFFCARE_Q1_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_01_TaS-TAS&DIFFCARE_Q1_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_21_PITC-L&D_Q2_PERC/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "up2YRgpn8Am", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "INTEGER_ZERO_OR_POSITIVE"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_21_PITC-L&D_Q2_PERC", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_21_PITC-L&D_Q2_PERC", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_23_RegP-L&D_COMM/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "RYIa54cSLLF", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "LONG_TEXT"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_23_RegP-L&D_COMM", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_23_RegP-L&D_COMM", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_23_RegP-L&D_Q3_CB3/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "VQNr0NPTJt7", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_23_RegP-L&D_Q3_CB3", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_23_RegP-L&D_Q3_CB3", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_11_03_P&P-POCT_Q3_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "tu3TyNptYWv", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_11_03_P&P-POCT_Q3_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_11_03_P&P-POCT_Q3_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_23_RegP-L&D_Q3_CB4/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "KzM1s3VKLbM", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_23_RegP-L&D_Q3_CB4", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_23_RegP-L&D_Q3_CB4", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_11_03_P&P-POCT_Q2_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "OB0Dpndd8RJ", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_11_03_P&P-POCT_Q2_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_11_03_P&P-POCT_Q2_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB1/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "AI4To8D8mxX", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB1", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB1", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB2/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "zouoFgPz0KA", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB2", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB2", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_01_TaS-TAS&DIFFCARE_Q1_CB2/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "JYjKUAEboiX", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_01_TaS-TAS&DIFFCARE_Q1_CB2", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_01_TaS-TAS&DIFFCARE_Q1_CB2", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_22_ARV-L&D_Q2_PERC/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "L8dIQFf1iu9", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "INTEGER_ZERO_OR_POSITIVE"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_22_ARV-L&D_Q2_PERC", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_22_ARV-L&D_Q2_PERC", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_24_RegE-L&D_NA/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "QhNVekapnlr", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_24_RegE-L&D_NA", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_24_RegE-L&D_NA", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB3/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "PIFtSPuL5l9", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB3", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB3", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_23_RegP-L&D_Q2_CB2/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "UHxQCXNNOzo", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_23_RegP-L&D_Q2_CB2", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_23_RegP-L&D_Q2_CB2", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_23_RegP-L&D_Q4_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "psi6c0K7RLy", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_23_RegP-L&D_Q4_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_23_RegP-L&D_Q4_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_24_RegE-L&D_Q3_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "Teqdzxcg61s", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_24_RegE-L&D_Q3_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_24_RegE-L&D_Q3_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_11_03_P&P-POCT_Q1_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "uGhJAFDxIql", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_11_03_P&P-POCT_Q1_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_11_03_P&P-POCT_Q1_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_24_RegE-L&D_Q3_CB3/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "JJ3uQEfY4vQ", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_24_RegE-L&D_Q3_CB3", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_24_RegE-L&D_Q3_CB3", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_01_TaS-TAS&DIFFCARE_NA/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "bGYGRfj2VE9", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_01_TaS-TAS&DIFFCARE_NA", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_01_TaS-TAS&DIFFCARE_NA", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_11_03_P&P-POCT_Q4_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "C9byVPxJbjS", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_11_03_P&P-POCT_Q4_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_11_03_P&P-POCT_Q4_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_24_RegE-L&D_Q2_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "oaCaYBOEdr2", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_24_RegE-L&D_Q2_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_24_RegE-L&D_Q2_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_24_RegE-L&D_COMM/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "VUjlZukixMc", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "LONG_TEXT"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_24_RegE-L&D_COMM", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_24_RegE-L&D_COMM", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB5/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "AwoUr6cjPOs", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB5", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB5", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_23_RegP-L&D_NA/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "yZonsB7NNd3", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_23_RegP-L&D_NA", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_23_RegP-L&D_NA", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_22_ARV-L&D_Q3_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "dXyyjIQntEc", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_22_ARV-L&D_Q3_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_22_ARV-L&D_Q3_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_SCORE/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "FaWaomJAyRn", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "INTEGER_ZERO_OR_POSITIVE"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_SCORE", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_SCORE", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_22_ARV-L&D_Q1_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "Z69vGFeEtyi", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_22_ARV-L&D_Q1_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_22_ARV-L&D_Q1_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_24_RegE-L&D_Q2_CB2/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "LYvLhmePUPf", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_24_RegE-L&D_Q2_CB2", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_24_RegE-L&D_Q2_CB2", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_24_RegE-L&D_Q1_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "m59WGhSHHJ5", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_24_RegE-L&D_Q1_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_24_RegE-L&D_Q1_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_11_03_P&P-POCT_SCORE/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "FIxSjPaEtwe", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "INTEGER_ZERO_OR_POSITIVE"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_11_03_P&P-POCT_SCORE", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_11_03_P&P-POCT_SCORE", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_23_RegP-L&D_Q3_CB2/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "iv1cQdEdu4g", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_23_RegP-L&D_Q3_CB2", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_23_RegP-L&D_Q3_CB2", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_21_PITC-L&D_SCORE/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "iTOoKjtk3sO", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "INTEGER_ZERO_OR_POSITIVE"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_21_PITC-L&D_SCORE", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_21_PITC-L&D_SCORE", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_24_RegE-L&D_Q5_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "eAn1XjiupFB", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_24_RegE-L&D_Q5_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_24_RegE-L&D_Q5_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_21_PITC-L&D_COMM/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "VRsfdmzq2jo", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "LONG_TEXT"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_21_PITC-L&D_COMM", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_21_PITC-L&D_COMM", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_23_RegP-L&D_Q2_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "gX4ae8wvZRB", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_23_RegP-L&D_Q2_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_23_RegP-L&D_Q2_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_23_RegP-L&D_Q2_CB1/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "HW2SkE6ITB4", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_23_RegP-L&D_Q2_CB1", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_23_RegP-L&D_Q2_CB1", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_22_ARV-L&D_SCORE/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "t1KTtYefEVb", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "INTEGER_ZERO_OR_POSITIVE"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_22_ARV-L&D_SCORE", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_22_ARV-L&D_SCORE", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_24_RegE-L&D_Q2_CB1/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "hmp1tof1rkB", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_24_RegE-L&D_Q2_CB1", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_24_RegE-L&D_Q2_CB1", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_21_PITC-L&D_Q1_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "ODRRhLfwu33", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_21_PITC-L&D_Q1_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_21_PITC-L&D_Q1_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_11_03_P&P-POCT_Q2_CB2/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "xddAkiqF5bl", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_11_03_P&P-POCT_Q2_CB2", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_11_03_P&P-POCT_Q2_CB2", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_11_03_P&P-POCT_COMM/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "AqThQsJcum7", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "LONG_TEXT"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_11_03_P&P-POCT_COMM", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_11_03_P&P-POCT_COMM", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_23_RegP-L&D_Q1_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "ZITJrMnPrVI", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_23_RegP-L&D_Q1_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_23_RegP-L&D_Q1_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB6/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "N7sFJ14bmbR", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB6", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_Q1_CB6", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_24_RegE-L&D_Q3_CB2/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "p0Rum9L8nA6", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_24_RegE-L&D_Q3_CB2", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_24_RegE-L&D_Q3_CB2", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_22_ARV-L&D_COMM/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "pTckkFiM2Qf", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "LONG_TEXT"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_22_ARV-L&D_COMM", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_22_ARV-L&D_COMM", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_24_RegE-L&D_Q2_CB3/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "mcLxZsaQqbV", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_24_RegE-L&D_Q2_CB3", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_24_RegE-L&D_Q2_CB3", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_COMM/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "Mev5gfcAH2T", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "LONG_TEXT"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_COMM", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_02_ApptSpaceMMDrg-TAS&DIFFCARE_COMM", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_23_RegP-L&D_Q2_CB3/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "UXbKA1mKnez", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_23_RegP-L&D_Q2_CB3", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_23_RegP-L&D_Q2_CB3", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_24_RegE-L&D_Q4_RESP/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "goWXGrxjpXx", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_24_RegE-L&D_Q4_RESP", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_24_RegE-L&D_Q4_RESP", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_01_TaS-TAS&DIFFCARE_Q3_PERC/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "VTqDGJrNIht", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "INTEGER_ZERO_OR_POSITIVE"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_01_TaS-TAS&DIFFCARE_Q3_PERC", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_01_TaS-TAS&DIFFCARE_Q3_PERC", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_11_03_P&P-POCT_Q2_CB3/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "rYbqzW7Go0l", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_11_03_P&P-POCT_Q2_CB3", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_11_03_P&P-POCT_Q2_CB3", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_12_01_TaS-TAS&DIFFCARE_Q1_CB1/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "rcxLjPFo2Kw", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "BOOLEAN"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_12_01_TaS-TAS&DIFFCARE_Q1_CB1", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_12_01_TaS-TAS&DIFFCARE_Q1_CB1", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/SIMS/concepts/SIMS.F_04_24_RegE-L&D_SCORE/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "WY29hDYawOk", 
+                "concept_class": "Assessment Type", 
+                "source": "SIMS", 
+                "extras": {
+                    "Value Type": "INTEGER_ZERO_OR_POSITIVE"
+                }, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "SIMS.F_04_24_RegE-L&D_SCORE", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "SIMS.F_04_24_RegE-L&D_SCORE", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }
+        }
+    }, 
+    "Mechanisms": {
+        "dictionary_item_added": {
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/18674/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Funding Mechanism", 
+                "source": "Mechanisms", 
+                "extras": {
+                    "Prime Id": "Partner_19875", 
+                    "End Date": "2017-09-30T00:00:00.000", 
+                    "Organizational Unit": "Vietnam", 
+                    "Agency": "USAID", 
+                    "Partner": "CENTER FOR COMMUNITY HEALTH RESEARCH AND DEVELOPMENT", 
+                    "Start Date": "2016-10-01T00:00:00.000"
+                }, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "18674 - USAID Enhanced Community HIV Link-Northern", 
+                        "name_type": "Fully Specified"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "oK1E35JWhMD", 
+                "id": "18674", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/18677/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Funding Mechanism", 
+                "source": "Mechanisms", 
+                "extras": {
+                    "Prime Id": "Partner_15384", 
+                    "End Date": "2018-09-30T00:00:00.000", 
+                    "Organizational Unit": "Nigeria", 
+                    "Agency": "HHS/CDC", 
+                    "Partner": "Center for Integrated Health Programs", 
+                    "Start Date": "2017-10-01T00:00:00.000"
+                }, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "18677 - Partnering Effectively to end AIDS through Results and Learning (PEARL)_2097", 
+                        "name_type": "Fully Specified"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "FXEEva7qjQB", 
+                "id": "18677", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/18676/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Funding Mechanism", 
+                "source": "Mechanisms", 
+                "extras": {
+                    "Prime Id": "Partner_15381", 
+                    "End Date": "2018-09-30T00:00:00.000", 
+                    "Organizational Unit": "Nigeria", 
+                    "Agency": "HHS/CDC", 
+                    "Partner": "Catholic Caritas Foundation of Nigeria (CCFN)", 
+                    "Start Date": "2017-10-01T00:00:00.000"
+                }, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "18676 - Global Action towards HIV Epidemic Control in Subnational units in Nigeria (4GATES PROJECT)_2100", 
+                        "name_type": "Fully Specified"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "vF1tUCoYtkS", 
+                "id": "18676", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/18480/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Funding Mechanism", 
+                "source": "Mechanisms", 
+                "extras": {
+                    "Prime Id": "Partner_271", 
+                    "End Date": "2018-09-30T00:00:00.000", 
+                    "Organizational Unit": "South Africa", 
+                    "Agency": "HHS/CDC", 
+                    "Partner": "Foundation for Professional Development", 
+                    "Start Date": "2016-10-01T00:00:00.000"
+                }, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "18480 - Foundation for Professional Development Comprehensive (CDC GH001932)", 
+                        "name_type": "Fully Specified"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "jSu8AD6i3qh", 
+                "id": "18480", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/14631/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Funding Mechanism", 
+                "source": "Mechanisms", 
+                "extras": {
+                    "Prime Id": "Partner_226", 
+                    "End Date": "2018-09-30T00:00:00.000", 
+                    "Organizational Unit": "South Africa", 
+                    "Agency": "USAID", 
+                    "Partner": "Pact, Inc.", 
+                    "Start Date": "2013-09-01T00:00:00.000"
+                }, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "14631 - Government Capacity Building and Support Mechanism", 
+                        "name_type": "Fully Specified"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "WWQMdu5tWua", 
+                "id": "14631", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/18203/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Funding Mechanism", 
+                "source": "Mechanisms", 
+                "extras": {
+                    "Prime Id": "Partner_204", 
+                    "End Date": "2018-09-30T00:00:00.000", 
+                    "Organizational Unit": "Kenya", 
+                    "Agency": "HHS/CDC", 
+                    "Partner": "Elizabeth Glaser Pediatric AIDS Foundation", 
+                    "Start Date": "2016-10-01T00:00:00.000"
+                }, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "18203 - EGPAF Timiza", 
+                        "name_type": "Fully Specified"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "tLjPXQ3zYIB", 
+                "id": "18203", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/18675/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Funding Mechanism", 
+                "source": "Mechanisms", 
+                "extras": {
+                    "Prime Id": "Partner_4505", 
+                    "End Date": "2018-09-30T00:00:00.000", 
+                    "Organizational Unit": "Nigeria", 
+                    "Agency": "HHS/CDC", 
+                    "Partner": "Institute of Human Virology, Nigeria", 
+                    "Start Date": "2017-10-01T00:00:00.000"
+                }, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "18675 - ACTION to Control HIV Epidemic through Evidence (ACHIEVE)_2099", 
+                        "name_type": "Fully Specified"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "ARBAaiIB2ay", 
+                "id": "18675", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/18557/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Funding Mechanism", 
+                "source": "Mechanisms", 
+                "extras": {
+                    "Prime Id": "Partner_7715", 
+                    "End Date": "2018-09-30T00:00:00.000", 
+                    "Organizational Unit": "Uganda", 
+                    "Agency": "USAID", 
+                    "Partner": "University Research Council", 
+                    "Start Date": "2017-10-01T00:00:00.000"
+                }, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "18557 - Defeat TB", 
+                        "name_type": "Fully Specified"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "lpexkGYYuGf", 
+                "id": "18557", 
+                "descriptions": null
+            }
+        }, 
+        "values_changed": {
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/10118/']['extras']['Agency']": {
+                "new_value": "HHS/HRSA", 
+                "old_value": "HHS/CDC"
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/18169/']['extras']['Partner']": {
+                "new_value": "Population Services International", 
+                "old_value": "TBD"
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/18615/']['extras']['Partner']": {
+                "new_value": "AIDS Prevention Initiative in Nigeria, LTD", 
+                "old_value": "TBD"
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/18169/']['extras']['Prime Id']": {
+                "new_value": "Partner_232", 
+                "old_value": "Partner_2997"
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/18615/']['extras']['Prime Id']": {
+                "new_value": "Partner_9065", 
+                "old_value": "Partner_2997"
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/10107/']['extras']['Agency']": {
+                "new_value": "HHS/CDC", 
+                "old_value": "HHS/HRSA"
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/10141/']['extras']['Agency']": {
+                "new_value": "USAID", 
+                "old_value": "HHS/CDC"
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/18601/']['extras']['Prime Id']": {
+                "new_value": "Partner_507", 
+                "old_value": "Partner_2997"
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/18601/']['extras']['Partner']": {
+                "new_value": "Johns Hopkins University Center for Communication Programs", 
+                "old_value": "TBD"
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/17688/']['extras']['Prime Id']": {
+                "new_value": "Partner_459", 
+                "old_value": "Partner_2997"
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/17688/']['extras']['Partner']": {
+                "new_value": "Social and Scientific Systems", 
+                "old_value": "TBD"
+            }, 
+            "root['/orgs/PEPFAR/sources/Mechanisms/concepts/10123/']['extras']['Agency']": {
+                "new_value": "HHS/CDC", 
+                "old_value": "USAID"
+            }
+        }
+    }, 
+    "MER": {
+        "dictionary_item_removed": {
+            "root['/orgs/PEPFAR/sources/MER/concepts/uWs9Xn8SqrC/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "locale_preferred": true, 
+                        "external_id": null, 
+                        "name_type": "Fully Specified", 
+                        "name": "Management, Salary"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "uWs9Xn8SqrC", 
+                "id": "uWs9Xn8SqrC", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/nbmyLmyUaJD/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "locale_preferred": true, 
+                        "external_id": null, 
+                        "name_type": "Fully Specified", 
+                        "name": "Faculty / Tutors, Non-Monetary"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "nbmyLmyUaJD", 
+                "id": "nbmyLmyUaJD", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/bpamcNgZfL7/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "locale_preferred": true, 
+                        "external_id": null, 
+                        "name_type": "Fully Specified", 
+                        "name": "Other Cadre, Stipend"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "bpamcNgZfL7", 
+                "id": "bpamcNgZfL7", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/kOpluTtRjuN/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "locale_preferred": true, 
+                        "external_id": null, 
+                        "name_type": "Fully Specified", 
+                        "name": "Epidemiologist / Surveillance, Non-Monetary"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "kOpluTtRjuN", 
+                "id": "kOpluTtRjuN", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/kgNn6lyjUyj/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "locale_preferred": true, 
+                        "external_id": null, 
+                        "name_type": "Fully Specified", 
+                        "name": "Epidemiologist / Surveillance, Stipend"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "kgNn6lyjUyj", 
+                "id": "kgNn6lyjUyj", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/LMTwEzAmdmJ/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "locale_preferred": true, 
+                        "external_id": null, 
+                        "name_type": "Fully Specified", 
+                        "name": "Other Cadre, Non-Monetary"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "LMTwEzAmdmJ", 
+                "id": "LMTwEzAmdmJ", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/bi7FFx5BbsM/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "locale_preferred": true, 
+                        "external_id": null, 
+                        "name_type": "Fully Specified", 
+                        "name": "Epidemiologist / Surveillance, Salary"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "bi7FFx5BbsM", 
+                "id": "bi7FFx5BbsM", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/uipdJ5jqkbJ/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "locale_preferred": true, 
+                        "external_id": null, 
+                        "name_type": "Fully Specified", 
+                        "name": "Clinical, Salary"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "uipdJ5jqkbJ", 
+                "id": "uipdJ5jqkbJ", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/IIykhVwfJ5e/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "locale_preferred": true, 
+                        "external_id": null, 
+                        "name_type": "Fully Specified", 
+                        "name": "Clinical, Non-Monetary"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "IIykhVwfJ5e", 
+                "id": "IIykhVwfJ5e", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/DILcENlpECk/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "locale_preferred": true, 
+                        "external_id": null, 
+                        "name_type": "Fully Specified", 
+                        "name": "Management, Non-Monetary"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "DILcENlpECk", 
+                "id": "DILcENlpECk", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/nlYZyMInc9u/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "locale_preferred": true, 
+                        "external_id": null, 
+                        "name_type": "Fully Specified", 
+                        "name": "Management, Stipend"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "nlYZyMInc9u", 
+                "id": "nlYZyMInc9u", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/O0OMvcSVRsb/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "locale_preferred": true, 
+                        "external_id": null, 
+                        "name_type": "Fully Specified", 
+                        "name": "Clinical, Stipend"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "O0OMvcSVRsb", 
+                "id": "O0OMvcSVRsb", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/eA6uto8ucbB/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "locale_preferred": true, 
+                        "external_id": null, 
+                        "name_type": "Fully Specified", 
+                        "name": "Faculty / Tutors, Stipend"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "eA6uto8ucbB", 
+                "id": "eA6uto8ucbB", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/eMr2arULJEl/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "locale_preferred": true, 
+                        "external_id": null, 
+                        "name_type": "Fully Specified", 
+                        "name": "Other Cadre, Salary"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "eMr2arULJEl", 
+                "id": "eMr2arULJEl", 
+                "descriptions": null
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/jo1iUYWHUnY/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "type": "Concept", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "locale_preferred": true, 
+                        "external_id": null, 
+                        "name_type": "Fully Specified", 
+                        "name": "Faculty / Tutors, Salary"
+                    }
+                ], 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "jo1iUYWHUnY", 
+                "id": "jo1iUYWHUnY", 
+                "descriptions": null
+            }
+        }, 
+        "dictionary_item_added": {
+            "root['/orgs/PEPFAR/sources/MER/concepts/TX_UNDETECT_N_DSD_TestIndication)/']": {
+                "retired": false, 
+                "datatype": "Numeric", 
+                "type": "Concept", 
+                "concept_class": "Indicator", 
+                "source": "MER", 
+                "extras": null, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "Q3JU1WkfIRP", 
+                "id": "TX_UNDETECT_N_DSD_TestIndication)", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "TX_UNDETECT (N, DSD, TestIndication): 12 Months Viral Load < 1000", 
+                        "name_type": "Fully Specified"
+                    }, 
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": false, 
+                        "name": "TX_UNDETECT (N, DSD, TestIndication)", 
+                        "name_type": "Short"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/LAB_PT _N_TA_NARRATIVE/']": {
+                "retired": false, 
+                "datatype": "Numeric", 
+                "type": "Concept", 
+                "concept_class": "Indicator", 
+                "source": "MER", 
+                "extras": null, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "DgBwGe4Lszc", 
+                "id": "LAB_PT _N_TA_NARRATIVE", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "LAB_PT (N, TA_NARRATIVE): Labs Accredited", 
+                        "name_type": "Fully Specified"
+                    }, 
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": false, 
+                        "name": "LAB_PT (N, TA NARRATIVE)", 
+                        "name_type": "Short"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/TX_UNDETECT_N_TA_TestIndication)/']": {
+                "retired": false, 
+                "datatype": "Numeric", 
+                "type": "Concept", 
+                "concept_class": "Indicator", 
+                "source": "MER", 
+                "extras": null, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "external_id": "oPaEHkOS1Nr", 
+                "id": "TX_UNDETECT_N_TA_TestIndication)", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "TX_UNDETECT (N, TA, TestIndication): 12 Months Viral Load < 1000", 
+                        "name_type": "Fully Specified"
+                    }, 
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": false, 
+                        "name": "TX_UNDETECT (N, TA, TestIndication)", 
+                        "name_type": "Short"
+                    }
+                ]
+            }, 
+            "root['/orgs/PEPFAR/sources/MER/concepts/g7yIOoyvhbF/']": {
+                "retired": false, 
+                "datatype": "None", 
+                "external_id": "g7yIOoyvhbF", 
+                "concept_class": "Disaggregate", 
+                "source": "MER", 
+                "extras": null, 
+                "descriptions": null, 
+                "owner": "PEPFAR", 
+                "owner_type": "Organization", 
+                "type": "Concept", 
+                "id": "g7yIOoyvhbF", 
+                "names": [
+                    {
+                        "locale": "en", 
+                        "external_id": null, 
+                        "locale_preferred": true, 
+                        "name": "MSM, Known at Entry Positive", 
+                        "name_type": "Fully Specified"
+                    }
+                ]
+            }
+        }
+    }
+}

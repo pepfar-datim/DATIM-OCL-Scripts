@@ -106,7 +106,15 @@ class DatimShow(DatimBase):
         sys.stdout.flush()
 
     def transform_to_json(self, content):
-        sys.stdout.write(json.dumps(content, indent=4))
+        # convert the rows to lists in the same column order as the headers
+        reduced_rows = []
+        for row in content['rows']:
+            reduced_row = []
+            for header in content['headers']:
+                reduced_row.append(row[header['name']])
+            reduced_rows.append(reduced_row)
+        content['rows'] = reduced_rows
+        sys.stdout.write(json.dumps(content, indent=4, sort_keys=True))
         sys.stdout.flush()
 
     def xml_dict_clean(self, intermediate_data):
@@ -162,10 +170,9 @@ class DatimShow(DatimBase):
 
     def get(self, repo_id='', export_format=''):
         """
-        Get some stuff
-        :param repo_id:
-        :param repo_type:
-        :param export_format:
+        Get the a repository in the specified format
+        :param repo_id: ID of the repo that matches an OCL_EXPORT_DEF key
+        :param export_format: One of the supported export formats. See DATIM_FORMAT constants
         :return:
         """
 

@@ -28,6 +28,9 @@ from datimconstants import DatimConstants
 class DatimSyncSims(DatimSync):
     """ Class to manage DATIM SIMS Synchronization """
 
+    # Name of this sync script (used to name files and in logging)
+    SYNC_NAME = 'SIMS'
+
     # Dataset ID settings
     OCL_DATASET_ENDPOINT = '/orgs/PEPFAR/collections/?q=SIMS&verbose=true&limit=200'
     REPO_ACTIVE_ATTR = 'datim_sync_sims'

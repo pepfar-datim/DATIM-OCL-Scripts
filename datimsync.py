@@ -86,6 +86,7 @@ class DatimSync(DatimBase):
         self.import_delay = 0
         self.diff_result = None
         self.sync_resource_types = None
+        self.write_diff_to_file = False
 
         # Instructs the sync script to combine reference imports to the same source and within the same
         # import batch to a single API request. This results in a significant increase in performance.
@@ -607,6 +608,11 @@ class DatimSync(DatimBase):
             local_ocl_diff = json.load(file_ocl_diff)
             local_dhis2_diff = json.load(file_dhis2_diff)
             self.diff_result = self.perform_diff(ocl_diff=local_ocl_diff, dhis2_diff=local_dhis2_diff)
+        if self.write_diff_to_file:
+            filename_diff_results = self.filename_diff_result(self.SYNC_NAME)
+            with open(self.attach_absolute_path(filename_diff_results), 'wb') as ofile:
+                ofile.write(json.dumps(self.diff_result))
+            self.vlog(1, 'Diff results successfully written to "%s"' % filename_diff_results)
 
         # STEP 8: Determine action based on diff result
         # NOTE: This step occurs regardless of sync mode -- processing terminates here if DIFF mode

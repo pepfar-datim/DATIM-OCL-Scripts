@@ -14,9 +14,19 @@ class DatimConstants:
         IMPORT_BATCH_TIERED_SUPPORT
     ]
 
+    # OpenHIM Endpoints
+    OPENHIM_ENDPOINT_MER = 'datim-mer'
+    OPENHIM_ENDPOINT_SIMS = 'datim-sims'
+    OPENHIM_ENDPOINT_MECHANISMS = 'datim-mechanisms'
+    OPENHIM_ENDPOINT_TIERED_SUPPORT = 'datim-tiered-support'
+
     # DHIS2 Presentation URLs
     DHIS2_PRESENTATION_URL_MER = 'https://www.datim.org/api/sqlViews/DotdxKrNZxG/data.{{format}}?var=dataSets:{{dataset}}'
     DHIS2_PRESENTATION_URL_DEFAULT = 'https://dev-de.datim.org/api/sqlViews/{{sqlview}}/data.{{format}}'
+
+    # E2E Testing
+    MER_PRESENTATION_SORT_COLUMN = 4
+    SIMS_PRESENTATION_SORT_COLUMN = 2
 
     # SIMS DHIS2 Queries
     SIMS_DHIS2_QUERIES = {

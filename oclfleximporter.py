@@ -80,6 +80,7 @@ class OclImportResults:
     def __init__(self, total_lines=0):
         self._results = {}
         self.count = 0
+        self.num_skipped = 0
         self.total_lines = total_lines
 
     def add(self, obj_url='', action_type='', obj_type='', obj_repo_url='', http_method='', obj_owner_url='',
@@ -139,6 +140,7 @@ class OclImportResults:
         if self.SKIP_KEY not in self._results[self.SKIP_KEY][obj_type]:
             self._results[self.SKIP_KEY][obj_type][self.SKIP_KEY] = []
         self._results[self.SKIP_KEY][obj_type][self.SKIP_KEY].append(text)
+        self.num_skipped += 1
         self.count += 1
 
     def has(self, root_key='', limit_to_success_codes=False):
@@ -217,7 +219,8 @@ class OclImportResults:
         if root_key:
             output = '%s %s for key "%s"' % (process_str, output, root_key)
         else:
-            output = '%s %s of %s total -- %s' % (process_str, total_count, self.total_lines, output)
+            output = '%s %s and skipped %s of %s total -- %s' % (
+                process_str, total_count, self.num_skipped, self.total_lines, output)
 
         return output
 

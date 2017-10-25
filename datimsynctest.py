@@ -1,20 +1,26 @@
 import sys
 import requests
+import warnings
+import difflib
+from deepdiff import DeepDiff
+from operator import itemgetter
 from datimconstants import DatimConstants
 from datimbase import DatimBase
 from datimshow import DatimShow
-from deepdiff import DeepDiff
 from pprint import pprint
 
-
 class DatimSyncTest(DatimBase):
-    def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd=''):
+    def __init__(self, oclenv='', oclapitoken='', formats=None, dhis2env='', dhis2uid='', dhis2pwd=''):
         DatimBase.__init__(self)
         self.oclenv = oclenv
         self.oclapitoken = oclapitoken
         self.dhis2env = dhis2env
         self.dhis2uid = dhis2uid
         self.dhis2pwd = dhis2pwd
+        if formats:
+            self.formats = formats
+        else:
+            self.formats = DatimShow.PRESENTATION_FORMATS
         self.oclapiheaders = {
             'Authorization': 'Token ' + self.oclapitoken,
             'Content-Type': 'application/json'
@@ -38,19 +44,18 @@ class DatimSyncTest(DatimBase):
             sys.exit(1)
 
     def test_sims(self):
-        self.test_default(DatimConstants.SIMS_OCL_EXPORT_DEFS, 'datim-sims')
+        self.test_default(DatimConstants.SIMS_OCL_EXPORT_DEFS, DatimConstants.OPENHIM_ENDPOINT_SIMS)
 
     def test_mechanisms(self):
-        self.test_default(DatimConstants.MECHANISMS_OCL_EXPORT_DEFS, 'datim-mechanisms')
+        self.test_default(DatimConstants.MECHANISMS_OCL_EXPORT_DEFS, DatimConstants.OPENHIM_ENDPOINT_MECHANISMS)
 
     def test_tiered_support(self):
-        self.test_default(DatimConstants.TIERED_SUPPORT_OCL_EXPORT_DEFS, 'datim-tiered-support')
+        self.test_default(DatimConstants.TIERED_SUPPORT_OCL_EXPORT_DEFS, DatimConstants.OPENHIM_ENDPOINT_TIERED_SUPPORT)
 
     def test_default(self, export_defs, openhim_endpoint):
         for export_def_key in export_defs:
             # Iterate through the formats
-            # for format in DatimShow.PRESENTATION_FORMATS:
-            for format in [DatimShow.DATIM_FORMAT_JSON]:
+            for format in self.formats:
                 if 'dhis2_sqlview_id' not in export_defs[export_def_key]:
                     continue
 
@@ -72,14 +77,13 @@ class DatimSyncTest(DatimBase):
             url_ocl_repo = self.oclenv + DatimConstants.MER_OCL_EXPORT_DEFS[export_def_key]['endpoint']
             r = requests.get(url_ocl_repo, headers=self.oclapiheaders)
             repo = r.json()
-            print('%s: %s' % (DatimConstants.MER_OCL_EXPORT_DEFS[export_def_key]['endpoint'], repo['external_id']))
+            print('\n**** %s (dataSet.id=%s) ****' % (DatimConstants.MER_OCL_EXPORT_DEFS[export_def_key]['endpoint'], repo['external_id']))
             if not repo['external_id']:
-                print '\tSkipping because no external ID...'
+                print('Skipping because no external ID...')
                 continue
 
             # Iterate through the formats
-            # for format in DatimShow.PRESENTATION_FORMATS:
-            for format in [DatimShow.DATIM_FORMAT_JSON]:
+            for format in self.formats:
 
                 # Build the dhis2 presentation url
                 dhis2_presentation_url = self.replace_attr(
@@ -88,29 +92,68 @@ class DatimSyncTest(DatimBase):
 
                 # Build the OCL presentation url
                 openhimenv = 'https://ocl-mediator-trial.ohie.org:5000/'
-                ocl_presentation_url = '%sdatim-mer?format=%s&collection=%s' % (openhimenv, format, export_def_key)
+                ocl_presentation_url = '%s%s?format=%s&collection=%s' % (
+                    openhimenv, DatimConstants.OPENHIM_ENDPOINT_MER, format, export_def_key)
 
                 self.test_one(format, dhis2_presentation_url, ocl_presentation_url)
 
     def test_one(self, format, dhis2_presentation_url, ocl_presentation_url):
-        print ('\tFormat = %s' % format)
-        print('\t\tDHIS2: %s' % dhis2_presentation_url)
-        print('\t\tOCL:   %s' % ocl_presentation_url)
+        print ('Format = %s' % format)
+        print('DHIS2: %s' % dhis2_presentation_url)
+        print('OCL:   %s' % ocl_presentation_url)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            request_dhis2 = requests.get(dhis2_presentation_url)
+            request_ocl = requests.get(ocl_presentation_url, verify=False)
+        diff = None
+        if format == DatimShow.DATIM_FORMAT_JSON:
+            diff = self.test_json(request_dhis2, request_ocl)
+        elif format == DatimShow.DATIM_FORMAT_HTML:
+            diff = self.test_html(request_dhis2, request_ocl)
+        elif format == DatimShow.DATIM_FORMAT_XML:
+            diff = self.test_xml(request_dhis2, request_ocl)
+        elif format == DatimShow.DATIM_FORMAT_CSV:
+            diff = self.test_csv(request_dhis2, request_ocl)
+        if diff:
+            print('Diff Results:')
+            pprint(diff)
+        else:
+            print('No diff!')
+        sys.stdout.flush()
 
-        # Get the DHIS2 json
-        r = requests.get(dhis2_presentation_url)
-        dhis2_json = r.json()
+    def test_json(self, request_dhis2, request_ocl):
+        dhis2_json = request_dhis2.json()
+        ocl_json = request_ocl.json()
+        dhis2_json['rows_dict'] = {}
+        ocl_json['rows_dict'] = {}
+        for row in dhis2_json['rows']:
+            dhis2_json['rows_dict']['%s-%s' % (row[4], row[7])] = row[1:]
+        for row in ocl_json['rows']:
+            ocl_json['rows_dict']['%s-%s' % (row[4], row[7])] = row[1:]
+        del(dhis2_json['rows'])
+        del(ocl_json['rows'])
+        print('Rows: DHIS2(%s), OCL(%s)' % (len(dhis2_json['rows_dict']), len(ocl_json['rows_dict'])))
 
-        # Get the OCL json
-        r = requests.get(ocl_presentation_url, verify=False)
-        ocl_json = r.json()
+        # Do the diff
+        diff = DeepDiff(dhis2_json, ocl_json, ignore_order=False, verbose_level=2, exclude_paths={"root['title']", "root['subtitle']"})
+        return diff
 
-        diff = DeepDiff(dhis2_json, ocl_json, ignore_order=True, verbose_level=2)
-        pprint(diff)
+    def test_html(self, request_dhis2, request_ocl):
+        d = difflib.Differ()
+        return d.compare(request_dhis2.text.splitlines(1), request_ocl.text.splitlines(1))
+
+    def test_xml(self, request_dhis2, request_ocl):
+        d = difflib.Differ()
+        return d.compare(request_dhis2.text.splitlines(1), request_ocl.text.splitlines(1))
+
+    def test_csv(self, request_dhis2, request_ocl):
+        d = difflib.Differ()
+        return d.compare(request_dhis2.text.splitlines(1), request_ocl.text.splitlines(1))
+
 
 # OCL Settings - JetStream Staging user=datim-admin
 oclenv = 'https://api.staging.openconceptlab.org'
 oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
 
-datim_test = DatimSyncTest(oclenv=oclenv, oclapitoken=oclapitoken)
-datim_test.test_all()
+datim_test = DatimSyncTest(oclenv=oclenv, oclapitoken=oclapitoken, formats=[DatimShow.DATIM_FORMAT_JSON])
+datim_test.test_mer()

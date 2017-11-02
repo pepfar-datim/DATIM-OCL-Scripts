@@ -86,7 +86,7 @@ class DatimSync(DatimBase):
         self.import_delay = 0
         self.diff_result = None
         self.sync_resource_types = None
-        self.write_diff_to_file = False
+        self.write_diff_to_file = True
 
         # Instructs the sync script to combine reference imports to the same source and within the same
         # import batch to a single API request. This results in a significant increase in performance.

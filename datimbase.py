@@ -101,7 +101,7 @@ class DatimBase:
         return 'dhis2-' + dhis2_query_id + '-export-converted.json'
 
     def filename_diff_result(self, import_batch_name):
-        return import_batch_name + '-diff-results.json'
+        return '%s-diff-results-%s.json' % (import_batch_name, datetime.now().strftime("%Y%m%d-%H%M%S"))
 
     def repo_type_to_stem(self, repo_type, default_repo_stem=None):
         if repo_type == self.RESOURCE_TYPE_SOURCE:

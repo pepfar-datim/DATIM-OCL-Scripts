@@ -255,7 +255,7 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     if "IMPORT_LIMIT" in os.environ:
       import_limit = os.environ['IMPORT_LIMIT']
     if "IMPORT_DELAY" in os.environ:
-      import_delay = os.environ['IMPORT_DELAY']
+      import_delay = float(os.environ['IMPORT_DELAY'])
     if "COMPARE_PREVIOUS_EXPORT" in os.environ:
       compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
     if "SYNC_MODE" in os.environ:

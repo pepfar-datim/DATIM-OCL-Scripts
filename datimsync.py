@@ -564,10 +564,10 @@ class DatimSync(DatimBase):
             cnt += 1
             self.vlog(1, '** [OCL Export %s of %s] %s:' % (cnt, num_total, ocl_export_def_key))
             export_def = self.OCL_EXPORT_DEFS[ocl_export_def_key]
-            tarfilename = self.endpoint2filename_ocl_export_tar(export_def['endpoint'])
+            zipfilename = self.endpoint2filename_ocl_export_tar(export_def['endpoint'])
             jsonfilename = self.endpoint2filename_ocl_export_json(export_def['endpoint'])
             if not self.run_ocl_offline:
-                self.get_ocl_export(endpoint=export_def['endpoint'], version='latest', tarfilename=tarfilename,
+                self.get_ocl_export(endpoint=export_def['endpoint'], version='latest', zipfilename=zipfilename,
                                     jsonfilename=jsonfilename)
             else:
                 self.vlog(1, 'OCL-OFFLINE: Using local file "%s"...' % jsonfilename)

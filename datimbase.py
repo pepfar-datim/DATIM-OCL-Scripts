@@ -9,6 +9,7 @@ import tarfile
 import time
 from datetime import datetime
 import json
+import zipfile
 
 
 class DatimBase:
@@ -80,7 +81,7 @@ class DatimBase:
         return filename
 
     def endpoint2filename_ocl_export_tar(self, endpoint):
-        return 'ocl-' + self._convert_endpoint_to_filename_fmt(endpoint) + '.tar'
+        return 'ocl-' + self._convert_endpoint_to_filename_fmt(endpoint) + '.zip'
 
     def endpoint2filename_ocl_export_json(self, endpoint):
         return 'ocl-' + self._convert_endpoint_to_filename_fmt(endpoint) + '-raw.json'
@@ -229,14 +230,14 @@ class DatimBase:
             self.vlog(1, '[OCL Export %s of %s] %s: Created new repository version "%s"' % (
                 cnt, len(self.OCL_EXPORT_DEFS), ocl_export_key, repo_version_endpoint))
 
-    def get_ocl_export(self, endpoint='', version='', tarfilename='', jsonfilename=''):
+    def get_ocl_export(self, endpoint='', version='', zipfilename='', jsonfilename=''):
         """
         Fetches an export of the specified repository version and saves to file.
         Use version="latest" to fetch the most recent released repo version.
         Note that the export must already exist before using this method.
         :param endpoint: endpoint must point to the repo endpoint only, e.g. '/orgs/myorg/sources/mysource/'
         :param version: repo version ID or "latest"
-        :param tarfilename: Filename to save the compressed OCL export to
+        :param zipfilename: Filename to save the compressed OCL export to
         :param jsonfilename: Filename to save the decompressed OCL-JSON export to
         :return: bool True upon success; False otherwise
         """
@@ -255,32 +256,32 @@ class DatimBase:
         # Get the export
         url_ocl_export = self.oclenv + endpoint + repo_version_id + '/export/'
         self.vlog(1, 'Export URL:', url_ocl_export)
-        r = requests.get(url_ocl_export, headers=self.oclapiheaders)
+        r = requests.get(url_ocl_export)
         r.raise_for_status()
         if r.status_code == 204:
             # Create the export and try one more time...
             self.log('WARNING: Export does not exist for "%s". Creating export...' % url_ocl_export)
-            new_export_request = requests.post(url_ocl_export, headers=self.oclapiheaders)
+            new_export_request = requests.post(url_ocl_export)
             if new_export_request.status_code == 202:
                 # Wait for export to be processed then try to fetch it
                 self.log('INFO: Waiting 30 seconds while export is being generated...')
                 time.sleep(30)
-                r = requests.get(url_ocl_export, headers=self.oclapiheaders)
+                r = requests.get(url_ocl_export)
                 r.raise_for_status()
             else:
                 self.log('ERROR: Unable to generate export for "%s"' % url_ocl_export)
                 sys.exit(1)
 
         # Write tar'd export to file
-        with open(self.attach_absolute_path(tarfilename), 'wb') as handle:
+        with open(self.attach_absolute_path(zipfilename), 'wb') as handle:
             for block in r.iter_content(1024):
                 handle.write(block)
-        self.vlog(1, '%s bytes saved to "%s"' % (r.headers['Content-Length'], tarfilename))
+        self.vlog(1, '%s bytes saved to "%s"' % (r.headers['Content-Length'], zipfilename))
 
         # Decompress the tar and rename
-        tar = tarfile.open(self.attach_absolute_path(tarfilename))
-        tar.extractall(self.__location__)
-        tar.close()
+        zip_ref = zipfile.ZipFile(self.attach_absolute_path(zipfilename), 'r')
+        zip_ref.extractall(self.__location__)
+        zip_ref.close()
         os.rename(self.attach_absolute_path('export.json'), self.attach_absolute_path(jsonfilename))
         self.vlog(1, 'Export decompressed to "%s"' % jsonfilename)
 

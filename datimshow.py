@@ -201,10 +201,10 @@ class DatimShow(DatimBase):
         # STEP 1 of 4: Fetch latest version of relevant OCL repository export
         self.vlog(1, '**** STEP 1 of 4: Fetch latest version of relevant OCL repository export')
         self.vlog(1, '%s:' % repo_endpoint)
-        tarfilename = self.endpoint2filename_ocl_export_tar(repo_endpoint)
+        zipfilename = self.endpoint2filename_ocl_export_tar(repo_endpoint)
         jsonfilename = self.endpoint2filename_ocl_export_json(repo_endpoint)
         if not self.run_ocl_offline:
-            self.get_ocl_export(endpoint=repo_endpoint, version='latest', tarfilename=tarfilename,
+            self.get_ocl_export(endpoint=repo_endpoint, version='latest', zipfilename=zipfilename,
                                 jsonfilename=jsonfilename)
         else:
             self.vlog(1, 'OCL-OFFLINE: Using local file "%s"...' % jsonfilename)

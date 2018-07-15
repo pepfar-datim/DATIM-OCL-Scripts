@@ -20,7 +20,7 @@ import sys
 from requests.auth import HTTPBasicAuth
 from shutil import copyfile
 from datimbase import DatimBase
-from oclfleximporter import OclFlexImporter
+from ocldev.oclfleximporter import OclFlexImporter
 from deepdiff import DeepDiff
 
 
@@ -120,7 +120,7 @@ class DatimSync(DatimBase):
             self.vlog(1, '** [OCL Export %s of %s] %s:' % (cnt, num_total, ocl_export_def_key))
             cleaning_method_name = export_def.get('cleaning_method', self.DEFAULT_OCL_EXPORT_CLEANING_METHOD)
             getattr(self, cleaning_method_name)(export_def, cleaning_attr=cleaning_attr)
-        with open(self.attach_absolute_path(self.OCL_CLEANED_EXPORT_FILENAME), 'wb') as output_file:
+        with open(self.attach_absolute_data_path(self.OCL_CLEANED_EXPORT_FILENAME), 'wb') as output_file:
             output_file.write(json.dumps(self.ocl_diff))
             self.vlog(1, 'Cleaned OCL exports successfully written to "%s"' % (
                 self.OCL_CLEANED_EXPORT_FILENAME))
@@ -152,7 +152,7 @@ class DatimSync(DatimBase):
         """
         import_batch_key = ocl_export_def['import_batch']
         jsonfilename = self.endpoint2filename_ocl_export_json(ocl_export_def['endpoint'])
-        with open(self.attach_absolute_path(jsonfilename), 'rb') as input_file:
+        with open(self.attach_absolute_data_path(jsonfilename), 'rb') as input_file:
             ocl_repo_export_raw = json.load(input_file)
 
             if ocl_repo_export_raw['type'] in ['Source', 'Source Version']:
@@ -240,10 +240,10 @@ class DatimSync(DatimBase):
             # Delete old file if it exists
             dhis2filename_export_new = self.dhis2filename_export_new(self.DHIS2_QUERIES[dhis2_query_key]['id'])
             dhis2filename_export_old = self.dhis2filename_export_old(self.DHIS2_QUERIES[dhis2_query_key]['id'])
-            if os.path.isfile(self.attach_absolute_path(dhis2filename_export_old)):
-                os.remove(self.attach_absolute_path(dhis2filename_export_old))
-            copyfile(self.attach_absolute_path(dhis2filename_export_new),
-                     self.attach_absolute_path(dhis2filename_export_old))
+            if os.path.isfile(self.attach_absolute_data_path(dhis2filename_export_old)):
+                os.remove(self.attach_absolute_data_path(dhis2filename_export_old))
+            copyfile(self.attach_absolute_data_path(dhis2filename_export_new),
+                     self.attach_absolute_data_path(dhis2filename_export_old))
             self.vlog(1, 'DHIS2 export successfully copied to "%s"' % dhis2filename_export_old)
 
     def transform_dhis2_exports(self, conversion_attr=None):
@@ -257,7 +257,7 @@ class DatimSync(DatimBase):
             cnt += 1
             self.vlog(1, '** [DHIS2 Export %s of %s] %s:' % (cnt, len(self.DHIS2_QUERIES), dhis2_query_key))
             getattr(self, dhis2_query_def['conversion_method'])(dhis2_query_def, conversion_attr=conversion_attr)
-        with open(self.attach_absolute_path(self.DHIS2_CONVERTED_EXPORT_FILENAME), 'wb') as output_file:
+        with open(self.attach_absolute_data_path(self.DHIS2_CONVERTED_EXPORT_FILENAME), 'wb') as output_file:
             output_file.write(json.dumps(self.dhis2_diff))
             self.vlog(1, 'Transformed DHIS2 exports successfully written to "%s"' % (
                 self.DHIS2_CONVERTED_EXPORT_FILENAME))
@@ -272,7 +272,7 @@ class DatimSync(DatimBase):
         self.vlog(1, 'Request URL:', url_dhis2_query)
         r = requests.get(url_dhis2_query, auth=HTTPBasicAuth(self.dhis2uid, self.dhis2pwd))
         r.raise_for_status()
-        with open(self.attach_absolute_path(outputfilename), 'wb') as handle:
+        with open(self.attach_absolute_data_path(outputfilename), 'wb') as handle:
             for block in r.iter_content(1024):
                 handle.write(block)
         return r.headers['Content-Length']
@@ -306,7 +306,7 @@ class DatimSync(DatimBase):
         :param diff: Diff results used to generate the import script
         :return:
         """
-        with open(self.attach_absolute_path(self.NEW_IMPORT_SCRIPT_FILENAME), 'wb') as output_file:
+        with open(self.attach_absolute_data_path(self.NEW_IMPORT_SCRIPT_FILENAME), 'wb') as output_file:
             for import_batch in self.IMPORT_BATCHES:
                 for resource_type in self.sync_resource_types:
                     if resource_type not in diff[import_batch]:
@@ -475,10 +475,10 @@ class DatimSync(DatimBase):
                     content_length, dhis2filename_export_new))
             else:
                 self.vlog(1, 'DHIS2-OFFLINE: Using local file: "%s"' % dhis2filename_export_new)
-                if os.path.isfile(self.attach_absolute_path(dhis2filename_export_new)):
+                if os.path.isfile(self.attach_absolute_data_path(dhis2filename_export_new)):
                     self.vlog(1, 'DHIS2-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
                         dhis2filename_export_new,
-                        os.path.getsize(self.attach_absolute_path(dhis2filename_export_new))))
+                        os.path.getsize(self.attach_absolute_data_path(dhis2filename_export_new))))
                 else:
                     self.log('ERROR: Could not find offline dhis2 file "%s". Exiting...' % dhis2filename_export_new)
                     sys.exit(1)
@@ -511,7 +511,7 @@ class DatimSync(DatimBase):
         if self.verbosity:
             self.log_settings()
 
-        # STEP 1: Load OCL Collections for Dataset IDs
+        # STEP 1 of 12: Load OCL Collections for Dataset IDs
         # NOTE: This step occurs regardless of sync mode
         self.vlog(1, '**** STEP 1 of 12: Load OCL Collections for Dataset IDs')
         if self.SYNC_LOAD_DATASETS:
@@ -519,12 +519,12 @@ class DatimSync(DatimBase):
         else:
             self.vlog(1, 'SKIPPING: SYNC_LOAD_DATASETS set to "False"')
 
-        # STEP 2: Load new exports from DATIM-DHIS2
+        # STEP 2 of 12: Load new exports from DATIM-DHIS2
         # NOTE: This step occurs regardless of sync mode
         self.vlog(1, '**** STEP 2 of 12: Load new exports from DATIM DHIS2')
         self.load_dhis2_exports()
 
-        # STEP 3: Quick comparison of current and previous DHIS2 exports
+        # STEP 3 of 12: Quick comparison of current and previous DHIS2 exports
         # Compares new DHIS2 export to most recent previous export from a successful sync that is available
         # NOTE: This step is skipped if in DIFF mode or compare2previousexport is set to False
         self.vlog(1, '**** STEP 3 of 12: Quick comparison of current and previous DHIS2 exports')
@@ -535,8 +535,8 @@ class DatimSync(DatimBase):
                 self.vlog(1, dhis2_query_key + ':')
                 dhis2filename_export_new = self.dhis2filename_export_new(dhis2_query_def['id'])
                 dhis2filename_export_old = self.dhis2filename_export_old(dhis2_query_def['id'])
-                if self.filecmp(self.attach_absolute_path(dhis2filename_export_old),
-                                self.attach_absolute_path(dhis2filename_export_new)):
+                if self.filecmp(self.attach_absolute_data_path(dhis2filename_export_old),
+                                self.attach_absolute_data_path(dhis2filename_export_new)):
                     self.vlog(1, '"%s" and "%s" are identical' % (
                         dhis2filename_export_old, dhis2filename_export_new))
                 else:
@@ -555,7 +555,7 @@ class DatimSync(DatimBase):
         else:
             self.vlog(1, "SKIPPING: compare2previousexport == false")
 
-        # STEP 4: Fetch latest versions of relevant OCL exports
+        # STEP 4 of 12: Fetch latest versions of relevant OCL exports
         # NOTE: This step occurs regardless of sync mode
         self.vlog(1, '**** STEP 4 of 12: Fetch latest versions of relevant OCL exports')
         cnt = 0
@@ -564,21 +564,21 @@ class DatimSync(DatimBase):
             cnt += 1
             self.vlog(1, '** [OCL Export %s of %s] %s:' % (cnt, num_total, ocl_export_def_key))
             export_def = self.OCL_EXPORT_DEFS[ocl_export_def_key]
-            tarfilename = self.endpoint2filename_ocl_export_tar(export_def['endpoint'])
+            zipfilename = self.endpoint2filename_ocl_export_zip(export_def['endpoint'])
             jsonfilename = self.endpoint2filename_ocl_export_json(export_def['endpoint'])
             if not self.run_ocl_offline:
-                self.get_ocl_export(endpoint=export_def['endpoint'], version='latest', tarfilename=tarfilename,
+                self.get_ocl_export(endpoint=export_def['endpoint'], version='latest', zipfilename=zipfilename,
                                     jsonfilename=jsonfilename)
             else:
                 self.vlog(1, 'OCL-OFFLINE: Using local file "%s"...' % jsonfilename)
-                if os.path.isfile(self.attach_absolute_path(jsonfilename)):
+                if os.path.isfile(self.attach_absolute_data_path(jsonfilename)):
                     self.vlog(1, 'OCL-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
-                        jsonfilename, os.path.getsize(self.attach_absolute_path(jsonfilename))))
+                        jsonfilename, os.path.getsize(self.attach_absolute_data_path(jsonfilename))))
                 else:
                     self.log('ERROR: Could not find offline OCL file "%s". Exiting...' % jsonfilename)
                     sys.exit(1)
 
-        # STEP 5: Transform new DHIS2 export to diff format
+        # STEP 5 of 12: Transform new DHIS2 export to diff format
         # NOTE: This step occurs regardless of sync mode
         self.vlog(1, '**** STEP 5 of 12: Transform DHIS2 exports to OCL-formatted JSON')
         self.dhis2_diff = {}
@@ -588,7 +588,7 @@ class DatimSync(DatimBase):
                 self.dhis2_diff[import_batch_key][resource_type] = {}
         self.transform_dhis2_exports(conversion_attr={'ocl_dataset_repos': self.ocl_dataset_repos})
 
-        # STEP 6: Prepare OCL exports for diff
+        # STEP 6 of 12: Prepare OCL exports for diff
         # NOTE: This step occurs regardless of sync mode
         self.vlog(1, '**** STEP 6 of 12: Prepare OCL exports for diff')
         self.ocl_diff = {}
@@ -598,23 +598,23 @@ class DatimSync(DatimBase):
                 self.ocl_diff[import_batch_key][resource_type] = {}
         self.prepare_ocl_exports(cleaning_attr={})
 
-        # STEP 7: Perform deep diff
+        # STEP 7 of 12: Perform deep diff
         # One deep diff is performed per resource type in each import batch
         # OCL/DHIS2 exports reloaded from file to eliminate unicode type_change diff -- but that may be short sighted!
         # NOTE: This step occurs regardless of sync mode
         self.vlog(1, '**** STEP 7 of 12: Perform deep diff')
-        with open(self.attach_absolute_path(self.OCL_CLEANED_EXPORT_FILENAME), 'rb') as file_ocl_diff,\
-                open(self.attach_absolute_path(self.DHIS2_CONVERTED_EXPORT_FILENAME), 'rb') as file_dhis2_diff:
+        with open(self.attach_absolute_data_path(self.OCL_CLEANED_EXPORT_FILENAME), 'rb') as file_ocl_diff,\
+                open(self.attach_absolute_data_path(self.DHIS2_CONVERTED_EXPORT_FILENAME), 'rb') as file_dhis2_diff:
             local_ocl_diff = json.load(file_ocl_diff)
             local_dhis2_diff = json.load(file_dhis2_diff)
             self.diff_result = self.perform_diff(ocl_diff=local_ocl_diff, dhis2_diff=local_dhis2_diff)
         if self.write_diff_to_file:
             filename_diff_results = self.filename_diff_result(self.SYNC_NAME)
-            with open(self.attach_absolute_path(filename_diff_results), 'wb') as ofile:
+            with open(self.attach_absolute_data_path(filename_diff_results), 'wb') as ofile:
                 ofile.write(json.dumps(self.diff_result))
             self.vlog(1, 'Diff results successfully written to "%s"' % filename_diff_results)
 
-        # STEP 8: Determine action based on diff result
+        # STEP 8 of 12: Determine action based on diff result
         # NOTE: This step occurs regardless of sync mode -- processing terminates here if DIFF mode
         self.vlog(1, '**** STEP 8 of 12: Determine action based on diff result')
         if self.diff_result:
@@ -622,7 +622,7 @@ class DatimSync(DatimBase):
         else:
             self.vlog(1, 'No diff between DHIS2 and OCL...')
 
-        # STEP 9: Generate one OCL import script per import batch by processing the diff results
+        # STEP 9 of 12: Generate one OCL import script per import batch by processing the diff results
         # Note that OCL import scripts are JSON-lines files
         # NOTE: This step occurs unless in DIFF mode
         self.vlog(1, '**** STEP 9 of 12: Generate import scripts')
@@ -631,7 +631,7 @@ class DatimSync(DatimBase):
         else:
             self.vlog(1, 'SKIPPING: Diff check only')
 
-        # STEP 10: Perform the import in OCL
+        # STEP 10 of 12: Perform the import in OCL
         # NOTE: This step occurs regardless of sync mode
         self.vlog(1, '**** STEP 10 of 12: Perform the import in OCL')
         num_import_rows_processed = 0
@@ -641,7 +641,7 @@ class DatimSync(DatimBase):
             if sync_mode == DatimSync.SYNC_MODE_TEST_IMPORT:
                 test_mode = True
             ocl_importer = OclFlexImporter(
-                file_path=self.attach_absolute_path(self.NEW_IMPORT_SCRIPT_FILENAME),
+                file_path=self.attach_absolute_data_path(self.NEW_IMPORT_SCRIPT_FILENAME),
                 api_token=self.oclapitoken, api_url_root=self.oclenv, test_mode=test_mode,
                 do_update_if_exists=False, verbosity=self.verbosity, limit=self.import_limit,
                 import_delay=self.import_delay)
@@ -652,7 +652,7 @@ class DatimSync(DatimBase):
         elif sync_mode == DatimSync.SYNC_MODE_BUILD_IMPORT_SCRIPT:
             self.vlog(1, 'SKIPPING: Building import script only...')
 
-        # STEP 11: Save new DHIS2 export for the next sync attempt
+        # STEP 11 of 12: Save new DHIS2 export for the next sync attempt
         self.vlog(1, '**** STEP 11 of 12: Save the DHIS2 export')
         if sync_mode == DatimSync.SYNC_MODE_FULL_IMPORT:
             if num_import_rows_processed:
@@ -666,7 +666,7 @@ class DatimSync(DatimBase):
         elif sync_mode == DatimSync.SYNC_MODE_TEST_IMPORT:
             self.vlog(1, 'SKIPPING: Import test mode enabled...')
 
-        # STEP 12: Manage OCL repository versions
+        # STEP 12 of 12: Manage OCL repository versions
         self.vlog(1, '**** STEP 12 of 12: Manage OCL repository versions')
         if sync_mode == DatimSync.SYNC_MODE_FULL_IMPORT:
             if num_import_rows_processed:

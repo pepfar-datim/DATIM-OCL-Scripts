@@ -1,3 +1,6 @@
+"""
+Shared class for custom presentations (i.e. shows) of DATIM metadata
+"""
 import csv
 import sys
 import json
@@ -6,9 +9,13 @@ from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import SubElement
 from xml.etree.ElementTree import tostring
 from datimbase import DatimBase
+import settings
 
 
 class DatimShow(DatimBase):
+    """
+    Shared class for custom presentations (i.e. shows) of DATIM metadata
+    """
 
     # Presentation Formats
     DATIM_FORMAT_HTML = 'html'
@@ -43,7 +50,7 @@ class DatimShow(DatimBase):
         intermediate['width'] = len(intermediate['headers'])
 
         # Read in the content
-        with open(self.attach_absolute_path(input_filename), 'rb') as ifile:
+        with open(self.attach_absolute_data_path(input_filename), 'rb') as ifile:
             ocl_export_raw = json.load(ifile)
             for c in ocl_export_raw['concepts']:
                 direct_mappings = [item for item in ocl_export_raw['mappings'] if str(
@@ -164,7 +171,7 @@ class DatimShow(DatimBase):
     @staticmethod
     def get_format_from_string(format_string, default_fmt='html'):
         for fmt in DatimShow.PRESENTATION_FORMATS:
-            if format_string.lower() == fmt:
+            if format_string.lower() == fmt.lower():
                 return fmt
         return default_fmt
 
@@ -201,16 +208,16 @@ class DatimShow(DatimBase):
         # STEP 1 of 4: Fetch latest version of relevant OCL repository export
         self.vlog(1, '**** STEP 1 of 4: Fetch latest version of relevant OCL repository export')
         self.vlog(1, '%s:' % repo_endpoint)
-        tarfilename = self.endpoint2filename_ocl_export_tar(repo_endpoint)
+        zipfilename = self.endpoint2filename_ocl_export_zip(repo_endpoint)
         jsonfilename = self.endpoint2filename_ocl_export_json(repo_endpoint)
         if not self.run_ocl_offline:
-            self.get_ocl_export(endpoint=repo_endpoint, version='latest', tarfilename=tarfilename,
+            self.get_ocl_export(endpoint=repo_endpoint, version='latest', zipfilename=zipfilename,
                                 jsonfilename=jsonfilename)
         else:
             self.vlog(1, 'OCL-OFFLINE: Using local file "%s"...' % jsonfilename)
-            if os.path.isfile(self.attach_absolute_path(jsonfilename)):
+            if os.path.isfile(self.attach_absolute_data_path(jsonfilename)):
                 self.vlog(1, 'OCL-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
-                    jsonfilename, os.path.getsize(self.attach_absolute_path(jsonfilename))))
+                    jsonfilename, os.path.getsize(self.attach_absolute_data_path(jsonfilename))))
             else:
                 self.log('ERROR: Could not find offline OCL file "%s". Exiting...' % jsonfilename)
                 sys.exit(1)
@@ -226,7 +233,7 @@ class DatimShow(DatimBase):
         self.vlog(1, '**** STEP 3 of 4: Cache the intermediate output')
         if self.cache_intermediate:
             intermediate_json_filename = self.endpoint2filename_ocl_export_intermediate_json(repo_endpoint)
-            with open(self.attach_absolute_path(intermediate_json_filename), 'wb') as ofile:
+            with open(self.attach_absolute_data_path(intermediate_json_filename), 'wb') as ofile:
                 ofile.write(json.dumps(intermediate))
                 self.vlog(1, 'Processed OCL export saved to "%s"' % intermediate_json_filename)
         else:

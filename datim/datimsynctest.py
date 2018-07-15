@@ -1,3 +1,7 @@
+"""
+Class to test the synchronization by comparing the resulting metadata presentation
+formats from DHIS2 and OCL.
+"""
 import sys
 import requests
 import warnings
@@ -122,6 +126,7 @@ class DatimSyncTest(DatimBase):
         sys.stdout.flush()
 
     def test_json(self, request_dhis2, request_ocl):
+        # Prepare the diff
         dhis2_json = request_dhis2.json()
         ocl_json = request_ocl.json()
         dhis2_json['rows_dict'] = {}
@@ -149,11 +154,3 @@ class DatimSyncTest(DatimBase):
     def test_csv(self, request_dhis2, request_ocl):
         d = difflib.Differ()
         return d.compare(request_dhis2.text.splitlines(1), request_ocl.text.splitlines(1))
-
-
-# OCL Settings - JetStream Staging user=datim-admin
-oclenv = 'https://api.staging.openconceptlab.org'
-oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
-
-datim_test = DatimSyncTest(oclenv=oclenv, oclapitoken=oclapitoken, formats=[DatimShow.DATIM_FORMAT_JSON])
-datim_test.test_mer()

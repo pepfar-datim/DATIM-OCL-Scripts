@@ -1,1 +1,0 @@
-select z.TimePeriod as Z_Period, z.IndicatorType as Z_Type, z.Name as Z_Name, z.SqlView, z.Dataset as dataset_uid, d.name as D_Name from zendesk z left join Datasets d on z.Dataset = d.uid;

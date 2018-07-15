@@ -5,10 +5,11 @@ import functools
 import operator
 import requests
 import sys
-import tarfile
+import zipfile
 import time
 from datetime import datetime
 import json
+import settings
 
 
 class DatimBase:
@@ -37,8 +38,14 @@ class DatimBase:
     REPO_STEM_SOURCES = 'sources'
     REPO_STEM_COLLECTIONS = 'collections'
 
-    __location__ = os.path.realpath(
-        os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    DATA_FOLDER_NAME = 'data'
+
+    # Set the root directory
+    if settings and settings.ROOT_DIR:
+        __location__ = settings.ROOT_DIR
+    else:
+        __location__ = os.path.realpath(
+            os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
     def __init__(self):
         self.verbosity = 1
@@ -63,7 +70,7 @@ class DatimBase:
         sys.stdout.flush()
 
     def log(self, *args):
-        """ Output log information """
+        """ Output log information ignoring verbosity level """
         sys.stdout.write('[' + str(datetime.now()) + '] ')
         for arg in args:
             sys.stdout.write(str(arg))
@@ -79,8 +86,8 @@ class DatimBase:
             filename = filename[:-1]
         return filename
 
-    def endpoint2filename_ocl_export_tar(self, endpoint):
-        return 'ocl-' + self._convert_endpoint_to_filename_fmt(endpoint) + '.tar'
+    def endpoint2filename_ocl_export_zip(self, endpoint):
+        return 'ocl-' + self._convert_endpoint_to_filename_fmt(endpoint) + '.zip'
 
     def endpoint2filename_ocl_export_json(self, endpoint):
         return 'ocl-' + self._convert_endpoint_to_filename_fmt(endpoint) + '-raw.json'
@@ -104,6 +111,7 @@ class DatimBase:
         return '%s-diff-results-%s.json' % (import_batch_name, datetime.now().strftime("%Y%m%d-%H%M%S"))
 
     def repo_type_to_stem(self, repo_type, default_repo_stem=None):
+        """ Get a repo stem (e.g. sources, collections) given a fully specified repo type (e.g. Source, Collection) """
         if repo_type == self.RESOURCE_TYPE_SOURCE:
             return self.REPO_STEM_SOURCES
         elif repo_type == self.RESOURCE_TYPE_COLLECTION:
@@ -112,6 +120,7 @@ class DatimBase:
             return default_repo_stem
 
     def owner_type_to_stem(self, owner_type, default_owner_stem=None):
+        """ Get an owner stem (e.g. orgs, users) given a fully specified owner type (e.g. Organization, User) """
         if owner_type == self.RESOURCE_TYPE_USER:
             return self.OWNER_STEM_USERS
         elif owner_type == self.RESOURCE_TYPE_ORGANIZATION:
@@ -122,6 +131,10 @@ class DatimBase:
     def attach_absolute_path(self, filename):
         """ Adds full absolute path to the filename """
         return os.path.join(self.__location__, filename)
+
+    def attach_absolute_data_path(self, filename):
+        """ Adds full absolute path to the filename """
+        return os.path.join(self.__location__, self.DATA_FOLDER_NAME, filename)
 
     def get_ocl_repositories(self, endpoint=None, key_field='id', require_external_id=True,
                              active_attr_name='__datim_sync'):
@@ -146,19 +159,21 @@ class DatimBase:
         return filtered_repos
 
     def load_datasets_from_ocl(self):
+        """ Fetch the OCL repositories corresponding to the DHIS2 datasets defined in each sync object """
+
         # Fetch the repositories from OCL
         if not self.run_ocl_offline:
             self.vlog(1, 'Request URL:', self.oclenv + self.OCL_DATASET_ENDPOINT)
             self.ocl_dataset_repos = self.get_ocl_repositories(endpoint=self.OCL_DATASET_ENDPOINT,
                                                                key_field='external_id',
                                                                active_attr_name=self.REPO_ACTIVE_ATTR)
-            with open(self.attach_absolute_path(self.DATASET_REPOSITORIES_FILENAME), 'wb') as output_file:
+            with open(self.attach_absolute_data_path(self.DATASET_REPOSITORIES_FILENAME), 'wb') as output_file:
                 output_file.write(json.dumps(self.ocl_dataset_repos))
             self.vlog(1, 'Repositories retrieved from OCL and stored in memory:', len(self.ocl_dataset_repos))
             self.vlog(1, 'Repositories successfully written to "%s"' % self.DATASET_REPOSITORIES_FILENAME)
         else:
             self.vlog(1, 'OCL-OFFLINE: Loading repositories from "%s"' % self.DATASET_REPOSITORIES_FILENAME)
-            with open(self.attach_absolute_path(self.DATASET_REPOSITORIES_FILENAME), 'rb') as handle:
+            with open(self.attach_absolute_data_path(self.DATASET_REPOSITORIES_FILENAME), 'rb') as handle:
                 self.ocl_dataset_repos = json.load(handle)
             self.vlog(1, 'OCL-OFFLINE: Repositories successfully loaded:', len(self.ocl_dataset_repos))
 
@@ -229,14 +244,15 @@ class DatimBase:
             self.vlog(1, '[OCL Export %s of %s] %s: Created new repository version "%s"' % (
                 cnt, len(self.OCL_EXPORT_DEFS), ocl_export_key, repo_version_endpoint))
 
-    def get_ocl_export(self, endpoint='', version='', tarfilename='', jsonfilename=''):
+    def get_ocl_export(self, endpoint='', version='', zipfilename='', jsonfilename=''):
         """
         Fetches an export of the specified repository version and saves to file.
         Use version="latest" to fetch the most recent released repo version.
-        Note that the export must already exist before using this method.
+        Note that if the export is not already cached, it will attempt to generate the export and
+        wait for 30 seconds before trying again. If the export still does not exist, this method will fail.
         :param endpoint: endpoint must point to the repo endpoint only, e.g. '/orgs/myorg/sources/mysource/'
         :param version: repo version ID or "latest"
-        :param tarfilename: Filename to save the compressed OCL export to
+        :param zipfilename: Filename to save the compressed OCL export to
         :param jsonfilename: Filename to save the decompressed OCL-JSON export to
         :return: bool True upon success; False otherwise
         """
@@ -271,17 +287,17 @@ class DatimBase:
                 self.log('ERROR: Unable to generate export for "%s"' % url_ocl_export)
                 sys.exit(1)
 
-        # Write tar'd export to file
-        with open(self.attach_absolute_path(tarfilename), 'wb') as handle:
+        # Write compressed export to file
+        with open(self.attach_absolute_data_path(zipfilename), 'wb') as handle:
             for block in r.iter_content(1024):
                 handle.write(block)
-        self.vlog(1, '%s bytes saved to "%s"' % (r.headers['Content-Length'], tarfilename))
+        self.vlog(1, '%s bytes saved to "%s"' % (r.headers['Content-Length'], zipfilename))
 
-        # Decompress the tar and rename
-        tar = tarfile.open(self.attach_absolute_path(tarfilename))
-        tar.extractall(self.__location__)
-        tar.close()
-        os.rename(self.attach_absolute_path('export.json'), self.attach_absolute_path(jsonfilename))
+        # Decompress the export file and rename
+        zipref = zipfile.ZipFile(self.attach_absolute_data_path(zipfilename))
+        zipref.extractall(os.path.join(self.__location__, self.DATA_FOLDER_NAME))
+        zipref.close()
+        os.rename(self.attach_absolute_data_path('export.json'), self.attach_absolute_data_path(jsonfilename))
         self.vlog(1, 'Export decompressed to "%s"' % jsonfilename)
 
         return True
@@ -295,6 +311,10 @@ class DatimBase:
         return start
 
     def replace_attr(self, str_input, attributes):
+        """
+        Replaces attributes in the string designated by double curly brackets with values passed
+        in the attributes dictionary
+        """
         if attributes:
             for attr_name in attributes:
                 str_input = str_input.replace('{{' + attr_name + '}}', attributes[attr_name])

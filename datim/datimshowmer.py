@@ -6,7 +6,6 @@ Supported Formats: html, xml, csv, json
 Supported Collections: Refer to DatimConstants.MER_OCL_EXPORT_DEFS (there are more than 60 options)
 """
 from __future__ import with_statement
-import sys
 from datimshow import DatimShow
 from datimconstants import DatimConstants
 
@@ -78,24 +77,3 @@ class DatimShowMer(DatimShow):
             return output_rows
         else:
             return output_concept
-
-
-# Default Script Settings
-verbosity = 0  # 0=none, 1=some, 2=all
-run_ocl_offline = False  # Set to true to use local copies of ocl exports
-export_format = DatimShow.DATIM_FORMAT_HTML
-repo_id = 'MER-R-Operating-Unit-Level-IM-FY17Q2'
-
-# OCL Settings - JetStream Staging user=datim-admin
-oclenv = 'https://api.staging.openconceptlab.org'
-oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
-
-# Set arguments from the command line
-if sys.argv and len(sys.argv) > 2:
-    export_format = DatimShow.get_format_from_string(sys.argv[1])
-    repo_id = sys.argv[2]
-
-# Create Show object and run
-datim_show = DatimShowMer(
-    oclenv=oclenv, oclapitoken=oclapitoken, run_ocl_offline=run_ocl_offline, verbosity=verbosity)
-datim_show.get(repo_id=repo_id, export_format=export_format)

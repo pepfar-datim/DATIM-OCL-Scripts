@@ -1,17 +1,54 @@
 import json
 import requests
-import oclfleximporter
+from ocldev.oclfleximporter import OclFlexImporter
 import time
+import settings
+from pprint import pprint
 
 
 # JetStream staging
-oclenv = 'https://api.staging.openconceptlab.org'
-oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
+oclenv = settings.ocl_api_url_staging
+oclapitoken = settings.api_token_staging_datim_admin
 endpoint = '/orgs/PEPFAR/collections/'
 oclapiheaders = {
     'Authorization': 'Token ' + oclapitoken,
     'Content-Type': 'application/json'
 }
+
+
+# Get all collections
+collections_endpoint = '/orgs/DATIM-MOH-LS/collections/?limit=0'
+r = requests.get(oclenv + collections_endpoint, headers=oclapiheaders)
+collections = r.json()
+
+# Loop through 
+version_id = 'FY17'
+for c in collections:
+    url = '%s%s%s/' % (oclenv, c['url'], version_id)
+    print '**** DELETE %s' % url
+    r = requests.delete(url, headers=oclapiheaders)
+    print 'STATUS CODE: %d, %s' % (r.status_code, r.text)
+    #c_version = r.json()
+    #pprint(c_version)
+
+# Create new version for each collection
+for c in collections:
+    create_repo_version(oclenv + c['url'], oclapiheaders=oclapiheaders, version_desc='FY17', version_id='FY17', released=True)
+
+
+url_ou_mappings = oclenv + '/orgs/PEPFAR/sources/Mechanisms/mappings/'
+r = requests.get(url_ou_mappings, headers=oclapiheaders)
+mappings = r.json()
+for m in mappings:
+    mapping_url = oclenv + m['url']
+    data = {'map_type': 'Has Organizational Unit'}
+    print mapping_url
+    print '\tFROM:%s' % m['from_concept_url']
+    print '\tMAPTYPE: %s' % m['map_type']
+    print '\tTO:  %s' % m['to_concept_url']
+    r = requests.put(mapping_url, data=json.dumps(data), headers=oclapiheaders)
+    print r.status_code, r.text
+
 url_all_collections = oclenv + endpoint + '?limit=100'
 # url = oclenv + endpoint + '?q=MER+Results+Facility+dod&verbose=true&limit=100'
 r = requests.get(url_all_collections, headers=oclapiheaders)
@@ -122,7 +159,7 @@ sims_external_ids = {
     'SIMS2-Above-Site': 'xDFgyFbegjl'
 }
 
-# Create new repo version if only 'initial' empty version exists
+# Create new repo version if 'initial' is still the "latest" released version
 r = requests.get(url_all_collections, headers=oclapiheaders)
 collections = r.json()
 cnt = 0
@@ -137,10 +174,9 @@ for c in collections:
         try:
             create_repo_version(repo_url=oclenv + c['url'], oclapiheaders=oclapiheaders, version_desc='Automatically generated repository version', version_id='v2017-10-02', released=True)
         except:
-            print "That one failed... but no way we're going to let that keep us donw..."
+            print "That one failed... but no way we're going to let that keep us down..."
         print 'Sleeping for 10 seconds...'
         time.sleep(10)
-
 
 
 for c in collections:
@@ -152,6 +188,6 @@ for c in collections:
 
 # import_filename = 'init/temp.json'
 import_filename = 'mer_dhis2ocl_import_script.json'
-importer_collections = oclfleximporter.OclFlexImporter(
+importer_collections = OclFlexImporter(
     file_path=import_filename, limit=1, api_url_root=oclenv, api_token=oclapitoken, test_mode=False)
 importer_collections.process()

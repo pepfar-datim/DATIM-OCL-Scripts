@@ -271,17 +271,17 @@ class DatimBase:
         # Get the export
         url_ocl_export = self.oclenv + endpoint + repo_version_id + '/export/'
         self.vlog(1, 'Export URL:', url_ocl_export)
-        r = requests.get(url_ocl_export, headers=self.oclapiheaders)
+        r = requests.get(url_ocl_export)
         r.raise_for_status()
         if r.status_code == 204:
             # Create the export and try one more time...
             self.log('WARNING: Export does not exist for "%s". Creating export...' % url_ocl_export)
-            new_export_request = requests.post(url_ocl_export, headers=self.oclapiheaders)
+            new_export_request = requests.post(url_ocl_export)
             if new_export_request.status_code == 202:
                 # Wait for export to be processed then try to fetch it
                 self.log('INFO: Waiting 30 seconds while export is being generated...')
                 time.sleep(30)
-                r = requests.get(url_ocl_export, headers=self.oclapiheaders)
+                r = requests.get(url_ocl_export)
                 r.raise_for_status()
             else:
                 self.log('ERROR: Unable to generate export for "%s"' % url_ocl_export)

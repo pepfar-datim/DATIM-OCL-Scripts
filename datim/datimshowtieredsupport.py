@@ -6,15 +6,15 @@ Supported Formats: html, xml, csv, json
 Supported Collections: datalements, options
 """
 from __future__ import with_statement
-from datimshow import DatimShow
-from datimconstants import DatimConstants
+import datimshow
+import datimconstants
 
 
-class DatimShowTieredSupport(DatimShow):
+class DatimShowTieredSupport(datimshow.DatimShow):
     """ Class to manage DATIM Tiered Support Presentation """
 
     # OCL Export Definitions
-    OCL_EXPORT_DEFS = DatimConstants.TIERED_SUPPORT_OCL_EXPORT_DEFS
+    OCL_EXPORT_DEFS = datimconstants.DatimConstants.TIERED_SUPPORT_OCL_EXPORT_DEFS
 
     # Default endpoint to use if unspecified OCL export
     DEFAULT_REPO_LIST_ENDPOINT = '/orgs/PEPFAR/collections/'
@@ -35,7 +35,7 @@ class DatimShowTieredSupport(DatimShow):
     }
 
     def __init__(self, oclenv='', oclapitoken='', run_ocl_offline=False, verbosity=0, cache_intermediate=True):
-        DatimShow.__init__(self)
+        datimshow.DatimShow.__init__(self)
         self.oclenv = oclenv
         self.oclapitoken = oclapitoken
         self.run_ocl_offline = run_ocl_offline

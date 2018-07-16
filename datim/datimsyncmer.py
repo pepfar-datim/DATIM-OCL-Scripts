@@ -15,11 +15,11 @@ from __future__ import with_statement
 import os
 import sys
 import json
-from datimsync import DatimSync
-from datimconstants import DatimConstants
+import datimsync
+import datimconstants
 
 
-class DatimSyncMer(DatimSync):
+class DatimSyncMer(datimsync.DatimSync):
     """ Class to manage DATIM MER Indicators Synchronization """
 
     # Name of this sync script (used to name files and in logging)
@@ -36,18 +36,18 @@ class DatimSyncMer(DatimSync):
     OCL_CLEANED_EXPORT_FILENAME = 'mer_ocl_cleaned_export.json'
 
     # Import batches
-    IMPORT_BATCHES = [DatimConstants.IMPORT_BATCH_MER]
+    IMPORT_BATCHES = [datimconstants.DatimConstants.IMPORT_BATCH_MER]
 
     # DATIM DHIS2 Query Definitions
-    DHIS2_QUERIES = DatimConstants.MER_DHIS2_QUERIES
+    DHIS2_QUERIES = datimconstants.DatimConstants.MER_DHIS2_QUERIES
 
     # OCL Export Definitions
-    OCL_EXPORT_DEFS = DatimConstants.MER_OCL_EXPORT_DEFS
+    OCL_EXPORT_DEFS = datimconstants.DatimConstants.MER_OCL_EXPORT_DEFS
 
     def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='', compare2previousexport=True,
                  run_dhis2_offline=False, run_ocl_offline=False,
                  verbosity=0, data_check_only=False, import_test_mode=False, import_limit=0):
-        DatimSync.__init__(self)
+        datimsync.DatimSync.__init__(self)
         self.oclenv = oclenv
         self.oclapitoken = oclapitoken
         self.dhis2env = dhis2env
@@ -127,7 +127,7 @@ class DatimSyncMer(DatimSync):
                             'external_id': None,
                         }
                     ]
-                self.dhis2_diff[DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT][
+                self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT][
                     indicator_concept_key] = indicator_concept
                 num_indicators += 1
 
@@ -141,7 +141,7 @@ class DatimSyncMer(DatimSync):
 
                     # Only build the disaggregate concept if it has not already been defined
                     if disaggregate_concept_key not in self.dhis2_diff[
-                            DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT]:
+                            datimconstants.DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT]:
                         disaggregate_concept = {
                             'type': 'Concept',
                             'id': disaggregate_concept_id,
@@ -164,7 +164,7 @@ class DatimSyncMer(DatimSync):
                                 }
                             ]
                         }
-                        self.dhis2_diff[DatimConstants.IMPORT_BATCH_MER][
+                        self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MER][
                             self.RESOURCE_TYPE_CONCEPT][disaggregate_concept_key] = disaggregate_concept
                         num_disaggregates += 1
 
@@ -186,8 +186,8 @@ class DatimSyncMer(DatimSync):
                         'extras': None,
                         'retired': False,
                     }
-                    self.dhis2_diff[DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_MAPPING][
-                        disaggregate_mapping_key] = disaggregate_mapping
+                    self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MER][
+                        self.RESOURCE_TYPE_MAPPING][disaggregate_mapping_key] = disaggregate_mapping
                     num_mappings += 1
 
                 # Iterate through DataSets to transform to build references
@@ -204,7 +204,7 @@ class DatimSyncMer(DatimSync):
                     indicator_ref_key, indicator_ref = self.get_concept_reference_json(
                         collection_owner_id='PEPFAR', collection_owner_type=self.RESOURCE_TYPE_ORGANIZATION,
                         collection_id=collection_id, concept_url=indicator_concept_url)
-                    self.dhis2_diff[DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF][
+                    self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF][
                         indicator_ref_key] = indicator_ref
                     num_indicator_refs += 1
 
@@ -214,8 +214,8 @@ class DatimSyncMer(DatimSync):
                             collection_owner_id='PEPFAR', collection_owner_type=self.RESOURCE_TYPE_ORGANIZATION,
                             collection_id=collection_id, concept_url=disaggregate_concept_url)
                         if disaggregate_ref_key not in self.dhis2_diff[
-                                DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF]:
-                            self.dhis2_diff[DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF][
+                                datimconstants.DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF]:
+                            self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MER][self.RESOURCE_TYPE_CONCEPT_REF][
                                 disaggregate_ref_key] = disaggregate_ref
                             num_disaggregate_refs += 1
 

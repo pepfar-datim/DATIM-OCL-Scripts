@@ -19,12 +19,12 @@ import os
 import sys
 from requests.auth import HTTPBasicAuth
 from shutil import copyfile
-from datimbase import DatimBase
-from ocldev.oclfleximporter import OclFlexImporter
-from deepdiff import DeepDiff
+import ocldev.oclfleximporter
+import deepdiff
+import datimbase
 
 
-class DatimSync(DatimBase):
+class DatimSync(datimbase.DatimBase):
 
     # Mode constants
     SYNC_MODE_DIFF_ONLY = 'diff'
@@ -73,7 +73,7 @@ class DatimSync(DatimBase):
                                         'version', 'versioned_object_id', 'versioned_object_url']
 
     def __init__(self):
-        DatimBase.__init__(self)
+        datimbase.DatimBase.__init__(self)
 
         self.dhis2_diff = {}
         self.ocl_diff = {}
@@ -289,7 +289,7 @@ class DatimSync(DatimBase):
             diff[import_batch_key] = {}
             for resource_type in self.sync_resource_types:
                 if resource_type in ocl_diff[import_batch_key] and resource_type in dhis2_diff[import_batch_key]:
-                    diff[import_batch_key][resource_type] = DeepDiff(
+                    diff[import_batch_key][resource_type] = deepdiff.DeepDiff(
                         ocl_diff[import_batch_key][resource_type],
                         dhis2_diff[import_batch_key][resource_type],
                         ignore_order=True, verbose_level=2)
@@ -640,7 +640,7 @@ class DatimSync(DatimBase):
             test_mode = False
             if sync_mode == DatimSync.SYNC_MODE_TEST_IMPORT:
                 test_mode = True
-            ocl_importer = OclFlexImporter(
+            ocl_importer = ocldev.oclfleximporter.OclFlexImporter(
                 file_path=self.attach_absolute_data_path(self.NEW_IMPORT_SCRIPT_FILENAME),
                 api_token=self.oclapitoken, api_url_root=self.oclenv, test_mode=test_mode,
                 do_update_if_exists=False, verbosity=self.verbosity, limit=self.import_limit,

@@ -5,13 +5,13 @@ though JSON format is also supported.
 """
 import sys
 import settings
-from datim.datimimapexport import DatimImapExport
-from datim.datimimap import DatimImap
+import datim.datimimap
+import datim.datimimapexport
 
 
 # Default Script Settings
 country_code = 'LS'
-export_format = DatimImap.DATIM_IMAP_FORMAT_CSV
+export_format = datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV
 period = 'FY17'
 run_ocl_offline = False
 verbosity = 0
@@ -23,14 +23,14 @@ oclapitoken = settings.api_token_staging_datim_admin
 # Optionally set arguments from the command line
 if sys.argv and len(sys.argv) > 3:
     country_code = sys.argv[1]
-    export_format = DatimImapExport.get_format_from_string(sys.argv[2])
+    export_format = datim.datimimapexport.DatimImapExport.get_format_from_string(sys.argv[2])
     period = sys.argv[3]
 
 # Prepocess input parameters
 country_org = 'DATIM-MOH-%s' % country_code
 
 # Generate the imap export
-datim_imap_export = DatimImapExport(
+datim_imap_export = datim.datimimapexport.DatimImapExport(
 	oclenv=oclenv, oclapitoken=oclapitoken, verbosity=verbosity, run_ocl_offline=run_ocl_offline)
 imap = datim_imap_export.get_imap(period=period, country_org=country_org, country_code=country_code)
 imap.display(export_format)

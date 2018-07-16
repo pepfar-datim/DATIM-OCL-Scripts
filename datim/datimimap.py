@@ -4,7 +4,7 @@ DATIM I-MAP object and its helper classes
 import sys
 import csv
 import json
-#from datim.datimimapexport import DatimImapExport
+import datimimapexport
 
 
 class DatimImap(object):
@@ -120,7 +120,7 @@ class DatimImapFactory(object):
                            country_code='', country_org='', period=''):
         """ Fetch an IMAP from OCL """
 
-        datim_imap_export = DatimImapExport(
+        datim_imap_export = datimimapexport.DatimImapExport(
             oclenv=oclenv, oclapitoken=oclapitoken, run_ocl_offline=run_ocl_offline)
         return datim_imap_export.get_imap(
             period=period, country_org=country_org, country_code=country_code)

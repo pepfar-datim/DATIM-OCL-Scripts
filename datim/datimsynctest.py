@@ -6,8 +6,8 @@ import sys
 import requests
 import warnings
 import difflib
-from pprint import pprint
-from deepdiff import DeepDiff
+import deepdiff
+import pprint
 from operator import itemgetter
 import datimconstants
 import datimbase
@@ -123,7 +123,7 @@ class DatimSyncTest(datimbase.DatimBase):
             diff = self.test_csv(request_dhis2, request_ocl)
         if diff:
             print('Diff Results:')
-            pprint(diff)
+            pprint.pprint(diff)
         else:
             print('No diff!')
         sys.stdout.flush()
@@ -143,7 +143,7 @@ class DatimSyncTest(datimbase.DatimBase):
         print('Rows: DHIS2(%s), OCL(%s)' % (len(dhis2_json['rows_dict']), len(ocl_json['rows_dict'])))
 
         # Do the diff
-        diff = DeepDiff(dhis2_json, ocl_json, ignore_order=False, verbose_level=2, exclude_paths={"root['title']", "root['subtitle']"})
+        diff = deepdiff.DeepDiff(dhis2_json, ocl_json, ignore_order=False, verbose_level=2, exclude_paths={"root['title']", "root['subtitle']"})
         return diff
 
     def test_html(self, request_dhis2, request_ocl):

@@ -5,6 +5,7 @@ import sys
 import csv
 import json
 import datimimapexport
+import deepdiff
 
 
 class DatimImap(object):
@@ -126,6 +127,12 @@ class DatimImapFactory(object):
             period=period, country_org=country_org, country_code=country_code)
 
     @staticmethod
+    def generate_import_script_from_diff(imap_diff):
+        print 'hello'
+        print imap_diff
+        exit()
+
+    @staticmethod
     def get_csv(datim_imap):
         pass
 
@@ -152,4 +159,4 @@ class DatimImapDiff(object):
         self.diff(imap_a, imap_b)
 
     def diff(self, imap_a, imap_b):
-        self.__diff_data = None
+        self.__diff_data = deepdiff.DeepDiff(imap_a.__imap_data, imap_b.__imap_data)

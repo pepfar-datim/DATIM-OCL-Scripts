@@ -20,7 +20,7 @@ synchronized with repositories in OCL as described below.
 from __future__ import with_statement
 import json
 import datimsync
-from datimconstants
+import datimconstants
 
 
 class DatimSyncSims(datimsync.DatimSync):

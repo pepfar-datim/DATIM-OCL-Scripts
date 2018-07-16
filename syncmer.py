@@ -13,6 +13,7 @@ synchronized with repositories in OCL as described below.
 """
 import os
 import sys
+import settings
 import datim.datimsync
 import datim.datimsyncmer
 

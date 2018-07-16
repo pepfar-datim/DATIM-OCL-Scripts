@@ -8,15 +8,15 @@ Supported Collections:
     sims_option_sets
 """
 from __future__ import with_statement
-from datimshow import DatimShow
-from datimconstants import DatimConstants
+import datimshow
+import datimconstants
 
 
-class DatimShowSims(DatimShow):
+class DatimShowSims(datimshow.DatimShow):
     """ Class to manage DATIM SIMS Presentation """
 
     # OCL Export Definitions
-    OCL_EXPORT_DEFS = DatimConstants.SIMS_OCL_EXPORT_DEFS
+    OCL_EXPORT_DEFS = datimconstants.DatimConstants.SIMS_OCL_EXPORT_DEFS
 
     # Default endpoint to use if unspecified OCL export
     DEFAULT_REPO_LIST_ENDPOINT = '/orgs/PEPFAR/collections/'
@@ -38,7 +38,7 @@ class DatimShowSims(DatimShow):
     }
 
     def __init__(self, oclenv='', oclapitoken='', run_ocl_offline=False, verbosity=0, cache_intermediate=True):
-        DatimShow.__init__(self)
+        datimshow.DatimShow.__init__(self)
         self.oclenv = oclenv
         self.oclapitoken = oclapitoken
         self.run_ocl_offline = run_ocl_offline

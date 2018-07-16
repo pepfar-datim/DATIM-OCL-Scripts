@@ -4,8 +4,8 @@ period (e.g. FY17). CSV must follow the format of the country mapping CSV templa
 """
 import sys
 import settings
-from datim.datimimap import DatimImap, DatimImapFactory
-from datim.datimimapimport import DatimImapImport
+import datim.datimimap
+import datim.datimimapimport
 
 
 # Default Script Settings
@@ -28,11 +28,11 @@ if sys.argv and len(sys.argv) > 2:
 country_org = 'DATIM-MOH-%s' % country_code
 
 # Load i-map from CSV file
-imap_input = DatimImapFactory.load_imap_from_csv(
+imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(
 	csv_filename=csv_filename, country_org=country_org,
 	country_code=country_code, period=period)
 
 # Run the import
-imap_import = DatimImapImport(
+imap_import = datim.datimimapimport.DatimImapImport(
 	oclenv=oclenv, oclapitoken=oclapitoken, verbosity=verbosity, run_ocl_offline=run_ocl_offline)
 imap_import.import_imap(imap_input=imap_input)

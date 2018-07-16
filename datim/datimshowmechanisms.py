@@ -5,15 +5,15 @@ Request Format: /datim-mechanisms?format=____
 Supported Formats: html, xml, csv, json
 """
 from __future__ import with_statement
-from datimshow import DatimShow
-from datimconstants import DatimConstants
+import datimshow
+import datimconstants
 
 
-class DatimShowMechanisms(DatimShow):
+class DatimShowMechanisms(datimshow.DatimShow):
     """ Class to manage DATIM Mechanisms Presentation """
 
     # OCL Export Definitions
-    OCL_EXPORT_DEFS = DatimConstants.MECHANISMS_OCL_EXPORT_DEFS
+    OCL_EXPORT_DEFS = datimconstants.DatimConstants.MECHANISMS_OCL_EXPORT_DEFS
 
     # Default endpoint to use if unspecified OCL export
     DEFAULT_REPO_LIST_ENDPOINT = '/orgs/PEPFAR/collections/'
@@ -34,7 +34,7 @@ class DatimShowMechanisms(DatimShow):
     }
 
     def __init__(self, oclenv='', oclapitoken='', run_ocl_offline=False, verbosity=0, cache_intermediate=True):
-        DatimShow.__init__(self)
+        datimshow.DatimShow.__init__(self)
         self.oclenv = oclenv
         self.oclapitoken = oclapitoken
         self.run_ocl_offline = run_ocl_offline

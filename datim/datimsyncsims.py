@@ -19,11 +19,11 @@ synchronized with repositories in OCL as described below.
 """
 from __future__ import with_statement
 import json
-from datimsync import DatimSync
-from datimconstants import DatimConstants
+import datimsync
+from datimconstants
 
 
-class DatimSyncSims(DatimSync):
+class DatimSyncSims(datimsync.DatimSync):
     """ Class to manage DATIM SIMS Synchronization """
 
     # Name of this sync script (used to name files and in logging)
@@ -40,17 +40,17 @@ class DatimSyncSims(DatimSync):
     OCL_CLEANED_EXPORT_FILENAME = 'sims_ocl_cleaned_export.json'
 
     # Import batches
-    IMPORT_BATCHES = [DatimConstants.IMPORT_BATCH_SIMS]
+    IMPORT_BATCHES = [datimconstants.DatimConstants.IMPORT_BATCH_SIMS]
 
     # DATIM DHIS2 Query Definitions
-    DHIS2_QUERIES = DatimConstants.SIMS_DHIS2_QUERIES
+    DHIS2_QUERIES = datimconstants.DatimConstants.SIMS_DHIS2_QUERIES
 
     # OCL Export Definitions
-    OCL_EXPORT_DEFS = DatimConstants.SIMS_OCL_EXPORT_DEFS
+    OCL_EXPORT_DEFS = datimconstants.DatimConstants.SIMS_OCL_EXPORT_DEFS
 
     def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='', compare2previousexport=True,
                  run_dhis2_offline=False, run_ocl_offline=False, verbosity=0, import_limit=0):
-        DatimSync.__init__(self)
+        datimsync.DatimSync.__init__(self)
         self.oclenv = oclenv
         self.oclapitoken = oclapitoken
         self.dhis2env = dhis2env
@@ -112,7 +112,7 @@ class DatimSyncSims(DatimSync):
                             'Option Code': option['code'],
                         }
                     }
-                    self.dhis2_diff[DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT][
+                    self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT][
                         option_concept_key] = option_concept
                     num_concepts += 1
 
@@ -121,7 +121,7 @@ class DatimSyncSims(DatimSync):
                     option_ref_key, option_ref = self.get_concept_reference_json(
                         collection_owner_id='PEPFAR', collection_owner_type=self.RESOURCE_TYPE_ORGANIZATION,
                         collection_id=ocl_collection_id, concept_url=option_concept_url)
-                    self.dhis2_diff[DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT_REF][
+                    self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT_REF][
                         option_ref_key] = option_ref
                     num_references += 1
 
@@ -170,7 +170,7 @@ class DatimSyncSims(DatimSync):
                     ],
                     'extras': {'Value Type': data_element['valueType']}
                 }
-                self.dhis2_diff[DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT][
+                self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT][
                     sims_concept_key] = sims_concept
                 num_concepts += 1
 
@@ -180,7 +180,7 @@ class DatimSyncSims(DatimSync):
                     sims_concept_ref_key, sims_concept_ref = self.get_concept_reference_json(
                         collection_owner_id='PEPFAR', collection_owner_type=self.RESOURCE_TYPE_ORGANIZATION,
                         collection_id=ocl_collection_id, concept_url=sims_concept_url)
-                    self.dhis2_diff[DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT_REF][
+                    self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_SIMS][self.RESOURCE_TYPE_CONCEPT_REF][
                         sims_concept_ref_key] = sims_concept_ref
                     num_references += 1
 

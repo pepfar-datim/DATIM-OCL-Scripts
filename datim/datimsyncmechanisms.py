@@ -12,11 +12,11 @@ from __future__ import with_statement
 import os
 import sys
 import json
-from datimsync import DatimSync
-from datimconstants import DatimConstants
+import datimsync
+import datimconstants
 
 
-class DatimSyncMechanisms(DatimSync):
+class DatimSyncMechanisms(datimsync.DatimSync):
     """ Class to manage DATIM Mechanisms Synchronization """
 
     # Name of this sync script (used to name files and in logging)
@@ -33,20 +33,20 @@ class DatimSyncMechanisms(DatimSync):
     OCL_CLEANED_EXPORT_FILENAME = 'mechanisms_ocl_cleaned_export.json'
 
     # Import batches
-    IMPORT_BATCHES = [DatimConstants.IMPORT_BATCH_MECHANISMS]
+    IMPORT_BATCHES = [datimconstants.DatimConstants.IMPORT_BATCH_MECHANISMS]
 
     # Overwrite DatimSync.SYNC_LOAD_DATASETS
     SYNC_LOAD_DATASETS = False
 
     # DATIM DHIS2 Query Definitions
-    DHIS2_QUERIES = DatimConstants.MECHANISMS_DHIS2_QUERIES
+    DHIS2_QUERIES = datimconstants.DatimConstants.MECHANISMS_DHIS2_QUERIES
 
     # OCL Export Definitions
-    OCL_EXPORT_DEFS = DatimConstants.MECHANISMS_OCL_EXPORT_DEFS
+    OCL_EXPORT_DEFS = datimconstants.DatimConstants.MECHANISMS_OCL_EXPORT_DEFS
 
     def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='', compare2previousexport=True,
                  run_dhis2_offline=False, run_ocl_offline=False, verbosity=0, import_limit=0):
-        DatimSync.__init__(self)
+        datimsync.DatimSync.__init__(self)
         self.oclenv = oclenv
         self.oclapitoken = oclapitoken
         self.dhis2env = dhis2env
@@ -129,7 +129,7 @@ class DatimSyncMechanisms(DatimSync):
                                     'Organizational Unit': orgunit
                                 }
                             }
-                            self.dhis2_diff[DatimConstants.IMPORT_BATCH_MECHANISMS][
+                            self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MECHANISMS][
                                 self.RESOURCE_TYPE_CONCEPT][concept_key] = c
                             num_concepts += 1
                             partner = ''

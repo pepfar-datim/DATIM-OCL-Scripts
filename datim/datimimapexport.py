@@ -19,11 +19,11 @@ MOH_Disag_Name
 import sys
 import json
 import os
-from datim.datimbase import DatimBase
-from datim.datimimap import DatimImap
+import datimbase
+import datimimap
 
 
-class DatimImapExport(DatimBase):
+class DatimImapExport(datimbase.DatimBase):
     """
     Class to export PEPFAR country mapping metadata stored in OCL in various formats.
     """
@@ -74,7 +74,7 @@ class DatimImapExport(DatimBase):
     ]
 
     def __init__(self, oclenv='', oclapitoken='', verbosity=0, run_ocl_offline=False):
-        DatimBase.__init__(self)
+        datimbase.DatimBase.__init__(self)
         self.verbosity = verbosity
         self.oclenv = oclenv
         self.oclapitoken = oclapitoken
@@ -281,7 +281,7 @@ class DatimImapExport(DatimBase):
                     rows.append(row)
 
         # Generate and return the IMAP object
-        return DatimImap(imap_data=rows, country_code=country_code, country_org=country_org, period=period)
+        return datimimap.DatimImap(imap_data=rows, country_code=country_code, country_org=country_org, period=period)
 
     def map_type_to_operator(self, map_type):
         return map_type.replace(' OPERATION', '')

@@ -51,18 +51,17 @@ import os
 import csv
 import settings
 from pprint import pprint
-from datimbase import DatimBase
-from datimimap import DatimImap, DatimImapFactory
-from datimimapexport import DatimImapExport
+import datimbase
+import datimimap
 
 
-class DatimImapImport(DatimBase):
+class DatimImapImport(datimbase.DatimBase):
     """
     Class to import PEPFAR country mapping metadata from a CSV file into OCL.
     """
 
     def __init__(self, oclenv='', oclapitoken='', verbosity=0, run_ocl_offline=False):
-        DatimBase.__init__(self)
+        datimbase.DatimBase.__init__(self)
         self.verbosity = verbosity
         self.oclenv = oclenv
         self.oclapitoken = oclapitoken
@@ -73,7 +72,7 @@ class DatimImapImport(DatimBase):
         # STEP 1 of 11: Validate that PEPFAR metadata for specified period defined in OCL
         #/PEPFAR/DATIM-MOH course/fine metadata and released period (e.g. FY17) available
         self.vlog(1, '**** STEP 1 of 11: Validate that PEPFAR metadata for specified period defined in OCL')
-        if DatimImapFactory.is_valid_imap_period(imap_input.period):
+        if datimimap.DatimImapFactory.is_valid_imap_period(imap_input.period):
             self.vlog(1, 'PEPFAR metadata for period "%s" defined in OCL environement "%s"' % (imap_input.period, self.oclenv))
         else:
             print('uh oh')
@@ -95,7 +94,7 @@ class DatimImapImport(DatimBase):
         # STEP 4 of 11: Fetch existing IMAP export from OCL for the specified country+period
         # Refer to imapexport.py
         self.vlog(1, '**** STEP 4 of 11: Fetch existing IMAP export from OCL for the specified country and period')
-        imap_old = DatimImapFactory.load_imap_from_ocl(country_org=imap_input.country_org, period=imap_input.period)
+        imap_old = datimimap.DatimImapFactory.load_imap_from_ocl(country_org=imap_input.country_org, period=imap_input.period)
 
         # STEP 5 of 11: Evaluate delta between input and OCL IMAPs
         self.vlog(1, '**** STEP 5 of 11: Evaluate delta between input and OCL IMAPs')
@@ -104,7 +103,7 @@ class DatimImapImport(DatimBase):
         # STEP 6 of 11: Generate import script from the delta
         # country org, source, collections, concepts, and mappings...and remember the dedup
         self.vlog(1, '**** STEP 6 of 11: Generate import script from the delta')
-        import_script = DatimImapFactory.generate_import_script_from_diff(imap_diff)
+        import_script = datimimap.DatimImapFactory.generate_import_script_from_diff(imap_diff)
 
         # STEP 7 of 11: Import changes into OCL
         # Be sure to get the mapping IDs into the import results object! -- and what about import error handling?

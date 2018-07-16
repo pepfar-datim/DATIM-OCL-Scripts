@@ -6,16 +6,16 @@ import sys
 import requests
 import warnings
 import difflib
+from pprint import pprint
 from deepdiff import DeepDiff
 from operator import itemgetter
-from datimconstants import DatimConstants
-from datimbase import DatimBase
-from datimshow import DatimShow
-from pprint import pprint
+import datimconstants
+import datimbase
+import datimshow
 
-class DatimSyncTest(DatimBase):
+class DatimSyncTest(datimbase.DatimBase):
     def __init__(self, oclenv='', oclapitoken='', formats=None, dhis2env='', dhis2uid='', dhis2pwd=''):
-        DatimBase.__init__(self)
+        datimbase.DatimBase.__init__(self)
         self.oclenv = oclenv
         self.oclapitoken = oclapitoken
         self.dhis2env = dhis2env
@@ -24,37 +24,40 @@ class DatimSyncTest(DatimBase):
         if formats:
             self.formats = formats
         else:
-            self.formats = DatimShow.PRESENTATION_FORMATS
+            self.formats = datimshow.DatimShow.PRESENTATION_FORMATS
         self.oclapiheaders = {
             'Authorization': 'Token ' + self.oclapitoken,
             'Content-Type': 'application/json'
         }
 
     def test_all(self):
-        for resource_type in DatimConstants.SYNC_RESOURCE_TYPES:
+        for resource_type in datimconstants.DatimConstants.SYNC_RESOURCE_TYPES:
             self.test_resource_type(resource_type)
 
     def test_resource_type(self, resource_type):
-        if resource_type == DatimConstants.IMPORT_BATCH_SIMS:
+        if resource_type == datimconstants.DatimConstants.IMPORT_BATCH_SIMS:
             self.test_sims()
-        elif resource_type == DatimConstants.IMPORT_BATCH_MECHANISMS:
+        elif resource_type == datimconstants.DatimConstants.IMPORT_BATCH_MECHANISMS:
             self.test_mechanisms()
-        elif resource_type == DatimConstants.IMPORT_BATCH_TIERED_SUPPORT:
+        elif resource_type == datimconstants.DatimConstants.IMPORT_BATCH_TIERED_SUPPORT:
             self.test_tiered_support()
-        elif resource_type == DatimConstants.IMPORT_BATCH_MER:
+        elif resource_type == datimconstants.DatimConstants.IMPORT_BATCH_MER:
             self.test_mer()
         else:
             print('ERROR: Unrecognized resource_type "%s"' % resource_type)
             sys.exit(1)
 
     def test_sims(self):
-        self.test_default(DatimConstants.SIMS_OCL_EXPORT_DEFS, DatimConstants.OPENHIM_ENDPOINT_SIMS)
+        self.test_default(datimconstants.DatimConstants.SIMS_OCL_EXPORT_DEFS,
+                          datimconstants.DatimConstants.OPENHIM_ENDPOINT_SIMS)
 
     def test_mechanisms(self):
-        self.test_default(DatimConstants.MECHANISMS_OCL_EXPORT_DEFS, DatimConstants.OPENHIM_ENDPOINT_MECHANISMS)
+        self.test_default(datimconstants.DatimConstants.MECHANISMS_OCL_EXPORT_DEFS,
+                          datimconstants.DatimConstants.OPENHIM_ENDPOINT_MECHANISMS)
 
     def test_tiered_support(self):
-        self.test_default(DatimConstants.TIERED_SUPPORT_OCL_EXPORT_DEFS, DatimConstants.OPENHIM_ENDPOINT_TIERED_SUPPORT)
+        self.test_default(datimconstants.DatimConstants.TIERED_SUPPORT_OCL_EXPORT_DEFS,
+                          datimconstants.DatimConstants.OPENHIM_ENDPOINT_TIERED_SUPPORT)
 
     def test_default(self, export_defs, openhim_endpoint):
         for export_def_key in export_defs:
@@ -65,7 +68,7 @@ class DatimSyncTest(DatimBase):
 
                 # Build the dhis2 presentation url
                 dhis2_presentation_url = self.replace_attr(
-                    DatimConstants.DHIS2_PRESENTATION_URL_DEFAULT,
+                    datimconstants.DatimConstants.DHIS2_PRESENTATION_URL_DEFAULT,
                     {'format': format, 'sqlview': export_defs[export_def_key]['dhis2_sqlview_id']})
 
                 # Build the OCL presentation url
@@ -76,12 +79,12 @@ class DatimSyncTest(DatimBase):
                 self.test_one(format, dhis2_presentation_url, ocl_presentation_url)
 
     def test_mer(self):
-        for export_def_key in DatimConstants.MER_OCL_EXPORT_DEFS:
+        for export_def_key in datimconstants.DatimConstants.MER_OCL_EXPORT_DEFS:
             # Fetch the external_id from OCL, which is the DHIS2 dataSet uid
-            url_ocl_repo = self.oclenv + DatimConstants.MER_OCL_EXPORT_DEFS[export_def_key]['endpoint']
+            url_ocl_repo = self.oclenv + datimconstants.DatimConstants.MER_OCL_EXPORT_DEFS[export_def_key]['endpoint']
             r = requests.get(url_ocl_repo, headers=self.oclapiheaders)
             repo = r.json()
-            print('\n**** %s (dataSet.id=%s) ****' % (DatimConstants.MER_OCL_EXPORT_DEFS[export_def_key]['endpoint'], repo['external_id']))
+            print('\n**** %s (dataSet.id=%s) ****' % (datimconstants.DatimConstants.MER_OCL_EXPORT_DEFS[export_def_key]['endpoint'], repo['external_id']))
             if not repo['external_id']:
                 print('Skipping because no external ID...')
                 continue
@@ -91,13 +94,13 @@ class DatimSyncTest(DatimBase):
 
                 # Build the dhis2 presentation url
                 dhis2_presentation_url = self.replace_attr(
-                    DatimConstants.DHIS2_PRESENTATION_URL_MER,
+                    datimconstants.DatimConstants.DHIS2_PRESENTATION_URL_MER,
                     {'format': format, 'dataset': repo['external_id']})
 
                 # Build the OCL presentation url
                 openhimenv = 'https://ocl-mediator-trial.ohie.org:5000/'
                 ocl_presentation_url = '%s%s?format=%s&collection=%s' % (
-                    openhimenv, DatimConstants.OPENHIM_ENDPOINT_MER, format, export_def_key)
+                    openhimenv, datimconstants.DatimConstants.OPENHIM_ENDPOINT_MER, format, export_def_key)
 
                 self.test_one(format, dhis2_presentation_url, ocl_presentation_url)
 
@@ -110,13 +113,13 @@ class DatimSyncTest(DatimBase):
             request_dhis2 = requests.get(dhis2_presentation_url)
             request_ocl = requests.get(ocl_presentation_url, verify=False)
         diff = None
-        if format == DatimShow.DATIM_FORMAT_JSON:
+        if format == datimshow.DatimShow.DATIM_FORMAT_JSON:
             diff = self.test_json(request_dhis2, request_ocl)
-        elif format == DatimShow.DATIM_FORMAT_HTML:
+        elif format == datimshow.DatimShow.DATIM_FORMAT_HTML:
             diff = self.test_html(request_dhis2, request_ocl)
-        elif format == DatimShow.DATIM_FORMAT_XML:
+        elif format == datimshow.DatimShow.DATIM_FORMAT_XML:
             diff = self.test_xml(request_dhis2, request_ocl)
-        elif format == DatimShow.DATIM_FORMAT_CSV:
+        elif format == datimshow.DatimShow.DATIM_FORMAT_CSV:
             diff = self.test_csv(request_dhis2, request_ocl)
         if diff:
             print('Diff Results:')

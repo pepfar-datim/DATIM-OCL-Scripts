@@ -8,11 +8,11 @@ import os
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import SubElement
 from xml.etree.ElementTree import tostring
-from datimbase import DatimBase
+import datimbase
 import settings
 
 
-class DatimShow(DatimBase):
+class DatimShow(datimbase.DatimBase):
     """
     Shared class for custom presentations (i.e. shows) of DATIM metadata
     """
@@ -36,7 +36,7 @@ class DatimShow(DatimBase):
     DEFAULT_SHOW_BUILD_ROW_METHOD = 'default_show_build_row'
 
     def __init__(self):
-        DatimBase.__init__(self)
+        datimbase.DatimBase.__init__(self)
 
     def build_show_grid(self, repo_title='', repo_subtitle='', headers='', input_filename='', show_build_row_method=''):
         # Setup the headers

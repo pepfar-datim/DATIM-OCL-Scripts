@@ -1,4 +1,9 @@
-class DatimConstants:
+"""
+Static class of constants for the DATIM project
+"""
+
+class DatimConstants(object):
+    """ Static class of constants for the DATIM project """
 
     # Import batch IDs
     IMPORT_BATCH_MOH = 'MOH'

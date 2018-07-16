@@ -12,7 +12,7 @@ import json
 import settings
 
 
-class DatimBase:
+class DatimBase(object):
     """ Shared base class for DATIM synchronization and presentation """
 
     # Resource type constants
@@ -78,7 +78,7 @@ class DatimBase:
         sys.stdout.write('\n')
         sys.stdout.flush()
 
-    def _convert_endpoint_to_filename_fmt(seld, endpoint):
+    def _convert_endpoint_to_filename_fmt(self, endpoint):
         filename = endpoint.replace('/', '-')
         if filename[0] == '-':
             filename = filename[1:]

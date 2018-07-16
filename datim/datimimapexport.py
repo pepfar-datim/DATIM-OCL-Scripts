@@ -17,12 +17,10 @@ MOH_Disag_Name
 1. Implement long-term method for populating the indicator category column (currently manually set a custom attribute)
 """
 import sys
-import requests
 import json
 import os
-import csv
-from pprint import pprint
-from datimbase import DatimBase
+from datim.datimbase import DatimBase
+from datim.datimimap import DatimImap
 
 
 class DatimImapExport(DatimBase):
@@ -49,9 +47,9 @@ class DatimImapExport(DatimBase):
     DATIM_IMAP_FORMAT_CSV = 'CSV'
     DATIM_IMAP_FORMAT_JSON = 'JSON'
     DATIM_IMAP_FORMATS = [
-            DATIM_IMAP_FORMAT_CSV,
-            DATIM_IMAP_FORMAT_JSON,
-        ]
+        DATIM_IMAP_FORMAT_CSV,
+        DATIM_IMAP_FORMAT_JSON,
+    ]
 
     datim_owner_id = 'PEPFAR'
     datim_owner_type = 'Organization'
@@ -99,13 +97,10 @@ class DatimImapExport(DatimBase):
                 return fmt
         return default_fmt
 
-    def get(self, format='JSON', period='FY17', country_org=''):
+    def get_imap(self, period='FY17', country_org='', country_code=''):
         """ Fetch exports from OCL and build the export """
 
         # Initial validation
-        if format not in self.DATIM_IMAP_FORMATS:
-            self.log('ERROR: Unrecognized format "%s"' % (format))
-            exit(1)
         if not period:
             self.log('ERROR: Period identifier (e.g. "FY17") is required, none provided')
             exit(1)
@@ -113,16 +108,16 @@ class DatimImapExport(DatimBase):
             self.log('ERROR: Country organization ID (e.g. "DATIM-MOH-UG") is required, none provided')
             exit(1)
 
-        # STEP 1 of 8: Download DATIM-MOH source
-        self.vlog(1, '**** STEP 1 of 8: Download DATIM-MOH source')
+        # STEP 1 of 7: Download DATIM-MOH source
+        self.vlog(1, '**** STEP 1 of 7: Download DATIM-MOH source')
         datim_owner_endpoint = '/orgs/%s/' % (self.datim_owner_id)
         datim_source_endpoint = '%ssources/%s/' % (datim_owner_endpoint, self.datim_source_id)
         datim_source_zipfilename = self.endpoint2filename_ocl_export_zip(datim_source_endpoint)
         datim_source_jsonfilename = self.endpoint2filename_ocl_export_json(datim_source_endpoint)
         if not self.run_ocl_offline:
             datim_source_export = self.get_ocl_export(
-                    endpoint=datim_source_endpoint, version=period,
-                    zipfilename=datim_source_zipfilename, jsonfilename=datim_source_jsonfilename)
+                endpoint=datim_source_endpoint, version=period,
+                zipfilename=datim_source_zipfilename, jsonfilename=datim_source_jsonfilename)
         else:
             self.vlog(1, 'OCL-OFFLINE: Using local file "%s"...' % datim_source_jsonfilename)
             if os.path.isfile(self.attach_absolute_data_path(datim_source_jsonfilename)):
@@ -132,8 +127,8 @@ class DatimImapExport(DatimBase):
                 self.log('ERROR: Could not find offline OCL file "%s". Exiting...' % datim_source_jsonfilename)
                 sys.exit(1)
 
-        # STEP 2 of 8: Prepare output with the DATIM-MOH indicator+disag structure
-        self.vlog(1, '**** STEP 2 of 8: Prepare output with the DATIM-MOH indicator+disag structure')
+        # STEP 2 of 7: Prepare output with the DATIM-MOH indicator+disag structure
+        self.vlog(1, '**** STEP 2 of 7: Prepare output with the DATIM-MOH indicator+disag structure')
         indicators = {}
         disaggregates = {}
         with open(self.attach_absolute_data_path(datim_source_jsonfilename), 'rb') as handle_datim_source:
@@ -157,8 +152,8 @@ class DatimImapExport(DatimBase):
                 else:
                     self.log('SKIPPING: Unrecognized map type "%s" for mapping: %s' % (mapping['map_type'], str(mapping)))
 
-        # STEP 3 of 8: Download and process country source
-        self.vlog(1, '**** STEP 3 of 8: Download and process country source')
+        # STEP 3 of 7: Download and process country source
+        self.vlog(1, '**** STEP 3 of 7: Download and process country source')
         country_owner_endpoint = '/orgs/%s/' % (country_org)
         country_source_endpoint = '%ssources/%s/' % (country_owner_endpoint, self.country_source_id)
         country_source_zipfilename = self.endpoint2filename_ocl_export_zip(country_source_endpoint)
@@ -185,9 +180,9 @@ class DatimImapExport(DatimBase):
                 elif concept['concept_class'] == self.concept_class_indicator:
                     country_indicators[concept['url']] = concept.copy()
 
-        # STEP 4 of 8: Download list of country indicator mappings (i.e. collections)
+        # STEP 4 of 7: Download list of country indicator mappings (i.e. collections)
         # TODO: Make this one work offline
-        self.vlog(1, '**** STEP 4 of 8: Download list of country indicator mappings (i.e. collections)')
+        self.vlog(1, '**** STEP 4 of 7: Download list of country indicator mappings (i.e. collections)')
         country_collections_endpoint = '%scollections/' % (country_owner_endpoint)
         if self.run_ocl_offline:
             self.vlog('WARNING: Offline not supported here yet...')
@@ -195,8 +190,8 @@ class DatimImapExport(DatimBase):
                                                         require_external_id=False,
                                                         active_attr_name=None)
 
-        # STEP 5 of 8: Process one country collection at a time
-        self.vlog(1, '**** STEP 5 of 8: Process one country collection at a time')
+        # STEP 5 of 7: Process one country collection at a time
+        self.vlog(1, '**** STEP 5 of 7: Process one country collection at a time')
         for collection_id, collection in country_collections.items():
             collection_zipfilename = self.endpoint2filename_ocl_export_zip(collection['url'])
             collection_jsonfilename = self.endpoint2filename_ocl_export_json(collection['url'])
@@ -229,7 +224,7 @@ class DatimImapExport(DatimBase):
                             datim_disaggregate_url = mapping['to_concept_url']
                         else:
                             # we're not good. not good at all
-                            self.log('ERROR: The from_concept or to_concept of the "%s" mapping in collection "%s" are not part of "%s" version "%s": %s ' % (self.map_type_country_has_option, collection_id, datim_source_id, period, str(mapping)))
+                            self.log('ERROR: The from_concept or to_concept of the "%s" mapping in collection "%s" are not part of "%s" version "%s": %s ' % (self.map_type_country_has_option, collection_id, self.datim_source_id, period, str(mapping)))
                             exit(1)
                     elif mapping['map_type'] in self.DATIM_IMAP_OPERATIONS:
                         if mapping['from_concept_url'] in country_indicators and (mapping['to_concept_url'] in country_disaggregates or mapping['to_concept_url'] == self.null_disag_url):
@@ -249,11 +244,11 @@ class DatimImapExport(DatimBase):
                 if datim_indicator_mapping['from_concept_url'] == datim_indicator_url and datim_indicator_mapping['to_concept_url'] == datim_disaggregate_url:
                     datim_indicator_mapping['operations'] = operations
 
-        # STEP 6 of 8: Cache the results
-        self.vlog(1, '**** STEP 6 of 8: Cache the results')
+        # STEP 6 of 7: Cache the results
+        self.vlog(1, '**** STEP 6 of 7: SKIPPING -- Cache the results')
 
-        # STEP 7 of 8: Convert to tabular format
-        self.vlog(1, '**** STEP 7 of 8: Convert to tabular format')
+        # STEP 7 of 7: Convert to tabular format
+        self.vlog(1, '**** STEP 7 of 7: Convert to tabular format')
         rows = []
         for indicator_id, indicator in indicators.items():
             for mapping in indicator['mappings']:
@@ -285,15 +280,8 @@ class DatimImapExport(DatimBase):
                     row['MOH_Disag_Name'] = ''
                     rows.append(row)
 
-        # STEP 8 of 8: Output in requested format
-        self.vlog(1, '**** STEP 8 of 8: Output in requested format')
-        if format == self.DATIM_IMAP_FORMAT_CSV:
-            writer = csv.DictWriter(sys.stdout, fieldnames=self.imap_fields)
-            writer.writeheader()
-            for row in rows:
-                writer.writerow(row)
-        elif format == self.DATIM_IMAP_FORMAT_JSON:
-            pprint(rows)
+        # Generate and return the IMAP object
+        return DatimImap(imap_data=rows, country_code=country_code, country_org=country_org, period=period)
 
     def map_type_to_operator(self, map_type):
         return map_type.replace(' OPERATION', '')

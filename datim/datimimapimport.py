@@ -49,59 +49,11 @@ import requests
 import json
 import os
 import csv
+import settings
 from pprint import pprint
 from datimbase import DatimBase
-
-
-class DatimImapFactory(Object):
-	@staticmethod
-	def load_imap_from_csv(filename):
-		with open(filename) as input_file:
-            imap_csv = json.loads(input_file.read())
-            return DatimImap(imap_data=imap_csv)
-
-	@staticmethod
-    def load_imap_from_ocl(org_id):
-    	pass
-
-	@staticmethod
-    def get_csv(datim_imap):
-    	pass
-
-    @staticmethod
-    def get_ocl_import_script(datim_imap):
-    	pass
-
-    @staticmethod
-    def compare(datim_imap_1, datim_imap_2):
-    	pass
-
-    @staticmethod
-    def get_ocl_import_script_from_diff(imap_diff):
-    	pass
-
-
-class DatimImap(Object):
-	"""
-	Object representing a set of country indicator mappings
-	"""
-
-	def __init__(self, country_code='', period='', imap_data=None):
-		self.country_code = country_code
-		self.period = period
-		self.set_imap_data(imap_data)
-
-	def set_imap_data(imap_data):
-		pass
-
-	def compare()
-		pass
-
-	def get_csv():
-		pass
-
-	def get_ocl_collections():
-		pass
+from datimimap import DatimImap, DatimImapFactory
+from datimimapexport import DatimImapExport
 
 
 class DatimImapImport(DatimBase):
@@ -116,5 +68,58 @@ class DatimImapImport(DatimBase):
         self.oclapitoken = oclapitoken
         self.run_ocl_offline = run_ocl_offline
 
-    def generate_imap_import_script(imap_csv):
-    	pass
+
+    def import_imap(self, imap_input=None):
+        # STEP 1 of 11: Validate that PEPFAR metadata for specified period defined in OCL
+        #/PEPFAR/DATIM-MOH course/fine metadata and released period (e.g. FY17) available
+        self.vlog(1, '**** STEP 1 of 11: Validate that PEPFAR metadata for specified period defined in OCL')
+        if DatimImapFactory.is_valid_imap_period(imap_input.period):
+            self.vlog(1, 'PEPFAR metadata for period "%s" defined in OCL environement "%s"' % (imap_input.period, self.oclenv))
+        else:
+            print('uh oh')
+            sys.exit(1)
+
+        # STEP 2 of 11: Validate input country mapping CSV file
+        # verify correct columns exist (order agnostic)
+        self.vlog(1, '**** STEP 2 of 11: Validate that PEPFAR metadata for specified period defined in OCL')
+        if imap_input.is_valid():
+            self.vlog(1, 'Provided IMAP is valid')
+        else:
+            self.vlog(1, 'Provided IMAP is not valid')
+            sys.exit(1)
+
+        # STEP 3 of 11: Preprocess input country mapping CSV
+        # Determine if this is needed (csv_fixer.py)
+        self.vlog(1, '**** STEP 3 of 11: Preprocess input country mapping CSV')
+
+        # STEP 4 of 11: Fetch existing IMAP export from OCL for the specified country+period
+        # Refer to imapexport.py
+        self.vlog(1, '**** STEP 4 of 11: Fetch existing IMAP export from OCL for the specified country and period')
+        imap_old = DatimImapFactory.load_imap_from_ocl(country_org=imap_input.country_org, period=imap_input.period)
+
+        # STEP 5 of 11: Evaluate delta between input and OCL IMAPs
+        self.vlog(1, '**** STEP 5 of 11: Evaluate delta between input and OCL IMAPs')
+        imap_diff = imap_old.diff(imap_input)
+
+        # STEP 6 of 11: Generate import script from the delta
+        # country org, source, collections, concepts, and mappings...and remember the dedup
+        self.vlog(1, '**** STEP 6 of 11: Generate import script from the delta')
+        import_script = DatimImapFactory.generate_import_script_from_diff(imap_diff)
+
+        # STEP 7 of 11: Import changes into OCL
+        # Be sure to get the mapping IDs into the import results object! -- and what about import error handling?
+        self.vlog(1, '**** STEP 7 of 11: Import changes into OCL')
+
+        # STEP 8 of 11: Create released source version for the country
+        self.vlog(1, '**** STEP 8 of 11: Create released source version for the country')
+
+        # STEP 9 of 11: Generate collection references
+        # use refgen.py
+        self.vlog(1, '**** STEP 9 of 11: Generate collection references')
+
+        # STEP 10 of 11: Import the collection references
+        self.vlog(1, '**** STEP 10 of 11: Import the collection references')
+
+        # STEP 11 of 11: Create released versions for each of the collections
+        # Refer to new_versions.py
+        self.vlog(1, '**** STEP 11 of 11: Create released versions for each of the collections')

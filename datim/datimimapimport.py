@@ -50,7 +50,6 @@ import json
 import os
 import csv
 import settings
-from pprint import pprint
 import datimbase
 import datimimap
 
@@ -94,7 +93,9 @@ class DatimImapImport(datimbase.DatimBase):
         # STEP 4 of 11: Fetch existing IMAP export from OCL for the specified country+period
         # Refer to imapexport.py
         self.vlog(1, '**** STEP 4 of 11: Fetch existing IMAP export from OCL for the specified country and period')
-        imap_old = datimimap.DatimImapFactory.load_imap_from_ocl(country_org=imap_input.country_org, period=imap_input.period)
+        imap_old = datimimap.DatimImapFactory.load_imap_from_ocl(
+            oclenv=self.oclenv, oclapitoken=self.oclapitoken, run_ocl_offline=self.run_ocl_offline,
+            country_org=imap_input.country_org, period=imap_input.period)
 
         # STEP 5 of 11: Evaluate delta between input and OCL IMAPs
         self.vlog(1, '**** STEP 5 of 11: Evaluate delta between input and OCL IMAPs')

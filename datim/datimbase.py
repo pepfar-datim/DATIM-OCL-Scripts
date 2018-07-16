@@ -7,7 +7,7 @@ import requests
 import sys
 import zipfile
 import time
-from datetime import datetime
+import datetime
 import json
 import settings
 
@@ -62,7 +62,7 @@ class DatimBase(object):
         """ Output log information if verbosity setting is equal or greater than this verbose level """
         if self.verbosity < verbose_level:
             return
-        sys.stdout.write('[' + str(datetime.now()) + '] ')
+        sys.stdout.write('[' + str(datetime.datetime.now()) + '] ')
         for arg in args:
             sys.stdout.write(str(arg))
             sys.stdout.write(' ')
@@ -71,7 +71,7 @@ class DatimBase(object):
 
     def log(self, *args):
         """ Output log information ignoring verbosity level """
-        sys.stdout.write('[' + str(datetime.now()) + '] ')
+        sys.stdout.write('[' + str(datetime.datetime.now()) + '] ')
         for arg in args:
             sys.stdout.write(str(arg))
             sys.stdout.write(' ')
@@ -108,7 +108,7 @@ class DatimBase(object):
         return 'dhis2-' + dhis2_query_id + '-export-converted.json'
 
     def filename_diff_result(self, import_batch_name):
-        return '%s-diff-results-%s.json' % (import_batch_name, datetime.now().strftime("%Y%m%d-%H%M%S"))
+        return '%s-diff-results-%s.json' % (import_batch_name, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 
     def repo_type_to_stem(self, repo_type, default_repo_stem=None):
         """ Get a repo stem (e.g. sources, collections) given a fully specified repo type (e.g. Source, Collection) """
@@ -210,7 +210,7 @@ class DatimBase(object):
         :param import_results:
         :return:
         """
-        dt = datetime.utcnow()
+        dt = datetime.datetime.utcnow()
         cnt = 0
         for ocl_export_key, ocl_export_def in self.OCL_EXPORT_DEFS.iteritems():
             cnt += 1

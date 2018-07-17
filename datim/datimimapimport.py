@@ -49,10 +49,11 @@ import requests
 import json
 import os
 import csv
+import pprint
 import settings
 import datimbase
 import datimimap
-
+import ocldev.oclcsvtojsonconverter
 
 class DatimImapImport(datimbase.DatimBase):
     """
@@ -66,7 +67,6 @@ class DatimImapImport(datimbase.DatimBase):
         self.oclapitoken = oclapitoken
         self.run_ocl_offline = run_ocl_offline
 
-
     def import_imap(self, imap_input=None):
         # STEP 1 of 11: Validate that PEPFAR metadata for specified period defined in OCL
         #/PEPFAR/DATIM-MOH course/fine metadata and released period (e.g. FY17) available
@@ -79,7 +79,7 @@ class DatimImapImport(datimbase.DatimBase):
 
         # STEP 2 of 11: Validate input country mapping CSV file
         # verify correct columns exist (order agnostic)
-        self.vlog(1, '**** STEP 2 of 11: Validate that PEPFAR metadata for specified period defined in OCL')
+        self.vlog(1, '**** STEP 2 of 11: Validate input country mapping CSV file')
         if imap_input.is_valid():
             self.vlog(1, 'Provided IMAP is valid')
         else:
@@ -100,10 +100,18 @@ class DatimImapImport(datimbase.DatimBase):
         # STEP 5 of 11: Evaluate delta between input and OCL IMAPs
         self.vlog(1, '**** STEP 5 of 11: Evaluate delta between input and OCL IMAPs')
         imap_diff = imap_old.diff(imap_input)
+        # TODO: Post-processing of diff results
+        pprint.pprint(imap_diff.get_diff())
+        # What I really want to extract from the diff file -- which CSV rows were added, updated and deleted
+        # What I really want to extract from the answers above -- changes to the source,
+        # collection versions that have been deleted, 
 
-        # STEP 6 of 11: Generate import script from the delta
+
+
+        # STEP 6 of 11: Generate import script
+        # Generate from the delta or just go with the raw CSV if no prior version exists
         # country org, source, collections, concepts, and mappings...and remember the dedup
-        self.vlog(1, '**** STEP 6 of 11: Generate import script from the delta')
+        self.vlog(1, '**** STEP 6 of 11: Generate import script')
         import_script = datimimap.DatimImapFactory.generate_import_script_from_diff(imap_diff)
 
         # STEP 7 of 11: Import changes into OCL
@@ -123,3 +131,187 @@ class DatimImapImport(datimbase.DatimBase):
         # STEP 11 of 11: Create released versions for each of the collections
         # Refer to new_versions.py
         self.vlog(1, '**** STEP 11 of 11: Create released versions for each of the collections')
+
+    def get_country_org_dict(self, country_org='', country_code='', country_name=''):
+        return {
+            'type': 'Organization',
+            'id': country_org,
+            'name': 'DATIM MOH %s' % country_name,
+            'location': country_name,
+        }
+
+    def get_country_source_dict(self, country_org='', country_code='', country_name=''):
+        source_name = 'DATIM MOH %s Alignment Indicators' % (country_name)
+        source = {
+            'type': 'Source',
+            'id': 'DATIM-Alignment-Indicators',
+            'short_code': 'DATIM-Alignment-Indicators',
+            'owner': country_org,
+            'owner_type': 'Organization',
+            'name': source_name,
+            'full_name': source_name,
+            'source_type': 'Dictionary',
+            'default_locale': 'en',
+            'supported_locales': 'en',
+        }
+        return source
+
+
+class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter):
+    ''' Extend to add a custom CSV pre-processor '''
+
+    def get_owner_type_url_part(self, owner_type):
+        if owner_type == 'Organization':
+            return 'orgs'
+        elif owner_type == 'User':
+            return 'users'
+        return ''
+
+    def preprocess_csv_row(self, row, attr=None):
+        ''' Create all of the additional columns '''
+        if row['MOH_Indicator_ID'] and row['MOH_Disag_ID']:
+            row['DATIM Owner Type'] = attr['datim_owner_type']
+            row['DATIM Owner ID'] = attr['datim_owner']
+            row['DATIM Source ID'] = attr['datim_source']
+            datim_owner_type_url_part = self.get_owner_type_url_part(row['DATIM Owner Type'])
+            row['Country Data Element Owner Type'] = attr['country_owner_type']
+            row['Country Data Element Owner ID'] = attr['country_owner']
+            row['Country Data Element Source ID'] = attr['country_source']
+            country_data_element_owner_type_url_part = self.get_owner_type_url_part(row['Country Data Element Owner Type'])
+            if row['MOH_Disag_ID'] == 'null_disag':
+                row['Country Disaggregate Owner Type'] = attr['null_disag_owner_type']
+                row['Country Disaggregate Owner ID'] = attr['null_disag_owner']
+                row['Country Disaggregate Source ID'] = attr['null_disag_source']
+            else:
+                row['Country Disaggregate Owner Type'] = attr['country_owner_type']
+                row['Country Disaggregate Owner ID'] = attr['country_owner']
+                row['Country Disaggregate Source ID'] = attr['country_source']
+            country_disaggregate_owner_type_url_part = self.get_owner_type_url_part(row['Country Disaggregate Owner Type'])
+            row['DATIM_Disag_Name_Clean'] = '_'.join(row['DATIM_Disag_Name'].replace('>', ' gt ').replace('<', ' lt ').replace('|',' ').replace('+', ' plus ').split())
+            row['Country Collection Name'] = row['DATIM_Indicator_ID'] + ': ' + row['DATIM_Disag_Name']
+            row['Country Collection ID'] = (row['DATIM_Indicator_ID'] + '_' + row['DATIM_Disag_Name_Clean']).replace('_', '-')
+            row['DATIM From Concept URI'] = '/%s/%s/sources/%s/concepts/%s/' % (datim_owner_type_url_part, row['DATIM Owner ID'], row['DATIM Source ID'], row['DATIM_Indicator_ID'])
+            row['DATIM To Concept URI'] = '/%s/%s/sources/%s/concepts/%s/' % (datim_owner_type_url_part, row['DATIM Owner ID'], row['DATIM Source ID'], row['DATIM_Disag_ID'])
+            row['Country Map Type'] = row['Operation'] + ' OPERATION'
+            # Data Element
+            row['Country From Concept URI'] = '/%s/%s/sources/%s/concepts/%s/' % (country_data_element_owner_type_url_part, row['Country Data Element Owner ID'], row['Country Data Element Source ID'], row['MOH_Indicator_ID'])
+            # Disaggregate
+            row['Country To Concept URI'] = '/%s/%s/sources/%s/concepts/%s/' % (country_disaggregate_owner_type_url_part, row['Country Disaggregate Owner ID'], row['Country Disaggregate Source ID'], row['MOH_Disag_ID'])
+        else:
+            row['DATIM_Disag_Name_Clean'] = ''
+            row['Country Collection Name'] = ''
+            row['Country Collection ID'] = ''
+            row['DATIM From Concept URI'] = ''
+            row['DATIM To Concept URI'] = ''
+            row['Country Map Type'] = ''
+            row['Country From Concept URI'] = ''
+            row['Country To Concept URI'] = ''
+        return row
+
+    @staticmethod
+    def get_country_csv_resource_definitions(attr):
+        csv_resource_definitions = [
+            {
+                'definition_name':'MOH-Indicator',
+                'is_active': True,
+                'resource_type':'Concept',
+                'id_column':'MOH_Indicator_ID',
+                'skip_if_empty_column':'MOH_Indicator_ID',
+                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS:[
+                    {'resource_field':'concept_class', 'value':'Indicator'},
+                    {'resource_field':'datatype', 'value':'Numeric'},
+                    {'resource_field':'owner', 'column':'Country Data Element Owner ID'},
+                    {'resource_field':'owner_type', 'column':'Country Data Element Owner Type'},
+                    {'resource_field':'source', 'column':'Country Data Element Source ID'},
+                ],
+                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_SUB_RESOURCES:{
+                    'names':[
+                        [
+                            {'resource_field':'name', 'column':'MOH_Indicator_Name'},
+                            {'resource_field':'locale', 'value':'en'},
+                            {'resource_field':'locale_preferred', 'value':'True'},
+                            {'resource_field':'name_type', 'value':'Fully Specified'},
+                        ],
+                    ],
+                    'descriptions':[]
+                },
+            },
+            {
+                'definition_name':'MOH-Disaggregate',
+                'is_active': True,
+                'resource_type':'Concept',
+                'id_column':'MOH_Disag_ID',
+                'skip_if_empty_column':'MOH_Disag_ID',
+                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS:[
+                    {'resource_field':'concept_class', 'value':'Disaggregate'},
+                    {'resource_field':'datatype', 'value':'None'},
+                    {'resource_field':'owner', 'column':'Country Disaggregate Owner ID'},
+                    {'resource_field':'owner_type', 'column':'Country Disaggregate Owner Type'},
+                    {'resource_field':'source', 'column':'Country Disaggregate Source ID'},
+                ],
+                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_SUB_RESOURCES:{
+                    'names':[
+                        [
+                            {'resource_field':'name', 'column':'MOH_Disag_Name'},
+                            {'resource_field':'locale', 'value':'en'},
+                            {'resource_field':'locale_preferred', 'value':'True'},
+                            {'resource_field':'name_type', 'value':'Fully Specified'},
+                        ],
+                    ],
+                    'descriptions':[]
+                },
+            },
+            {
+                'definition_name':'Mapping-Datim-Has-Option',
+                'is_active': True,
+                'resource_type':'Mapping',
+                'id_column':None,
+                'skip_if_empty_column':'MOH_Disag_ID',
+                'internal_external': {'value':ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.INTERNAL_MAPPING_ID},
+                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS:[
+                    {'resource_field':'from_concept_url', 'column':'DATIM From Concept URI'},
+                    {'resource_field':'map_type', 'value':attr['datim_map_type']},
+                    {'resource_field':'to_concept_url', 'column':'DATIM To Concept URI'},
+                    {'resource_field':'owner', 'value':attr['country_owner']},
+                    {'resource_field':'owner_type', 'value':attr['country_owner_type']},
+                    {'resource_field':'source', 'value':attr['country_source']},
+                ]
+            },
+            {
+                'definition_name':'Mapping-Operation',
+                'is_active': True,
+                'resource_type':'Mapping',
+                'id_column':None,
+                'skip_if_empty_column':'Operation',
+                'internal_external': {'value':ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.INTERNAL_MAPPING_ID},
+                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS:[
+                    {'resource_field':'from_concept_url', 'column':'Country From Concept URI'},
+                    {'resource_field':'map_type', 'column':'Country Map Type'},
+                    {'resource_field':'to_concept_url', 'column':'Country To Concept URI'},
+                    {'resource_field':'owner', 'value':attr['country_owner']},
+                    {'resource_field':'owner_type', 'value':attr['country_owner_type']},
+                    {'resource_field':'source', 'value':attr['country_source']},
+                ]
+            },
+            {
+                'definition_name':'Collection',
+                'is_active': True,
+                'resource_type':'Collection',
+                'id_column':'Country Collection ID',
+                'skip_if_empty_column':'Country Collection ID',
+                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS:[
+                    {'resource_field':'full_name', 'column':'Country Collection Name'},
+                    {'resource_field':'name', 'column':'Country Collection Name'},
+                    {'resource_field':'short_code', 'column':'Country Collection ID'},
+                    {'resource_field':'collection_type', 'value':'Subset'},
+                    {'resource_field':'supported_locales', 'value':'en'},
+                    {'resource_field':'public_access', 'value':'View'},
+                    {'resource_field':'default_locale', 'value':'en'},
+                    {'resource_field':'description', 'value':''},
+                    {'resource_field':'owner', 'value':attr['country_owner']},
+                    {'resource_field':'owner_type', 'value':attr['country_owner_type']},
+                ]
+            }
+        ]
+        return csv_resource_definitions
+

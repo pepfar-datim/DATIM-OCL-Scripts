@@ -9,8 +9,9 @@ import datim.datimimapimport
 
 
 # Default Script Settings
-csv_filename = 'csv/UG-FY17.csv'
-country_code = 'UG'
+csv_filename = 'csv/LS-FY17.csv'
+country_name = 'Lesotho'
+country_code = 'LS'
 period = 'FY17'
 run_ocl_offline = False
 verbosity = 2
@@ -20,16 +21,17 @@ oclenv = settings.ocl_api_url_staging
 oclapitoken = settings.api_token_staging_datim_admin
 
 # Optionally set arguments from the command line
-if sys.argv and len(sys.argv) > 2:
+if sys.argv and len(sys.argv) > 3:
     country_code = sys.argv[1]
     period = sys.argv[2]
+    csv_filename = sys.argv[3]
 
 # Prepocess input parameters
 country_org = 'DATIM-MOH-%s' % country_code
 
 # Load i-map from CSV file
 imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(
-	csv_filename=csv_filename, country_org=country_org,
+	csv_filename=csv_filename, country_org=country_org, country_name=country_name,
 	country_code=country_code, period=period)
 
 # Run the import

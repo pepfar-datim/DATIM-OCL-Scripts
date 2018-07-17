@@ -4,8 +4,9 @@ DATIM I-MAP object and its helper classes
 import sys
 import csv
 import json
-import datimimapexport
+from operator import itemgetter
 import deepdiff
+import datimimapexport
 
 
 class DatimImap(object):
@@ -32,9 +33,10 @@ class DatimImap(object):
         DATIM_IMAP_FORMAT_JSON,
     ]
 
-    def __init__(self, country_code='', country_org='', period='', imap_data=None):
+    def __init__(self, country_code='', country_org='', country_name='', period='', imap_data=None):
         self.country_code = country_code
         self.country_org = country_org
+        self.country_name = country_name
         self.period = period
         self.__imap_data = None
         self.set_imap_data(imap_data)
@@ -46,13 +48,21 @@ class DatimImap(object):
                 return fmt
         return default_fmt
 
+    def get_imap_data(self):
+        return self.__imap_data
+
+    def get_sorted_imap_data(self):
+        return DatimImap.multikeysort(self.__imap_data, self.IMAP_FIELD_NAMES)
+
     def set_imap_data(self, imap_data):
+        self.__imap_data = []
         if isinstance(imap_data, csv.DictReader):
-            self.__imap_data = []
             for row in imap_data:
-                self.__imap_data.append(row)
+                self.__imap_data.append({k:unicode(v) for k,v in row.items()})
         elif type(imap_data) == type([]):
-            self.__imap_data = imap_data
+            for row in imap_data:
+                self.__imap_data.append({k:unicode(v) for k,v in row.items()})
+            #self.__imap_data = imap_data
         else:
             raise Exception("Cannot set I-MAP data with '%s'" % imap_data)
 
@@ -90,6 +100,20 @@ class DatimImap(object):
     def get_ocl_collections(self):
         pass
 
+    @staticmethod
+    def multikeysort(items, columns):
+        from operator import itemgetter
+        comparers = [((itemgetter(col[1:].strip()), -1) if col.startswith('-') else
+                      (itemgetter(col.strip()), 1)) for col in columns]
+        def comparer(left, right):
+            for fn, mult in comparers:
+                result = cmp(fn(left), fn(right))
+                if result:
+                    return mult * result
+            else:
+                return 0
+        return sorted(items, cmp=comparer)
+
 
 class DatimImapFactory(object):
     @staticmethod
@@ -110,10 +134,10 @@ class DatimImapFactory(object):
         return 'ocl-' + DatimImapFactory._convert_endpoint_to_filename_fmt(endpoint) + '-raw.json'
 
     @staticmethod
-    def load_imap_from_csv(csv_filename='', country_code='', country_org='', period=''):
+    def load_imap_from_csv(csv_filename='', country_code='', country_org='', country_name='', period=''):
         with open(csv_filename, 'rb') as input_file:
             imap_data = csv.DictReader(input_file)
-            return DatimImap(imap_data=imap_data, country_code=country_code,
+            return DatimImap(imap_data=imap_data, country_code=country_code, country_name=country_name,
                              country_org=country_org, period=period)
 
     @staticmethod
@@ -128,8 +152,6 @@ class DatimImapFactory(object):
 
     @staticmethod
     def generate_import_script_from_diff(imap_diff):
-        print 'hello'
-        print imap_diff
         exit()
 
     @staticmethod
@@ -153,10 +175,17 @@ class DatimImapFactory(object):
 
 
 class DatimImapDiff(object):
+    """ Object representing the diff between two IMAP objects """
+
     def __init__(self, imap_a, imap_b):
         self.imap_a = imap_a
         self.imap_b = imap_b
         self.diff(imap_a, imap_b)
 
     def diff(self, imap_a, imap_b):
-        self.__diff_data = deepdiff.DeepDiff(imap_a.__imap_data, imap_b.__imap_data)
+        self.__diff_data = deepdiff.DeepDiff(
+            imap_a.get_sorted_imap_data(), imap_b.get_sorted_imap_data(),
+            verbose_level=2)
+
+    def get_diff(self):
+        return self.__diff_data

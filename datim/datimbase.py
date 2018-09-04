@@ -40,6 +40,52 @@ class DatimBase(object):
 
     DATA_FOLDER_NAME = 'data'
 
+    DATIM_IMAP_OPERATION_ADD = 'ADD OPERATION'
+    DATIM_IMAP_OPERATION_ADD_HALF = 'ADD HALF OPERATION'
+    DATIM_IMAP_OPERATION_SUBTRACT = 'SUBTRACT OPERATION'
+    DATIM_IMAP_OPERATION_SUBTRACT_HALF = 'SUBTRACT HALF OPERATION'
+    DATIM_IMAP_OPERATIONS = [
+        DATIM_IMAP_OPERATION_ADD,
+        DATIM_IMAP_OPERATION_ADD_HALF,
+        DATIM_IMAP_OPERATION_SUBTRACT,
+        DATIM_IMAP_OPERATION_SUBTRACT_HALF
+    ]
+
+    DATIM_IMAP_FORMAT_CSV = 'CSV'
+    DATIM_IMAP_FORMAT_JSON = 'JSON'
+    DATIM_IMAP_FORMATS = [
+        DATIM_IMAP_FORMAT_CSV,
+        DATIM_IMAP_FORMAT_JSON,
+    ]
+
+    NULL_DISAG_ID = 'null_disag'
+    NULL_DISAG_ENDPOINT = '/orgs/PEPFAR/sources/DATIM-MOH/concepts/null_disag/'
+    NULL_DISAG_NAME = 'Null Disaggregation'
+
+    imap_fields = [
+        'DATIM_Indicator_Category',
+        'DATIM_Indicator_ID',
+        'DATIM_Disag_ID',
+        'DATIM_Disag_Name',
+        'Operation',
+        'MOH_Indicator_ID',
+        'MOH_Indicator_Name',
+        'MOH_Disag_ID',
+        'MOH_Disag_Name',
+    ]
+
+    # DATIM MOH Alignment Variables
+    datim_owner_id = 'PEPFAR'
+    datim_owner_type = 'Organization'
+    datim_source_id = 'DATIM-MOH'
+    country_owner = 'DATIM-MOH-xx'
+    country_owner_type = 'Organization'
+    country_source_id = 'DATIM-Alignment-Indicators'
+    concept_class_indicator = 'Indicator'
+    concept_class_disaggregate = 'Disaggregate'
+    map_type_datim_has_option = 'Has Option'
+    map_type_country_has_option = 'DATIM HAS OPTION'
+
     # Set the root directory
     if settings and settings.ROOT_DIR:
         __location__ = settings.ROOT_DIR
@@ -119,12 +165,16 @@ class DatimBase(object):
         else:
             return default_repo_stem
 
-    def owner_type_to_stem(self, owner_type, default_owner_stem=None):
-        """ Get an owner stem (e.g. orgs, users) given a fully specified owner type (e.g. Organization, User) """
-        if owner_type == self.RESOURCE_TYPE_USER:
-            return self.OWNER_STEM_USERS
-        elif owner_type == self.RESOURCE_TYPE_ORGANIZATION:
-            return self.OWNER_STEM_ORGS
+    @staticmethod
+    def owner_type_to_stem(owner_type, default_owner_stem=None):
+        """
+        Get an owner stem (e.g. orgs, users) given a fully specified
+        owner type (e.g. Organization, User)
+        """
+        if owner_type == DatimBase.RESOURCE_TYPE_USER:
+            return DatimBase.OWNER_STEM_USERS
+        elif owner_type == DatimBase.RESOURCE_TYPE_ORGANIZATION:
+            return DatimBase.OWNER_STEM_ORGS
         else:
             return default_owner_stem
 
@@ -244,6 +294,23 @@ class DatimBase(object):
             self.vlog(1, '[OCL Export %s of %s] %s: Created new repository version "%s"' % (
                 cnt, len(self.OCL_EXPORT_DEFS), ocl_export_key, repo_version_endpoint))
 
+    def get_latest_version_for_period(self, repo_endpoint='', period=''):
+        """
+        Fetch the latest version of a repository for the specified period
+        For example, if period is 'FY17', and 'FY17.v0' and 'FY17.v1' versions have been defined,
+        then 'FY17.v1' would be returned.
+        """
+
+        repo_versions_endpoint = '/orgs/%s/sources/%s/versions/' % (self.datim_owner_id, self.datim_source_id)
+        repo_versions_url = '%s%sversions/?limit=0' % (self.oclenv, repo_endpoint)
+        self.vlog(1, 'Fetching latest repository version for period "%s": %s' % (period, repo_versions_url))
+        r = requests.get(repo_versions_url, headers=self.oclapiheaders)
+        repo_versions = r.json()
+        for repo_version in repo_versions:
+            if repo_version['released'] == True and len(repo_version['id']) > len(period) and repo_version['id'][:len(period)] == period:
+                return repo_version['id']
+        return None
+
     def get_ocl_export(self, endpoint='', version='', zipfilename='', jsonfilename=''):
         """
         Fetches an export of the specified repository version and saves to file.
@@ -260,7 +327,7 @@ class DatimBase(object):
         if version == 'latest':
             url_latest_version = self.oclenv + endpoint + 'latest/'
             self.vlog(1, 'Latest version request URL:', url_latest_version)
-            r = requests.get(url_latest_version)
+            r = requests.get(url_latest_version, headers=self.oclapiheaders)
             r.raise_for_status()
             latest_version_attr = r.json()
             repo_version_id = latest_version_attr['id']
@@ -271,17 +338,17 @@ class DatimBase(object):
         # Get the export
         url_ocl_export = self.oclenv + endpoint + repo_version_id + '/export/'
         self.vlog(1, 'Export URL:', url_ocl_export)
-        r = requests.get(url_ocl_export)
+        r = requests.get(url_ocl_export, headers=self.oclapiheaders)
         r.raise_for_status()
         if r.status_code == 204:
             # Create the export and try one more time...
             self.log('WARNING: Export does not exist for "%s". Creating export...' % url_ocl_export)
-            new_export_request = requests.post(url_ocl_export)
+            new_export_request = requests.post(url_ocl_export, headers=self.oclapiheaders)
             if new_export_request.status_code == 202:
                 # Wait for export to be processed then try to fetch it
                 self.log('INFO: Waiting 30 seconds while export is being generated...')
                 time.sleep(30)
-                r = requests.get(url_ocl_export)
+                r = requests.get(url_ocl_export, headers=self.oclapiheaders)
                 r.raise_for_status()
             else:
                 self.log('ERROR: Unable to generate export for "%s"' % url_ocl_export)

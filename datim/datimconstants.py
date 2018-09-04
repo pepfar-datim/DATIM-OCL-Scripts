@@ -7,6 +7,7 @@ class DatimConstants(object):
 
     # Import batch IDs
     IMPORT_BATCH_MOH = 'MOH'
+    IMPORT_BATCH_MOH_FY18 = 'MOH-FY18'
     IMPORT_BATCH_MER = 'MER'
     IMPORT_BATCH_SIMS = 'SIMS'
     IMPORT_BATCH_MECHANISMS = 'Mechanisms'
@@ -15,6 +16,7 @@ class DatimConstants(object):
     # List of content categories
     SYNC_RESOURCE_TYPES = [
         IMPORT_BATCH_MOH,
+        IMPORT_BATCH_MOH_FY18,
         IMPORT_BATCH_MER,
         IMPORT_BATCH_SIMS,
         IMPORT_BATCH_MECHANISMS,
@@ -23,18 +25,21 @@ class DatimConstants(object):
 
     # OpenHIM Endpoints
     OPENHIM_ENDPOINT_MOH = 'datim-moh'
+    OPENHIM_ENDPOINT_MOH_FY18 = 'datim-moh'
     OPENHIM_ENDPOINT_MER = 'datim-mer'
     OPENHIM_ENDPOINT_SIMS = 'datim-sims'
     OPENHIM_ENDPOINT_MECHANISMS = 'datim-mechanisms'
     OPENHIM_ENDPOINT_TIERED_SUPPORT = 'datim-tiered-support'
 
     # DHIS2 Presentation URLs
+    DHIS2_PRESENTATION_URL_MOH_FY18 = 'https://test.geoalign.datim.org/api/sqlViews/jxuvedhz3S3/data.{{format}}?var=dataSets:sfk9cyQSUyi'
     DHIS2_PRESENTATION_URL_MOH = 'https://www.datim.org/api/sqlViews/DotdxKrNZxG/data.{{format}}?var=dataSets:{{dataset}}'
     DHIS2_PRESENTATION_URL_MER = 'https://www.datim.org/api/sqlViews/DotdxKrNZxG/data.{{format}}?var=dataSets:{{dataset}}'
     DHIS2_PRESENTATION_URL_DEFAULT = 'https://dev-de.datim.org/api/sqlViews/{{sqlview}}/data.{{format}}'
 
     # E2E Testing
     MOH_PRESENTATION_SORT_COLUMN = 4
+    MOH_FY18_PRESENTATION_SORT_COLUMN = 4
     MER_PRESENTATION_SORT_COLUMN = 4
     SIMS_PRESENTATION_SORT_COLUMN = 2
 
@@ -74,12 +79,26 @@ class DatimConstants(object):
     MOH_DHIS2_QUERIES = {
         'MOH': {
             'id': 'MOH',
-            'name': 'DATIM MOH Indicators',
+            'name': 'DATIM MOH FY17 Indicators',
             'query': '/api/dataElements.json?fields=id,code,name,shortName,lastUpdated,description,'
                      'categoryCombo[id,code,name,lastUpdated,created,'
                      'categoryOptionCombos[id,code,name,lastUpdated,created]],'
                      'dataSetElements[*,dataSet[id,name,shortName]]&'
                      'paging=false&filter=dataSetElements.dataSet.id:in:[{{active_dataset_ids}}]',
+            'conversion_method': 'dhis2diff_moh'
+        }
+    }
+
+    # MOH-FY18 DHIS2 Queries
+    MOH_FY18_DHIS2_QUERIES = {
+        'MOH-FY18': {
+            'id': 'MOH-FY18',
+            'name': 'DATIM MOH FY18 Indicators',
+            'query': '/api/dataElements.json?fields=id,code,name,shortName,lastUpdated,description,'
+                     'categoryCombo[id,code,name,lastUpdated,created,'
+                     'categoryOptionCombos[id,code,name,lastUpdated,created]],'
+                     'dataSetElements[*,dataSet[id,name,shortName]]&'
+                     'paging=false&filter=dataSetElements.dataSet.id:in:[sfk9cyQSUyi]',
             'conversion_method': 'dhis2diff_moh'
         }
     }
@@ -102,6 +121,15 @@ class DatimConstants(object):
             'import_batch': IMPORT_BATCH_MOH,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH/'},
+        }
+
+    # MOH FY18 OCL Export Definitions
+    MOH_FY18_OCL_EXPORT_DEFS = {
+        'MOH-FY18': {
+            'import_batch': IMPORT_BATCH_MOH_FY18,
+            'show_build_row_method': 'build_moh_fy18_indicator_output',
+            'show_headers_key': 'moh_fy18',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH/'},
         }
 
@@ -468,7 +496,6 @@ class DatimConstants(object):
             'show_headers_key': 'mer',
             'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-FY16Q1Q2Q3/'},
     }
-    # INACTIVE_MER_OCL_EXPORT_DEFS
 
     # SIMS OCL Export Definitions
     SIMS_OCL_EXPORT_DEFS = {

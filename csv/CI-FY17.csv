@@ -1,0 +1,119 @@
+DATIM_Indicator_Category,DATIM_Indicator_ID,DATIM_Disag_ID,DATIM_Disag_Name,Operation,MOH_Indicator_ID,MOH_Indicator_Name,MOH_Disag_ID,MOH_Disag_Name
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,HQWtIkUYJnX,TO-REPLACE--CI-Disag-Name-001
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,SULdDcCMhFZ,TO-REPLACE--CI-Disag-Name-002
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,QTQthvWluSq,TO-REPLACE--CI-Disag-Name-003
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,O3iQ4ZrdfMu,TO-REPLACE--CI-Disag-Name-004
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,qFM8SzeRUzs,TO-REPLACE--CI-Disag-Name-005
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,dOs57l5veXk,TO-REPLACE--CI-Disag-Name-006
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,jnjGnaXRYFY,TO-REPLACE--CI-Disag-Name-007
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,HfKG4nY4GxP,TO-REPLACE--CI-Disag-Name-008
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,nmvcJXCOkbZ,TO-REPLACE--CI-Disag-Name-009
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,LhM3JYaC4sw,TO-REPLACE--CI-Disag-Name-010
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,COIMYUgXS10,TO-REPLACE--CI-Disag-Name-011
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,XQcnS0da9M6,TO-REPLACE--CI-Disag-Name-012
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,Hhvh6cEoyBW,TO-REPLACE--CI-Disag-Name-013
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,Sh5mbUDWl1v,TO-REPLACE--CI-Disag-Name-014
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,HrQbkVgBM1X,Positive | <15 | Female,ADD,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,HQWtIkUYJnX,TO-REPLACE--CI-Disag-Name-001
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,HrQbkVgBM1X,Positive | <15 | Female,ADD,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,SULdDcCMhFZ,TO-REPLACE--CI-Disag-Name-002
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,HrQbkVgBM1X,Positive | <15 | Female,ADD,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,QTQthvWluSq,TO-REPLACE--CI-Disag-Name-003
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,HrQbkVgBM1X,Positive | <15 | Female,ADD,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,O3iQ4ZrdfMu,TO-REPLACE--CI-Disag-Name-004
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,R4WXCEzPZcY,Positive | <15 | Male,ADD,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,HfKG4nY4GxP,TO-REPLACE--CI-Disag-Name-008
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,R4WXCEzPZcY,Positive | <15 | Male,ADD,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,nmvcJXCOkbZ,TO-REPLACE--CI-Disag-Name-009
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,R4WXCEzPZcY,Positive | <15 | Male,ADD,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,LhM3JYaC4sw,TO-REPLACE--CI-Disag-Name-010
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,R4WXCEzPZcY,Positive | <15 | Male,ADD,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,COIMYUgXS10,TO-REPLACE--CI-Disag-Name-011
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,DY0yrJtBeSC,Positive | <15 | SexUnknown,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,WXV5qLgw7kE,Positive | 15+ | Female,ADD,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,qFM8SzeRUzs,TO-REPLACE--CI-Disag-Name-005
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,WXV5qLgw7kE,Positive | 15+ | Female,ADD,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,dOs57l5veXk,TO-REPLACE--CI-Disag-Name-006
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,WXV5qLgw7kE,Positive | 15+ | Female,ADD,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,jnjGnaXRYFY,TO-REPLACE--CI-Disag-Name-007
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,XQ52MZdCLMe,Positive | 15+ | Male,ADD,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,XQcnS0da9M6,TO-REPLACE--CI-Disag-Name-012
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,XQ52MZdCLMe,Positive | 15+ | Male,ADD,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,Hhvh6cEoyBW,TO-REPLACE--CI-Disag-Name-013
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,XQ52MZdCLMe,Positive | 15+ | Male,ADD,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,Sh5mbUDWl1v,TO-REPLACE--CI-Disag-Name-014
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,a2dDU6KZyd0,Positive | 15+ | SexUnknown,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,U6ErjBQYGSG,Positive | AgeUnknown | Female,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,SCD7EVreQUA,Positive | AgeUnknown | Male,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,EyJRtSgSChq,Positive | AgeUnknown | SexUnknown,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,FSmIqIsgheB,Negative | <15 | Female,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,HQWtIkUYJnX,TO-REPLACE--CI-Disag-Name-001
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,FSmIqIsgheB,Negative | <15 | Female,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,SULdDcCMhFZ,TO-REPLACE--CI-Disag-Name-002
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,FSmIqIsgheB,Negative | <15 | Female,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,QTQthvWluSq,TO-REPLACE--CI-Disag-Name-003
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,FSmIqIsgheB,Negative | <15 | Female,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,O3iQ4ZrdfMu,TO-REPLACE--CI-Disag-Name-004
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,FSmIqIsgheB,Negative | <15 | Female,SUBTRACT,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,HQWtIkUYJnX,TO-REPLACE--CI-Disag-Name-001
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,FSmIqIsgheB,Negative | <15 | Female,SUBTRACT,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,SULdDcCMhFZ,TO-REPLACE--CI-Disag-Name-002
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,FSmIqIsgheB,Negative | <15 | Female,SUBTRACT,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,QTQthvWluSq,TO-REPLACE--CI-Disag-Name-003
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,FSmIqIsgheB,Negative | <15 | Female,SUBTRACT,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,O3iQ4ZrdfMu,TO-REPLACE--CI-Disag-Name-004
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,LhAJq3vYXyi,Negative | <15 | Male,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,HfKG4nY4GxP,TO-REPLACE--CI-Disag-Name-008
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,LhAJq3vYXyi,Negative | <15 | Male,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,nmvcJXCOkbZ,TO-REPLACE--CI-Disag-Name-009
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,LhAJq3vYXyi,Negative | <15 | Male,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,LhM3JYaC4sw,TO-REPLACE--CI-Disag-Name-010
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,LhAJq3vYXyi,Negative | <15 | Male,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,COIMYUgXS10,TO-REPLACE--CI-Disag-Name-011
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,LhAJq3vYXyi,Negative | <15 | Male,SUBTRACT,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,HfKG4nY4GxP,TO-REPLACE--CI-Disag-Name-008
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,LhAJq3vYXyi,Negative | <15 | Male,SUBTRACT,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,nmvcJXCOkbZ,TO-REPLACE--CI-Disag-Name-009
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,LhAJq3vYXyi,Negative | <15 | Male,SUBTRACT,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,LhM3JYaC4sw,TO-REPLACE--CI-Disag-Name-010
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,LhAJq3vYXyi,Negative | <15 | Male,SUBTRACT,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,COIMYUgXS10,TO-REPLACE--CI-Disag-Name-011
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,PrIxM0pIjFl,Negative | <15 | SexUnknown,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,ymXkr5eCjR5,Negative | 15+ | Female,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,qFM8SzeRUzs,TO-REPLACE--CI-Disag-Name-005
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,ymXkr5eCjR5,Negative | 15+ | Female,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,dOs57l5veXk,TO-REPLACE--CI-Disag-Name-006
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,ymXkr5eCjR5,Negative | 15+ | Female,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,jnjGnaXRYFY,TO-REPLACE--CI-Disag-Name-007
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,ymXkr5eCjR5,Negative | 15+ | Female,SUBTRACT,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,qFM8SzeRUzs,TO-REPLACE--CI-Disag-Name-005
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,ymXkr5eCjR5,Negative | 15+ | Female,SUBTRACT,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,dOs57l5veXk,TO-REPLACE--CI-Disag-Name-006
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,ymXkr5eCjR5,Negative | 15+ | Female,SUBTRACT,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,jnjGnaXRYFY,TO-REPLACE--CI-Disag-Name-007
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,mlFWWrUMuV7,Negative | 15+ | Male,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,XQcnS0da9M6,TO-REPLACE--CI-Disag-Name-012
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,mlFWWrUMuV7,Negative | 15+ | Male,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,Hhvh6cEoyBW,TO-REPLACE--CI-Disag-Name-013
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,mlFWWrUMuV7,Negative | 15+ | Male,ADD,IXB6r4yuaNs,TO-REPLACE--CI-Indicator-Name-001,Sh5mbUDWl1v,TO-REPLACE--CI-Disag-Name-014
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,mlFWWrUMuV7,Negative | 15+ | Male,SUBTRACT,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,XQcnS0da9M6,TO-REPLACE--CI-Disag-Name-012
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,mlFWWrUMuV7,Negative | 15+ | Male,SUBTRACT,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,Hhvh6cEoyBW,TO-REPLACE--CI-Disag-Name-013
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,mlFWWrUMuV7,Negative | 15+ | Male,SUBTRACT,qXZ0XZSxPMf,TO-REPLACE--CI-Indicator-Name-002,Sh5mbUDWl1v,TO-REPLACE--CI-Disag-Name-014
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,qL3AXhLXfHf,Negative | 15+ | SexUnknown,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,K21p4HUGqOS,Negative | AgeUnknown | Female,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,iGj3YxYXGRF,Negative | AgeUnknown | Male,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,mV483q7SboN,Negative | AgeUnknown | SexUnknown,,,,,
+PMTCT_ART,PMTCT_ART_N_MOH,HllvX50cXC0,Total,ADD,Lvfxxn01Fw5,TO-REPLACE--CI-Indicator-Name-003,default,TO-REPLACE--CI-Disag-Name-015
+PMTCT_STAT,PMTCT_STAT_N_MOH,HllvX50cXC0,Total,ADD,CuwuNAZ07Pm,TO-REPLACE--CI-Indicator-Name-004,S8vPeswjEE0,TO-REPLACE--CI-Disag-Name-016
+PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,g2AcKVKFFTR,KnownPositives,ADD,U3YQks0pUgt,TO-REPLACE--CI-Indicator-Name-005,default,TO-REPLACE--CI-Disag-Name-015
+PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,skZHj1KgCFs,NewlyTestedPositives,ADD,dDDEBjP12cx,TO-REPLACE--CI-Indicator-Name-006,S8vPeswjEE0,TO-REPLACE--CI-Disag-Name-016
+PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,FwRU6E2C5kt,NewNegatives,,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Sex,BGFCDhyk4M8,<15 | Female,ADD,BptpWTVLDqv,TO-REPLACE--CI-Indicator-Name-007,HQWtIkUYJnX,TO-REPLACE--CI-Disag-Name-001
+TX_CURR,TX_CURR_N_MOH_Age_Sex,BGFCDhyk4M8,<15 | Female,ADD,BptpWTVLDqv,TO-REPLACE--CI-Indicator-Name-007,SULdDcCMhFZ,TO-REPLACE--CI-Disag-Name-002
+TX_CURR,TX_CURR_N_MOH_Age_Sex,BGFCDhyk4M8,<15 | Female,ADD,BptpWTVLDqv,TO-REPLACE--CI-Indicator-Name-007,QTQthvWluSq,TO-REPLACE--CI-Disag-Name-003
+TX_CURR,TX_CURR_N_MOH_Age_Sex,BGFCDhyk4M8,<15 | Female,ADD,BptpWTVLDqv,TO-REPLACE--CI-Indicator-Name-007,O3iQ4ZrdfMu,TO-REPLACE--CI-Disag-Name-004
+TX_CURR,TX_CURR_N_MOH_Age_Sex,SBUMYkq3pEs,<15 | Male,ADD,BptpWTVLDqv,TO-REPLACE--CI-Indicator-Name-007,HfKG4nY4GxP,TO-REPLACE--CI-Disag-Name-008
+TX_CURR,TX_CURR_N_MOH_Age_Sex,SBUMYkq3pEs,<15 | Male,ADD,BptpWTVLDqv,TO-REPLACE--CI-Indicator-Name-007,nmvcJXCOkbZ,TO-REPLACE--CI-Disag-Name-009
+TX_CURR,TX_CURR_N_MOH_Age_Sex,SBUMYkq3pEs,<15 | Male,ADD,BptpWTVLDqv,TO-REPLACE--CI-Indicator-Name-007,LhM3JYaC4sw,TO-REPLACE--CI-Disag-Name-010
+TX_CURR,TX_CURR_N_MOH_Age_Sex,SBUMYkq3pEs,<15 | Male,ADD,BptpWTVLDqv,TO-REPLACE--CI-Indicator-Name-007,COIMYUgXS10,TO-REPLACE--CI-Disag-Name-011
+TX_CURR,TX_CURR_N_MOH_Age_Sex,DOE1p3gdXIr,<15 | SexUnknown,,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Sex,er95aeLbIHg,15+ | Female,ADD,BptpWTVLDqv,TO-REPLACE--CI-Indicator-Name-007,qFM8SzeRUzs,TO-REPLACE--CI-Disag-Name-005
+TX_CURR,TX_CURR_N_MOH_Age_Sex,er95aeLbIHg,15+ | Female,ADD,BptpWTVLDqv,TO-REPLACE--CI-Indicator-Name-007,dOs57l5veXk,TO-REPLACE--CI-Disag-Name-006
+TX_CURR,TX_CURR_N_MOH_Age_Sex,er95aeLbIHg,15+ | Female,ADD,BptpWTVLDqv,TO-REPLACE--CI-Indicator-Name-007,jnjGnaXRYFY,TO-REPLACE--CI-Disag-Name-007
+TX_CURR,TX_CURR_N_MOH_Age_Sex,RFKoE51NKAq,15+ | Male,ADD,BptpWTVLDqv,TO-REPLACE--CI-Indicator-Name-007,XQcnS0da9M6,TO-REPLACE--CI-Disag-Name-012
+TX_CURR,TX_CURR_N_MOH_Age_Sex,RFKoE51NKAq,15+ | Male,ADD,BptpWTVLDqv,TO-REPLACE--CI-Indicator-Name-007,Hhvh6cEoyBW,TO-REPLACE--CI-Disag-Name-013
+TX_CURR,TX_CURR_N_MOH_Age_Sex,RFKoE51NKAq,15+ | Male,ADD,BptpWTVLDqv,TO-REPLACE--CI-Indicator-Name-007,Sh5mbUDWl1v,TO-REPLACE--CI-Disag-Name-014
+TX_CURR,TX_CURR_N_MOH_Age_Sex,EnFWVKd0OVk,15+ | SexUnknown,,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Sex,Na0IrYFjVsM,AgeUnknown | Female,,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Sex,iQArB1Jys2K,AgeUnknown | Male,,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Sex,sZtIQvBYLEV,AgeUnknown | SexUnknown,,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Sex,BGFCDhyk4M8,<15 | Female,ADD,uzRicBQ7oCh,TO-REPLACE--CI-Indicator-Name-008,HQWtIkUYJnX,TO-REPLACE--CI-Disag-Name-001
+TX_NEW,TX_NEW_N_MOH_Age_Sex,BGFCDhyk4M8,<15 | Female,ADD,uzRicBQ7oCh,TO-REPLACE--CI-Indicator-Name-008,SULdDcCMhFZ,TO-REPLACE--CI-Disag-Name-002
+TX_NEW,TX_NEW_N_MOH_Age_Sex,BGFCDhyk4M8,<15 | Female,ADD,uzRicBQ7oCh,TO-REPLACE--CI-Indicator-Name-008,QTQthvWluSq,TO-REPLACE--CI-Disag-Name-003
+TX_NEW,TX_NEW_N_MOH_Age_Sex,BGFCDhyk4M8,<15 | Female,ADD,uzRicBQ7oCh,TO-REPLACE--CI-Indicator-Name-008,O3iQ4ZrdfMu,TO-REPLACE--CI-Disag-Name-004
+TX_NEW,TX_NEW_N_MOH_Age_Sex,SBUMYkq3pEs,<15 | Male,ADD,uzRicBQ7oCh,TO-REPLACE--CI-Indicator-Name-008,HfKG4nY4GxP,TO-REPLACE--CI-Disag-Name-008
+TX_NEW,TX_NEW_N_MOH_Age_Sex,SBUMYkq3pEs,<15 | Male,ADD,uzRicBQ7oCh,TO-REPLACE--CI-Indicator-Name-008,nmvcJXCOkbZ,TO-REPLACE--CI-Disag-Name-009
+TX_NEW,TX_NEW_N_MOH_Age_Sex,SBUMYkq3pEs,<15 | Male,ADD,uzRicBQ7oCh,TO-REPLACE--CI-Indicator-Name-008,LhM3JYaC4sw,TO-REPLACE--CI-Disag-Name-010
+TX_NEW,TX_NEW_N_MOH_Age_Sex,SBUMYkq3pEs,<15 | Male,ADD,uzRicBQ7oCh,TO-REPLACE--CI-Indicator-Name-008,COIMYUgXS10,TO-REPLACE--CI-Disag-Name-011
+TX_NEW,TX_NEW_N_MOH_Age_Sex,DOE1p3gdXIr,<15 | SexUnknown,,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Sex,er95aeLbIHg,15+ | Female,ADD,uzRicBQ7oCh,TO-REPLACE--CI-Indicator-Name-008,qFM8SzeRUzs,TO-REPLACE--CI-Disag-Name-005
+TX_NEW,TX_NEW_N_MOH_Age_Sex,er95aeLbIHg,15+ | Female,ADD,uzRicBQ7oCh,TO-REPLACE--CI-Indicator-Name-008,dOs57l5veXk,TO-REPLACE--CI-Disag-Name-006
+TX_NEW,TX_NEW_N_MOH_Age_Sex,er95aeLbIHg,15+ | Female,ADD,uzRicBQ7oCh,TO-REPLACE--CI-Indicator-Name-008,jnjGnaXRYFY,TO-REPLACE--CI-Disag-Name-007
+TX_NEW,TX_NEW_N_MOH_Age_Sex,RFKoE51NKAq,15+ | Male,ADD,uzRicBQ7oCh,TO-REPLACE--CI-Indicator-Name-008,XQcnS0da9M6,TO-REPLACE--CI-Disag-Name-012
+TX_NEW,TX_NEW_N_MOH_Age_Sex,RFKoE51NKAq,15+ | Male,ADD,uzRicBQ7oCh,TO-REPLACE--CI-Indicator-Name-008,Hhvh6cEoyBW,TO-REPLACE--CI-Disag-Name-013
+TX_NEW,TX_NEW_N_MOH_Age_Sex,RFKoE51NKAq,15+ | Male,ADD,uzRicBQ7oCh,TO-REPLACE--CI-Indicator-Name-008,Sh5mbUDWl1v,TO-REPLACE--CI-Disag-Name-014
+TX_NEW,TX_NEW_N_MOH_Age_Sex,EnFWVKd0OVk,15+ | SexUnknown,,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Sex,Na0IrYFjVsM,AgeUnknown | Female,,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Sex,iQArB1Jys2K,AgeUnknown | Male,,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Sex,sZtIQvBYLEV,AgeUnknown | SexUnknown,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,BGFCDhyk4M8,<15 | Female,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,SBUMYkq3pEs,<15 | Male,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,DOE1p3gdXIr,<15 | SexUnknown,ADD,noY53a6XIFk,TO-REPLACE--CI-Indicator-Name-009,eKKZSAV1jH5,TO-REPLACE--CI-Disag-Name-017
+TX_RET,TX_RET_N_MOH_Age_Sex,er95aeLbIHg,15+ | Female,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,RFKoE51NKAq,15+ | Male,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,EnFWVKd0OVk,15+ | SexUnknown,ADD,noY53a6XIFk,TO-REPLACE--CI-Indicator-Name-009,ssuCZrP8K3M,TO-REPLACE--CI-Disag-Name-018
+TX_RET,TX_RET_N_MOH_Age_Sex,Na0IrYFjVsM,AgeUnknown | Female,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,iQArB1Jys2K,AgeUnknown | Male,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,sZtIQvBYLEV,AgeUnknown | SexUnknown,,,,,

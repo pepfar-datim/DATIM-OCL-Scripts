@@ -1,0 +1,69 @@
+DATIM_Indicator_Category,DATIM_Indicator_ID,DATIM_Disag_ID,DATIM_Disag_Name,Operation,MOH_Indicator_ID,MOH_Indicator_Name,MOH_Disag_ID,MOH_Disag_Name
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,TO-REPLACE--KE-Indicator-ID-001,HV01-01,TO-REPLACE--KE-Disag-ID-001,First Test
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,TO-REPLACE--KE-Indicator-ID-002,HV01-02,TO-REPLACE--KE-Disag-ID-002,Repeat Test
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,HrQbkVgBM1X,Positive | <15 | Female,ADD,TO-REPLACE--KE-Indicator-ID-003,HV01-11,TO-REPLACE--KE-Disag-ID-003,Positive| Females - Below 15 year
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,R4WXCEzPZcY,Positive | <15 | Male,ADD,TO-REPLACE--KE-Indicator-ID-004,HV01-10,TO-REPLACE--KE-Disag-ID-004,Positive| Males - Below 15 year
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,DY0yrJtBeSC,Positive | <15 | SexUnknown,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,WXV5qLgw7kE,Positive | 15+ | Female,ADD,TO-REPLACE--KE-Indicator-ID-005,HV01-13,TO-REPLACE--KE-Disag-ID-005,Positive|Female 15-24 years
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,WXV5qLgw7kE,Positive | 15+ | Female,ADD,TO-REPLACE--KE-Indicator-ID-006,HV01-15,TO-REPLACE--KE-Disag-ID-006,Positive|Females 25 years & older
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,XQ52MZdCLMe,Positive | 15+ | Male,ADD,TO-REPLACE--KE-Indicator-ID-007,HV01-12,TO-REPLACE--KE-Disag-ID-007,Positive|Males 15-24 years
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,XQ52MZdCLMe,Positive | 15+ | Male,ADD,TO-REPLACE--KE-Indicator-ID-008,HV01-14,TO-REPLACE--KE-Disag-ID-008,Positive|Males 25 years & older
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,a2dDU6KZyd0,Positive | 15+ | SexUnknown,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,U6ErjBQYGSG,Positive | AgeUnknown | Female,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,SCD7EVreQUA,Positive | AgeUnknown | Male,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,EyJRtSgSChq,Positive | AgeUnknown | SexUnknown,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,FSmIqIsgheB,Negative | <15 | Female,ADD,TO-REPLACE--KE-Indicator-ID-001,HV01-01,TO-REPLACE--KE-Disag-ID-001,First Test
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,FSmIqIsgheB,Negative | <15 | Female,ADD,TO-REPLACE--KE-Indicator-ID-002,HV01-02,TO-REPLACE--KE-Disag-ID-002,Repeat Test
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,FSmIqIsgheB,Negative | <15 | Female,SUBTRACT,TO-REPLACE--KE-Indicator-ID-003,HV01-11,TO-REPLACE--KE-Disag-ID-003,Positive| Females - Below 15 year
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,LhAJq3vYXyi,Negative | <15 | Male,ADD,TO-REPLACE--KE-Indicator-ID-001,HV01-01,TO-REPLACE--KE-Disag-ID-001,First Test
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,LhAJq3vYXyi,Negative | <15 | Male,ADD,TO-REPLACE--KE-Indicator-ID-002,HV01-02,TO-REPLACE--KE-Disag-ID-002,Repeat Test
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,LhAJq3vYXyi,Negative | <15 | Male,SUBTRACT,TO-REPLACE--KE-Indicator-ID-004,HV01-10,TO-REPLACE--KE-Disag-ID-004,Positive| Males - Below 15 year
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,PrIxM0pIjFl,Negative | <15 | SexUnknown,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,ymXkr5eCjR5,Negative | 15+ | Female,ADD,TO-REPLACE--KE-Indicator-ID-001,HV01-01,TO-REPLACE--KE-Disag-ID-001,First Test
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,ymXkr5eCjR5,Negative | 15+ | Female,ADD,TO-REPLACE--KE-Indicator-ID-002,HV01-02,TO-REPLACE--KE-Disag-ID-002,Repeat Test
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,ymXkr5eCjR5,Negative | 15+ | Female,SUBTRACT,TO-REPLACE--KE-Indicator-ID-005,HV01-13,TO-REPLACE--KE-Disag-ID-009,Positive| Female 15-24 years
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,ymXkr5eCjR5,Negative | 15+ | Female,SUBTRACT,TO-REPLACE--KE-Indicator-ID-006,HV01-15,TO-REPLACE--KE-Disag-ID-010,Positive|Female 25 years & older
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,mlFWWrUMuV7,Negative | 15+ | Male,ADD,TO-REPLACE--KE-Indicator-ID-001,HV01-01,TO-REPLACE--KE-Disag-ID-001,First Test
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,mlFWWrUMuV7,Negative | 15+ | Male,ADD,TO-REPLACE--KE-Indicator-ID-002,HV01-02,TO-REPLACE--KE-Disag-ID-002,Repeat Test
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,qL3AXhLXfHf,Negative | 15+ | SexUnknown,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,K21p4HUGqOS,Negative | AgeUnknown | Female,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,iGj3YxYXGRF,Negative | AgeUnknown | Male,,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,mV483q7SboN,Negative | AgeUnknown | SexUnknown,,,,,
+PMTCT_ART,PMTCT_ART_N_MOH,HllvX50cXC0,Total,ADD,TO-REPLACE--KE-Indicator-ID-009,HV02-13,TO-REPLACE--KE-Disag-ID-011,Prophylaxis – NVP Only
+PMTCT_ART,PMTCT_ART_N_MOH,HllvX50cXC0,Total,ADD,TO-REPLACE--KE-Indicator-ID-010,HV02-14,TO-REPLACE--KE-Disag-ID-012,Prophylaxis – (AZT + SdNVP)
+PMTCT_ART,PMTCT_ART_N_MOH,HllvX50cXC0,Total,ADD,TO-REPLACE--KE-Indicator-ID-011,HV02-15,TO-REPLACE--KE-Disag-ID-013,Prophylaxis – Interrupted HAART
+PMTCT_ART,PMTCT_ART_N_MOH,HllvX50cXC0,Total,ADD,TO-REPLACE--KE-Indicator-ID-012,HV02-16,TO-REPLACE--KE-Disag-ID-014,HAART (ART)
+PMTCT_STAT,PMTCT_STAT_N_MOH,HllvX50cXC0,Total,ADD,TO-REPLACE--KE-Indicator-ID-013,HV02-01,TO-REPLACE--KE-Disag-ID-015,Testing for HIV Antenatal
+PMTCT_STAT,PMTCT_STAT_N_MOH,HllvX50cXC0,Total,ADD,TO-REPLACE--KE-Indicator-ID-014,HV02-05,TO-REPLACE--KE-Disag-ID-016,Known positive status (at entry into ANC)
+PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,g2AcKVKFFTR,KnownPositives,ADD,TO-REPLACE--KE-Indicator-ID-014,HV02-05,TO-REPLACE--KE-Disag-ID-016,Known positive status (at entry into ANC)
+PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,skZHj1KgCFs,NewlyTestedPositives,ADD,TO-REPLACE--KE-Indicator-ID-015,HV02-06,TO-REPLACE--KE-Disag-ID-017,HIV positive results Antenatal
+PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,FwRU6E2C5kt,NewNegatives,,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Sex,BGFCDhyk4M8,<15 | Female,ADD,TO-REPLACE--KE-Indicator-ID-016,HV03-36 (F),TO-REPLACE--KE-Disag-ID-018,Currently on ART - Below 15 years
+TX_CURR,TX_CURR_N_MOH_Age_Sex,SBUMYkq3pEs,<15 | Male,ADD,TO-REPLACE--KE-Indicator-ID-017,HV03-35 (M),TO-REPLACE--KE-Disag-ID-018,Currently on ART - Below 15 years
+TX_CURR,TX_CURR_N_MOH_Age_Sex,DOE1p3gdXIr,<15 | SexUnknown,,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Sex,er95aeLbIHg,15+ | Female,ADD,TO-REPLACE--KE-Indicator-ID-018,HV03-38(F),TO-REPLACE--KE-Disag-ID-019,Currently on ART - 15 years & older
+TX_CURR,TX_CURR_N_MOH_Age_Sex,RFKoE51NKAq,15+ | Male,ADD,TO-REPLACE--KE-Indicator-ID-019,HV03-37 (M),TO-REPLACE--KE-Disag-ID-019,Currently on ART - 15 years & older
+TX_CURR,TX_CURR_N_MOH_Age_Sex,EnFWVKd0OVk,15+ | SexUnknown,,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Sex,Na0IrYFjVsM,AgeUnknown | Female,,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Sex,iQArB1Jys2K,AgeUnknown | Male,,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Sex,sZtIQvBYLEV,AgeUnknown | SexUnknown,,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Sex,BGFCDhyk4M8,<15 | Female,ADD,TO-REPLACE--KE-Indicator-ID-020,HV03-22 (F),TO-REPLACE--KE-Disag-ID-020,Starting ART - Below 15 years
+TX_NEW,TX_NEW_N_MOH_Age_Sex,SBUMYkq3pEs,<15 | Male,ADD,TO-REPLACE--KE-Indicator-ID-021,HV03-21 (M),TO-REPLACE--KE-Disag-ID-020,Starting ART - Below 15 years
+TX_NEW,TX_NEW_N_MOH_Age_Sex,DOE1p3gdXIr,<15 | SexUnknown,,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Sex,er95aeLbIHg,15+ | Female,ADD,TO-REPLACE--KE-Indicator-ID-022,HV03-24 (F),TO-REPLACE--KE-Disag-ID-021,Starting ART - 15 years & older
+TX_NEW,TX_NEW_N_MOH_Age_Sex,RFKoE51NKAq,15+ | Male,ADD,TO-REPLACE--KE-Indicator-ID-023,HV03-23 (M),TO-REPLACE--KE-Disag-ID-021,Starting ART - 15 years & older
+TX_NEW,TX_NEW_N_MOH_Age_Sex,EnFWVKd0OVk,15+ | SexUnknown,,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Sex,Na0IrYFjVsM,AgeUnknown | Female,,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Sex,iQArB1Jys2K,AgeUnknown | Male,,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Sex,sZtIQvBYLEV,AgeUnknown | SexUnknown,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,BGFCDhyk4M8,<15 | Female,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,SBUMYkq3pEs,<15 | Male,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,DOE1p3gdXIr,<15 | SexUnknown,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,er95aeLbIHg,15+ | Female,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,RFKoE51NKAq,15+ | Male,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,EnFWVKd0OVk,15+ | SexUnknown,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,Na0IrYFjVsM,AgeUnknown | Female,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,iQArB1Jys2K,AgeUnknown | Male,,,,,
+TX_RET,TX_RET_N_MOH_Age_Sex,sZtIQvBYLEV,AgeUnknown | SexUnknown,ADD,TO-REPLACE--KE-Indicator-ID-024,ART Net Cohort at 12 months,TO-REPLACE--KE-Disag-ID-022,1st line
+TX_RET,TX_RET_N_MOH_Age_Sex,sZtIQvBYLEV,AgeUnknown | SexUnknown,ADD,TO-REPLACE--KE-Indicator-ID-024,ART Net Cohort at 12 months,TO-REPLACE--KE-Disag-ID-023,Alternate 1st line
+TX_RET,TX_RET_N_MOH_Age_Sex,sZtIQvBYLEV,AgeUnknown | SexUnknown,ADD,TO-REPLACE--KE-Indicator-ID-024,ART Net Cohort at 12 months,TO-REPLACE--KE-Disag-ID-024,2nd line or higher

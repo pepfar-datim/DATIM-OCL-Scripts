@@ -191,3 +191,61 @@ import_filename = 'mer_dhis2ocl_import_script.json'
 importer_collections = OclFlexImporter(
     file_path=import_filename, limit=1, api_url_root=oclenv, api_token=oclapitoken, test_mode=False)
 importer_collections.process()
+
+
+
+
+
+# Code to import JSON into OCL using the fancy new ocldev package
+import json
+import ocldev.oclfleximporter
+oclenv = 'https://api.staging.openconceptlab.org'
+oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
+with open('fy18_import_list.json') as ifile:
+    import_list = json.load(ifile)
+importer = ocldev.oclfleximporter.OclFlexImporter(input_list=import_list, api_url_root=oclenv, api_token=oclapitoken, test_mode=False)
+importer.process()
+
+
+# Code to retire matching mappings using the fancy new ocldev package
+import json
+import requests
+import ocldev.oclexport
+import ocldev.oclfleximporter
+oclenv = 'https://api.staging.openconceptlab.org'
+oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
+oclapiheaders = {
+    'Authorization': 'Token ' + oclapitoken,
+    'Content-Type': 'application/json'
+}
+with open('mappings_to_retire.json') as ifile:
+    mr = json.load(ifile)
+datim_moh_export = ocldev.oclexport.OclExportFactory.load_export(repo_version_url='https://api.staging.openconceptlab.org/orgs/PEPFAR/sources/DATIM-MOH/FY18.alpha/', oclapitoken=oclapitoken)
+for partial_map in mr:
+    full_maps = datim_moh_export.get_mappings(from_concept_uri=partial_map['from_concept_url'], to_concept_uri=partial_map['to_concept_url'], map_type=partial_map['map_type'])
+    if len(full_maps) == 1:
+        mapping_url = oclenv + full_maps[0]['versioned_object_url']
+        print mapping_url
+        r = requests.put(mapping_url, json={'retired':True, "update_comment":"FY18 update"}, headers=oclapiheaders)
+        print r.status_code
+
+
+# Delete all references in a collection
+collection_url = 'https://api.staging.openconceptlab.org/users/paynejd/collections/MyCollection/'
+collection_ref_url = '%sreferences/' % collection_url
+r = requests.get(collection_url, headers=oclapiheaders)
+r.raise_for_status()
+collection = r.json()
+refs = []
+for ref in collection['references']:
+    refs.append(ref['expression'])
+
+payload = { "references": refs }
+r = requests.delete(collection_ref_url, json=payload, headers=oclapiheaders)
+r.raise_for_status()
+print r.text
+
+
+
+
+

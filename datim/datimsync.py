@@ -22,6 +22,7 @@ from shutil import copyfile
 import ocldev.oclfleximporter
 import deepdiff
 import datimbase
+import pprint
 
 
 class DatimSync(datimbase.DatimBase):
@@ -130,7 +131,7 @@ class DatimSync(datimbase.DatimBase):
                         to_source_url='', to_concept_code=''):
         # Handle the source url
         if not mapping_source_url:
-            mapping_owner_stem = self.owner_type_to_stem(mapping_owner_type)
+            mapping_owner_stem = datimbase.DatimBase.owner_type_to_stem(mapping_owner_type)
             if not mapping_owner_stem:
                 self.log('ERROR: Invalid mapping_owner_type "%s"' % mapping_owner_type)
                 sys.exit(1)
@@ -272,10 +273,12 @@ class DatimSync(datimbase.DatimBase):
         self.vlog(1, 'Request URL:', url_dhis2_query)
         r = requests.get(url_dhis2_query, auth=HTTPBasicAuth(self.dhis2uid, self.dhis2pwd))
         r.raise_for_status()
+        content_length = 0
         with open(self.attach_absolute_data_path(outputfilename), 'wb') as handle:
             for block in r.iter_content(1024):
                 handle.write(block)
-        return r.headers['Content-Length']
+                content_length += len(block)
+        return content_length
 
     def perform_diff(self, ocl_diff=None, dhis2_diff=None):
         """
@@ -289,10 +292,17 @@ class DatimSync(datimbase.DatimBase):
             diff[import_batch_key] = {}
             for resource_type in self.sync_resource_types:
                 if resource_type in ocl_diff[import_batch_key] and resource_type in dhis2_diff[import_batch_key]:
-                    diff[import_batch_key][resource_type] = deepdiff.DeepDiff(
+                    resource_specific_diff = deepdiff.DeepDiff(
                         ocl_diff[import_batch_key][resource_type],
                         dhis2_diff[import_batch_key][resource_type],
                         ignore_order=True, verbose_level=2)
+                    if resource_type in [self.RESOURCE_TYPE_CONCEPT, self.RESOURCE_TYPE_MAPPING] and 'dictionary_item_removed' in resource_specific_diff:
+                        # Remove these resources from the diff results if they are already retired in OCL - no action needed
+                        keys = resource_specific_diff['dictionary_item_removed'].keys()
+                        for key in keys:
+                            if 'retired' in resource_specific_diff['dictionary_item_removed'][key] and resource_specific_diff['dictionary_item_removed'][key]['retired']:
+                                del(resource_specific_diff['dictionary_item_removed'][key])
+                    diff[import_batch_key][resource_type] = resource_specific_diff
                     if self.verbosity:
                         str_log = 'IMPORT_BATCH["%s"]["%s"]: ' % (import_batch_key, resource_type)
                         for k in diff[import_batch_key][resource_type]:
@@ -385,7 +395,7 @@ class DatimSync(datimbase.DatimBase):
             # all good...
             pass
         elif collection_owner_id and collection_id:
-            collection_owner_stem = self.owner_type_to_stem(collection_owner_type, self.OWNER_STEM_ORGS)
+            collection_owner_stem = datimbase.DatimBase.owner_type_to_stem(collection_owner_type, self.OWNER_STEM_ORGS)
             collection_url = '/%s/%s/collections/%s/' % (collection_owner_stem, collection_owner_id, collection_id)
         else:
             self.log('ERROR: Must provide "collection_owner_type", "collection_owner_id", and "collection_id" '
@@ -404,7 +414,7 @@ class DatimSync(datimbase.DatimBase):
         if not mapping_from_export:
             self.log('something really wrong happened here...')
             sys.exit(1)
-        mapping_owner_stem = self.owner_type_to_stem(mapping_from_export['owner_type'])
+        mapping_owner_stem = datimbase.DatimBase.owner_type_to_stem(mapping_from_export['owner_type'])
         mapping_owner = mapping_from_export['owner']
         mapping_source = mapping_from_export['source']
         mapping_source_url = '/%s/%s/sources/%s/' % (mapping_owner_stem, mapping_owner, mapping_source)
@@ -437,7 +447,7 @@ class DatimSync(datimbase.DatimBase):
             # all good...
             pass
         elif collection_owner_id and collection_id:
-            collection_owner_stem = self.owner_type_to_stem(collection_owner_type, self.OWNER_STEM_ORGS)
+            collection_owner_stem = datimbase.DatimBase.owner_type_to_stem(collection_owner_type, self.OWNER_STEM_ORGS)
             collection_url = '/%s/%s/collections/%s/' % (collection_owner_stem, collection_owner_id, collection_id)
         else:
             self.log('ERROR: Must provide "collection_owner_type", "collection_owner_id", and "collection_id" '
@@ -608,11 +618,18 @@ class DatimSync(datimbase.DatimBase):
             local_ocl_diff = json.load(file_ocl_diff)
             local_dhis2_diff = json.load(file_dhis2_diff)
             self.diff_result = self.perform_diff(ocl_diff=local_ocl_diff, dhis2_diff=local_dhis2_diff)
+
+        # TODO: Remove the diff_result display after final testing of DATIM FY18 content
+        pprint.pprint(self.diff_result)
+
+        '''
+        # JP (2018-08-29): Unable to serialize NoneType or sets as JSON
         if self.write_diff_to_file:
             filename_diff_results = self.filename_diff_result(self.SYNC_NAME)
             with open(self.attach_absolute_data_path(filename_diff_results), 'wb') as ofile:
                 ofile.write(json.dumps(self.diff_result))
             self.vlog(1, 'Diff results successfully written to "%s"' % filename_diff_results)
+        '''
 
         # STEP 8 of 12: Determine action based on diff result
         # NOTE: This step occurs regardless of sync mode -- processing terminates here if DIFF mode

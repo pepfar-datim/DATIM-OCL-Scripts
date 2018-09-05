@@ -25,10 +25,11 @@ oclenv = settings.ocl_api_url_staging
 oclapitoken = settings.api_token_staging_datim_admin
 
 # Optionally set arguments from the command line
-if sys.argv and len(sys.argv) > 3:
+if sys.argv and len(sys.argv) > 4:
     country_code = sys.argv[1]
     period = sys.argv[2]
     csv_filename = sys.argv[3]
+    country_name = sys.argv[4]
 
 # Pre-pocess input parameters
 country_org = 'DATIM-MOH-%s' % country_code

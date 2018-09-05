@@ -30,7 +30,7 @@ if sys.argv and len(sys.argv) > 5:
     country_code = sys.argv[1]
     export_format = datim.datimimapexport.DatimImapExport.get_format_from_string(sys.argv[2])
     period = sys.argv[3]
-    verbosity = sys.argv[4]
+    verbosity = int(sys.argv[4])
     exclude_empty_maps = sys.argv[5]
 
 # Pre-pocess input parameters

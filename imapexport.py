@@ -26,10 +26,12 @@ oclenv = settings.ocl_api_url_staging
 oclapitoken = settings.api_token_staging_datim_admin
 
 # Optionally set arguments from the command line
-if sys.argv and len(sys.argv) > 3:
+if sys.argv and len(sys.argv) > 5:
     country_code = sys.argv[1]
     export_format = datim.datimimapexport.DatimImapExport.get_format_from_string(sys.argv[2])
     period = sys.argv[3]
+    verbosity = sys.argv[4]
+    exclude_empty_maps = sys.argv[5]
 
 # Pre-pocess input parameters
 country_org = 'DATIM-MOH-%s' % country_code

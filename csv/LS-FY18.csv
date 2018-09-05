@@ -1,0 +1,43 @@
+DATIM_Indicator_Category,DATIM_Indicator_ID,DATIM_Disag_Name,DATIM_Disag_ID,Operation,MOH_Indicator_Name,MOH_Indicator_ID,MOH_Disag_Name,MOH_Disag_ID
+HTS_TST,HTS_TST_N_MOH,Total,HllvX50cXC0,ADD,Clients tesed for HIV,INDHTC-01,Clients tested for HIV,INDHTC-01
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | AgeUnknown | Female,U6ErjBQYGSG,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | AgeUnknown | Male,SCD7EVreQUA,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | AgeUnknown | Female,K21p4HUGqOS,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | AgeUnknown | Male,iGj3YxYXGRF,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | <15 | Female,HrQbkVgBM1X,ADD,Children 0-14  tested HIV positive,INDHTC- 108b,Children 0-14  tested HIV positive,F
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | <15 | Male,R4WXCEzPZcY,ADD,Children 0-14  tested HIV positive,INDHTC- 108b,Children 0-14  tested HIV positive,M
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | <15 | SexUnknown,DY0yrJtBeSC,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | 15+ | Female,WXV5qLgw7kE,ADD,Adults 15+  tested HIV positive,INDHTC-110b,Adults 15+  tested HIV positive,F
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | 15+ | Male,XQ52MZdCLMe,ADD,Adults 15+  tested HIV positive,INDHTC-110b,Adults 15+  tested HIV positiv,M
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | 15+ | SexUnknown,a2dDU6KZyd0,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | AgeUnknown | SexUnknown,EyJRtSgSChq,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Female,FSmIqIsgheB,ADD,HIV negative Children (0-14years),INDHTC-108c,HIV negative Children (0-14years),Females
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Male,LhAJq3vYXyi,ADD,HIV negative Children (0-14years),INDHTC-108c,HIV negative Children (0-14years),Males
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | SexUnknown,PrIxM0pIjFl,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | Female,ymXkr5eCjR5,ADD,HIV negative adults 15+,INDHTC-110c,HIV negative adults 15+,Females
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | Male,mlFWWrUMuV7,ADD,HIV negative adults 15+,INDHTC-110c,HIV negative adults 15+,Males
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | SexUnknown,qL3AXhLXfHf,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | AgeUnknown | SexUnknown,mV483q7SboN,ADD,,,,
+PMTCT_ART,PMTCT_ART_N_MOH,Total,HllvX50cXC0,ADD,HIV+ pregnant women receiving ART,INDANC-04a,HIV+ pregnant women receiving ART ,INDANC-04a
+PMTCT_STAT,PMTCT_STAT_N_MOH,Total,HllvX50cXC0,ADD,Number of new ANC clients with documented HIV status,INDANC-02a,Number of new ANC clients with documented HIV status,INDANC-02a
+PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,KnownPositives,g2AcKVKFFTR,ADD,ANC clientswith known HIV positive status before ANC visit,ANC-15_2,ANC clientswith known HIV positive status before ANC visit ,ANC-15_2
+PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,NewlyTestedPositives,skZHj1KgCFs,ADD,HIV+ ANC clients(New and subsequent visits),INDANC-03a,HIV+ ANC clients(New and subsequent visits ,INDANC-03a
+PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,NewNegatives,FwRU6E2C5kt,ADD,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex_HIVStatus,<15 | Female,chrwpNxHlQQ,ADD,Children 0-14yrs currently in HIV Care (PRE- ART+ART) (Includes children not seen but still active on Pre-ART and ART),INDART-69,Children 0-14yrs currently in HIV Care (PRE- ART+ART) (Includes children not seen but still active on Pre-ART and ART),Females
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex_HIVStatus,<15 | Male,zHSL7ATXJib,ADD,Children 0-14yrs currently in HIV Care (PRE- ART+ART) (Includes children not seen but still active on Pre-ART and ART),INDART-69,Children (0-14)initiated ART,Males
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex_HIVStatus,<15 | SexUnknown,uURluLqPIJ5,ADD,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex_HIVStatus,15+ | Female,Yf1BiWq71NE,ADD,Adults 15+yrs currently on ART (includes adults not seen but still active on ART),INDART-68,Adults 15+yrs currently on ART (includes adults not seen but still active on ART),Females
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex_HIVStatus,15+ | Male,XX7hDj6iz0D,ADD,Adults 15+yrs currently on ART (includes adults not seen but still active on ART),INDART-68,Adults 15+yrs currently on ART (includes adults not seen but still active on ART),Males
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex_HIVStatus,15+ | SexUnknown,qli3maq9Ot7,ADD,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex_HIVStatus,AgeUnknown | Female,P9UIhogYbAa,ADD,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex_HIVStatus,AgeUnknown | Male,UN9ZOZLLVqN,ADD,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex_HIVStatus,AgeUnknown | SexUnknown,Gfje2jHn5TY,ADD,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex_HIVStatus,<15 | Female,chrwpNxHlQQ,ADD,Children (0-14)initiated ART,INDART-01a,Children (0-14)initiated ART,Females
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex_HIVStatus,<15 | Male,zHSL7ATXJib,ADD,Children (0-14)initiated ART,INDART-01a,Children (0-14)initiated ART,Males
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex_HIVStatus,<15 | SexUnknown,uURluLqPIJ5,ADD,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex_HIVStatus,15+ | Female,Yf1BiWq71NE,ADD,Adults (14+) initiated ART,INDART-01b,Adults (14+) initiated ART,Females
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex_HIVStatus,15+ | Male,XX7hDj6iz0D,ADD,Adults (14+) initiated ART,INDART-01b,Adults (14+) initiated ART,Males
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex_HIVStatus,15+ | SexUnknown,qli3maq9Ot7,ADD,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex_HIVStatus,AgeUnknown | Female,P9UIhogYbAa,ADD,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex_HIVStatus,AgeUnknown | Male,UN9ZOZLLVqN,ADD,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex_HIVStatus,AgeUnknown | SexUnknown,Gfje2jHn5TY,ADD,,,,

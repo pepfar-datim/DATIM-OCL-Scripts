@@ -1,0 +1,110 @@
+DATIM_Indicator_Category,DATIM_Indicator_ID,DATIM_Disag_Name,DATIM_Disag_ID,Operation,MOH_Indicator_Name,MOH_Indicator_ID,MOH_Disag_Name,MOH_Disag_ID
+HTS_TST,HTS_TST_N_MOH,Total,HTS_TST_N_MOH,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"0-11 mois, Feminin",HQWtIkUYJnX
+HTS_TST,HTS_TST_N_MOH,Total,HTS_TST_N_MOH,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"1-4 ans, Feminin",SULdDcCMhFZ
+HTS_TST,HTS_TST_N_MOH,Total,HTS_TST_N_MOH,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"5-9 ans , Feminin",QTQthvWluSq
+HTS_TST,HTS_TST_N_MOH,Total,HTS_TST_N_MOH,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"10-14 ans, Feminin",O3iQ4ZrdfMu
+HTS_TST,HTS_TST_N_MOH,Total,HTS_TST_N_MOH,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"15 - 24 ans , Feminin",qFM8SzeRUzs
+HTS_TST,HTS_TST_N_MOH,Total,HTS_TST_N_MOH,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"25-49 ans , Feminin",dOs57l5veXk
+HTS_TST,HTS_TST_N_MOH,Total,HTS_TST_N_MOH,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"50 ans et plus, Feminin",jnjGnaXRYFY
+HTS_TST,HTS_TST_N_MOH,Total,HTS_TST_N_MOH,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"0-11 mois, Masculin",HfKG4nY4GxP
+HTS_TST,HTS_TST_N_MOH,Total,HTS_TST_N_MOH,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"1-4 ans, Masculin",nmvcJXCOkbZ
+HTS_TST,HTS_TST_N_MOH,Total,HTS_TST_N_MOH,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"5-9 ans , Masculin",LhM3JYaC4sw
+HTS_TST,HTS_TST_N_MOH,Total,HTS_TST_N_MOH,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"10-14 ans, Masculin",COIMYUgXS10
+HTS_TST,HTS_TST_N_MOH,Total,HTS_TST_N_MOH,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"15 - 24 ans , Masculin",XQcnS0da9M6
+HTS_TST,HTS_TST_N_MOH,Total,HTS_TST_N_MOH,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"25-49 ans , Masculin",Hhvh6cEoyBW
+HTS_TST,HTS_TST_N_MOH,Total,HTS_TST_N_MOH,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"50 ans et plus, Masculin",Sh5mbUDWl1v
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | AgeUnknown | Female,TBD,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | AgeUnknown | Male,TBD,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | AgeUnknown | Female,TBD,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | AgeUnknown | Male,TBD,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | <15 | Female,TBD,ADD,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"0-11 mois, Feminin",HQWtIkUYJnX
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | <15 | Female,TBD,ADD,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"1-4 ans, Feminin",SULdDcCMhFZ
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | <15 | Female,TBD,ADD,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"5-9 ans , Feminin",QTQthvWluSq
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | <15 | Female,TBD,ADD,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"10-14 ans, Feminin",O3iQ4ZrdfMu
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | <15 | Male,TBD,ADD,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"0-11 mois, Masculin",HfKG4nY4GxP
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | <15 | Male,TBD,ADD,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"1-4 ans, Masculin",nmvcJXCOkbZ
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | <15 | Male,TBD,ADD,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"5-9 ans , Masculin",LhM3JYaC4sw
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | <15 | Male,TBD,ADD,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"10-14 ans, Masculin",COIMYUgXS10
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | <15 | SexUnknown,TBD,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | 15+ | Female,TBD,ADD,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"15 - 24 ans , Feminin",qFM8SzeRUzs
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | 15+ | Female,TBD,ADD,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"25-49 ans , Feminin",dOs57l5veXk
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | 15+ | Female,TBD,ADD,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"50 ans et plus, Feminin",jnjGnaXRYFY
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | 15+ | Male,TBD,ADD,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"15 - 24 ans , Masculin",XQcnS0da9M6
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | 15+ | Male,TBD,ADD,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"25-49 ans , Masculin",Hhvh6cEoyBW
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | 15+ | Male,TBD,ADD,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"50 ans et plus, Masculin",Sh5mbUDWl1v
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | 15+ | SexUnknown,TBD,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Positive | AgeUnknown | SexUnknown,TBD,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Female,TBD,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"0-11 mois, Feminin",HQWtIkUYJnX
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Female,TBD,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"1-4 ans, Feminin",SULdDcCMhFZ
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Female,TBD,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"5-9 ans , Feminin",QTQthvWluSq
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Female,TBD,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"10-14 ans, Feminin",O3iQ4ZrdfMu
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Female,TBD,SUBTRACT,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"0-11 mois, Feminin",HQWtIkUYJnX
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Female,TBD,SUBTRACT,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"1-4 ans, Feminin",SULdDcCMhFZ
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Female,TBD,SUBTRACT,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"5-9 ans , Feminin",QTQthvWluSq
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Female,TBD,SUBTRACT,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"10-14 ans, Feminin",O3iQ4ZrdfMu
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Male,TBD,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"0-11 mois, Masculin",HfKG4nY4GxP
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Male,TBD,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"1-4 ans, Masculin",nmvcJXCOkbZ
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Male,TBD,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"5-9 ans , Masculin",LhM3JYaC4sw
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Male,TBD,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"10-14 ans, Masculin",COIMYUgXS10
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Male,TBD,SUBTRACT,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"0-11 mois, Masculin",HfKG4nY4GxP
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Male,TBD,SUBTRACT,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"1-4 ans, Masculin",nmvcJXCOkbZ
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Male,TBD,SUBTRACT,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"5-9 ans , Masculin",LhM3JYaC4sw
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | Male,TBD,SUBTRACT,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"10-14 ans, Masculin",COIMYUgXS10
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | <15 | SexUnknown,TBD,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | Female,TBD,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"15 - 24 ans , Feminin",qFM8SzeRUzs
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | Female,TBD,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"25-49 ans , Feminin",dOs57l5veXk
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | Female,TBD,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"50 ans et plus, Feminin",jnjGnaXRYFY
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | Female,TBD,SUBTRACT,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"15 - 24 ans , Feminin",qFM8SzeRUzs
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | Female,TBD,SUBTRACT,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"25-49 ans , Feminin",dOs57l5veXk
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | Female,TBD,SUBTRACT,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"50 ans et plus, Feminin",jnjGnaXRYFY
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | Male,TBD,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"15 - 24 ans , Masculin",XQcnS0da9M6
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | Male,TBD,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"25-49 ans , Masculin",Hhvh6cEoyBW
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | Male,TBD,ADD,Nombre de clients conseilles et depistes pour le VIH ayant recu le resultat du test_2015,IXB6r4yuaNs,"50 ans et plus, Masculin",Sh5mbUDWl1v
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | Male,TBD,SUBTRACT,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"15 - 24 ans , Masculin",XQcnS0da9M6
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | Male,TBD,SUBTRACT,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"25-49 ans , Masculin",Hhvh6cEoyBW
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | Male,TBD,SUBTRACT,Nombre de clients depistes positif pour le VIH_2015,qXZ0XZSxPMf,"50 ans et plus, Masculin",Sh5mbUDWl1v
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | 15+ | SexUnknown,TBD,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,Negative | AgeUnknown | SexUnknown,TBD,ADD,,,,
+PMTCT_ART,PMTCT_ART_N_MOH,Total,PMTCT_ART_N_MOH,ADD,Nombre de femmes enceintes VIH positif sous ARV (file active)_2015,Lvfxxn01Fw5,,
+PMTCT_STAT,PMTCT_STAT_N_MOH,Total,PMTCT_STAT_N_MOH,ADD,Nombre de femmes enceintes conseillees et testees qui ont recues leur resultat du test VIH en CPN et Maternite_2015,CuwuNAZ07Pm,CPN,S8vPeswjEE0
+PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,KnownPositives,TBD,ADD,Nombre de femmes enceintes recues en CPN1 et se connaissant deja seropositive au VIH_2015,U3YQks0pUgt,,
+PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,NewlyTestedPositives,TBD,ADD,Nombre de femmes enceintes depistees seropositives au VIH_2015,dDDEBjP12cx,CPN,S8vPeswjEE0
+PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,NewNegatives,TBD,ADD,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,<15 | Female,TBD,ADD,Nombre de Patients VIH positif sous ARV (file active)_2015,BptpWTVLDqv,"0-11 mois, Feminin",HQWtIkUYJnX
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,<15 | Female,TBD,ADD,Nombre de Patients VIH positif sous ARV (file active)_2015,BptpWTVLDqv,"1-4 ans, Feminin",SULdDcCMhFZ
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,<15 | Female,TBD,ADD,Nombre de Patients VIH positif sous ARV (file active)_2015,BptpWTVLDqv,"5-9 ans , Feminin",QTQthvWluSq
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,<15 | Female,TBD,ADD,Nombre de Patients VIH positif sous ARV (file active)_2015,BptpWTVLDqv,"10-14 ans, Feminin",O3iQ4ZrdfMu
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,<15 | Male,TBD,ADD,Nombre de Patients VIH positif sous ARV (file active)_2015,BptpWTVLDqv,"0-11 mois, Masculin",HfKG4nY4GxP
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,<15 | Male,TBD,ADD,Nombre de Patients VIH positif sous ARV (file active)_2015,BptpWTVLDqv,"1-4 ans, Masculin",nmvcJXCOkbZ
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,<15 | Male,TBD,ADD,Nombre de Patients VIH positif sous ARV (file active)_2015,BptpWTVLDqv,"5-9 ans , Masculin",LhM3JYaC4sw
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,<15 | Male,TBD,ADD,Nombre de Patients VIH positif sous ARV (file active)_2015,BptpWTVLDqv,"10-14 ans, Masculin",COIMYUgXS10
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,<15 | SexUnknown,TBD,ADD,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,15+ | Female,TBD,ADD,Nombre de Patients VIH positif sous ARV (file active)_2015,BptpWTVLDqv,"15 - 24 ans , Feminin",qFM8SzeRUzs
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,15+ | Female,TBD,ADD,Nombre de Patients VIH positif sous ARV (file active)_2015,BptpWTVLDqv,"25-49 ans , Feminin",dOs57l5veXk
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,15+ | Female,TBD,ADD,Nombre de Patients VIH positif sous ARV (file active)_2015,BptpWTVLDqv,"50 ans et plus, Feminin",jnjGnaXRYFY
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,15+ | Male,TBD,ADD,Nombre de Patients VIH positif sous ARV (file active)_2015,BptpWTVLDqv,"15 - 24 ans , Masculin",XQcnS0da9M6
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,15+ | Male,TBD,ADD,Nombre de Patients VIH positif sous ARV (file active)_2015,BptpWTVLDqv,"25-49 ans , Masculin",Hhvh6cEoyBW
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,15+ | Male,TBD,ADD,Nombre de Patients VIH positif sous ARV (file active)_2015,BptpWTVLDqv,"50 ans et plus, Masculin",Sh5mbUDWl1v
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,15+ | SexUnknown,TBD,ADD,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,AgeUnknown | Female,TBD,ADD,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,AgeUnknown | Male,TBD,ADD,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex,AgeUnknown | SexUnknown,TBD,ADD,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,<15 | Female,TBD,ADD,Nombre de Patients VIH positif ayant nouvellement commence (initie) le traitement ARV dans l'etablissement au cours du mois_2015,uzRicBQ7oCh,"0-11 mois, Feminin",HQWtIkUYJnX
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,<15 | Female,TBD,ADD,Nombre de Patients VIH positif ayant nouvellement commence (initie) le traitement ARV dans l'etablissement au cours du mois_2015,uzRicBQ7oCh,"1-4 ans, Feminin",SULdDcCMhFZ
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,<15 | Female,TBD,ADD,Nombre de Patients VIH positif ayant nouvellement commence (initie) le traitement ARV dans l'etablissement au cours du mois_2015,uzRicBQ7oCh,"5-9 ans , Feminin",QTQthvWluSq
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,<15 | Female,TBD,ADD,Nombre de Patients VIH positif ayant nouvellement commence (initie) le traitement ARV dans l'etablissement au cours du mois_2015,uzRicBQ7oCh,"10-14 ans, Feminin",O3iQ4ZrdfMu
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,<15 | Male,TBD,ADD,Nombre de Patients VIH positif ayant nouvellement commence (initie) le traitement ARV dans l'etablissement au cours du mois_2015,uzRicBQ7oCh,"0-11 mois, Masculin",HfKG4nY4GxP
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,<15 | Male,TBD,ADD,Nombre de Patients VIH positif ayant nouvellement commence (initie) le traitement ARV dans l'etablissement au cours du mois_2015,uzRicBQ7oCh,"1-4 ans, Masculin",nmvcJXCOkbZ
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,<15 | Male,TBD,ADD,Nombre de Patients VIH positif ayant nouvellement commence (initie) le traitement ARV dans l'etablissement au cours du mois_2015,uzRicBQ7oCh,"5-9 ans , Masculin",LhM3JYaC4sw
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,<15 | Male,TBD,ADD,Nombre de Patients VIH positif ayant nouvellement commence (initie) le traitement ARV dans l'etablissement au cours du mois_2015,uzRicBQ7oCh,"10-14 ans, Masculin",COIMYUgXS10
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,<15 | SexUnknown,TBD,ADD,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,15+ | Female,TBD,ADD,Nombre de Patients VIH positif ayant nouvellement commence (initie) le traitement ARV dans l'etablissement au cours du mois_2015,uzRicBQ7oCh,"15 - 24 ans , Feminin",qFM8SzeRUzs
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,15+ | Female,TBD,ADD,Nombre de Patients VIH positif ayant nouvellement commence (initie) le traitement ARV dans l'etablissement au cours du mois_2015,uzRicBQ7oCh,"25-49 ans , Feminin",dOs57l5veXk
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,15+ | Female,TBD,ADD,Nombre de Patients VIH positif ayant nouvellement commence (initie) le traitement ARV dans l'etablissement au cours du mois_2015,uzRicBQ7oCh,"50 ans et plus, Feminin",jnjGnaXRYFY
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,15+ | Male,TBD,ADD,Nombre de Patients VIH positif ayant nouvellement commence (initie) le traitement ARV dans l'etablissement au cours du mois_2015,uzRicBQ7oCh,"15 - 24 ans , Masculin",XQcnS0da9M6
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,15+ | Male,TBD,ADD,Nombre de Patients VIH positif ayant nouvellement commence (initie) le traitement ARV dans l'etablissement au cours du mois_2015,uzRicBQ7oCh,"25-49 ans , Masculin",Hhvh6cEoyBW
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,15+ | Male,TBD,ADD,Nombre de Patients VIH positif ayant nouvellement commence (initie) le traitement ARV dans l'etablissement au cours du mois_2015,uzRicBQ7oCh,"50 ans et plus, Masculin",Sh5mbUDWl1v
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,15+ | SexUnknown,TBD,ADD,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,AgeUnknown | Female,TBD,ADD,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,AgeUnknown | Male,TBD,ADD,,,,
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex,AgeUnknown | SexUnknown,TBD,ADD,,,,

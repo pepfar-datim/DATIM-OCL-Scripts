@@ -31,16 +31,16 @@ if sys.argv and len(sys.argv) > 3:
     export_format = datim.datimimapexport.DatimImapExport.get_format_from_string(sys.argv[2])
     period = sys.argv[3]
 
-# Prepocess input parameters
+# Pre-pocess input parameters
 country_org = 'DATIM-MOH-%s' % country_code
 
 # Generate the imap export
 datim_imap_export = datim.datimimapexport.DatimImapExport(
-	oclenv=oclenv, oclapitoken=oclapitoken, verbosity=verbosity, run_ocl_offline=run_ocl_offline)
+    oclenv=oclenv, oclapitoken=oclapitoken, verbosity=verbosity, run_ocl_offline=run_ocl_offline)
 try:
     imap = datim_imap_export.get_imap(period=period, country_org=country_org, country_code=country_code)
 except requests.exceptions.HTTPError:
-	print 'ERROR: Unrecognized country code "%s" for period "%s"' % (country_code, period)
-	sys.exit(1)
+    print 'ERROR: Unrecognized country code "%s" for period "%s"' % (country_code, period)
+    sys.exit(1)
 else:
-	imap.display(export_format, exclude_empty_maps=exclude_empty_maps)
+    imap.display(export_format, exclude_empty_maps=exclude_empty_maps)

@@ -15,9 +15,9 @@ import datim.datimimapimport
 csv_filename = '' # e.g. csv/RW-FY18.csv
 country_name = '' # e.g. Rwanda
 country_code = '' # e.g. RW
-period = '' # e.g. FY18
-run_ocl_offline = False
+period = '' # e.g. FY18, FY19
 verbosity = 2
+run_ocl_offline = False
 test_mode = False
 
 # OCL Settings

@@ -469,7 +469,7 @@ class DatimImapFactory(object):
                 # country DATIM mapping
                 if not imap_diff.imap_a.has_country_datim_mapping(csv_row):
                     import_list_narrative.append('Create country DATIM mapping: %s, %s --> %s --> %s, %s' % (
-                        csv_row['DATIM_Indicator_ID'], csv_row['DATIM_Indicator_Name'], 'HAS DATIM OPTION',
+                        csv_row['DATIM_Indicator_Category'], csv_row['DATIM_Indicator_ID'], 'HAS DATIM OPTION',
                         csv_row['DATIM_Disag_ID'], csv_row['DATIM_Disag_Name']))
                     import_list += imap_diff.imap_b.get_country_datim_mapping_create_json(csv_row)
 

@@ -34,6 +34,13 @@ if sys.argv and len(sys.argv) > 4:
 # Pre-pocess input parameters
 country_org = 'DATIM-MOH-%s' % country_code
 
+# Debug output
+if verbosity:
+    print '\n\n*****************************************************************************************************'
+    print '** [IMPORT] Country: %s (%s), Org: %s, CSV: %s, Period: %s, Exclude Empty Maps: %s, Verbosity: %s, Test Mode: %s' % (
+        country_code, country_name, country_org, csv_filename, period, str(verbosity), str(test_mode))
+    print '*****************************************************************************************************'
+
 # Load i-map from CSV file
 imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(
     csv_filename=csv_filename, period=period,

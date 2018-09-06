@@ -257,7 +257,6 @@ class DatimImapImport(datimbase.DatimBase):
             # TODO: Note that the source version should still be incremented if references are added to collections
 
         # STEP 10b of 12: Delay until the country source version is done processing
-        # time.sleep(15)
         self.vlog(1, '**** STEP 10b of 12: Delay until the country source version is done processing')
         if not self.test_mode:
             is_repo_version_processing = True

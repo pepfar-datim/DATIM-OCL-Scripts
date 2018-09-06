@@ -194,8 +194,6 @@ importer_collections.process()
 
 
 
-
-
 # Code to import JSON into OCL using the fancy new ocldev package
 import json
 import ocldev.oclfleximporter
@@ -244,8 +242,3 @@ payload = { "references": refs }
 r = requests.delete(collection_ref_url, json=payload, headers=oclapiheaders)
 r.raise_for_status()
 print r.text
-
-
-
-
-

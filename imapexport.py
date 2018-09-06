@@ -36,6 +36,13 @@ if sys.argv and len(sys.argv) > 5:
 # Pre-pocess input parameters
 country_org = 'DATIM-MOH-%s' % country_code
 
+# Debug output
+if verbosity:
+    print '\n\n*****************************************************************************************************'
+    print '** [EXPORT] Country Code: %s, Org: %s, Format: %s, Period: %s, Exclude Empty Maps: %s, Verbosity: %s' % (
+        country_code, country_org, export_format, period, str(exclude_empty_maps), str(verbosity))
+    print '*****************************************************************************************************'
+
 # Generate the imap export
 datim_imap_export = datim.datimimapexport.DatimImapExport(
     oclenv=oclenv, oclapitoken=oclapitoken, verbosity=verbosity, run_ocl_offline=run_ocl_offline)

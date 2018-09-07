@@ -2,9 +2,6 @@
 Script to generate a country mapping export for a specified country (e.g. UG) and
 period (e.g. FY17). Export follows the format of the country mapping CSV template,
 though JSON format is also supported.
-
-TODO:
-- Content type returned should be text if an error occurs
 """
 import sys
 import settings
@@ -18,6 +15,7 @@ country_code = '' # e.g. RW, LS, etc.
 export_format = datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV  # CSV and JSON are supported
 period = '' # e.g. FY17, FY18, etc.
 exclude_empty_maps = True
+include_extra_info = False
 verbosity = 0
 run_ocl_offline = False
 
@@ -51,8 +49,10 @@ datim_imap_export = datim.datimimapexport.DatimImapExport(
     oclenv=oclenv, oclapitoken=oclapitoken, verbosity=verbosity, run_ocl_offline=run_ocl_offline)
 try:
     imap = datim_imap_export.get_imap(period=period, country_org=country_org, country_code=country_code)
-except requests.exceptions.HTTPError:
+except requests.exceptions.HTTPError as e:
     print('ERROR: Unrecognized country code "%s" for period "%s"' % (country_code, period))
+    print(e)
     sys.exit(1)
 else:
-    imap.display(export_format, exclude_empty_maps=exclude_empty_maps)
+    imap.display(fmt=export_format, sort=True, exclude_empty_maps=exclude_empty_maps,
+                 include_extra_info=include_extra_info)

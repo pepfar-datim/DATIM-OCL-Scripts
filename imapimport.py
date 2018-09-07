@@ -48,4 +48,3 @@ imap_import = datim.datimimapimport.DatimImapImport(
     oclenv=oclenv, oclapitoken=oclapitoken, verbosity=verbosity,
     run_ocl_offline=run_ocl_offline, test_mode=test_mode)
 imap_import.import_imap(imap_input=imap_input)
-

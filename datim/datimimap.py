@@ -32,6 +32,17 @@ class DatimImap(object):
         'MOH_Disag_Name',
     ]
 
+    IMAP_EXTRA_FIELD_NAMES = [
+        'Country Collection ID',
+        'Country Map Type',
+        'Country Collection Name',
+        'Country To Concept URI',
+        'DATIM From Concept URI',
+        'Country From Concept URI',
+        'DATIM To Concept URI',
+        'DATIM_Disag_Name_Clean'
+    ]
+
     DATIM_IMAP_FORMAT_CSV = 'CSV'
     DATIM_IMAP_FORMAT_JSON = 'JSON'
     DATIM_IMAP_FORMATS = [
@@ -101,15 +112,18 @@ class DatimImap(object):
                 return fmt
         return default_fmt
 
-    def get_imap_data(self, sort=False, exclude_empty_maps=False, convert_to_dict=False):
+    def get_imap_data(self, sort=False, exclude_empty_maps=False, convert_to_dict=False, include_extra_info=False):
         """
         Get IMAP data.
         :param sort: Returns sorted list if True. Ignored if convert_to_dict is True.
         :param exclude_empty_maps: Rows with empty maps are excluded from the results if True.
         :param convert_to_dict: Returns a dictionary with a unique key for each row if True.
+        :param include_extra_info: Add extra pre-processing columns
         :return: <list> or <dict>
         """
         data = self.__imap_data
+
+        # Handle exclude empty maps
         if exclude_empty_maps:
             new_data = []
             for row in data:
@@ -117,16 +131,33 @@ class DatimImap(object):
                         row['Operation'] and row['MOH_Indicator_ID'] and row['MOH_Disag_ID']):
                     new_data.append(row.copy())
             data = new_data
+
+        # Handle include extra info
+        if include_extra_info:
+            new_data = []
+            for row in data:
+                new_data.append(self.add_columns_to_row(row))
+            data = new_data
+
+        # Handle sort
         if sort:
             data = DatimImap.multikeysort(data, self.IMAP_FIELD_NAMES)
+
+        # Handle conver to dict
         if convert_to_dict:
             new_data = {}
             for row in data:
                 new_data[DatimImap.get_imap_row_key(row, self.country_org)] = row
             data = new_data
+
         return data
 
     def get_imap_row_by_key(self, row_key):
+        """
+        Return a specific row of the IMAP that matches the specified string row_key
+        :param row_key:
+        :return:
+        """
         row_key_dict = DatimImap.parse_imap_row_key(row_key)
         for row in self.__imap_data:
             if (row['DATIM_Indicator_ID'] == row_key_dict['DATIM_Indicator_ID'] and
@@ -199,19 +230,30 @@ class DatimImap(object):
             return True
         return False
 
-    def display(self, fmt=DATIM_IMAP_FORMAT_CSV, exclude_empty_maps=False):
+    def display(self, fmt=DATIM_IMAP_FORMAT_CSV, sort=False, exclude_empty_maps=False, include_extra_info=False):
+        """
+        Outputs IMAP contents as CSV or JSON
+        :param fmt: CSV or JSON
+        :param sort: default=False; Set to True to sort by DATIM indicator+disag followed by Country indicator+disag
+        :param exclude_empty_maps: Rows with empty maps are excluded from the results if True.
+        :param include_extra_info: Add extra pre-processing columns
+        :return:
+        """
         fmt = DatimImap.get_format_from_string(fmt)
+        if fmt not in DatimImap.DATIM_IMAP_FORMATS:
+            fmt = DatimImap.DATIM_IMAP_FORMAT_JSON
+        data = self.get_imap_data(
+            sort=sort, exclude_empty_maps=exclude_empty_maps, include_extra_info=include_extra_info)
         if fmt == self.DATIM_IMAP_FORMAT_CSV:
-            writer = csv.DictWriter(sys.stdout, fieldnames=self.IMAP_FIELD_NAMES)
+            fieldnames = list(self.IMAP_FIELD_NAMES)
+            if include_extra_info:
+                fieldnames += list(self.IMAP_EXTRA_FIELD_NAMES)
+            writer = csv.DictWriter(sys.stdout, fieldnames=fieldnames)
             writer.writeheader()
-            for row in self.__imap_data:
-                if exclude_empty_maps:
-                    if (not row['Operation'] or not row['MOH_Indicator_ID'] or not row['MOH_Disag_ID'] or
-                            not row['DATIM_Indicator_ID'] or not row['DATIM_Disag_ID']):
-                        continue
+            for row in data:
                 writer.writerow({k:v.encode('utf8') for k,v in row.items()})
         elif fmt == self.DATIM_IMAP_FORMAT_JSON:
-            print(json.dumps(self.__imap_data))
+            print(json.dumps(data))
 
     def diff(self, imap, exclude_empty_maps=False):
         return DatimImapDiff(self, imap, exclude_empty_maps=exclude_empty_maps)

@@ -1,9 +1,6 @@
 """
 Script to import a country mapping CSV for a specified country (e.g. UG) and
 period (e.g. FY17, FY18). CSV must follow the format of the country mapping CSV template.
-
-TODO:
-- Encode error messages as text not JSON
 """
 import sys
 import settings
@@ -36,10 +33,10 @@ country_org = 'DATIM-MOH-%s' % country_code
 
 # Debug output
 if verbosity:
-    print '\n\n*****************************************************************************************************'
-    print '** [IMPORT] Country: %s (%s), Org: %s, CSV: %s, Period: %s, Exclude Empty Maps: %s, Verbosity: %s, Test Mode: %s' % (
-        country_code, country_name, country_org, csv_filename, period, str(verbosity), str(test_mode))
-    print '*****************************************************************************************************'
+    print('\n\n*****************************************************************************************************')
+    print('** [IMPORT] Country: %s (%s), Org: %s, CSV: %s, Period: %s, Verbosity: %s, Test Mode: %s' % (
+        country_code, country_name, country_org, csv_filename, period, str(verbosity), str(test_mode)))
+    print('*****************************************************************************************************')
 
 # Load i-map from CSV file
 imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(

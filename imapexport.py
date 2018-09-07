@@ -32,7 +32,10 @@ if sys.argv and len(sys.argv) > 5:
     else:
      period = sys.argv[3]
     verbosity = int(sys.argv[4])
-    exclude_empty_maps = sys.argv[5]
+    if sys.argv[5].lower() == 'true':
+     exclude_empty_maps = True
+    else:
+     exclude_empty_maps = False
 
 # Pre-pocess input parameters
 country_org = 'DATIM-MOH-%s' % country_code

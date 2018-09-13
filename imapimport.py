@@ -9,10 +9,10 @@ import datim.datimimapimport
 
 
 # Default Script Settings
-csv_filename = '' # e.g. csv/RW-FY18.csv
-country_name = '' # e.g. Rwanda
-country_code = '' # e.g. RW
-period = '' # e.g. FY18, FY19
+country_code = ''  # e.g. RW
+period = ''  # e.g. FY18, FY19
+csv_filename = ''  # e.g. csv/RW-FY18.csv
+country_name = ''  # e.g. Rwanda
 verbosity = 2
 run_ocl_offline = False
 test_mode = False
@@ -33,15 +33,16 @@ country_org = 'DATIM-MOH-%s' % country_code
 
 # Debug output
 if verbosity:
-    print('\n\n*****************************************************************************************************')
+    print('\n\n' + '*' * 100)
     print('** [IMPORT] Country: %s (%s), Org: %s, CSV: %s, Period: %s, Verbosity: %s, Test Mode: %s' % (
         country_code, country_name, country_org, csv_filename, period, str(verbosity), str(test_mode)))
-    print('*****************************************************************************************************')
+    print('*' * 100)
 
 # Load i-map from CSV file
 imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(
     csv_filename=csv_filename, period=period,
     country_org=country_org, country_name=country_name, country_code=country_code)
+#imap_input.display(fmt='CSV', sort=True, exclude_empty_maps=True, auto_fix_null_disag=True)
 
 # Run the import
 imap_import = datim.datimimapimport.DatimImapImport(

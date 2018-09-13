@@ -46,10 +46,10 @@ country_org = 'DATIM-MOH-%s' % country_code
 
 # Debug output
 if verbosity:
-    print('\n\n*****************************************************************************************************')
+    print('\n\n' + '*' * 100)
     print('** [EXPORT] Country Code: %s, Org: %s, Format: %s, Period: %s, Exclude Empty Maps: %s, Verbosity: %s' % (
         country_code, country_org, export_format, period, str(exclude_empty_maps), str(verbosity)))
-    print('*****************************************************************************************************')
+    print('*' * 100)
 
 # Generate the imap export
 datim_imap_export = datim.datimimapexport.DatimImapExport(
@@ -57,7 +57,6 @@ datim_imap_export = datim.datimimapexport.DatimImapExport(
 try:
     imap = datim_imap_export.get_imap(period=period, country_org=country_org, country_code=country_code)
 except requests.exceptions.HTTPError as e:
-    print('ERROR: Unrecognized country code "%s" for period "%s"' % (country_code, period))
     print(e)
     sys.exit(1)
 else:

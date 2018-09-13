@@ -33,6 +33,7 @@ class DatimBase(object):
         RESOURCE_TYPE_CONCEPT_REF,
         RESOURCE_TYPE_MAPPING_REF
     ]
+
     OWNER_STEM_USERS = 'users'
     OWNER_STEM_ORGS = 'orgs'
     REPO_STEM_SOURCES = 'sources'
@@ -58,10 +59,7 @@ class DatimBase(object):
         DATIM_IMAP_FORMAT_JSON,
     ]
 
-    NULL_DISAG_ID = 'null_disag'
-    NULL_DISAG_ENDPOINT = '/orgs/PEPFAR/sources/DATIM-MOH/concepts/null_disag/'
-    NULL_DISAG_NAME = 'Null Disaggregation'
-
+    # Note that this is a duplicate -- see DatimImap.IMAP_FIELD_NAMES
     imap_fields = [
         'DATIM_Indicator_Category',
         'DATIM_Indicator_ID',
@@ -85,6 +83,18 @@ class DatimBase(object):
     concept_class_disaggregate = 'Disaggregate'
     map_type_datim_has_option = 'Has Option'
     map_type_country_has_option = 'DATIM HAS OPTION'
+
+    # DATIM Default DISAG
+    DATIM_DEFAULT_DISAG_ID = 'HllvX50cXC0'
+    DATIM_DEFAULT_DISAG_REPLACEMENT_NAME = 'Total'
+
+    # NULL Disag Attributes
+    NULL_DISAG_OWNER_TYPE = 'Organization'
+    NULL_DISAG_OWNER_ID = 'PEPFAR'
+    NULL_DISAG_SOURCE_ID = 'DATIM-MOH'
+    NULL_DISAG_ID = 'null-disag'
+    NULL_DISAG_ENDPOINT = '/orgs/PEPFAR/sources/DATIM-MOH/concepts/null-disag/'
+    NULL_DISAG_NAME = 'Null Disaggregate'
 
     # Set the root directory
     if settings and settings.ROOT_DIR:

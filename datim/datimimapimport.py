@@ -2,6 +2,15 @@
 Class to import into OCL a country mapping CSV for a specified country (e.g. UG) and
 period (e.g. FY17). CSV must follow the format of the country mapping CSV template.
 
+TODO:
+- Move country collection reconstruction and version creation into a separate process that this class uses
+- Some comparisons need to be against either the latest IMAP or the actual OCL source rather than
+  the IMAP for the requested period, because very possible that no IMAP exists for requested period, but that
+  it does for a previous period for the same country
+- Add "clean up" functionality
+- Query collections by their mappings, not ID -- names are not consistent coming from DHIS2 which is killing this
+- Exclude "null-disag" from the import scripts -- this does not have any effect, its just a wasted step
+
 Diff & Import Steps:
 1.  Validate that OCL environment is ready: /PEPFAR/DATIM-MOH course/fine metadata
     and released period (e.g. FY17) available
@@ -52,6 +61,7 @@ import time
 import pprint
 import datimbase
 import datimimap
+import datimimapexport
 import datimimapreferencegenerator
 import ocldev.oclfleximporter
 import ocldev.oclexport
@@ -81,8 +91,9 @@ class DatimImapImport(datimbase.DatimBase):
 
         # Get out of here if variables aren't set
         if not self.oclapitoken or not self.oclapiheaders:
-            self.log('ERROR: Authorization token must be set')
-            sys.exit(1)
+            msg = 'ERROR: Authorization token must be set'
+            self.log(msg)
+            raise Exception(msg)
 
         # STEP 1 of 12: Download PEPFAR DATIM metadata export for specified period from OCL
         self.vlog(1, '**** STEP 1 of 12: Download PEPFAR/DATIM-MOH metadata export for specified period from OCL')
@@ -91,8 +102,10 @@ class DatimImapImport(datimbase.DatimBase):
         datim_source_version = self.get_latest_version_for_period(
             repo_endpoint=datim_source_endpoint, period=imap_input.period)
         if not datim_source_version:
-            self.log('ERROR: Could not find released version for period "%s" for source PEPFAR/DATIM-MOH' % imap_input.period)
-            sys.exit(1)
+            msg = 'ERROR: Could not find released version for period "%s" for source PEPFAR/DATIM-MOH' % (
+                imap_input.period)
+            self.log(msg)
+            raise Exception(msg)
         self.vlog(1, 'Latest version found for period "%s" for source PEPFAR/DATIM-MOH: "%s"' % (imap_input.period, datim_source_version))
         datim_source_zipfilename = self.endpoint2filename_ocl_export_zip(datim_source_endpoint)
         datim_source_jsonfilename = self.endpoint2filename_ocl_export_json(datim_source_endpoint)
@@ -107,17 +120,19 @@ class DatimImapImport(datimbase.DatimBase):
                     datim_source_jsonfilename, os.path.getsize(self.attach_absolute_data_path(
                         datim_source_jsonfilename))))
             else:
-                self.log('ERROR: Could not find offline OCL file "%s". Exiting...' % datim_source_jsonfilename)
-                sys.exit(1)
+                msg = 'ERROR: Could not find offline OCL file "%s". Exiting...' % datim_source_jsonfilename
+                self.log(msg)
+                raise Exception(msg)
 
         # STEP 2 of 12: Validate input country mapping CSV file
         # Verify that correct columns exist (order agnostic)
         self.vlog(1, '**** STEP 2 of 12: Validate input country mapping CSV file')
         if imap_input.is_valid():
-            self.vlog(1, 'Provided IMAP CSV is valid')
+            self.vlog(1, 'Required fields are defined in the provided IMAP CSV')
         else:
-            self.vlog(1, 'Provided IMAP CSV is not valid. Exiting...')
-            sys.exit(1)
+            msg = 'Missing required fields in the provided IMAP CSV. Exiting...'
+            self.log(msg)
+            raise Exception(msg)
 
         # STEP 3 of 12: Fetch existing IMAP export from OCL for the specified country
         self.vlog(1, '**** STEP 3 of 12: Fetch existing IMAP export from OCL for the specified country and period')
@@ -131,6 +146,9 @@ class DatimImapImport(datimbase.DatimBase):
             imap_old = None
             self.vlog(1, 'OCL IMAP export not available for country "%s" and period "%s". Continuing...' % (
                 imap_input.country_org, imap_input.period))
+        except datimimapexport.DatimUnknownCountryPeriodError:
+            imap_old = None
+            self.vlog(1, 'Export not available for this country and period. Continuing...')
 
         # STEP 4 of 12: Evaluate delta between input and OCL IMAPs
         self.vlog(1, '**** STEP 4 of 12: Evaluate delta between input and OCL IMAPs')
@@ -138,14 +156,23 @@ class DatimImapImport(datimbase.DatimBase):
         if imap_old:
             self.vlog(1, 'Previous OCL IMAP export is available. Evaluating delta...')
             imap_diff = imap_old.diff(imap_input, exclude_empty_maps=True)
-            print '\n**** OLD IMAP'
-            imap_old.display(exclude_empty_maps=True)
-            print '\n**** NEW IMAP'
-            imap_input.display(exclude_empty_maps=True)
-            print '\n**** DIFF'
-            pprint.pprint(imap_diff.get_diff())
         else:
             self.vlog(1, 'No previous OCL IMAP export available. Continuing...')
+
+        # SHOW SOME DEBUG OUTPUT
+        if self.verbosity:
+            print('\n**** NEW IMAP')
+            imap_input.display(exclude_empty_maps=True, auto_fix_null_disag=True)
+            print('\n**** OLD IMAP')
+            if imap_old:
+                imap_old.display(exclude_empty_maps=True, auto_fix_null_disag=True)
+            else:
+                print('No old IMAP available for the specified country/period')
+            print('\n**** DIFF')
+            if imap_diff:
+                pprint.pprint(imap_diff.get_diff())
+            else:
+                print('No DIFF available for the specified country/period')
 
         # STEP 5 of 12: Determine actions to take
         self.vlog(1, '**** STEP 5 of 12: Determine actions to take')
@@ -168,7 +195,7 @@ class DatimImapImport(datimbase.DatimBase):
         if (not do_create_country_org and not do_create_country_source and
                 not do_update_country_concepts and not do_update_country_collections):
             self.vlog(1, 'No action to take. Exiting...')
-            sys.exit()
+            return
 
         # STEP 6 of 12: Determine next country version number
         # NOTE: The country source and collections all version together
@@ -236,7 +263,7 @@ class DatimImapImport(datimbase.DatimBase):
             importer = ocldev.oclfleximporter.OclFlexImporter(
                 input_list=import_list, api_token=self.oclapitoken, api_url_root=self.oclenv,
                 test_mode=self.test_mode, verbosity=self.verbosity,
-                do_update_if_exists=True, import_delay=5)
+                do_update_if_exists=True, import_delay=0)
             importer.process()
             if self.verbosity:
                 importer.import_results.display_report()
@@ -258,7 +285,7 @@ class DatimImapImport(datimbase.DatimBase):
 
         # STEP 10b of 12: Delay until the country source version is done processing
         self.vlog(1, '**** STEP 10b of 12: Delay until the country source version is done processing')
-        if not self.test_mode:
+        if import_list and not self.test_mode:
             is_repo_version_processing = True
             country_version_processing_url = '%s%sprocessing/' % (
                 self.oclenv, country_next_version_endpoint)
@@ -273,53 +300,64 @@ class DatimImapImport(datimbase.DatimBase):
                 else:
                     self.vlog(1, 'DELAY: Delaying 15 seconds while new source version is processing')
                     time.sleep(15)
-        else:
-            self.vlog(1, 'SKIPPING: New version not created in test mode...')
+        elif not import_list:
+            self.vlog(1, 'SKIPPING: No resources imported so no new versions to create...')
+        elif self.test_mode:
+            self.vlog(1, 'SKIPPING: New source version not created in test mode...')
 
         # STEP 11 of 12: Generate all references for all country collections
         self.vlog(1, '**** STEP 11 of 12: Generate collection references')
-        refgen = datimimapreferencegenerator.DatimImapReferenceGenerator(
-            oclenv=self.oclenv, oclapitoken=self.oclapitoken, imap_input=imap_input)
-        country_source_export = ocldev.oclexport.OclExportFactory.load_export(
-            repo_version_url=country_next_version_url, oclapitoken=self.oclapitoken)
-        ref_import_list = refgen.process_imap(country_source_export=country_source_export)
-        pprint.pprint(ref_import_list)
+        ref_import_list = None
+        if import_list and not self.test_mode:
+            refgen = datimimapreferencegenerator.DatimImapReferenceGenerator(
+                oclenv=self.oclenv, oclapitoken=self.oclapitoken, imap_input=imap_input)
+            country_source_export = ocldev.oclexport.OclExportFactory.load_export(
+                repo_version_url=country_next_version_url, oclapitoken=self.oclapitoken)
+            ref_import_list = refgen.process_imap(country_source_export=country_source_export)
+            pprint.pprint(ref_import_list)
+        elif not import_list:
+            self.vlog(1, 'SKIPPING: No resources imported so no need to update collections...')
+        else:
+            self.vlog(1, 'SKIPPING: New version not created in test mode...')
 
         # STEP 12 of 12: Import new collection references
         self.vlog(1, '**** STEP 12 of 12: Import new collection references')
+        if ref_import_list:
 
-        # 12a. Get the list of unique collection IDs
-        unique_collection_ids = []
-        for ref_import in ref_import_list:
-            if ref_import['collection'] not in unique_collection_ids:
-                unique_collection_ids.append(ref_import['collection'])
+            # 12a. Get the list of unique collection IDs
+            unique_collection_ids = []
+            for ref_import in ref_import_list:
+                if ref_import['collection'] not in unique_collection_ids:
+                    unique_collection_ids.append(ref_import['collection'])
 
-        # 12b. Delete existing references for each unique collection
-        self.vlog(1, 'Clearing existing collection references...')
-        for collection_id in unique_collection_ids:
-            collection_url = '%s/orgs/%s/collections/%s/' % (
-                self.oclenv, imap_input.country_org, collection_id)
-            self.vlog(1, '  - %s' % collection_url)
-            self.clear_collection_references(collection_url=collection_url)
+            # 12b. Delete existing references for each unique collection
+            self.vlog(1, 'Clearing existing collection references...')
+            for collection_id in unique_collection_ids:
+                collection_url = '%s/orgs/%s/collections/%s/' % (
+                    self.oclenv, imap_input.country_org, collection_id)
+                self.vlog(1, '  - %s' % collection_url)
+                self.clear_collection_references(collection_url=collection_url)
 
-        # 12c. Import new references for the collection
-        self.vlog(1, 'Importing %s batch(es) of collection references...' % len(ref_import_list))
-        importer = ocldev.oclfleximporter.OclFlexImporter(
-            input_list=ref_import_list, api_token=self.oclapitoken, api_url_root=self.oclenv,
-            test_mode=self.test_mode, verbosity=self.verbosity, import_delay=5)
-        importer.process()
-        if self.verbosity:
-            importer.import_results.display_report()
+            # 12c. Import new references for the collection
+            self.vlog(1, 'Importing %s batch(es) of collection references...' % len(ref_import_list))
+            importer = ocldev.oclfleximporter.OclFlexImporter(
+                input_list=ref_import_list, api_token=self.oclapitoken, api_url_root=self.oclenv,
+                test_mode=self.test_mode, verbosity=self.verbosity, import_delay=0)
+            importer.process()
+            if self.verbosity:
+                importer.import_results.display_report()
 
-        # 12d. Create new version for each unique collection
-            self.vlog(1, 'Creating new collection versions...')
-        for collection_id in unique_collection_ids:
-            collection_endpoint = '/orgs/%s/collections/%s/' % (imap_input.country_org, collection_id)
-            collection_version_endpoint = '%s%s/' % (collection_endpoint, next_country_version_id)
-            self.vlog(1, 'Creating collection version: %s' % collection_version_endpoint)
-            datimimap.DatimImapFactory.create_repo_version(
-                oclenv=self.oclenv, oclapitoken=self.oclapitoken,
-                repo_endpoint=collection_endpoint, repo_version_id=next_country_version_id)
+            # 12d. Create new version for each unique collection
+                self.vlog(1, 'Creating new collection versions...')
+            for collection_id in unique_collection_ids:
+                collection_endpoint = '/orgs/%s/collections/%s/' % (imap_input.country_org, collection_id)
+                collection_version_endpoint = '%s%s/' % (collection_endpoint, next_country_version_id)
+                self.vlog(1, 'Creating collection version: %s' % collection_version_endpoint)
+                datimimap.DatimImapFactory.create_repo_version(
+                    oclenv=self.oclenv, oclapitoken=self.oclapitoken,
+                    repo_endpoint=collection_endpoint, repo_version_id=next_country_version_id)
+        else:
+            self.vlog(1, 'SKIPPING: No collections updated...')
 
         self.vlog(1, '**** IMAP import process complete!')
 

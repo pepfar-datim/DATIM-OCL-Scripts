@@ -3,6 +3,7 @@ Script to import a country mapping CSV for a specified country (e.g. UG) and
 period (e.g. FY17, FY18). CSV must follow the format of the country mapping CSV template.
 """
 import sys
+import time
 import settings
 import datim.datimimap
 import datim.datimimapimport
@@ -13,9 +14,10 @@ country_code = ''  # e.g. RW
 period = ''  # e.g. FY18, FY19
 csv_filename = ''  # e.g. csv/RW-FY18.csv
 country_name = ''  # e.g. Rwanda
-verbosity = 2
-run_ocl_offline = False
-test_mode = False
+verbosity = 2  # Set to 0 to hide all debug info, or 2 to show all debug info
+run_ocl_offline = False  # Not currently supported
+test_mode = False  # If true, generates the import script but does not actually import it
+delete_org_if_exists = False  # Be very careful with this option!
 
 # OCL Settings
 oclenv = settings.ocl_api_url_staging
@@ -38,11 +40,31 @@ if verbosity:
         country_code, country_name, country_org, csv_filename, period, str(verbosity), str(test_mode)))
     print('*' * 100)
 
+# (Optionally) Delete org if it exists
+if delete_org_if_exists:
+    if not test_mode:
+        print('Deleting org "%s" if it exists in 10 seconds...' % country_org)
+        # Pause briefly to allow user to cancel in case deleting org on accident...
+        time.sleep(10)
+        result = datim.datimimap.DatimImapFactory.delete_org_if_exists(
+            org_id=country_org, oclenv=oclenv, ocl_root_api_token=settings.api_token_staging_root)
+        if result:
+            print('Org successfully deleted.')
+        else:
+            print('Org does not exist.')
+    elif verbosity:
+        print('Skipping "delete_org_if_exists" step in test mode...')
+
 # Load i-map from CSV file
 imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(
     csv_filename=csv_filename, period=period,
     country_org=country_org, country_name=country_name, country_code=country_code)
-#imap_input.display(fmt='CSV', sort=True, exclude_empty_maps=True, auto_fix_null_disag=True)
+if verbosity and imap_input:
+    print('IMAP CSV file "%s" loaded successfully' % csv_filename)
+    #imap_input.display(fmt='CSV', sort=True, exclude_empty_maps=True, auto_fix_null_disag=True)
+elif not imap_input:
+    print('Unable to load IMAP CSV file "%s"' % csv_filename)
+    exit(1)
 
 # Run the import
 imap_import = datim.datimimapimport.DatimImapImport(

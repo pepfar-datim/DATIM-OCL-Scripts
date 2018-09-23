@@ -598,6 +598,32 @@ class DatimImapFactory(object):
         return False
 
     @staticmethod
+    def delete_org_if_exists(org_id, oclenv='', ocl_root_api_token=''):
+        """
+        Delete the org if it exists. Requires a root API token.
+        :param org_id:
+        :param ocl_root_api_token:
+        :return:
+        """
+
+        # Check if org exists
+        oclapiheaders = {
+            'Authorization': 'Token ' + ocl_root_api_token,
+            'Content-Type': 'application/json'
+        }
+        org_url = "%s/orgs/%s/" % (oclenv, org_id)
+        r = requests.get(org_url, headers=oclapiheaders)
+        if r.status_code != 200:
+            return False
+
+        # Delete the org
+        r = requests.delete(org_url, headers=oclapiheaders)
+        r.raise_for_status()
+        print(r)
+        return True
+
+
+    @staticmethod
     def get_repo_latest_period_version(repo_url='', period='', oclapitoken='', released=True):
         """
         Returns the OCL repo version dictionary for the latest minor version of the specified period.

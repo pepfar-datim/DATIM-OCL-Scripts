@@ -54,9 +54,11 @@ class DatimBase(object):
 
     DATIM_IMAP_FORMAT_CSV = 'CSV'
     DATIM_IMAP_FORMAT_JSON = 'JSON'
+    DATIM_IMAP_FORMAT_HTML = 'HTML'
     DATIM_IMAP_FORMATS = [
         DATIM_IMAP_FORMAT_CSV,
         DATIM_IMAP_FORMAT_JSON,
+        DATIM_IMAP_FORMAT_HTML
     ]
 
     # Note that this is a duplicate -- see DatimImap.IMAP_FIELD_NAMES

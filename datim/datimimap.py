@@ -55,9 +55,11 @@ class DatimImap(object):
 
     DATIM_IMAP_FORMAT_CSV = 'CSV'
     DATIM_IMAP_FORMAT_JSON = 'JSON'
+    DATIM_IMAP_FORMAT_HTML = 'HTML'
     DATIM_IMAP_FORMATS = [
         DATIM_IMAP_FORMAT_CSV,
         DATIM_IMAP_FORMAT_JSON,
+        DATIM_IMAP_FORMAT_HTML
     ]
 
     EMPTY_DISAG_MODE_NULL = 'null'
@@ -297,7 +299,7 @@ class DatimImap(object):
                 auto_fix_null_disag=False, show_null_disag_as_blank=True):
         """
         Outputs IMAP contents as CSV or JSON
-        :param fmt: CSV or JSON
+        :param fmt: string CSV, JSON, HTML
         :param sort: default=False; Set to True to sort by DATIM indicator+disag followed by Country indicator+disag
         :param exclude_empty_maps: Rows with empty maps are excluded from the results if True.
         :param include_extra_info: Add extra pre-processing columns
@@ -321,6 +323,17 @@ class DatimImap(object):
                 writer.writerow({k:v.encode('utf8') for k, v in row.items()})
         elif fmt == self.DATIM_IMAP_FORMAT_JSON:
             print(json.dumps(data))
+        elif fmt == self.DATIM_IMAP_FORMAT_HTML:
+            print('<table border="1" cellspacing="0"><tr>')
+            for field_name in self.IMAP_FIELD_NAMES:
+                print('<th>%s</th>' % field_name)
+            print('</tr>')
+            for row in data:
+                print('<tr>')
+                for field_name in self.IMAP_FIELD_NAMES:
+                    print('<td>%s</td>' % row[field_name])
+                print('</tr>')
+            print('</table>')
 
     def diff(self, imap, exclude_empty_maps=True):
         """

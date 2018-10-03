@@ -112,7 +112,7 @@ class DatimImapExport(datimbase.DatimBase):
         self.vlog(1, 'Using version "%s" for country "%s"' % (country_version_id, country_org))
 
         # STEP 2 of 8: Download PEPFAR/DATIM-MOH source
-        self.vlog(1, '**** STEP 2 of 8: Download PEPFAR/DATIM-MOH source')
+        self.vlog(1, '**** STEP 2 of 8: Download PEPFAR/DATIM-MOH source for specified period')
         datim_owner_endpoint = '/orgs/%s/' % (self.datim_owner_id)
         datim_source_endpoint = '%ssources/%s/' % (datim_owner_endpoint, self.datim_source_id)
         datim_source_url = '%s%s' % (self.oclenv, datim_source_endpoint)

@@ -84,7 +84,7 @@ class DatimImapExport(datimbase.DatimBase):
         # Initial validation
         if not country_org:
             msg = 'ERROR: Country organization ID (e.g. "DATIM-MOH-UG") is required, none provided'
-            self.log(msg)
+            self.vlog(1, msg)
             raise Exception(msg)
 
         # STEP 1 of 8: Determine the country period, minor version, and repo version ID (e.g. FY18.v0)
@@ -99,15 +99,15 @@ class DatimImapExport(datimbase.DatimBase):
             country_version = datimimap.DatimImapFactory.get_repo_latest_period_version(
                 repo_url=country_source_url, period=period, oclapitoken=self.oclapitoken)
             if not country_version:
-                msg = 'ERROR: No valid and released version found for country "%s" for period "%s". Exiting...' % (
+                msg = 'ERROR: No valid released version found for country "%s" for period "%s". Exiting...' % (
                     country_org, period)
-                self.log(msg)
+                self.vlog(1, msg)
                 raise DatimUnknownCountryPeriodError(msg)
             country_version_id = country_version['id']
             period = datimimap.DatimImapFactory.get_period_from_version_id(country_version_id)
         if not period or not country_version_id:
             msg = 'ERROR: No valid and released version found for the specified country. Exiting...'
-            self.log(msg)
+            self.vlog(1, msg)
             raise DatimUnknownCountryPeriodError(msg)
         self.vlog(1, 'Using version "%s" for country "%s"' % (country_version_id, country_org))
 
@@ -120,7 +120,7 @@ class DatimImapExport(datimbase.DatimBase):
             repo_url=datim_source_url, period=period, oclapitoken=self.oclapitoken)
         if not datim_version:
             msg = 'ERROR: PEPFAR/DATIM-MOH metadata not defined for period "%s". Exiting...' % period
-            self.log(msg)
+            self.vlog(1, msg)
             raise DatimUnknownDatimPeriodError(msg)
         datim_version_id = datim_version['id']
         datim_source_zipfilename = self.endpoint2filename_ocl_export_zip(datim_source_endpoint)
@@ -136,7 +136,7 @@ class DatimImapExport(datimbase.DatimBase):
                     datim_source_jsonfilename, os.path.getsize(self.attach_absolute_data_path(datim_source_jsonfilename))))
             else:
                 msg = 'ERROR: Could not find offline OCL file "%s". Exiting...' % datim_source_jsonfilename
-                self.log(msg)
+                self.vlog(1, msg)
                 raise Exception(msg)
 
         # STEP 3 of 8: Prepare output with the DATIM-MOH indicator+disag structure
@@ -159,11 +159,11 @@ class DatimImapExport(datimbase.DatimBase):
                 if mapping['map_type'] == self.map_type_datim_has_option:
                     if mapping['from_concept_url'] not in indicators:
                         msg = 'ERROR: Missing indicator from_concept: %s' % (mapping['from_concept_url'])
-                        self.log(msg)
+                        self.vlog(1, msg)
                         raise Exception(msg)
                     indicators[mapping['from_concept_url']]['mappings'].append(mapping.copy())
                 else:
-                    self.log('SKIPPING: Unrecognized map type "%s" for mapping: %s' % (mapping['map_type'], str(mapping)))
+                    self.vlog(1, 'SKIPPING: Unrecognized map type "%s" for mapping: %s' % (mapping['map_type'], str(mapping)))
 
         # STEP 4 of 8: Download and process country source
         self.vlog(1, '**** STEP 4 of 8: Download and process country source')
@@ -180,7 +180,7 @@ class DatimImapExport(datimbase.DatimBase):
                     country_source_jsonfilename, os.path.getsize(self.attach_absolute_data_path(country_source_jsonfilename))))
             else:
                 msg = 'ERROR: Could not find offline OCL file "%s". Exiting...' % country_source_jsonfilename
-                self.log(msg)
+                self.vlog(1, msg)
                 raise Exception(msg)
         country_indicators = {}
         country_disaggregates = {}
@@ -197,7 +197,7 @@ class DatimImapExport(datimbase.DatimBase):
         self.vlog(1, '**** STEP 5 of 8: Download list of country indicator mappings (i.e. collections)')
         country_collections_endpoint = '%scollections/' % (country_owner_endpoint)
         if self.run_ocl_offline:
-            self.vlog('WARNING: Offline not supported here yet. Taking this ship online!')
+            self.vlog(1, 'WARNING: Offline not supported here yet. Taking this ship online!')
         country_collections = self.get_ocl_repositories(endpoint=country_collections_endpoint,
                                                         require_external_id=False,
                                                         active_attr_name=None)
@@ -218,7 +218,7 @@ class DatimImapExport(datimbase.DatimBase):
                         collection_jsonfilename, os.path.getsize(self.attach_absolute_data_path(collection_jsonfilename))))
                 else:
                     msg = 'ERROR: Could not find offline OCL file "%s". Exiting...' % collection_jsonfilename
-                    self.log(msg)
+                    self.vlog(1, msg)
                     raise Exception(msg)
             operations = []
             datim_pair_mapping = None
@@ -239,7 +239,7 @@ class DatimImapExport(datimbase.DatimBase):
                             # we're not good. not good at all
                             msg = 'ERROR: The from_concept or to_concept of the "%s" mapping in collection "%s" are not part of "%s" version "%s": %s ' % (
                                 self.map_type_country_has_option, collection_id, self.datim_source_id, period, str(mapping))
-                            self.log(msg)
+                            self.vlog(1, msg)
                             raise Exception(msg)
                     elif mapping['map_type'] in self.DATIM_IMAP_OPERATIONS:
                         if (mapping['from_concept_url'] in country_indicators and
@@ -251,12 +251,12 @@ class DatimImapExport(datimbase.DatimBase):
                             # also not good - we are missing the country indicator or disag concepts
                             msg = 'ERROR: From or to concept not found in country source for operation mapping: %s' % (
                                 str(mapping))
-                            self.log(msg)
+                            self.vlog(1, msg)
                             raise Exception(msg)
                     else:
                         # also not good - we don't know what to do with this map type
                         msg = 'ERROR: Invalid map_type "%s" in collection "%s".' % (mapping['map_type'], collection_id)
-                        self.log(msg)
+                        self.vlog(1, msg)
                         raise Exception(msg)
 
             # Save the set of operations in the relevant datim indicator mapping

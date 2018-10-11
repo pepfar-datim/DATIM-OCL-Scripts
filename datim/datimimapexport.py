@@ -99,14 +99,14 @@ class DatimImapExport(datimbase.DatimBase):
             country_version = datimimap.DatimImapFactory.get_repo_latest_period_version(
                 repo_url=country_source_url, period=period, oclapitoken=self.oclapitoken)
             if not country_version:
-                msg = 'ERROR: No valid released version found for country "%s" for period "%s". Exiting...' % (
+                msg = 'ERROR: No valid released version found for country "%s" for period "%s"' % (
                     country_org, period)
                 self.vlog(1, msg)
                 raise DatimUnknownCountryPeriodError(msg)
             country_version_id = country_version['id']
             period = datimimap.DatimImapFactory.get_period_from_version_id(country_version_id)
         if not period or not country_version_id:
-            msg = 'ERROR: No valid and released version found for the specified country. Exiting...'
+            msg = 'ERROR: No valid and released version found for the specified country'
             self.vlog(1, msg)
             raise DatimUnknownCountryPeriodError(msg)
         self.vlog(1, 'Using version "%s" for country "%s"' % (country_version_id, country_org))
@@ -119,7 +119,7 @@ class DatimImapExport(datimbase.DatimBase):
         datim_version = datimimap.DatimImapFactory.get_repo_latest_period_version(
             repo_url=datim_source_url, period=period, oclapitoken=self.oclapitoken)
         if not datim_version:
-            msg = 'ERROR: PEPFAR/DATIM-MOH metadata not defined for period "%s". Exiting...' % period
+            msg = 'ERROR: PEPFAR/DATIM-MOH metadata not defined for period "%s"' % period
             self.vlog(1, msg)
             raise DatimUnknownDatimPeriodError(msg)
         datim_version_id = datim_version['id']
@@ -135,7 +135,7 @@ class DatimImapExport(datimbase.DatimBase):
                 self.vlog(1, 'OCL-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
                     datim_source_jsonfilename, os.path.getsize(self.attach_absolute_data_path(datim_source_jsonfilename))))
             else:
-                msg = 'ERROR: Could not find offline OCL file "%s". Exiting...' % datim_source_jsonfilename
+                msg = 'ERROR: Could not find offline OCL file "%s"' % datim_source_jsonfilename
                 self.vlog(1, msg)
                 raise Exception(msg)
 
@@ -179,7 +179,7 @@ class DatimImapExport(datimbase.DatimBase):
                 self.vlog(1, 'OCL-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
                     country_source_jsonfilename, os.path.getsize(self.attach_absolute_data_path(country_source_jsonfilename))))
             else:
-                msg = 'ERROR: Could not find offline OCL file "%s". Exiting...' % country_source_jsonfilename
+                msg = 'ERROR: Could not find offline OCL file "%s"' % country_source_jsonfilename
                 self.vlog(1, msg)
                 raise Exception(msg)
         country_indicators = {}
@@ -217,7 +217,7 @@ class DatimImapExport(datimbase.DatimBase):
                     self.vlog(1, 'OCL-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
                         collection_jsonfilename, os.path.getsize(self.attach_absolute_data_path(collection_jsonfilename))))
                 else:
-                    msg = 'ERROR: Could not find offline OCL file "%s". Exiting...' % collection_jsonfilename
+                    msg = 'ERROR: Could not find offline OCL file "%s"' % collection_jsonfilename
                     self.vlog(1, msg)
                     raise Exception(msg)
             operations = []

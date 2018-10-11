@@ -728,8 +728,8 @@ class DatimImapFactory(object):
     def generate_import_script_from_diff(imap_diff):
         """
         Return a list of JSON imports representing the diff
-        :param imap_diff:
-        :return:
+        :param imap_diff: IMAP diff used to generate the import script
+        :return list: Ordered list of dictionaries ready for import
         """
         import_list = []
         import_list_narrative = []
@@ -781,6 +781,7 @@ class DatimImapFactory(object):
                     import_list += imap_diff.imap_b.get_country_disag_create_json(csv_row)
 
                 # country collection
+                # TODO: Compare this against OCL not the original IMAP - low priority
                 if not imap_diff.imap_a.has_country_collection(csv_row):
                     full_csv_row = imap_diff.imap_b.add_columns_to_row(csv_row.copy())
                     import_list_narrative.append('Create country collection: %s' % (
@@ -788,16 +789,18 @@ class DatimImapFactory(object):
                     import_list += imap_diff.imap_b.get_country_collection_create_json(csv_row)
 
                 # country DATIM mapping
+                # TODO: Compare this against OCL not the original IMAP - low priority
                 if not imap_diff.imap_a.has_country_datim_mapping(csv_row):
-                    import_list_narrative.append('Create country DATIM mapping: %s, %s --> %s --> %s, %s' % (
+                    import_list_narrative.append('Create DATIM mapping: %s, %s --> %s --> %s, %s' % (
                         csv_row['DATIM_Indicator_Category'], csv_row['DATIM_Indicator_ID'],
                         datimbase.DatimBase.map_type_country_has_option,
                         csv_row['DATIM_Disag_ID'], csv_row['DATIM_Disag_Name']))
                     import_list += imap_diff.imap_b.get_country_datim_mapping_create_json(csv_row)
 
                 # country operation mapping
+                # TODO: Compare this against OCL not the original IMAP - low priority
                 if not imap_diff.imap_a.has_country_operation_mapping(csv_row):
-                    import_list_narrative.append('Create country operation mapping: %s, %s --> %s --> %s, %s' % (
+                    import_list_narrative.append('Create country mapping: %s, %s --> %s --> %s, %s' % (
                         csv_row['MOH_Indicator_ID'], csv_row['MOH_Indicator_Name'], csv_row['Operation'],
                         csv_row['MOH_Disag_ID'], csv_row['MOH_Disag_Name']))
                     import_list += imap_diff.imap_b.get_country_operation_mapping_create_json(csv_row)
@@ -808,10 +811,10 @@ class DatimImapFactory(object):
                 row_key = diff_key.strip("root['").strip("']")
                 csv_row = imap_diff.imap_a.get_imap_row_by_key(row_key)
 
-                # TODO: country operation mapping
+                # TODO: country mapping
                 # print 'dictionary_item_removed:', diff_key
                 if imap_diff.imap_a.has_country_operation_mapping(csv_row):
-                    import_list_narrative.append('SKIP: Retire country operation mapping: %s, %s --> %s --> %s, %s' % (
+                    import_list_narrative.append('SKIP: Retire country mapping: %s, %s --> %s --> %s, %s' % (
                         csv_row['MOH_Indicator_ID'], csv_row['MOH_Indicator_Name'], csv_row['Operation'],
                         csv_row['MOH_Disag_ID'], csv_row['MOH_Disag_Name']))
                     # import_list += imap_diff.imap_a.get_country_operation_mapping_retire_json(csv_row)
@@ -874,10 +877,13 @@ class DatimImapFactory(object):
                         csv_row_new['MOH_Disag_ID'], csv_row_new['MOH_Disag_Name']))
                     import_list += imap_diff.imap_b.get_country_disag_update_json(csv_row_new)
 
-        # TODO: Dedup the import_list JSON, if needed
+        # Dedup the import list without changing order
+        import_list_dedup = [i for n, i in enumerate(import_list) if i not in import_list[n + 1:]]
+        import_list_narrative_dedup = []
+        [import_list_narrative_dedup.append(i) for i in import_list_narrative if not import_list_narrative_dedup.count(i)]
 
-        pprint.pprint(import_list_narrative)
-        return import_list
+        pprint.pprint(import_list_narrative_dedup)
+        return import_list_dedup
 
     @staticmethod
     def generate_import_script_from_csv_row(imap_input=None, csv_row=None, defs=None, do_add_columns_to_csv=True):
@@ -893,7 +899,7 @@ class DatimImapFactory(object):
             defs=defs)
         datim_csv_converter.set_resource_definitions(datim_csv_resource_definitions)
         import_list = datim_csv_converter.process_by_definition()
-        # Dedup the import list using list enumeration
+        # Dedup the import list without changing order using list enumeration
         import_list_dedup = [i for n, i in enumerate(import_list) if i not in import_list[n + 1:]]
         return import_list_dedup
 

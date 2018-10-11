@@ -3,50 +3,19 @@ Class to import into OCL a country mapping CSV for a specified country (e.g. UG)
 period (e.g. FY17). CSV must follow the format of the country mapping CSV template.
 
 TODO:
-- Move country collection reconstruction and version creation into a separate process that this class uses
 - Some comparisons need to be against either the latest IMAP or the actual OCL source rather than
   the IMAP for the requested period, because very possible that no IMAP exists for requested period, but that
   it does for a previous period for the same country
+- Improve validation step:
+    - New import must be for the latest or newer country period (e.g. can't import/update FY17 if FY18 already defined)
+- Move country collection reconstruction and version creation into a separate process that this class uses
 - Add "clean up" functionality
 - Query collections by their mappings, not ID -- names are not consistent coming from DHIS2 which is killing this
-- Exclude "null-disag" from the import scripts -- this does not have any effect, its just a wasted step
+- Exclude "null-disag" from the import scripts -- this does not have any effect, its just an unnecessary step
 
-Diff & Import Steps:
-1.  Validate that OCL environment is ready: /PEPFAR/DATIM-MOH course/fine metadata
-    and released period (e.g. FY17) available
-2.  Load/validate input country mapping CSV file: verify correct columns exist (order agnostic)
-3.  Pre-process input country mapping CSV, if needed (csv_fixer.py)
-4.  Fetch imap CSV export from OCL for the specified country+period (imapexport.py)
-5.  Evaluate delta between input and OCL CSV
-6.  Generate (and dedup) import script of country org, source, collections, concepts, and
-    mappings from the delta
-7.  Import delta JSON into OCL, and be sure to get the mapping IDs into the import results object!
-    - Import error handling?
-8.  Generate released source version for the country
-9.  Generate collection references (refgen.py)
-10. Import the collection references
-11. Create released versions for each of the collections (new_versions.py)
-
-Source files from ocl_import/DATIM/:
-    moh_csv2json.py
-    new_versions.py
-    refgen.py
-    csv_fixer.py
-
-Columns for the input country mapping CSV file:
-    DATIM_Indicator_Category (e.g. HTS_TST)
-    DATIM_Indicator_ID (e.g. HTS_TST_N_MOH or HTS_TST_N_MOH_Age_Sex_Result)
-    DATIM_Disag_ID (e.g. HllvX50cXC0)
-    DATIM_Disag_Name (e.g. Total)
-    Operation (ADD, SUBTRACT, ADD HALF, SUBTRACT HALF)
-    MOH_Indicator_ID (e.g. )
-    MOH_Indicator_Name (HTS_TST_POS_U15_F, PMTCT_STAT_NEW_NEG)
-    MOH_Disag_ID (e.g. HQWtIkUYJnX)
-    MOH_Disag_Name (e.g. 5-9yrsF, Positive|15+|Male)
-
-The output JSON file consists of one JSON document per line and for each country includes:
-    Country Org (e.g. DATIM-MOH-UG)
-    Country Source (e.g. DATIM-Alignment-Indicators)
+The import script creates OCL-formatted JSON consisting of:
+    Country Org (e.g. DATIM-MOH-UG) - if doesn't exist
+    Country Source (e.g. DATIM-Alignment-Indicators) - if doesn't exist
     One concept for each country unique indicator/data element and unique disag
     One mapping for each unique country indicator+disag pair with an operation map type (e.g. ADD, SUBTRACT)
     One mapping for each PEPFAR indicator+disag pair represented with a "DATIM HAS OPTION" map type
@@ -92,7 +61,7 @@ class DatimImapImport(datimbase.DatimBase):
         # Get out of here if variables aren't set
         if not self.oclapitoken or not self.oclapiheaders:
             msg = 'ERROR: Authorization token must be set'
-            self.log(msg)
+            self.vlog(1, msg)
             raise Exception(msg)
 
         # STEP 1 of 12: Download PEPFAR DATIM metadata export for specified period from OCL
@@ -104,7 +73,7 @@ class DatimImapImport(datimbase.DatimBase):
         if not datim_source_version:
             msg = 'ERROR: Could not find released version for period "%s" for source PEPFAR/DATIM-MOH' % (
                 imap_input.period)
-            self.log(msg)
+            self.vlog(1, msg)
             raise Exception(msg)
         self.vlog(1, 'Latest version found for period "%s" for source PEPFAR/DATIM-MOH: "%s"' % (imap_input.period, datim_source_version))
         datim_source_zipfilename = self.endpoint2filename_ocl_export_zip(datim_source_endpoint)
@@ -120,18 +89,18 @@ class DatimImapImport(datimbase.DatimBase):
                     datim_source_jsonfilename, os.path.getsize(self.attach_absolute_data_path(
                         datim_source_jsonfilename))))
             else:
-                msg = 'ERROR: Could not find offline OCL file "%s". Exiting...' % datim_source_jsonfilename
-                self.log(msg)
+                msg = 'ERROR: Could not find offline OCL file "%s"' % datim_source_jsonfilename
+                self.vlog(1, msg)
                 raise Exception(msg)
 
         # STEP 2 of 12: Validate input country mapping CSV file
-        # Verify that correct columns exist (order agnostic)
+        # NOTE: This currently just verifies that the correct columns exist (order agnostic)
         self.vlog(1, '**** STEP 2 of 12: Validate input country mapping CSV file')
         if imap_input.is_valid():
             self.vlog(1, 'Required fields are defined in the provided IMAP CSV')
         else:
-            msg = 'Missing required fields in the provided IMAP CSV. Exiting...'
-            self.log(msg)
+            msg = 'Missing required fields in the provided IMAP CSV'
+            self.vlog(1, msg)
             raise Exception(msg)
 
         # STEP 3 of 12: Fetch existing IMAP export from OCL for the specified country
@@ -171,8 +140,9 @@ class DatimImapImport(datimbase.DatimBase):
             print('\n**** DIFF')
             if imap_diff:
                 pprint.pprint(imap_diff.get_diff())
+                print('\n')
             else:
-                print('No DIFF available for the specified country/period')
+                print('No DIFF available for the specified country/period\n')
 
         # STEP 5 of 12: Determine actions to take
         self.vlog(1, '**** STEP 5 of 12: Determine actions to take')
@@ -253,7 +223,8 @@ class DatimImapImport(datimbase.DatimBase):
             add_to_import_list = datimimap.DatimImapFactory.generate_import_script_from_csv(imap_input)
             self.vlog(1, '%s resources added to import list' % len(add_to_import_list))
             import_list += add_to_import_list
-        pprint.pprint(import_list)
+        if self.verbosity > 1:
+            pprint.pprint(import_list)
 
         # STEP 9 of 12: Import changes to the source into OCL
         # NOTE: Up to this point, everything above is non-destructive. Changes are committed to OCL as of this step

@@ -29,8 +29,8 @@ if sys.argv and len(sys.argv) > 5:
     period = sys.argv[2]
     csv_filename = sys.argv[3]
     country_name = sys.argv[4]
-    if sys.argv[5].lower() == ‘true’:
-    test_mode = True
+    if sys.argv[5].lower() == 'true':
+     test_mode = True
 
 # Pre-pocess input parameters
 country_org = 'DATIM-MOH-%s' % country_code

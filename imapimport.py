@@ -42,18 +42,22 @@ if verbosity:
 
 # (Optionally) Delete org if it exists
 if delete_org_if_exists:
+    if verbosity:
+        print('"delete_org_if_exists" is set to True:')
     if not test_mode:
-        print('Deleting org "%s" if it exists in 10 seconds...' % country_org)
+        if verbosity:
+            print('Deleting org "%s" if it exists in 10 seconds...' % country_org)
         # Pause briefly to allow user to cancel in case deleting org on accident...
         time.sleep(10)
         result = datim.datimimap.DatimImapFactory.delete_org_if_exists(
             org_id=country_org, oclenv=oclenv, ocl_root_api_token=settings.api_token_staging_root)
-        if result:
-            print('Org successfully deleted.')
-        else:
-            print('Org does not exist.')
+        if verbosity:
+            if result:
+                print('Org successfully deleted.')
+            else:
+                print('Org does not exist.')
     elif verbosity:
-        print('Skipping "delete_org_if_exists" step in test mode...')
+        print('Skipping "delete_org_if_exists" step because in "test_mode"')
 
 # Load i-map from CSV file
 imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(
@@ -61,7 +65,6 @@ imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(
     country_org=country_org, country_name=country_name, country_code=country_code)
 if verbosity and imap_input:
     print('IMAP CSV file "%s" loaded successfully' % csv_filename)
-    #imap_input.display(fmt='CSV', sort=True, exclude_empty_maps=True, auto_fix_null_disag=True)
 elif not imap_input:
     print('Unable to load IMAP CSV file "%s"' % csv_filename)
     exit(1)

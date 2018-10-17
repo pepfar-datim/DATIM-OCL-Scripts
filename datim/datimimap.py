@@ -82,6 +82,10 @@ class DatimImap(object):
         return self
 
     def next(self):
+        """
+        Iterator for the DatimImap class
+        :return:
+        """
         # TODO: Provide a way to customize how the rows are returned when doing this loop
         if self._current_iter >= len(self.__imap_data):
             raise StopIteration
@@ -92,6 +96,12 @@ class DatimImap(object):
 
     @staticmethod
     def get_format_from_string(format_string, default_fmt='CSV'):
+        """
+        Get the DATIM_IMAP_FORMAT constant from a string
+        :param format_string:
+        :param default_fmt:
+        :return:
+        """
         for fmt in DatimImap.DATIM_IMAP_FORMATS:
             if format_string.lower() == fmt.lower():
                 return fmt
@@ -137,6 +147,11 @@ class DatimImap(object):
 
     @staticmethod
     def is_null_disag_row(row):
+        """
+        Returns True if specified row is a null disag row
+        :param row: Row to be checked
+        :return: bool
+        """
         if not row['MOH_Indicator_ID']:
             return False
         if row['MOH_Disag_ID'] == datimbase.DatimBase.NULL_DISAG_ID or not row['MOH_Disag_ID']:
@@ -213,8 +228,8 @@ class DatimImap(object):
         cw.writerow(data)
         return si.getvalue().strip('\r\n')
 
-    def get_imap_row_by_key(self, row_key, include_extra_info=False, auto_fix_null_disag=True,
-                convert_to_dict=False):
+    def get_imap_row_by_key(
+            self, row_key, include_extra_info=False, auto_fix_null_disag=True, convert_to_dict=False):
         """
         Return a specific row of the IMAP that matches the specified string row_key.
         Note that rows representing an empty map do not have keys and cannot be matched by this method.
@@ -324,6 +339,8 @@ class DatimImap(object):
         elif fmt == self.DATIM_IMAP_FORMAT_JSON:
             print(json.dumps(data))
         elif fmt == self.DATIM_IMAP_FORMAT_HTML:
+            print('<h1>Country IMAP Export for Country Code "%s" and Period "%s"</h1>' % (
+                self.country_code, self.period))
             print('<table border="1" cellspacing="0"><tr>')
             for field_name in self.IMAP_FIELD_NAMES:
                 print('<th>%s</th>' % field_name)
@@ -413,10 +430,10 @@ class DatimImap(object):
         # Build the collection ID, replacing the default disag ID from DHIS2 with plain English (i.e. Total)
         if row['DATIM_Disag_ID'] == datimbase.DatimBase.DATIM_DEFAULT_DISAG_ID:
             row['Country Collection ID'] = (
-                    row['DATIM_Indicator_ID'] + '_' + datimbase.DatimBase.DATIM_DEFAULT_DISAG_REPLACEMENT_NAME).replace('_', '-')
+                row['DATIM_Indicator_ID'] + '_' + datimbase.DatimBase.DATIM_DEFAULT_DISAG_REPLACEMENT_NAME).replace('_', '-')
         else:
             row['Country Collection ID'] = (
-                    row['DATIM_Indicator_ID'] + '_' + row['DATIM_Disag_Name_Clean']).replace('_', '-')
+                row['DATIM_Indicator_ID'] + '_' + row['DATIM_Disag_Name_Clean']).replace('_', '-')
 
         # DATIM mapping
         row['DATIM From Concept URI'] = '/%s/%s/sources/%s/concepts/%s/' % (
@@ -563,10 +580,11 @@ class DatimImap(object):
             imap_input=self, csv_row=row, defs=defs)
 
     def get_country_operation_mapping_retire_json(self, row):
-        # TODO
         if DatimImap.IMAP_EXTRA_FIELD_NAMES[0] not in row:
             row = self.add_columns_to_row(self.fix_null_disag_in_row(row))
-        return []
+        defs = [DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_OPERATION_MAPPING_RETIRED]
+        return DatimImapFactory.generate_import_script_from_csv_row(
+            imap_input=self, csv_row=row, defs=defs)
 
 
 class DatimImapFactory(object):
@@ -811,15 +829,14 @@ class DatimImapFactory(object):
                 row_key = diff_key.strip("root['").strip("']")
                 csv_row = imap_diff.imap_a.get_imap_row_by_key(row_key)
 
-                # TODO: country mapping
-                # print 'dictionary_item_removed:', diff_key
+                # Retire country operation mapping
                 if imap_diff.imap_a.has_country_operation_mapping(csv_row):
-                    import_list_narrative.append('SKIP: Retire country mapping: %s, %s --> %s --> %s, %s' % (
+                    import_list_narrative.append('Retire country mapping: %s, %s --> %s --> %s, %s' % (
                         csv_row['MOH_Indicator_ID'], csv_row['MOH_Indicator_Name'], csv_row['Operation'],
                         csv_row['MOH_Disag_ID'], csv_row['MOH_Disag_Name']))
-                    # import_list += imap_diff.imap_a.get_country_operation_mapping_retire_json(csv_row)
+                    import_list += imap_diff.imap_a.get_country_operation_mapping_retire_json(csv_row)
 
-                # TODO: country disag
+                # TODO: Retire country disag
                 """
                 -- Ignoring for now, because the compare needs to be against OCL itself, not the IMAP object
                 Is country disag used by any mappings that are not in the removed list? 
@@ -887,7 +904,14 @@ class DatimImapFactory(object):
 
     @staticmethod
     def generate_import_script_from_csv_row(imap_input=None, csv_row=None, defs=None, do_add_columns_to_csv=True):
-        """ Return a list of JSON imports representing the CSV row"""
+        """
+        Return a list of JSON imports representing the CSV row
+        :param imap_input:
+        :param csv_row:
+        :param defs:
+        :param do_add_columns_to_csv:
+        :return:
+        """
         if do_add_columns_to_csv:
             csv_row = imap_input.add_columns_to_row(csv_row.copy())
         datim_csv_converter = DatimMohCsvToJsonConverter(input_list=[csv_row])
@@ -924,19 +948,32 @@ class DatimImapFactory(object):
 
     @staticmethod
     def is_valid_imap_period(period):
+        """
+        Returns True if specified period is valid
+        :param period:
+        :return:
+        """
         # TODO: Confirm that the period has been defined in the PEPFAR metadata
-        if period in ('FY17', 'FY18', 'FY19'):
-            return True
-        return False
+        return True
 
 
 class DatimImapDiff(object):
     """ Object representing the diff between two IMAP objects """
 
     def __init__(self, imap_a, imap_b, exclude_empty_maps=False):
+        self.imap_a = imap_a
+        self.imap_b = imap_b
+        self.__diff_data = None
         self.diff(imap_a, imap_b, exclude_empty_maps=exclude_empty_maps)
 
     def diff(self, imap_a, imap_b, exclude_empty_maps=False):
+        """
+        Evaluates the diff between two DatimImap objects
+        :param imap_a:
+        :param imap_b:
+        :param exclude_empty_maps:
+        :return:
+        """
         self.imap_a = imap_a
         self.imap_b = imap_b
         self.__diff_data = deepdiff.DeepDiff(
@@ -952,6 +989,10 @@ class DatimImapDiff(object):
                     del(self.__diff_data['values_changed'][key])
 
     def get_diff(self):
+        """
+        Returns the diff results
+        :return:
+        """
         return self.__diff_data
 
 
@@ -963,10 +1004,24 @@ class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConver
     CSV_RESOURCE_DEF_MOH_DATIM_MAPPING = 'MOH-Datim-Mapping'
     CSV_RESOURCE_DEF_MOH_OPERATION_MAPPING = 'MOH-Mapping-Operation'
     CSV_RESOURCE_DEF_MOH_COLLECTION = 'MOH-Mapping-Collection'
+    CSV_RESOURCE_DEF_MOH_INDICATOR_RETIRED = 'MOH-Indicator-Retired'
+    CSV_RESOURCE_DEF_MOH_DISAG_RETIRED = 'MOH-Disaggregate-Retired'
+    CSV_RESOURCE_DEF_MOH_DATIM_MAPPING_RETIRED = 'MOH-Datim-Mapping-Retired'
+    CSV_RESOURCE_DEF_MOH_OPERATION_MAPPING_RETIRED = 'MOH-Mapping-Operation-Retired'
+
 
     @staticmethod
     def get_country_csv_resource_definitions(country_owner='', country_owner_type='',
                                              country_source='', datim_map_type='', defs=None):
+        """
+        Returns resource definitions for DATIM IMAP CSV
+        :param country_owner:
+        :param country_owner_type:
+        :param country_source:
+        :param datim_map_type:
+        :param defs:
+        :return:
+        """
         csv_resource_definitions = [
             {
                 'definition_name': DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_INDICATOR,
@@ -980,6 +1035,7 @@ class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConver
                     {'resource_field':'owner', 'column':'Country Data Element Owner ID'},
                     {'resource_field':'owner_type', 'column':'Country Data Element Owner Type'},
                     {'resource_field':'source', 'column':'Country Data Element Source ID'},
+                    {'resource_field':'retired', 'value':False},
                 ],
                 ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_SUB_RESOURCES:{
                     'names':[
@@ -1005,6 +1061,7 @@ class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConver
                     {'resource_field':'owner', 'column':'Country Disaggregate Owner ID'},
                     {'resource_field':'owner_type', 'column':'Country Disaggregate Owner Type'},
                     {'resource_field':'source', 'column':'Country Disaggregate Source ID'},
+                    {'resource_field':'retired', 'value':False},
                 ],
                 ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_SUB_RESOURCES:{
                     'names':[
@@ -1032,6 +1089,7 @@ class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConver
                     {'resource_field':'owner', 'value':country_owner},
                     {'resource_field':'owner_type', 'value':country_owner_type},
                     {'resource_field':'source', 'value':country_source},
+                    {'resource_field':'retired', 'value':False},
                 ]
             },
             {
@@ -1048,6 +1106,23 @@ class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConver
                     {'resource_field':'owner', 'value':country_owner},
                     {'resource_field':'owner_type', 'value':country_owner_type},
                     {'resource_field':'source', 'value':country_source},
+                    {'resource_field':'retired', 'value':False},
+                ]
+            },
+            {
+                'definition_name': DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_OPERATION_MAPPING_RETIRED,
+                'is_active': True,
+                'resource_type': 'Mapping',
+                'id_column': None,
+                'internal_external': {'value': ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.INTERNAL_MAPPING_ID},
+                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS: [
+                    {'resource_field': 'from_concept_url', 'column': 'Country From Concept URI'},
+                    {'resource_field': 'map_type', 'column': 'Country Map Type'},
+                    {'resource_field': 'to_concept_url', 'column': 'Country To Concept URI'},
+                    {'resource_field': 'owner', 'value': country_owner},
+                    {'resource_field': 'owner_type', 'value': country_owner_type},
+                    {'resource_field': 'source', 'value': country_source},
+                    {'resource_field': 'retired', 'value': True},
                 ]
             },
             {

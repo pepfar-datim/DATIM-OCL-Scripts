@@ -244,8 +244,9 @@ class DatimBase(object):
             self.str_active_dataset_ids = ','.join(self.ocl_dataset_repos.keys())
             self.vlog(1, 'Dataset IDs returned from OCL:', self.str_active_dataset_ids)
         else:
-            self.log('ERROR: No dataset IDs returned from OCL. Exiting...')
-            sys.exit(1)
+            msg = 'ERROR: No dataset IDs returned from OCL. Exiting...'
+            self.vlog(1, msg)
+            raise Exception(msg)
 
     def filecmp(self, filename1, filename2):
         """
@@ -354,17 +355,18 @@ class DatimBase(object):
         r.raise_for_status()
         if r.status_code == 204:
             # Create the export and try one more time...
-            self.log('WARNING: Export does not exist for "%s". Creating export...' % url_ocl_export)
+            self.vlog(1, 'WARNING: Export does not exist for "%s". Creating export...' % url_ocl_export)
             new_export_request = requests.post(url_ocl_export, headers=self.oclapiheaders)
             if new_export_request.status_code == 202:
                 # Wait for export to be processed then try to fetch it
-                self.log('INFO: Waiting 30 seconds while export is being generated...')
+                self.vlog(1, 'INFO: Waiting 30 seconds while export is being generated...')
                 time.sleep(30)
                 r = requests.get(url_ocl_export, headers=self.oclapiheaders)
                 r.raise_for_status()
             else:
-                self.log('ERROR: Unable to generate export for "%s"' % url_ocl_export)
-                sys.exit(1)
+                msg = 'ERROR: Unable to generate export for "%s"' % url_ocl_export
+                self.vlog(1, msg)
+                raise Exception(msg)
 
         # Write compressed export to file
         with open(self.attach_absolute_data_path(zipfilename), 'wb') as handle:

@@ -195,12 +195,11 @@ class DatimImapExport(datimbase.DatimBase):
         # STEP 5 of 8: Download list of country indicator mappings (i.e. collections)
         # TODO: Make this one work offline
         self.vlog(1, '**** STEP 5 of 8: Download list of country indicator mappings (i.e. collections)')
-        country_collections_endpoint = '%scollections/' % (country_owner_endpoint)
+        country_collections_endpoint = '%scollections/' % country_owner_endpoint
         if self.run_ocl_offline:
             self.vlog(1, 'WARNING: Offline not supported here yet. Taking this ship online!')
-        country_collections = self.get_ocl_repositories(endpoint=country_collections_endpoint,
-                                                        require_external_id=False,
-                                                        active_attr_name=None)
+        country_collections = self.get_ocl_repositories(
+            endpoint=country_collections_endpoint, require_external_id=False, active_attr_name=None)
 
         # STEP 6 of 8: Process one country collection at a time
         self.vlog(1, '**** STEP 6 of 8: Process one country collection at a time')
@@ -208,9 +207,13 @@ class DatimImapExport(datimbase.DatimBase):
             collection_zipfilename = self.endpoint2filename_ocl_export_zip(collection['url'])
             collection_jsonfilename = self.endpoint2filename_ocl_export_json(collection['url'])
             if not self.run_ocl_offline:
-                collection_export = self.get_ocl_export(
-                    endpoint=collection['url'], version=country_version_id,
-                    zipfilename=collection_zipfilename, jsonfilename=collection_jsonfilename)
+                try:
+                    self.get_ocl_export(
+                        endpoint=collection['url'], version=country_version_id,
+                        zipfilename=collection_zipfilename, jsonfilename=collection_jsonfilename)
+                except requests.exceptions.HTTPError:
+                    # collection or collection version does not exist, so we can safely throw it out
+                    continue
             else:
                 self.vlog(1, 'OCL-OFFLINE: Using local file "%s"...' % collection_jsonfilename)
                 if os.path.isfile(self.attach_absolute_data_path(collection_jsonfilename)):

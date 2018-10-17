@@ -103,21 +103,20 @@ class DatimImapImport(datimbase.DatimBase):
             self.vlog(1, msg)
             raise Exception(msg)
 
-        # STEP 3 of 12: Fetch existing IMAP export from OCL for the specified country
-        self.vlog(1, '**** STEP 3 of 12: Fetch existing IMAP export from OCL for the specified country and period')
+        # STEP 3 of 12: Fetch latest available IMAP export from OCL for the specified country
+        self.vlog(1, '**** STEP 3 of 12: Fetch latest available IMAP export from OCL for the specified country')
         try:
             imap_old = datimimap.DatimImapFactory.load_imap_from_ocl(
                 oclenv=self.oclenv, oclapitoken=self.oclapitoken, run_ocl_offline=self.run_ocl_offline,
-                country_code=imap_input.country_code, country_org=imap_input.country_org,
-                period=imap_input.period, verbosity=self.verbosity)
+                country_code=imap_input.country_code, country_org=imap_input.country_org, verbosity=self.verbosity)
             self.vlog(1, '%s CSV rows loaded from the OCL IMAP export' % imap_old.length())
-        except requests.exceptions.HTTPError:
+        except requests.exceptions.HTTPError as e:
             imap_old = None
-            self.vlog(1, 'OCL IMAP export not available for country "%s" and period "%s". Continuing...' % (
-                imap_input.country_org, imap_input.period))
+            self.vlog(1, 'HTTPError: No IMAP export available for country "%s". %s' % (imap_input.country_org, str(e)))
         except datimimapexport.DatimUnknownCountryPeriodError:
             imap_old = None
-            self.vlog(1, 'Export not available for this country and period. Continuing...')
+            self.vlog(1, 'DatimUnknownCountryPeriodError: No IMAP export available for country "%s". Continuing...' % (
+                imap_input.country_org))
 
         # STEP 4 of 12: Evaluate delta between input and OCL IMAPs
         self.vlog(1, '**** STEP 4 of 12: Evaluate delta between input and OCL IMAPs')
@@ -154,6 +153,7 @@ class DatimImapImport(datimbase.DatimBase):
             do_create_country_org = True
             do_create_country_source = True
             self.vlog(1, 'Country org and source do not exist. Will create...')
+            # TODO: Check existence of org/source directly with OCL rather than via IMAP
         else:
             self.vlog(1, 'Country org and source exist. No action to take...')
         if imap_diff or not imap_old:
@@ -216,12 +216,12 @@ class DatimImapImport(datimbase.DatimBase):
         if imap_diff:
             self.vlog(1, 'Creating import script based on the delta...')
             add_to_import_list = datimimap.DatimImapFactory.generate_import_script_from_diff(imap_diff)
-            self.vlog(1, '%s resources added to import list' % len(add_to_import_list))
+            self.vlog(1, '%s resource(s) added to import list' % len(add_to_import_list))
             import_list += add_to_import_list
         else:
             self.vlog(1, 'Creating import script for full country CSV...')
             add_to_import_list = datimimap.DatimImapFactory.generate_import_script_from_csv(imap_input)
-            self.vlog(1, '%s resources added to import list' % len(add_to_import_list))
+            self.vlog(1, '%s resource(s) added to import list' % len(add_to_import_list))
             import_list += add_to_import_list
         if self.verbosity > 1:
             pprint.pprint(import_list)

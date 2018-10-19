@@ -30,10 +30,37 @@ if sys.argv and len(sys.argv) > 5:
     csv_filename = sys.argv[3]
     country_name = sys.argv[4]
     if sys.argv[5].lower() == 'true':
-     test_mode = True
+        test_mode = True
 
 # Pre-pocess input parameters
 country_org = 'DATIM-MOH-%s' % country_code
+country_names = {
+        "BW": "Botswana",
+        "BI": "Burundi",
+        "CM": "Cameroon",
+        "CI": "Cote d'Ivoire",
+        "CD": "Democratic Republic of the Congo",
+        "SZ": "Eswatini",
+        "ET": "Ethiopia",
+        "HT": "Haiti",
+        "KE": "Kenya",
+        "LS": "Lesotho",
+        "MW": "Malawi",
+        "MZ": "Mozambique",
+        "NA": "Namibia",
+        "NG": "Nigeria",
+        "RW": "Rwanda",
+        "ZA": "South Africa",
+        "SS": "South Sudan",
+        "TZ": "Tanzania",
+        "UG": "Uganda",
+        "UA": "Ukraine",
+        "VN": "Vietnam",
+        "ZM": "Zambia",
+        "ZW": "Zimbabwe",
+    }
+if not country_name and country_code in country_names:
+    country_name = country_names[country_code]
 
 # Debug output
 if verbosity:

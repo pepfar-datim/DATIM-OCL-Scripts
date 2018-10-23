@@ -8,6 +8,8 @@ import settings
 import requests
 import datim.datimimap
 import datim.datimimapexport
+from import_manager import has_existing_import
+import json
 
 
 # Default Script Settings
@@ -40,6 +42,14 @@ if sys.argv and len(sys.argv) > 6:
      include_extra_info = True
     else:
      include_extra_info = False
+
+if has_existing_import(country_code):
+    response = {
+            'status_code': 409,
+            'result': 'There is an import already in progress for this country code'
+        }
+    print json.dumps(response)
+    sys.exit(1)
 
 # Pre-pocess input parameters
 country_org = 'DATIM-MOH-%s' % country_code

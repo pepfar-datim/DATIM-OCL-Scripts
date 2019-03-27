@@ -1,15 +1,12 @@
 """
-Class to import into OCL a country mapping CSV for a specified country (e.g. UG) and
-period (e.g. FY17). CSV must follow the format of the country mapping CSV template.
+Class to import into OCL an indicator mapping CSV for a specified country (e.g. UG) and
+period (e.g. FY17). CSV must follow the format of the country indicator mapping CSV template.
 
 TODO:
-- Some comparisons need to be against either the latest IMAP or the actual OCL source rather than
-  the IMAP for the requested period, because very possible that no IMAP exists for requested period, but that
-  it does for a previous period for the same country
-- Improve validation step:
-    - New import must be for the latest or newer country period (e.g. can't import/update FY17 if FY18 already defined)
+- Improve validation step: New import must be for the latest or newer country period
+  (e.g. can't import/update FY17 if FY18 already defined)
 - Move country collection reconstruction and version creation into a separate process that this class uses
-- Add "clean up" functionality
+- Add "clean up" functionality to retire unused resources
 - Query collections by their mappings, not ID -- names are not consistent coming from DHIS2 which is killing this
 - Exclude "null-disag" from the import scripts -- this does not have any effect, its just an unnecessary step
 
@@ -38,7 +35,7 @@ import ocldev.oclexport
 
 class DatimImapImport(datimbase.DatimBase):
     """
-    Class to import DATIM country mapping metadata from a CSV file into OCL.
+    Class to import DATIM country indicator mapping metadata from a CSV file into OCL.
     """
 
     def __init__(self, oclenv='', oclapitoken='', verbosity=0, run_ocl_offline=False, test_mode=False):
@@ -332,23 +329,39 @@ class DatimImapImport(datimbase.DatimBase):
 
         self.vlog(1, '**** IMAP import process complete!')
 
-    def clear_collection_references(self, collection_url=''):
+    def clear_collection_references(self, collection_url='', batch_size=25):
         """ Clear all references for the specified collection """
-        # TOOD: In the future, batch deletes for no more than 25 references at a time
+
+        # Load the list of references in the collection
         collection_refs_url = '%sreferences/' % collection_url
         r = requests.get(collection_url, headers=self.oclapiheaders)
         r.raise_for_status()
         collection = r.json()
+
+        # Exit if no references
+        if 'references' not in collection or not collection['references']:
+            self.vlog(1, 'Collection is already empty. Continuing...')
+            return
+
+        # Loop through collection references and delete in batches
+        i = 0
         refs = []
-        for ref in collection['references']:
-            refs.append(ref['expression'])
-        payload = {"references": refs}
+        while i < len(collection['references']):
+            refs.append(collection['references'][i]['expression'])
+            if len(refs) % batch_size == 0:
+                payload = {"references": refs}
+                self.vlog(1, '%s: %s' % (collection_refs_url, json.dumps(payload)))
+                r = requests.delete(collection_refs_url, json=payload, headers=self.oclapiheaders)
+                r.raise_for_status()
+                refs = []
+            i += 1
+
+        # Delete any references still in the refs list
         if refs:
+            payload = {"references": refs}
             self.vlog(1, '%s: %s' % (collection_refs_url, json.dumps(payload)))
             r = requests.delete(collection_refs_url, json=payload, headers=self.oclapiheaders)
             r.raise_for_status()
-        else:
-            self.vlog(1, 'Empty collection. Continuing...')
 
     @staticmethod
     def get_country_org_dict(country_org='', country_code='', country_name=''):

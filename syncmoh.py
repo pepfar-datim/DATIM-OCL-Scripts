@@ -1,7 +1,10 @@
 """
-Class to synchronize DATIM DHIS2 MOH Indicator definitions with OCL
+Class to synchronize DATIM DHIS2 MOH FY17 Indicator definitions with OCL
 The script runs 1 import batch, which consists of two queries to DHIS2, which are
 synchronized with repositories in OCL as described below.
+
+Note: This script is set to run against `www.datim.org` while `syncmohfy18.py` runs against `test.geoalign.org`
+
 |-------------|--------|-------------------------------------------------|
 | ImportBatch | DHIS2  | OCL                                             |
 |-------------|--------|-------------------------------------------------|

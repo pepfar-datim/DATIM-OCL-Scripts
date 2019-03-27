@@ -335,7 +335,10 @@ class DatimImap(object):
             writer = csv.DictWriter(sys.stdout, fieldnames=fieldnames)
             writer.writeheader()
             for row in data:
-                writer.writerow({k:v.encode('utf8') for k, v in row.items()})
+                row_to_output = {}
+                for field_name in fieldnames:
+                    row_to_output[field_name] = row[field_name].encode('utf8')
+                writer.writerow(row_to_output)
         elif fmt == self.DATIM_IMAP_FORMAT_JSON:
             print(json.dumps(data))
         elif fmt == self.DATIM_IMAP_FORMAT_HTML:

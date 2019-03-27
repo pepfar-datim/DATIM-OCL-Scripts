@@ -73,9 +73,9 @@ class DatimImapExport(datimbase.DatimBase):
 
     def get_imap(self, period='', version='', country_org='', country_code=''):
         """
-        Fetch exports from OCL and build the export
+        Fetch JSON exports from OCL and build the IMAP export
         If version is not specified, then the latest released version for the given period will be used.
-        For example, if period is 'FY17', and 'FY17.v0' and 'FY17.v1' versions have been defined,
+        For example, if period is 'FY17', and 'FY17.v0' and 'FY17.v1' versions are released in OCL,
         then 'FY17.v1' would be returned.
         If period is not specified, version is ignored and the latest released version of the repository
         is returned regardless of period.

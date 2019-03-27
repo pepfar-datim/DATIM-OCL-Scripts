@@ -1,5 +1,5 @@
 """
-Class to synchronize DATIM DHIS2 MOH Indicator definitions with OCL
+Class to synchronize DATIM DHIS2 MOH F717 Indicator definitions with OCL
 The script runs 1 import batch, which consists of two queries to DHIS2, which are
 synchronized with repositories in OCL as described below.
 |-------------|--------|-------------------------------------------------|

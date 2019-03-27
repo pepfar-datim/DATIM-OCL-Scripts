@@ -2,6 +2,9 @@
 Class to synchronize DATIM DHIS2 MOH FY18 Indicator definitions with OCL
 The script runs 1 import batch, which consists of two queries to DHIS2, which are
 synchronized with repositories in OCL as described below.
+
+Note: This script is set to run against `test.geoalign.org` while `syncmoh.py` runs against `www.datim.org`
+
 |-------------|----------|----------------------------------------|
 | ImportBatch | DHIS2    | OCL                                    |
 |-------------|----------|----------------------------------------|
@@ -21,14 +24,14 @@ dhis2uid = settings.dhis2uid_testgeoalign
 dhis2pwd = settings.dhis2pwd_testgeoalign
 
 # OCL Settings - JetStream Staging user=datim-admin
-oclenv = settings.ocl_api_url_staging
-oclapitoken = settings.api_token_staging_datim_admin
+oclenv = settings.ocl_api_url_production
+oclapitoken = settings.api_token_production_datim_admin
 
 # Local development environment settings
-sync_mode = datim.datimsync.DatimSync.SYNC_MODE_BUILD_IMPORT_SCRIPT  # Set which operation is performed by the sync script
+sync_mode = datim.datimsync.DatimSync.SYNC_MODE_FULL_IMPORT  # Set which operation is performed by the sync script
 verbosity = 2  # 0=none, 1=some, 2=all
 import_limit = 0  # Number of resources to import; 0=all
-import_delay = 3  # Number of seconds to delay between each import request
+import_delay = 1  # Number of seconds to delay between each import request
 compare2previousexport = False  # Set to False to ignore the previous export; set to True only after a full import
 run_dhis2_offline = False  # Set to true to use local copies of dhis2 exports
 run_ocl_offline = False  # Set to true to use local copies of ocl exports

@@ -285,7 +285,12 @@ class DatimImap(object):
         self.__imap_data = []
         if isinstance(imap_data, csv.DictReader) or type(imap_data) == type([]):
             for row in imap_data:
-                self.__imap_data.append({k:unicode(v) for k, v in row.items()})
+                # Get rid of uncrecognized columns and ensure unicode encoding
+                row_to_save = {}
+                for field_name in list(self.IMAP_FIELD_NAMES):
+                    row_to_save[field_name] = unicode(row[field_name])
+                # Store the cleaned up row in this IMAP object
+                self.__imap_data.append(row_to_save)
         else:
             raise Exception("Cannot set I-MAP data with '%s'" % imap_data)
 
@@ -335,9 +340,11 @@ class DatimImap(object):
             writer = csv.DictWriter(sys.stdout, fieldnames=fieldnames)
             writer.writeheader()
             for row in data:
+                # throw out columns we don't need
                 row_to_output = {}
                 for field_name in fieldnames:
                     row_to_output[field_name] = row[field_name].encode('utf8')
+                # output the row
                 writer.writerow(row_to_output)
         elif fmt == self.DATIM_IMAP_FORMAT_JSON:
             print(json.dumps(data))

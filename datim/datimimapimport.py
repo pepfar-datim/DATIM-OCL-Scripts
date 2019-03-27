@@ -190,7 +190,7 @@ class DatimImapImport(datimbase.DatimBase):
         self.vlog(1, 'Next country version number for period "%s": "%s"' % (
             imap_input.period, next_country_version_id))
 
-        # STEP 7 of 12: Generate country org and source if missing
+        # STEP 7 of 12: Generate import script for the country org and source, if missing
         self.vlog(1, '**** STEP 7 of 12: Generate country org and source if missing')
         import_list = []
         if do_create_country_org:

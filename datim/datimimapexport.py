@@ -3,15 +3,15 @@ Class to generate a country mapping export for a specified country (e.g. UG) and
 period (e.g. FY17). Export follows the format of the country mapping CSV template.
 
 ** Fields:
-DATIM_Indicator_Category
-DATIM_Indicator_ID
-DATIM_Disag_ID
-DATIM_Disag_Name
-Operation - ADD, SUBTRACT
-MOH_Indicator_ID
-MOH_Indicator_Name
-MOH_Disag_ID
-MOH_Disag_Name
+DATIM_Indicator_Category -
+DATIM_Indicator_ID - HTS_TST_N_MOH_Age_Agg_Sex_Result
+DATIM_Disag_ID - FSmIqIsgheB
+DATIM_Disag_Name - <15, Female, Negative
+Operation - ADD or SUBTRACT
+MOH_Indicator_ID - INDHTC-108c
+MOH_Indicator_Name - HIV negative Children (0-14years)
+MOH_Disag_ID - Females
+MOH_Disag_Name - Adults (14+) initiated ART
 
 ** Issues:
 1. Implement long-term method for populating the indicator category column (currently manually set a custom attribute)
@@ -262,10 +262,11 @@ class DatimImapExport(datimbase.DatimBase):
                         self.vlog(1, msg)
                         raise Exception(msg)
 
-            # Save the set of operations in the relevant datim indicator mapping
-            for datim_indicator_mapping in indicators[datim_indicator_url]['mappings']:
-                if datim_indicator_mapping['from_concept_url'] == datim_indicator_url and datim_indicator_mapping['to_concept_url'] == datim_disaggregate_url:
-                    datim_indicator_mapping['operations'] = operations
+            # Save the set of operations in the relevant datim indicator mapping, or skip if indicator has no mappings
+            if datim_indicator_url in indicators:
+                for datim_indicator_mapping in indicators[datim_indicator_url]['mappings']:
+                    if datim_indicator_mapping['from_concept_url'] == datim_indicator_url and datim_indicator_mapping['to_concept_url'] == datim_disaggregate_url:
+                        datim_indicator_mapping['operations'] = operations
 
         # STEP 7 of 8: Cache the results
         self.vlog(1, '**** STEP 7 of 8: SKIPPING -- Cache the results')

@@ -61,7 +61,7 @@ class DatimBase(object):
         DATIM_IMAP_FORMAT_HTML
     ]
 
-    # Note that this is a duplicate -- see DatimImap.IMAP_FIELD_NAMES
+    # TODO: Delete this. It is a duplicate -- see DatimImap.IMAP_FIELD_NAMES
     imap_fields = [
         'DATIM_Indicator_Category',
         'DATIM_Indicator_ID',

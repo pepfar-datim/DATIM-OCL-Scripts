@@ -20,16 +20,25 @@ class DatimImap(object):
     Object representing a set of country indicator mappings
     """
 
+    IMAP_FIELD_DATIM_INDICATOR_CATEGORY = 'DATIM_Indicator_Category'
+    IMAP_FIELD_DATIM_INDICATOR_ID = 'DATIM_Indicator_ID'
+    IMAP_FIELD_DATIM_DISAG_ID = 'DATIM_Disag_ID'
+    IMAP_FIELD_DATIM_DISAG_NAME = 'DATIM_Disag_Name'
+    IMAP_FIELD_OPERATION = 'Operation'
+    IMAP_FIELD_MOH_INDICATOR_ID = 'MOH_Indicator_ID'
+    IMAP_FIELD_MOH_INDICATOR_NAME = 'MOH_Indicator_Name'
+    IMAP_FIELD_MOH_DISAG_ID = 'MOH_Disag_ID'
+    IMAP_FIELD_MOH_DISAG_NAME = 'MOH_Disag_Name'
     IMAP_FIELD_NAMES = [
-        'DATIM_Indicator_Category',
-        'DATIM_Indicator_ID',
-        'DATIM_Disag_ID',
-        'DATIM_Disag_Name',
-        'Operation',
-        'MOH_Indicator_ID',
-        'MOH_Indicator_Name',
-        'MOH_Disag_ID',
-        'MOH_Disag_Name',
+        IMAP_FIELD_DATIM_INDICATOR_CATEGORY,
+        IMAP_FIELD_DATIM_INDICATOR_ID,
+        IMAP_FIELD_DATIM_DISAG_ID,
+        IMAP_FIELD_DATIM_DISAG_NAME,
+        IMAP_FIELD_OPERATION,
+        IMAP_FIELD_MOH_INDICATOR_ID,
+        IMAP_FIELD_MOH_INDICATOR_NAME,
+        IMAP_FIELD_MOH_DISAG_ID,
+        IMAP_FIELD_MOH_DISAG_NAME,
     ]
 
     IMAP_EXTRA_FIELD_NAMES = [
@@ -820,7 +829,7 @@ class DatimImapFactory(object):
                 # TODO: Compare this against OCL not the original IMAP - low priority
                 if not imap_diff.imap_a.has_country_datim_mapping(csv_row):
                     import_list_narrative.append('Create DATIM mapping: %s, %s --> %s --> %s, %s' % (
-                        csv_row['DATIM_Indicator_Category'], csv_row['DATIM_Indicator_ID'],
+                        csv_row[self.IMAP_FIELD_DATIM_INDICATOR_CATEGORY], csv_row['DATIM_Indicator_ID'],
                         datimbase.DatimBase.map_type_country_has_option,
                         csv_row['DATIM_Disag_ID'], csv_row['DATIM_Disag_Name']))
                     import_list += imap_diff.imap_b.get_country_datim_mapping_create_json(csv_row)

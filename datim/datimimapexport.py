@@ -281,8 +281,8 @@ class DatimImapExport(datimbase.DatimBase):
                     for operation in mapping['operations']:
                         row = {}
                         row['DATIM_Indicator_Category'] = ''
-                        if 'extras' in indicator and type(indicator['extras']) is dict and 'indicator_category_code' in indicator['extras']:
-                            row['DATIM_Indicator_Category'] = indicator['extras']['indicator_category_code']
+                        if 'extras' in indicator and type(indicator['extras']) is dict and datimimap.DatimImap.IMAP_INDICATOR_CATEGORY_CUSTOM_ATTRIBUTE in indicator['extras']:
+                            row['DATIM_Indicator_Category'] = indicator['extras'][datimimap.DatimImap.IMAP_INDICATOR_CATEGORY_CUSTOM_ATTRIBUTE]
                         row['DATIM_Indicator_ID'] = indicator['id']
                         row['DATIM_Disag_ID'] = mapping['to_concept_code']
                         row['DATIM_Disag_Name'] = mapping['to_concept_name']
@@ -296,8 +296,8 @@ class DatimImapExport(datimbase.DatimBase):
                     # Country has not defined any mappings for this datim indicator+disag pair
                     row = {}
                     row['DATIM_Indicator_Category'] = ''
-                    if 'extras' in indicator and type(indicator['extras']) is dict and 'indicator_category_code' in indicator['extras']:
-                        row['DATIM_Indicator_Category'] = indicator['extras']['indicator_category_code']
+                    if 'extras' in indicator and type(indicator['extras']) is dict and datimimap.DatimImap.IMAP_INDICATOR_CATEGORY_CUSTOM_ATTRIBUTE in indicator['extras']:
+                        row['DATIM_Indicator_Category'] = indicator['extras'][datimimap.DatimImap.IMAP_INDICATOR_CATEGORY_CUSTOM_ATTRIBUTE]
                     row['DATIM_Indicator_ID'] = indicator['id']
                     row['DATIM_Disag_ID'] = mapping['to_concept_code']
                     row['DATIM_Disag_Name'] = mapping['to_concept_name']

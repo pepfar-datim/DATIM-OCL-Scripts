@@ -20,6 +20,7 @@ class DatimImap(object):
     Object representing a set of country indicator mappings
     """
 
+    # TODO: Update all references to these field names to use these constants instead
     IMAP_FIELD_DATIM_INDICATOR_CATEGORY = 'DATIM_Indicator_Category'
     IMAP_FIELD_DATIM_INDICATOR_ID = 'DATIM_Indicator_ID'
     IMAP_FIELD_DATIM_DISAG_ID = 'DATIM_Disag_ID'
@@ -40,6 +41,8 @@ class DatimImap(object):
         IMAP_FIELD_MOH_DISAG_ID,
         IMAP_FIELD_MOH_DISAG_NAME,
     ]
+
+    IMAP_INDICATOR_CATEGORY_CUSTOM_ATTRIBUTE = 'indicator_category_code'
 
     IMAP_EXTRA_FIELD_NAMES = [
         'Country Collection ID',
@@ -829,7 +832,7 @@ class DatimImapFactory(object):
                 # TODO: Compare this against OCL not the original IMAP - low priority
                 if not imap_diff.imap_a.has_country_datim_mapping(csv_row):
                     import_list_narrative.append('Create DATIM mapping: %s, %s --> %s --> %s, %s' % (
-                        csv_row[self.IMAP_FIELD_DATIM_INDICATOR_CATEGORY], csv_row['DATIM_Indicator_ID'],
+                        csv_row['DATIM_Indicator_Category'], csv_row['DATIM_Indicator_ID'],
                         datimbase.DatimBase.map_type_country_has_option,
                         csv_row['DATIM_Disag_ID'], csv_row['DATIM_Disag_Name']))
                     import_list += imap_diff.imap_b.get_country_datim_mapping_create_json(csv_row)

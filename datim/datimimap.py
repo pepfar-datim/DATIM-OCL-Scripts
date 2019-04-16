@@ -290,17 +290,18 @@ class DatimImap(object):
 
     def set_imap_data(self, imap_data):
         """
-        Sets the IMAP data
+        Sets the IMAP data, discarding unrecognized columns, and ensures unicode encoding
         :param imap_data:
         :return:
         """
+        # TODO: Note the explicit UTF-8 character encoding and ignoring unicode decoding errors - fix in future
         self.__imap_data = []
         if isinstance(imap_data, csv.DictReader) or type(imap_data) == type([]):
             for row in imap_data:
-                # Get rid of uncrecognized columns and ensure unicode encoding
+                # Get rid of unrecognized columns and ensure unicode encoding
                 row_to_save = {}
                 for field_name in list(self.IMAP_FIELD_NAMES):
-                    row_to_save[field_name] = unicode(row[field_name])
+                    row_to_save[field_name] = unicode(row[field_name], encoding='utf8', errors='ignore')
                 # Store the cleaned up row in this IMAP object
                 self.__imap_data.append(row_to_save)
         else:

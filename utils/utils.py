@@ -1,4 +1,6 @@
-import json
+"""
+Useful code/snippets for interacting with DATIM repositories in OCL.
+"""
 import requests
 from ocldev.oclfleximporter import OclFlexImporter
 import time
@@ -186,7 +188,6 @@ for c in collections:
     latest_version_json = latest_version_request.json()
     if latest_version_json['id'] == 'initial':
 
-# import_filename = 'init/temp.json'
 import_filename = 'mer_dhis2ocl_import_script.json'
 importer_collections = OclFlexImporter(
     file_path=import_filename, limit=1, api_url_root=oclenv, api_token=oclapitoken, test_mode=False)
@@ -198,7 +199,7 @@ importer_collections.process()
 import json
 import ocldev.oclfleximporter
 oclenv = 'https://api.staging.openconceptlab.org'
-oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
+oclapitoken = 'enter-value-here'
 with open('fy18_import_list.json') as ifile:
     import_list = json.load(ifile)
 importer = ocldev.oclfleximporter.OclFlexImporter(input_list=import_list, api_url_root=oclenv, api_token=oclapitoken, test_mode=False)
@@ -211,7 +212,7 @@ import requests
 import ocldev.oclexport
 import ocldev.oclfleximporter
 oclenv = 'https://api.staging.openconceptlab.org'
-oclapitoken = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
+oclapitoken = 'enter-value-here'
 oclapiheaders = {
     'Authorization': 'Token ' + oclapitoken,
     'Content-Type': 'application/json'

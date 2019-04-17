@@ -1,5 +1,5 @@
 DATIM_Indicator_Category,DATIM_Indicator_ID,DATIM_Disag_ID,DATIM_Disag_Name,Operation,MOH_Indicator_ID,MOH_Indicator_Name,MOH_Disag_ID,MOH_Disag_Name
-HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,INDHTC-01,TO-REPLACE--LS-Indicator-Name-001,null_disag,Null Disaggregation
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,Total,ADD,INDHTC-01,TO-REPLACE--LS-Indicator-Name-001,null-disag,Null Disaggregate
 HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,HrQbkVgBM1X,Positive | <15 | Female,ADD,INDHTC-108b,TO-REPLACE--LS-Indicator-Name-002,F,TO-REPLACE--LS-Disag-Name-002
 HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,R4WXCEzPZcY,Positive | <15 | Male,ADD,INDHTC-108b,TO-REPLACE--LS-Indicator-Name-002,M,TO-REPLACE--LS-Disag-Name-003
 HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,DY0yrJtBeSC,Positive | <15 | SexUnknown,,,,,
@@ -18,10 +18,10 @@ HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,qL3AXhLXfHf,Negative | 15+ | SexUnknown,,,,
 HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,K21p4HUGqOS,Negative | AgeUnknown | Female,,,,,
 HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,iGj3YxYXGRF,Negative | AgeUnknown | Male,,,,,
 HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,mV483q7SboN,Negative | AgeUnknown | SexUnknown,,,,,
-PMTCT_ART,PMTCT_ART_N_MOH,HllvX50cXC0,Total,ADD,INDANC-04a,TO-REPLACE--LS-Indicator-Name-004,null_disag,Null Disaggregation
-PMTCT_STAT,PMTCT_STAT_N_MOH,HllvX50cXC0,Total,ADD,INDANC-02a,TO-REPLACE--LS-Indicator-Name-005,null_disag,Null Disaggregation
-PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,g2AcKVKFFTR,KnownPositives,ADD,ANC-15_2,TO-REPLACE--LS-Indicator-Name-006,null_disag,Null Disaggregation
-PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,skZHj1KgCFs,NewlyTestedPositives,ADD,INDANC-03a,TO-REPLACE--LS-Indicator-Name-007,null_disag,Null Disaggregation
+PMTCT_ART,PMTCT_ART_N_MOH,HllvX50cXC0,Total,ADD,INDANC-04a,TO-REPLACE--LS-Indicator-Name-004,null-disag,Null Disaggregate
+PMTCT_STAT,PMTCT_STAT_N_MOH,HllvX50cXC0,Total,ADD,INDANC-02a,TO-REPLACE--LS-Indicator-Name-005,null-disag,Null Disaggregate
+PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,g2AcKVKFFTR,KnownPositives,ADD,ANC-15_2,TO-REPLACE--LS-Indicator-Name-006,null-disag,Null Disaggregate
+PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,skZHj1KgCFs,NewlyTestedPositives,ADD,INDANC-03a,TO-REPLACE--LS-Indicator-Name-007,null-disag,Null Disaggregate
 PMTCT_STAT,PMTCT_STAT_N_MOH_KnownPosNeg,FwRU6E2C5kt,NewNegatives,,,,,
 TX_CURR,TX_CURR_N_MOH_Age_Sex,BGFCDhyk4M8,<15 | Female,ADD,INDART-69,TO-REPLACE--LS-Indicator-Name-008,F,TO-REPLACE--LS-Disag-Name-002
 TX_CURR,TX_CURR_N_MOH_Age_Sex,SBUMYkq3pEs,<15 | Male,ADD,INDART-69,TO-REPLACE--LS-Indicator-Name-008,M,TO-REPLACE--LS-Disag-Name-003

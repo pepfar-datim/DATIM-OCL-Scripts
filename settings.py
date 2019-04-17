@@ -9,14 +9,14 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # API tokens for different environments
 api_token_qa_root = ''
-api_token_qa_paynejd = 'a28072a2eb82c6c9949ba6bb8489002438e5bcc7'
-api_token_qa_paynejd99 = '2da0f46b7d29aa57970c0b3a535121e8e479f881'
+api_token_qa_paynejd = ''
+api_token_qa_paynejd99 = ''
 api_token_qa_datim_admin = ''
-api_token_staging_root = '23c5888470d4cb14d8a3c7f355f4cdb44000679a'
-api_token_staging_paynejd = 'a61ba53ed7b8b26ece8fcfc53022b645de0ec055'
-api_token_staging_datim_admin = 'c3b42623c04c87e266d12ae0e297abbce7f1cbe8'
-api_token_production_root = '230e6866c2037886909c58d8088b1a5e7cabc74b'
-api_token_production_paynejd = '950bd651dc4ee29d6bcee3e6dacfe7834bb0f881'
+api_token_staging_root = ''
+api_token_staging_paynejd = ''
+api_token_staging_datim_admin = ''
+api_token_production_root = ''
+api_token_production_paynejd = ''
 api_token_production_datim_admin = ''
 
 # File to be imported
@@ -35,13 +35,13 @@ api_url_root = ocl_api_url_root = ocl_api_url_staging
 # DATIM DHIS2 Credentials
 dhis2env_devde = 'https://dev-de.datim.org'
 dhis2uid_devde = 'paynejd'
-dhis2pwd_devde = 'Jonpayne1!'
+dhis2pwd_devde = ''
 dhis2env_triage = 'https://triage.datim.org'
 dhis2uid_triage = 'paynejd'
-dhis2pwd_triage = '2Monkeys!'
+dhis2pwd_triage = ''
 dhis2env_testgeoalign = 'https://test.geoalign.datim.org'
 dhis2uid_testgeoalign = 'system_ocl_metadata_sync'
-dhis2pwd_testgeoalign = 'ua=9(YyHw6rtZPs4'
+dhis2pwd_testgeoalign = ''
 
 # Set to True to allow updates to existing objects
 do_update_if_exists = False

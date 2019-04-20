@@ -228,6 +228,20 @@ class DatimImapImport(datimbase.DatimBase):
         self.vlog(1, '**** STEP 9 of 12: Import changes into OCL')
         if import_list:
             self.vlog(1, 'Importing %s changes to OCL...' % len(import_list))
+            bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
+                input_list=import_list, api_token=self.oclapitoken, api_url_root=self.oclenv)
+            task_id = bulk_import_response.json()['task']
+            import_results = ocldev.oclfleximporter.OclBulkImporter.get_bulk_import_results(
+                task_id=task_id, api_url_root=self.oclenv, api_token=self.oclapitoken,
+                delay_seconds=5, max_wait_seconds=300)
+            if self.verbosity:
+                if import_results:
+                    print import_results.display_report()
+                else:
+                    print 'Import is still processing...'
+                    sys.exit(1)
+
+            '''
             importer = ocldev.oclfleximporter.OclFlexImporter(
                 input_list=import_list, api_token=self.oclapitoken, api_url_root=self.oclenv,
                 test_mode=self.test_mode, verbosity=self.verbosity,
@@ -235,6 +249,7 @@ class DatimImapImport(datimbase.DatimBase):
             importer.process()
             if self.verbosity:
                 importer.import_results.display_report()
+            '''
         else:
             self.vlog(1, 'Nothing to import! Skipping...')
 
@@ -252,6 +267,7 @@ class DatimImapImport(datimbase.DatimBase):
             # TODO: Note that the source version should still be incremented if references are added to collections
 
         # STEP 10b of 12: Delay until the country source version is done processing
+        # TODO: Incorporate delay until done processing into the create_repo_version method
         self.vlog(1, '**** STEP 10b of 12: Delay until the country source version is done processing')
         if import_list and not self.test_mode:
             is_repo_version_processing = True

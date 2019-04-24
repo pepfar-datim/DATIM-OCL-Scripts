@@ -195,14 +195,14 @@ class DatimImapImport(datimbase.DatimBase):
         import_list = []
         if do_create_country_org:
             org = DatimImapImport.get_country_org_dict(country_org=imap_input.country_org,
-                                            country_code=imap_input.country_code,
-                                            country_name=imap_input.country_name)
+                                                       country_code=imap_input.country_code,
+                                                       country_name=imap_input.country_name)
             import_list.append(org)
             self.vlog(1, 'Country org import script generated:', json.dumps(org))
         if do_create_country_source:
             source = DatimImapImport.get_country_source_dict(country_org=imap_input.country_org,
-                                                  country_code=imap_input.country_code,
-                                                  country_name=imap_input.country_name)
+                                                             country_code=imap_input.country_code,
+                                                             country_name=imap_input.country_name)
             import_list.append(source)
             self.vlog(1, 'Country source import script generated:', json.dumps(source))
         if not do_create_country_org and not do_create_country_source:
@@ -228,20 +228,23 @@ class DatimImapImport(datimbase.DatimBase):
         self.vlog(1, '**** STEP 9 of 12: Import changes into OCL')
         if import_list:
             self.vlog(1, 'Importing %s changes to OCL...' % len(import_list))
+            # TODO: Implement better OclBulkImporter response -- a new class OclBulkImportResponse?
             bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
                 input_list=import_list, api_token=self.oclapitoken, api_url_root=self.oclenv)
             task_id = bulk_import_response.json()['task']
             import_results = ocldev.oclfleximporter.OclBulkImporter.get_bulk_import_results(
                 task_id=task_id, api_url_root=self.oclenv, api_token=self.oclapitoken,
-                delay_seconds=5, max_wait_seconds=300)
-            if self.verbosity:
-                if import_results:
-                    print import_results.display_report()
-                else:
-                    print 'Import is still processing...'
-                    sys.exit(1)
+                delay_seconds=5, max_wait_seconds=500)
+            if import_results:
+                if self.verbosity:
+                    self.vlog(self.verbosity, import_results.display_report())
+            else:
+                # TODO: Need smarter way to handle long running bulk import than just quitting
+                print 'Import is still processing... QUITTING'
+                sys.exit(1)
 
             '''
+            # JP 2019-04-23: Old OclFlexImporter code replaced by the bulk import code above 
             importer = ocldev.oclfleximporter.OclFlexImporter(
                 input_list=import_list, api_token=self.oclapitoken, api_url_root=self.oclenv,
                 test_mode=self.test_mode, verbosity=self.verbosity,
@@ -283,13 +286,13 @@ class DatimImapImport(datimbase.DatimBase):
                     self.vlog(1, 'Source version processing is complete. Continuing...')
                 else:
                     self.vlog(1, 'DELAY: Delaying 15 seconds while new source version is processing')
-                    time.sleep(15)
+                    time.sleep(10)
         elif not import_list:
             self.vlog(1, 'SKIPPING: No resources imported so no new versions to create...')
         elif self.test_mode:
             self.vlog(1, 'SKIPPING: New source version not created in test mode...')
 
-        # STEP 11 of 12: Generate all references for all country collections
+        # STEP 11 of 12: Generate JSON for ALL references for ALL country collections
         self.vlog(1, '**** STEP 11 of 12: Generate collection references')
         ref_import_list = None
         if import_list and not self.test_mode:
@@ -315,6 +318,7 @@ class DatimImapImport(datimbase.DatimBase):
                     unique_collection_ids.append(ref_import['collection'])
 
             # 12b. Delete existing references for each unique collection
+            # NOTE: Bulk import currently supports Creates & Updates, not Deletes, so this will be done the old way
             self.vlog(1, 'Clearing existing collection references...')
             for collection_id in unique_collection_ids:
                 collection_url = '%s/orgs/%s/collections/%s/' % (
@@ -322,17 +326,46 @@ class DatimImapImport(datimbase.DatimBase):
                 self.vlog(1, '  - %s' % collection_url)
                 self.clear_collection_references(collection_url=collection_url)
 
-            # 12c. Import new references for the collection
+            # 12c. Create JSON for new repo version for each unique collection
+            self.vlog(1, 'Creating JSON for each new collection version...')
+            for collection_id in unique_collection_ids:
+                new_repo_version_json = datimimap.DatimImapFactory.get_new_repo_version_json(
+                    owner_type='Organization', owner_id=imap_input.country_org, repo_type='Collection',
+                    repo_id=collection_id, released=True, repo_version_id=next_country_version_id)
+                self.vlog(1, '  - %s' % new_repo_version_json)
+                ref_import_list.append(new_repo_version_json)
+
+            # 12d. Bulk import new references and collection versions
             self.vlog(1, 'Importing %s batch(es) of collection references...' % len(ref_import_list))
+            # TODO: Implement better OclBulkImporter response -- a new class OclBulkImportResponse?
+            bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
+                input_list=ref_import_list, api_token=self.oclapitoken, api_url_root=self.oclenv)
+            ref_task_id = bulk_import_response.json()['task']
+            ref_import_results = ocldev.oclfleximporter.OclBulkImporter.get_bulk_import_results(
+                task_id=ref_task_id, api_url_root=self.oclenv, api_token=self.oclapitoken,
+                delay_seconds=6, max_wait_seconds=500)
+            if ref_import_results:
+                self.vlog(1, ref_import_results.display_report())
+            else:
+                # TODO: Need smarter way to handle long running bulk import than just quitting
+                print 'Reference import is still processing... QUITTING'
+                sys.exit(1)
+
+            '''
+            # JP 2019-04-23: Old OclFlexImporter code replaced by the bulk import code above 
             importer = ocldev.oclfleximporter.OclFlexImporter(
                 input_list=ref_import_list, api_token=self.oclapitoken, api_url_root=self.oclenv,
                 test_mode=self.test_mode, verbosity=self.verbosity, import_delay=0)
             importer.process()
             if self.verbosity:
                 importer.import_results.display_report()
+            '''
 
+            '''
+            # JP 2019-04-24: Incorporated creation of new collection versions into the bulk import script above
             # 12d. Create new version for each unique collection
-                self.vlog(1, 'Creating new collection versions...')
+            # TODO: Incorporate collection version requests into the bulk import script above
+            self.vlog(1, 'Creating new collection versions...')
             for collection_id in unique_collection_ids:
                 collection_endpoint = '/orgs/%s/collections/%s/' % (imap_input.country_org, collection_id)
                 collection_version_endpoint = '%s%s/' % (collection_endpoint, next_country_version_id)
@@ -340,6 +373,7 @@ class DatimImapImport(datimbase.DatimBase):
                 datimimap.DatimImapFactory.create_repo_version(
                     oclenv=self.oclenv, oclapitoken=self.oclapitoken,
                     repo_endpoint=collection_endpoint, repo_version_id=next_country_version_id)
+            '''
         else:
             self.vlog(1, 'SKIPPING: No collections updated...')
 

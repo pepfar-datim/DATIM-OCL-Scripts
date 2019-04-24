@@ -781,6 +781,28 @@ class DatimImapFactory(object):
             period=period, country_org=country_org, country_code=country_code)
 
     @staticmethod
+    def get_new_repo_version_json(owner_type='', owner_id='', repo_type='', repo_id='', released=True,
+                                  repo_version_id='', repo_version_desc='Automatically created version'):
+        if repo_type == 'Source':
+            obj_type = 'Source Version'
+            repo_id_key = 'source'
+        elif repo_type == 'Collection':
+            obj_type = 'Collection Version'
+            repo_id_key = 'collection'
+        else:
+            raise Exception('repo_type must be set to "Source" or "Collection". "%s" provided.' % repo_type)
+        new_version_data = {
+            'type': obj_type,
+            'id': repo_version_id,
+            repo_id_key: repo_id,
+            'description': repo_version_desc,
+            'released': released,
+            'owner': owner_id,
+            'owner_type': owner_type,
+        }
+        return new_version_data
+
+    @staticmethod
     def create_repo_version(oclenv='', oclapitoken='', repo_endpoint='', repo_version_id=''):
         """
         Create a new repository version

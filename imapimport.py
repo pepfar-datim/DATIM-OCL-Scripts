@@ -18,6 +18,7 @@ verbosity = 2  # Set to 0 to hide all debug info, or 2 to show all debug info
 run_ocl_offline = False  # Not currently supported
 test_mode = False  # If true, generates the import script but does not actually import it
 delete_org_if_exists = False  # Be very careful with this option!
+country_public_access = 'View'  # Set visibility of country org/repos. None, View, or Edit supported
 
 # OCL Settings
 oclenv = settings.ocl_api_url_staging
@@ -32,7 +33,7 @@ if sys.argv and len(sys.argv) > 5:
     if sys.argv[5].lower() == 'true':
         test_mode = True
 
-# Pre-pocess input parameters
+# Pre-process input parameters
 country_org = 'DATIM-MOH-%s' % country_code
 country_names = {
         "BW": "Botswana",
@@ -88,7 +89,7 @@ if delete_org_if_exists:
     elif verbosity:
         print('Skipping "delete_org_if_exists" step because in "test_mode"')
 
-# Load i-map from CSV file
+# Load IMAP from CSV file
 imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(
     csv_filename=csv_filename, period=period,
     country_org=country_org, country_name=country_name, country_code=country_code)
@@ -98,8 +99,8 @@ elif not imap_input:
     print('Unable to load IMAP CSV file "%s"' % csv_filename)
     exit(1)
 
-# Run the import
+# Process the IMAP import
 imap_import = datim.datimimapimport.DatimImapImport(
     oclenv=oclenv, oclapitoken=oclapitoken, verbosity=verbosity,
-    run_ocl_offline=run_ocl_offline, test_mode=test_mode)
+    run_ocl_offline=run_ocl_offline, test_mode=test_mode, country_public_access=country_public_access)
 imap_import.import_imap(imap_input=imap_input)

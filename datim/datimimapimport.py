@@ -38,13 +38,15 @@ class DatimImapImport(datimbase.DatimBase):
     Class to import DATIM country indicator mapping metadata from a CSV file into OCL.
     """
 
-    def __init__(self, oclenv='', oclapitoken='', verbosity=0, run_ocl_offline=False, test_mode=False):
+    def __init__(self, oclenv='', oclapitoken='', verbosity=0, run_ocl_offline=False, test_mode=False,
+                 country_public_access='View'):
         datimbase.DatimBase.__init__(self)
         self.verbosity = verbosity
         self.oclenv = oclenv
         self.oclapitoken = oclapitoken
         self.run_ocl_offline = run_ocl_offline
         self.test_mode = test_mode
+        self.country_public_access = country_public_access
 
         # Prepare the headers
         self.oclapiheaders = {
@@ -72,7 +74,8 @@ class DatimImapImport(datimbase.DatimBase):
                 imap_input.period)
             self.vlog(1, msg)
             raise Exception(msg)
-        self.vlog(1, 'Latest version found for period "%s" for source PEPFAR/DATIM-MOH: "%s"' % (imap_input.period, datim_source_version))
+        self.vlog(1, 'Latest version found for period "%s" for source PEPFAR/DATIM-MOH: "%s"' % (
+            imap_input.period, datim_source_version))
         datim_source_zipfilename = self.endpoint2filename_ocl_export_zip(datim_source_endpoint)
         datim_source_jsonfilename = self.endpoint2filename_ocl_export_json(datim_source_endpoint)
         if not self.run_ocl_offline:
@@ -146,21 +149,23 @@ class DatimImapImport(datimbase.DatimBase):
         do_create_country_source = False
         do_update_country_concepts = False
         do_update_country_collections = False
+        do_something = False
         if not imap_old:
             do_create_country_org = True
             do_create_country_source = True
+            do_something = True
             self.vlog(1, 'Country org and source do not exist. Will create...')
             # TODO: Check existence of org/source directly with OCL rather than via IMAP
         else:
             self.vlog(1, 'Country org and source exist. No action to take...')
         if imap_diff or not imap_old:
-            do_update_country_concepts = True
-            do_update_country_collections = True
+            # TODO: Actually use the "do_update..." variables
+            do_update_country = True
+            do_something = True
             self.vlog(1, 'Country concepts and mappings do not exist or are out of date. Will update...')
         else:
             self.vlog(1, 'Country concepts and mappings are up-to-date. No action to take...')
-        if (not do_create_country_org and not do_create_country_source and
-                not do_update_country_concepts and not do_update_country_collections):
+        if not do_something:
             self.vlog(1, 'No action to take. Exiting...')
             return
 
@@ -196,13 +201,15 @@ class DatimImapImport(datimbase.DatimBase):
         if do_create_country_org:
             org = DatimImapImport.get_country_org_dict(country_org=imap_input.country_org,
                                                        country_code=imap_input.country_code,
-                                                       country_name=imap_input.country_name)
+                                                       country_name=imap_input.country_name,
+                                                       country_public_access=self.country_public_access)
             import_list.append(org)
             self.vlog(1, 'Country org import script generated:', json.dumps(org))
         if do_create_country_source:
             source = DatimImapImport.get_country_source_dict(country_org=imap_input.country_org,
                                                              country_code=imap_input.country_code,
-                                                             country_name=imap_input.country_name)
+                                                             country_name=imap_input.country_name,
+                                                             country_public_access=self.country_public_access)
             import_list.append(source)
             self.vlog(1, 'Country source import script generated:', json.dumps(source))
         if not do_create_country_org and not do_create_country_source:
@@ -225,8 +232,9 @@ class DatimImapImport(datimbase.DatimBase):
 
         # STEP 9 of 12: Import changes to the source into OCL
         # NOTE: Up to this point, everything above is non-destructive. Changes are committed to OCL as of this step
+        # TODO: Pass test_mode to the BulkImport API so that we can get real test results from the server
         self.vlog(1, '**** STEP 9 of 12: Import changes into OCL')
-        if import_list:
+        if import_list and not self.test_mode:
             self.vlog(1, 'Importing %s changes to OCL...' % len(import_list))
             # TODO: Implement better OclBulkImporter response -- a new class OclBulkImportResponse?
             bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
@@ -253,6 +261,8 @@ class DatimImapImport(datimbase.DatimBase):
             if self.verbosity:
                 importer.import_results.display_report()
             '''
+        elif self.test_mode:
+            self.vlog(1, 'Test mode! Skipping import...')
         else:
             self.vlog(1, 'Nothing to import! Skipping...')
 
@@ -414,19 +424,20 @@ class DatimImapImport(datimbase.DatimBase):
             r.raise_for_status()
 
     @staticmethod
-    def get_country_org_dict(country_org='', country_code='', country_name=''):
+    def get_country_org_dict(country_org='', country_code='', country_name='', country_public_access='View'):
         """ Get an OCL-formatted dictionary of a country IMAP organization ready to import """
         return {
             'type': 'Organization',
             'id': country_org,
             'name': 'DATIM MOH %s' % country_name,
             'location': country_name,
+            'public_access': country_public_access,
         }
 
     @staticmethod
-    def get_country_source_dict(country_org='', country_code='', country_name=''):
+    def get_country_source_dict(country_org='', country_code='', country_name='', country_public_access='View'):
         """ Get an OCL-formatted dictionary of a country IMAP source ready to import """
-        source_name = 'DATIM MOH %s Alignment Indicators' % (country_name)
+        source_name = 'DATIM MOH %s Alignment Indicators' % country_name
         source = {
             "type": "Source",
             "id": datimbase.DatimBase.country_source_id,
@@ -437,6 +448,7 @@ class DatimImapImport(datimbase.DatimBase):
             "full_name": source_name,
             "source_type": "Dictionary",
             "default_locale": "en",
-            "supported_locales": "en"
+            "supported_locales": "en",
+            "public_access": country_public_access,
         }
         return source

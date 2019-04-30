@@ -13,9 +13,9 @@ import json
 
 
 # Default Script Settings
-country_code = '' # e.g. RW, LS, etc.
-export_format = datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_HTML  # CSV, JSON and HTML are supported
-period = '' # e.g. FY17, FY18, etc.
+country_code = ''  # e.g. RW, LS, etc.
+export_format = datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV  # CSV, JSON and HTML are supported
+period = ''  # e.g. FY17, FY18, etc.
 exclude_empty_maps = True
 include_extra_info = False
 verbosity = 0
@@ -29,20 +29,22 @@ oclapitoken = settings.api_token_staging_datim_admin
 if sys.argv and len(sys.argv) > 6:
     country_code = sys.argv[1]
     export_format = datim.datimimapexport.DatimImapExport.get_format_from_string(sys.argv[2])
-    if sys.argv[3] == "default":
-     period = ''
+    if sys.argv[3] == 'default':
+        period = ''
     else:
-     period = sys.argv[3]
+        period = sys.argv[3]
     verbosity = int(sys.argv[4])
     if sys.argv[5].lower() == 'true':
-     exclude_empty_maps = True
+        exclude_empty_maps = True
     else:
-     exclude_empty_maps = False
+        exclude_empty_maps = False
     if sys.argv[6].lower() == 'true':
-     include_extra_info = True
+        include_extra_info = True
     else:
-     include_extra_info = False
+        include_extra_info = False
 
+# Exit if import is already in process
+# TODO: Fix this so that it is automatically skipped if not run in an async environment
 if has_existing_import(country_code):
     response = {
             'status_code': 409,
@@ -51,7 +53,7 @@ if has_existing_import(country_code):
     print json.dumps(response)
     sys.exit(1)
 
-# Pre-pocess input parameters
+# Pre-process input parameters
 country_org = 'DATIM-MOH-%s' % country_code
 
 # Debug output
@@ -61,7 +63,7 @@ if verbosity:
         country_code, country_org, export_format, period, str(exclude_empty_maps), str(verbosity)))
     print('*' * 100)
 
-# Generate the imap export
+# Generate the IMAP export
 datim_imap_export = datim.datimimapexport.DatimImapExport(
     oclenv=oclenv, oclapitoken=oclapitoken, verbosity=verbosity, run_ocl_offline=run_ocl_offline)
 try:

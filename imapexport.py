@@ -14,7 +14,7 @@ import json
 
 # Default Script Settings
 country_code = ''  # e.g. RW, LS, etc.
-export_format = datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV  # CSV, JSON and HTML are supported
+export_format = datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_JSON  # CSV, JSON and HTML are supported
 period = ''  # e.g. FY17, FY18, etc.
 exclude_empty_maps = True
 include_extra_info = False

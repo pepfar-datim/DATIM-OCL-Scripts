@@ -314,7 +314,7 @@ class DatimImap(object):
     def set_imap_data(self, imap_data):
         """
         Sets the IMAP data, discarding unrecognized columns, and ensures unicode encoding
-        :param imap_data:
+        :param imap_data: csv.DictReader or python dictionary
         :return:
         """
         # TODO: Note the explicit UTF-8 character encoding and ignoring unicode decoding errors - fix in future
@@ -744,6 +744,22 @@ class DatimImapFactory(object):
                 if period == current_period:
                     return repo_version
         return None
+
+    @staticmethod
+    def load_imap_from_json(json_filename='', country_code='', country_org='', country_name='', period=''):
+        """
+        Load IMAP from JSON file
+        :param json_filename:
+        :param country_code:
+        :param country_org:
+        :param country_name:
+        :param period:
+        :return:
+        """
+        with open(json_filename, 'rb') as input_file:
+            imap_data = json.load(input_file)
+            return DatimImap(imap_data=imap_data, country_code=country_code, country_name=country_name,
+                             country_org=country_org, period=period)
 
     @staticmethod
     def load_imap_from_csv(csv_filename='', country_code='', country_org='', country_name='', period=''):

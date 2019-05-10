@@ -1,6 +1,6 @@
 """
-Script to import a country mapping CSV for a specified country (e.g. UG) and
-period (e.g. FY17, FY18). CSV must follow the format of the country mapping CSV template.
+Script to import a CSV or JSON country mapping import file into OCL for a specified country (e.g. UG) and
+period (e.g. FY17, FY18, FY19). Import file must follow the format of the country mapping template.
 """
 import sys
 import time
@@ -12,13 +12,13 @@ import datim.datimimapimport
 # Default Script Settings
 country_code = ''  # e.g. RW
 period = ''  # e.g. FY18, FY19
-csv_filename = ''  # e.g. csv/RW-FY18.csv
+imap_import_filename = ''  # e.g. RW-FY18.csv or RW-FY18.json
 country_name = ''  # e.g. Rwanda
 verbosity = 2  # Set to 0 to hide all debug info, or 2 to show all debug info
 run_ocl_offline = False  # Not currently supported
 test_mode = False  # If true, generates the import script but does not actually import it
 delete_org_if_exists = False  # Be very careful with this option!
-country_public_access = 'View'  # Set visibility of country org/repos. None, View, or Edit supported
+country_public_access = 'None'  # Set visibility of country org/repos. None, View, or Edit supported
 
 # OCL Settings
 oclenv = settings.ocl_api_url_staging
@@ -28,7 +28,7 @@ oclapitoken = settings.api_token_staging_datim_admin
 if sys.argv and len(sys.argv) > 5:
     country_code = sys.argv[1]
     period = sys.argv[2]
-    csv_filename = sys.argv[3]
+    imap_import_filename = sys.argv[3]
     country_name = sys.argv[4]
     if sys.argv[5].lower() == 'true':
         test_mode = True
@@ -66,8 +66,8 @@ if not country_name and country_code in country_names:
 # Debug output
 if verbosity:
     print('\n\n' + '*' * 100)
-    print('** [IMPORT] Country: %s (%s), Org: %s, CSV: %s, Period: %s, Verbosity: %s, Test Mode: %s' % (
-        country_code, country_name, country_org, csv_filename, period, str(verbosity), str(test_mode)))
+    print('** [IMPORT] Country: %s (%s), Org: %s, Import Filename: %s, Period: %s, Verbosity: %s, Test Mode: %s' % (
+        country_code, country_name, country_org, imap_import_filename, period, str(verbosity), str(test_mode)))
     print('*' * 100)
 
 # (Optionally) Delete org if it exists
@@ -89,14 +89,19 @@ if delete_org_if_exists:
     elif verbosity:
         print('Skipping "delete_org_if_exists" step because in "test_mode"')
 
-# Load IMAP from CSV file
-imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(
-    csv_filename=csv_filename, period=period,
-    country_org=country_org, country_name=country_name, country_code=country_code)
+# Load IMAP from import file
+if imap_import_filename[-5:] == '.json':
+    imap_input = datim.datimimap.DatimImapFactory.load_imap_from_json(
+        json_filename=imap_import_filename, period=period,
+        country_org=country_org, country_name=country_name, country_code=country_code)
+elif imap_import_filename[-5:] == '.csv':
+    imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(
+        csv_filename=imap_import_filename, period=period,
+        country_org=country_org, country_name=country_name, country_code=country_code)
 if verbosity and imap_input:
-    print('IMAP CSV file "%s" loaded successfully' % csv_filename)
+    print('IMAP import file "%s" loaded successfully' % imap_import_filename)
 elif not imap_input:
-    print('Unable to load IMAP CSV file "%s"' % csv_filename)
+    print('Unable to load IMAP import file "%s"' % imap_import_filename)
     exit(1)
 
 # Process the IMAP import

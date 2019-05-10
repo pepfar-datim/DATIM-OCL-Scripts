@@ -95,6 +95,7 @@ class DatimImapImport(datimbase.DatimBase):
 
         # STEP 2 of 12: Validate input country mapping CSV file
         # NOTE: This currently just verifies that the correct columns exist (order agnostic)
+        # TODO: Validate that DATIM indicator/disag IDs in the provided IMAP are valid
         self.vlog(1, '**** STEP 2 of 12: Validate input country mapping CSV file')
         if imap_input.is_valid():
             self.vlog(1, 'Required fields are defined in the provided IMAP CSV')
@@ -147,8 +148,7 @@ class DatimImapImport(datimbase.DatimBase):
         self.vlog(1, '**** STEP 5 of 12: Determine actions to take')
         do_create_country_org = False
         do_create_country_source = False
-        do_update_country_concepts = False
-        do_update_country_collections = False
+        do_update_country = False
         do_something = False
         if not imap_old:
             do_create_country_org = True

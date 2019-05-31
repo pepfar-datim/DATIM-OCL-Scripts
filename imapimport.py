@@ -90,11 +90,11 @@ if delete_org_if_exists:
         print('Skipping "delete_org_if_exists" step because in "test_mode"')
 
 # Load IMAP from import file
-if imap_import_filename[-5:] == '.json':
+if imap_import_filename.endswith('.json'):
     imap_input = datim.datimimap.DatimImapFactory.load_imap_from_json(
         json_filename=imap_import_filename, period=period,
         country_org=country_org, country_name=country_name, country_code=country_code)
-elif imap_import_filename[-5:] == '.csv':
+elif imap_import_filename.endswith('.csv'):
     imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(
         csv_filename=imap_import_filename, period=period,
         country_org=country_org, country_name=country_name, country_code=country_code)

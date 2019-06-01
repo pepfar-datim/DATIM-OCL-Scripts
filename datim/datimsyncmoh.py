@@ -7,6 +7,8 @@ synchronized with repositories in OCL as described below.
 |-------------|--------|-------------------------------------------------|
 | MOH         | MOH    | /orgs/PEPFAR/sources/DATIM-MOH/                 |
 |-------------|--------|-------------------------------------------------|
+
+TODO: This class (FY17) must be updated to the model used by FY18 and FY19 before using!
 """
 from __future__ import with_statement
 import json

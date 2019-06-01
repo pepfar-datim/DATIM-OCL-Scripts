@@ -1,28 +1,28 @@
 """
-Script to synchronize FY18 DATIM MOH Alignment definitions between DHIS2 and OCL.
+Script to synchronize FY19 DATIM MOH Alignment definitions between DHIS2 and OCL.
 The script runs 1 import batch, consisting of one query to DHIS2, which is synchronized with
 repositories in OCL as described below.
 
-Note: This script is set to run against test.geoalign.org while syncmoh.py (for FY17)
-runs against www.datim.org.
+Note: This script is set to run against vshioshvili.datim.org, while FY18 runs against
+test.geoalign.org and FY17 (syncmoh.py) runs against www.datim.org.
 
 |-------------|----------|----------------------------------------|
 | ImportBatch | DHIS2    | OCL                                    |
 |-------------|----------|----------------------------------------|
-| MOH-FY18    | MOH-FY18 | /orgs/PEPFAR/sources/DATIM-MOH-FY18/   |
+| MOH-FY19    | MOH-FY19 | /orgs/PEPFAR/sources/DATIM-MOH-FY19/   |
 |-------------|----------|----------------------------------------|
 """
 import sys
 import os
 import settings
 import datim.datimsync
-import datim.datimsyncmohfy18
+import datim.datimsyncmohfy19
 
 
 # DATIM DHIS2 Settings
-dhis2env = settings.dhis2env_testgeoalign
-dhis2uid = settings.dhis2uid_testgeoalign
-dhis2pwd = settings.dhis2pwd_testgeoalign
+dhis2env = settings.dhis2env_vshioshvili
+dhis2uid = settings.dhis2uid_vshioshvili
+dhis2pwd = settings.dhis2pwd_vshioshvili
 
 # OCL Settings - staging user=datim-admin
 oclenv = settings.ocl_api_url_staging
@@ -59,7 +59,7 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
       run_ocl_offline = os.environ['RUN_OCL_OFFLINE'] in ['true', 'True']
 
 # Create sync object and run
-datim_sync = datim.datimsyncmohfy18.DatimSyncMohFy18(
+datim_sync = datim.datimsyncmohfy19.DatimSyncMohFy19(
     oclenv=oclenv, oclapitoken=oclapitoken, dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
     compare2previousexport=compare2previousexport, run_dhis2_offline=run_dhis2_offline,
     run_ocl_offline=run_ocl_offline, verbosity=verbosity, import_limit=import_limit)

@@ -201,8 +201,11 @@ class DatimBase(object):
     def get_ocl_repositories(self, endpoint=None, key_field='id', require_external_id=True,
                              active_attr_name='__datim_sync'):
         """
-        Gets repositories from OCL using the provided URL, optionally filtering
-        by external_id and a custom attribute indicating active status
+        Gets repositories from OCL using the provided URL, optionally filtering by external_id and a
+        custom attribute indicating active status. Note that only one repository is returned per unique
+        value of key_field. Meaning, if key_field='external_id' and more than one repository is returned
+        by OCL with the same value for external_id, only one of those repositories will be returned by
+        this method.
         """
         filtered_repos = {}
         next_url = self.oclenv + endpoint
@@ -223,17 +226,21 @@ class DatimBase(object):
     def load_datasets_from_ocl(self):
         """ Fetch the OCL repositories corresponding to the DHIS2 datasets defined in each sync object """
 
-        # Fetch the repositories from OCL
+        # Load the datasets using OCL_DATASET_ENDPOINT
         if not self.run_ocl_offline:
+            # Fetch the repositories from OCL
             self.vlog(1, 'Request URL:', self.oclenv + self.OCL_DATASET_ENDPOINT)
             self.ocl_dataset_repos = self.get_ocl_repositories(endpoint=self.OCL_DATASET_ENDPOINT,
                                                                key_field='external_id',
                                                                active_attr_name=self.REPO_ACTIVE_ATTR)
             with open(self.attach_absolute_data_path(self.DATASET_REPOSITORIES_FILENAME), 'wb') as output_file:
                 output_file.write(json.dumps(self.ocl_dataset_repos))
-            self.vlog(1, 'Repositories retrieved from OCL and stored in memory:', len(self.ocl_dataset_repos))
-            self.vlog(1, 'Repositories successfully written to "%s"' % self.DATASET_REPOSITORIES_FILENAME)
+            self.vlog(1, 'Repositories retrieved from OCL matching key "%s": %s' % (
+                self.REPO_ACTIVE_ATTR, len(self.ocl_dataset_repos)))
+            self.vlog(1, 'Repositories cached in memory and successfully written to "%s"' % (
+                self.DATASET_REPOSITORIES_FILENAME))
         else:
+            # Load the files offline (from a local cache) if they exist
             self.vlog(1, 'OCL-OFFLINE: Loading repositories from "%s"' % self.DATASET_REPOSITORIES_FILENAME)
             with open(self.attach_absolute_data_path(self.DATASET_REPOSITORIES_FILENAME), 'rb') as handle:
                 self.ocl_dataset_repos = json.load(handle)

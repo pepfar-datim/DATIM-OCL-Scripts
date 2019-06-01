@@ -9,7 +9,6 @@ from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import SubElement
 from xml.etree.ElementTree import tostring
 import datimbase
-import settings
 
 
 class DatimShow(datimbase.DatimBase):
@@ -35,8 +34,13 @@ class DatimShow(datimbase.DatimBase):
     # Set the default presentation row building method
     DEFAULT_SHOW_BUILD_ROW_METHOD = 'default_show_build_row'
 
+    # Default endpoint to use if unspecified OCL export
+    DEFAULT_REPO_LIST_ENDPOINT = ''
+
     def __init__(self):
         datimbase.DatimBase.__init__(self)
+        self.run_ocl_offline = False
+        self.cache_intermediate = True
 
     def build_show_grid(self, repo_title='', repo_subtitle='', headers='', input_filename='', show_build_row_method=''):
         # Setup the headers
@@ -49,9 +53,20 @@ class DatimShow(datimbase.DatimBase):
         }
         intermediate['width'] = len(intermediate['headers'])
 
-        # Read in the content
-        with open(self.attach_absolute_data_path(input_filename), 'rb') as ifile:
-            ocl_export_raw = json.load(ifile)
+        # Read in the content from the file saved to disk
+        with open(self.attach_absolute_data_path(input_filename), 'rb') as input_file:
+            ocl_export_raw = json.load(input_file)
+
+            # convert concepts to a dict for quick lookup
+            concepts_dict = {ocl_export_raw['concepts'][i]['url']: ocl_export_raw['concepts'][i] for i in range(
+                len(ocl_export_raw['concepts']))}
+
+            # add the to_concepts to the mappings so that they are available to the "show_build_row_method" method
+            for i in range(len(ocl_export_raw['mappings'])):
+                to_concept_url = ocl_export_raw['mappings'][i]['to_concept_url']
+                if to_concept_url in concepts_dict:
+                    ocl_export_raw['mappings'][i]['to_concept'] = concepts_dict[to_concept_url]
+
             for c in ocl_export_raw['concepts']:
                 direct_mappings = [item for item in ocl_export_raw['mappings'] if str(
                     item["from_concept_url"]) == c['url']]
@@ -182,8 +197,6 @@ class DatimShow(datimbase.DatimBase):
         :param export_format: One of the supported export formats. See DATIM_FORMAT constants
         :return:
         """
-
-        # Setup the export
         repo_title = ''
         repo_subtitle = ''
         repo_endpoint = ''
@@ -191,6 +204,8 @@ class DatimShow(datimbase.DatimBase):
         show_headers_key = ''
         if export_format not in self.PRESENTATION_FORMATS:
             export_format = self.DATIM_FORMAT_HTML
+
+        # Setup the export
         if repo_id in self.OCL_EXPORT_DEFS:
             repo_endpoint = self.OCL_EXPORT_DEFS[repo_id]['endpoint']
             repo_title = self.OCL_EXPORT_DEFS[repo_id].get('title')
@@ -200,6 +215,9 @@ class DatimShow(datimbase.DatimBase):
         elif not self.REQUIRE_OCL_EXPORT_DEFINITION:
             repo_endpoint = '%s%s/' % (self.DEFAULT_REPO_LIST_ENDPOINT, repo_id)
             show_build_row_method = self.DEFAULT_SHOW_BUILD_ROW_METHOD
+        else:
+            self.log('Unrecognized key "%s"' % repo_id)
+            exit(1)
         if not repo_title:
             repo_title = repo_id
         if not show_headers_key:
@@ -233,8 +251,8 @@ class DatimShow(datimbase.DatimBase):
         self.vlog(1, '**** STEP 3 of 4: Cache the intermediate output')
         if self.cache_intermediate:
             intermediate_json_filename = self.endpoint2filename_ocl_export_intermediate_json(repo_endpoint)
-            with open(self.attach_absolute_data_path(intermediate_json_filename), 'wb') as ofile:
-                ofile.write(json.dumps(intermediate))
+            with open(self.attach_absolute_data_path(intermediate_json_filename), 'wb') as output_file:
+                output_file.write(json.dumps(intermediate))
                 self.vlog(1, 'Processed OCL export saved to "%s"' % intermediate_json_filename)
         else:
             self.vlog(1, 'SKIPPING: "cache_intermediate" set to "false"')

@@ -531,7 +531,7 @@ class DatimSync(datimbase.DatimBase):
 
         # STEP 2 of 12: Load new exports from DATIM-DHIS2
         # NOTE: This step occurs regardless of sync mode
-        self.vlog(1, '**** STEP 2 of 12: Load new exports from DATIM DHIS2')
+        self.vlog(1, '**** STEP 2 of 12: Load latest exports from DHIS2 using Dataset IDs returned from OCL in Step 1')
         self.load_dhis2_exports()
 
         # STEP 3 of 12: Quick comparison of current and previous DHIS2 exports

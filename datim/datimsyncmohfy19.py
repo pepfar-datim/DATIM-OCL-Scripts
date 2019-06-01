@@ -1,15 +1,15 @@
 """
-Class to synchronize FY18 DATIM MOH Alignment definitions between DHIS2 and OCL.
+Class to synchronize FY19 DATIM MOH Alignment definitions between DHIS2 and OCL.
 The script runs 1 import batch, consisting of one query to DHIS2, which is synchronized with
 repositories in OCL as described below.
 |----------------|----------|----------------------------------------|
 | ImportBatch    | DHIS2    | OCL                                    |
 |----------------|----------|----------------------------------------|
-| MOH-FY18       | MOH-FY18 | /orgs/PEPFAR/sources/DATIM-MOH-FY18/   |
+| MOH-FY19       | MOH-FY19 | /orgs/PEPFAR/sources/DATIM-MOH-FY19/   |
 |----------------|----------|----------------------------------------|
 
 In order to run this script, the org and source in OCL must already exist (e.g.
-/orgs/PEPFAR/sources/DATIM-MOH-FY18/). Refer to init/importinit.py for more information
+/orgs/PEPFAR/sources/DATIM-MOH-FY19/). Refer to init/importinit.py for more information
 and to import the required starter content.
 """
 from __future__ import with_statement
@@ -19,19 +19,19 @@ import datimconstants
 import datimsyncmohhelper
 
 
-class DatimSyncMohFy18(datimsync.DatimSync):
-    """ Class to synchronize FY18 DATIM MOH Alignment between DHIS2 and OCL """
+class DatimSyncMohFy19(datimsync.DatimSync):
+    """ Class to synchronize FY19 DATIM MOH Alignment between DHIS2 and OCL """
 
     # Name of this sync script (used to name files and in logging)
-    SYNC_NAME = 'MOH-FY18'
+    SYNC_NAME = 'MOH-FY19'
 
     # Dataset ID settings
     OCL_DATASET_ENDPOINT = datimconstants.DatimConstants.OCL_DATASET_ENDPOINT_MOH
-    REPO_ACTIVE_ATTR = datimconstants.DatimConstants.REPO_ACTIVE_ATTR_MOH_FY18
+    REPO_ACTIVE_ATTR = datimconstants.DatimConstants.REPO_ACTIVE_ATTR_MOH_FY19
 
     # ID of the org and source in OCL
     DATIM_MOH_ORG_ID = 'PEPFAR'
-    DATIM_MOH_SOURCE_ID = 'DATIM-MOH-FY18'
+    DATIM_MOH_SOURCE_ID = 'DATIM-MOH-FY19'
     DATIM_MOH_DE_CONCEPT_CLASS = 'Data Element'
     DATIM_MOH_DE_DATATYPE = 'Numeric'
     DATIM_MOH_COC_CONCEPT_CLASS = 'Disaggregate'  # This is the DHIS2 categoryOptionCombo equivalent
@@ -39,19 +39,19 @@ class DatimSyncMohFy18(datimsync.DatimSync):
     DATIM_MOH_MAP_TYPE_DE_TO_COC = 'Has Option'
 
     # File names
-    DATASET_REPOSITORIES_FILENAME = 'moh_fy18_ocl_dataset_repos_export.json'
-    NEW_IMPORT_SCRIPT_FILENAME = 'moh_fy18_dhis2ocl_import_script.json'
-    DHIS2_CONVERTED_EXPORT_FILENAME = 'moh_fy18_dhis2_converted_export.json'
-    OCL_CLEANED_EXPORT_FILENAME = 'moh_fy18_ocl_cleaned_export.json'
+    DATASET_REPOSITORIES_FILENAME = 'moh_fy19_ocl_dataset_repos_export.json'
+    NEW_IMPORT_SCRIPT_FILENAME = 'moh_fy19_dhis2ocl_import_script.json'
+    DHIS2_CONVERTED_EXPORT_FILENAME = 'moh_fy19_dhis2_converted_export.json'
+    OCL_CLEANED_EXPORT_FILENAME = 'moh_fy19_ocl_cleaned_export.json'
 
     # Import batches
-    IMPORT_BATCHES = [datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY18]
+    IMPORT_BATCHES = [datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY19]
 
     # DATIM DHIS2 Query Definitions
-    DHIS2_QUERIES = datimconstants.DatimConstants.MOH_FY18_DHIS2_QUERIES
+    DHIS2_QUERIES = datimconstants.DatimConstants.MOH_FY19_DHIS2_QUERIES
 
     # OCL Export Definitions
-    OCL_EXPORT_DEFS = datimconstants.DatimConstants.MOH_FY18_OCL_EXPORT_DEFS
+    OCL_EXPORT_DEFS = datimconstants.DatimConstants.MOH_FY19_OCL_EXPORT_DEFS
 
     def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='',
                  compare2previousexport=True, run_dhis2_offline=False, run_ocl_offline=False,
@@ -137,7 +137,7 @@ class DatimSyncMohFy18(datimsync.DatimSync):
                             'external_id': None,
                         }
                     ]
-                self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY18][self.RESOURCE_TYPE_CONCEPT][
+                self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY19][self.RESOURCE_TYPE_CONCEPT][
                     de_concept_key] = de_concept
                 num_data_elements += 1
 
@@ -145,7 +145,7 @@ class DatimSyncMohFy18(datimsync.DatimSync):
                 de_disag_concept_urls = []
                 for coc in de['categoryCombo']['categoryOptionCombos']:
                     # Classify the disag and skip if INVALID
-                    disag_classification = datimsyncmohhelper.DatimSyncMohHelper.get_disag_classification_fy18(
+                    disag_classification = datimsyncmohhelper.DatimSyncMohHelper.get_disag_classification_fy19(
                         de_code=de_concept_id, de_uid=de['id'], coc_name=coc['name'])
                     if disag_classification == datimconstants.DatimConstants.DISAG_CLASSIFICATION_INVALID:
                         continue
@@ -153,7 +153,7 @@ class DatimSyncMohFy18(datimsync.DatimSync):
                     # Build disag key and URL
                     disaggregate_concept_id = coc['id']  # "id" is the same as "code", but "code" is sometimes missing
                     disaggregate_concept_url = '/orgs/%s/sources/%s/concepts/%s/' % (
-                        DatimSyncMohFy18.DATIM_MOH_ORG_ID, DatimSyncMohFy18.DATIM_MOH_SOURCE_ID,
+                        DatimSyncMohFy19.DATIM_MOH_ORG_ID, DatimSyncMohFy19.DATIM_MOH_SOURCE_ID,
                         disaggregate_concept_id)
                     disaggregate_concept_key = disaggregate_concept_url
                     de_disag_concept_urls.append(disaggregate_concept_url)
@@ -161,7 +161,7 @@ class DatimSyncMohFy18(datimsync.DatimSync):
                     # Only build the disaggregate concept if it has not already been defined
                     # NOTE: A disag will appear multiple times if its DHIS2 Category is used on more than 1 dataElement
                     if disaggregate_concept_key not in self.dhis2_diff[
-                            datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY18][self.RESOURCE_TYPE_CONCEPT]:
+                            datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY19][self.RESOURCE_TYPE_CONCEPT]:
                         disaggregate_concept = {
                             'type': 'Concept',
                             'id': disaggregate_concept_id,
@@ -184,7 +184,7 @@ class DatimSyncMohFy18(datimsync.DatimSync):
                                 }
                             ]
                         }
-                        self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY18][
+                        self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY19][
                             self.RESOURCE_TYPE_CONCEPT][disaggregate_concept_key] = disaggregate_concept
                         num_disaggregates += 1
 
@@ -206,7 +206,7 @@ class DatimSyncMohFy18(datimsync.DatimSync):
                         'extras': None,
                         'retired': False,
                     }
-                    self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY18][
+                    self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY19][
                         self.RESOURCE_TYPE_MAPPING][disaggregate_mapping_key] = disaggregate_mapping
                     num_mappings += 1
 
@@ -224,7 +224,7 @@ class DatimSyncMohFy18(datimsync.DatimSync):
                         collection_owner_id=self.DATIM_MOH_ORG_ID,
                         collection_owner_type=self.RESOURCE_TYPE_ORGANIZATION,
                         collection_id=collection_id, concept_url=de_concept_url)
-                    self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY18][
+                    self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY19][
                         self.RESOURCE_TYPE_CONCEPT_REF][de_ref_key] = de_ref
                     num_data_element_refs += 1
 
@@ -236,86 +236,15 @@ class DatimSyncMohFy18(datimsync.DatimSync):
                             collection_owner_type=self.RESOURCE_TYPE_ORGANIZATION,
                             collection_id=collection_id, concept_url=disaggregate_concept_url)
                         if disaggregate_ref_key not in self.dhis2_diff[
-                                datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY18][self.RESOURCE_TYPE_CONCEPT_REF]:
-                            self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY18][
+                                datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY19][self.RESOURCE_TYPE_CONCEPT_REF]:
+                            self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MOH_FY19][
                                 self.RESOURCE_TYPE_CONCEPT_REF][disaggregate_ref_key] = disaggregate_ref
                             num_disaggregate_refs += 1
 
             # End this process by logging a summary of the number and type of resources transformed
-            self.vlog(1, 'DATIM-MOH FY18 DHIS2 export "%s" successfully transformed to %s data element concepts, '
+            self.vlog(1, 'DATIM-MOH FY19 DHIS2 export "%s" successfully transformed to %s data element concepts, '
                          '%s disaggregate concepts, %s mappings from data elements to disaggregates, '
                          '%s data element concept references, and %s disaggregate concept references' % (
                             dhis2filename_export_new, num_data_elements, num_disaggregates, num_mappings,
                             num_data_element_refs, num_disaggregate_refs))
             return True
-
-    @staticmethod
-    def get_disag_classification_fy18(de_code='', de_uid='', coc_name=''):
-        """
-        Python implementation of the classification logic embedded in the DHIS2 SqlView
-        (refer to https://test.geoalign.datim.org/api/sqlViews/jxuvedhz3S3).
-        Here's the SQL version:
-            case
-            when de.code like '%_Age_Agg%' or de.uid = 'IXkZ7eWtFHs' or de.uid = 'iyANolnH3mk' then 'coarse'
-            when coc.name = 'default' then 'n/a'
-            when coc.name like '1-9, Female%' or coc.name like '1-9, Male%' or coc.name like '<1, Female%' or coc.name like '<1, Male%' or coc.name like '30-49%' then 'INVALID'
-            when coc.name like '25-49%' then 'semi-fine'
-            when coc.name like '25-29%' or coc.name like '30-34%' or coc.name like '35-39%' or coc.name like '40-49%' then 'fine'
-            else 'fine, semi-fine'
-            end as classification
-        :param de_code: DataElement code
-        :param de_uid: DataElement UID
-        :param coc_name: CategoryOptionCombo name
-        :return: <string> A member of DatimConstants.DISAG_CLASSIFICATIONS
-        """
-        CLASSIFIER_COARSE_UIDS = ['IXkZ7eWtFHs', 'iyANolnH3mk']
-        CLASSIFIER_INVALID_01 = '1-9, Female'
-        CLASSIFIER_INVALID_02 = '1-9, Male'
-        CLASSIFIER_INVALID_03 = '<1, Female'
-        CLASSIFIER_INVALID_04 = '<1, Male'
-        CLASSIFIER_INVALID_05 = '30-49'
-        CLASSIFIER_SEMI_FINE_01 = '25-49'
-        CLASSIFIER_FINE_01 = '25-29'
-        CLASSIFIER_FINE_02 = '30-34'
-        CLASSIFIER_FINE_03 = '35-39'
-        CLASSIFIER_FINE_04 = '40-49'
-        if '_Age_Agg' in de_code or de_uid in CLASSIFIER_COARSE_UIDS:
-            return datimconstants.DatimConstants.DISAG_CLASSIFICATION_COARSE
-        elif coc_name == 'default':
-            return datimconstants.DatimConstants.DISAG_CLASSIFICATION_NA
-        elif (coc_name[:len(CLASSIFIER_INVALID_01)] == CLASSIFIER_INVALID_01 or
-                coc_name[:len(CLASSIFIER_INVALID_02)] == CLASSIFIER_INVALID_02 or
-                coc_name[:len(CLASSIFIER_INVALID_03)] == CLASSIFIER_INVALID_03 or
-                coc_name[:len(CLASSIFIER_INVALID_04)] == CLASSIFIER_INVALID_04 or
-                coc_name[:len(CLASSIFIER_INVALID_05)] == CLASSIFIER_INVALID_05):
-            return datimconstants.DatimConstants.DISAG_CLASSIFICATION_INVALID
-        elif coc_name[:len(CLASSIFIER_SEMI_FINE_01)] == CLASSIFIER_SEMI_FINE_01:
-            return datimconstants.DatimConstants.DISAG_CLASSIFICATION_SEMI_FINE
-        elif (coc_name[:len(CLASSIFIER_FINE_01)] == CLASSIFIER_FINE_01 or
-              coc_name[:len(CLASSIFIER_FINE_02)] == CLASSIFIER_FINE_02 or
-              coc_name[:len(CLASSIFIER_FINE_03)] == CLASSIFIER_FINE_03 or
-              coc_name[:len(CLASSIFIER_FINE_04)] == CLASSIFIER_FINE_04):
-            return datimconstants.DatimConstants.DISAG_CLASSIFICATION_FINE
-        return datimconstants.DatimConstants.DISAG_CLASSIFICATION_FINE_AND_SEMI_FINE
-
-    @staticmethod
-    def get_disag_classification_fy19(de_code='', de_uid='', coc_name=''):
-        """
-        Python implementation of the classification logic embedded in the DHIS2 SqlView
-        (refer to https://vshioshvili.datim.org/api/sqlViews/ioG5uxOYnZe).
-        Here's the SQL version:
-            case
-            when de.code like '%_Age_Agg%' then 'coarse'
-            when de.code like '%_Age_%' then 'fine'
-            else 'n/a'
-            end as classification
-        :param de_code: DataElement code
-        :param de_uid: DataElement UID
-        :param coc_name: CategoryOptionCombo name
-        :return: <string> A member of DatimConstants.DISAG_CLASSIFICATIONS
-        """
-        if '_Age_Agg' in de_code:
-            return datimconstants.DatimConstants.DISAG_CLASSIFICATION_COARSE
-        elif '_Age_' in de_code:
-            return datimconstants.DatimConstants.DISAG_CLASSIFICATION_FINE
-        return datimconstants.DatimConstants.DISAG_CLASSIFICATION_NA

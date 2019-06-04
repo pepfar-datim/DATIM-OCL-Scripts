@@ -929,7 +929,7 @@ class DatimImapFactory(object):
                 row_key = diff_key.strip("root['").strip("']")
                 csv_row = imap_diff.imap_a.get_imap_row_by_key(row_key)
 
-                # Retire country operation mapping
+                # TODO: Retire country operation mapping
                 if imap_diff.imap_a.has_country_operation_mapping(csv_row):
                     import_list_narrative.append('Retire country mapping: %s, %s --> %s --> %s, %s' % (
                         csv_row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID], csv_row[DatimImap.IMAP_FIELD_MOH_INDICATOR_NAME], csv_row[DatimImap.IMAP_FIELD_OPERATION],

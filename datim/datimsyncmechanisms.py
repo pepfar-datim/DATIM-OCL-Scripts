@@ -24,7 +24,7 @@ class DatimSyncMechanisms(datimsync.DatimSync):
 
     # Dataset ID settings
     OCL_DATASET_ENDPOINT = ''
-    REPO_ACTIVE_ATTR = 'datim_sync_mechanisms'
+    REPO_ACTIVE_ATTR = datimconstants.DatimConstants.REPO_ACTIVE_ATTR_MECHANISMS
 
     # File names
     DATASET_REPOSITORIES_FILENAME = 'mechanisms_ocl_dataset_repos_export.json'

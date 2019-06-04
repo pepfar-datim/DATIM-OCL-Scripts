@@ -1,14 +1,6 @@
 """
-Class to import into OCL an indicator mapping CSV for a specified country (e.g. UG) and
-period (e.g. FY17). CSV must follow the format of the country indicator mapping CSV template.
-
-TODO:
-- Improve validation step: New import must be for the latest or newer country period
-  (e.g. can't import/update FY17 if FY18 already defined)
-- Move country collection reconstruction and version creation into a separate process that this class uses
-- Add "clean up" functionality to retire unused resources
-- Query collections by their mappings, not ID -- names are not consistent coming from DHIS2 which is killing this
-- Exclude "null-disag" from the import scripts -- this does not have any effect, its just an unnecessary step
+Class to import into OCL an indicator mapping file (CSV or JSON) for a specified country (e.g. UG) and
+period (e.g. FY19). CSV must follow the format of the country indicator mapping template.
 
 The import script creates OCL-formatted JSON consisting of:
     Country Org (e.g. DATIM-MOH-UG) - if doesn't exist
@@ -18,6 +10,12 @@ The import script creates OCL-formatted JSON consisting of:
     One mapping for each PEPFAR indicator+disag pair represented with a "DATIM HAS OPTION" map type
     Country Collections, one per mapping to DATIM indicator+disag pair
     References for each concept and mapping added to each collection
+
+TODO: Improve validation step
+TODO: Move country collection reconstruction and version creation into a separate process that this class uses
+TODO: Add "clean up" functionality to retire unused resources
+TODO: Query collections by their mappings, not ID -- names are not consistent coming from DHIS2
+TODO: Exclude "null-disag" from the import scripts -- this does not have any effect, its just an unnecessary step
 """
 import sys
 import requests
@@ -55,7 +53,11 @@ class DatimImapImport(datimbase.DatimBase):
         }
 
     def import_imap(self, imap_input=None):
-        """ Import the specified IMAP into OCL """
+        """
+        Import the specified IMAP into OCL
+        :param imap_input:
+        :return:
+        """
 
         # Get out of here if variables aren't set
         if not self.oclapitoken or not self.oclapiheaders:
@@ -64,7 +66,7 @@ class DatimImapImport(datimbase.DatimBase):
             raise Exception(msg)
 
         # STEP 1 of 12: Download PEPFAR DATIM metadata export for specified period from OCL
-        self.vlog(1, '**** STEP 1 of 12: Download PEPFAR/DATIM-MOH metadata export for specified period from OCL')
+        self.vlog(1, '**** STEP 1 of 12: Download PEPFAR/DATIM-MOH-FY## metadata export from OCL')
         datim_owner_endpoint = '/orgs/%s/' % self.datim_owner_id
         datim_source_endpoint = '%ssources/%s/' % (datim_owner_endpoint, self.datim_source_id)
         datim_source_version = self.get_latest_version_for_period(

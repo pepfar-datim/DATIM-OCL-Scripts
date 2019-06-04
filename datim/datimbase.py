@@ -114,7 +114,9 @@ class DatimBase(object):
         self.dhis2uid = ''
         self.dhis2pwd = ''
         self.ocl_dataset_repos = None
+        self.active_dataset_keys = []
         self.str_active_dataset_ids = ''
+        self.run_ocl_offline = False
 
     def vlog(self, verbose_level=0, *args):
         """ Output log information if verbosity setting is equal or greater than this verbose level """
@@ -230,9 +232,8 @@ class DatimBase(object):
         if not self.run_ocl_offline:
             # Fetch the repositories from OCL
             self.vlog(1, 'Request URL:', self.oclenv + self.OCL_DATASET_ENDPOINT)
-            self.ocl_dataset_repos = self.get_ocl_repositories(endpoint=self.OCL_DATASET_ENDPOINT,
-                                                               key_field='external_id',
-                                                               active_attr_name=self.REPO_ACTIVE_ATTR)
+            self.ocl_dataset_repos = self.get_ocl_repositories(
+                endpoint=self.OCL_DATASET_ENDPOINT, key_field='external_id', active_attr_name=self.REPO_ACTIVE_ATTR)
             with open(self.attach_absolute_data_path(self.DATASET_REPOSITORIES_FILENAME), 'wb') as output_file:
                 output_file.write(json.dumps(self.ocl_dataset_repos))
             self.vlog(1, 'Repositories retrieved from OCL matching key "%s": %s' % (
@@ -248,6 +249,7 @@ class DatimBase(object):
 
         # Extract list of DHIS2 dataset IDs from the repository attributes
         if self.ocl_dataset_repos:
+            self.active_dataset_keys = self.ocl_dataset_repos.keys()
             self.str_active_dataset_ids = ','.join(self.ocl_dataset_repos.keys())
             self.vlog(1, 'Dataset IDs returned from OCL:', self.str_active_dataset_ids)
         else:

@@ -219,13 +219,15 @@ class DatimSync(datimbase.DatimBase):
                     if ref['reference_type'] == 'concepts':
                         concept_ref_key, concept_ref_json = self.get_concept_reference_json(
                             collection_url=collection_url, concept_url=ref['expression'], strip_concept_version=True)
-                        self.ocl_diff[import_batch_key][self.RESOURCE_TYPE_CONCEPT_REF][concept_ref_key] = concept_ref_json
+                        self.ocl_diff[import_batch_key][self.RESOURCE_TYPE_CONCEPT_REF][
+                            concept_ref_key] = concept_ref_json
                         num_concept_refs += 1
                     elif ref['reference_type'] == 'mappings':
                         mapping_ref_key, mapping_ref_json = self.get_mapping_reference_json_from_export(
                             full_collection_export_dict=ocl_repo_export_raw, collection_url=collection_url,
                             mapping_url=ref['expression'], strip_mapping_version=True)
-                        self.ocl_diff[import_batch_key][self.RESOURCE_TYPE_MAPPING_REF][mapping_ref_key] = mapping_ref_json
+                        self.ocl_diff[import_batch_key][self.RESOURCE_TYPE_MAPPING_REF][
+                            mapping_ref_key] = mapping_ref_json
                         num_mapping_refs += 1
                         pass
 
@@ -297,7 +299,7 @@ class DatimSync(datimbase.DatimBase):
                         dhis2_diff[import_batch_key][resource_type],
                         ignore_order=True, verbose_level=2)
                     if resource_type in [self.RESOURCE_TYPE_CONCEPT, self.RESOURCE_TYPE_MAPPING] and 'dictionary_item_removed' in resource_specific_diff:
-                        # Remove these resources from the diff results if they are already retired in OCL - no action needed
+                        # Remove resources retired in OCL from the diff results - no action needed
                         keys = resource_specific_diff['dictionary_item_removed'].keys()
                         for key in keys:
                             if 'retired' in resource_specific_diff['dictionary_item_removed'][key] and resource_specific_diff['dictionary_item_removed'][key]['retired']:
@@ -327,7 +329,10 @@ class DatimSync(datimbase.DatimBase):
                     consolidated_mapping_refs = {}
                     if 'dictionary_item_added' in diff[import_batch][resource_type]:
                         for k, r in diff[import_batch][resource_type]['dictionary_item_added'].iteritems():
-                            if resource_type == self.RESOURCE_TYPE_CONCEPT and r['type'] == self.RESOURCE_TYPE_CONCEPT:
+                            if resource_type == self.RESOURCE_TYPE_COLLECTION and r['type'] == self.RESOURCE_TYPE_COLLECTION:
+                                output_file.write(json.dumps(r))
+                                output_file.write('\n')
+                            elif resource_type == self.RESOURCE_TYPE_CONCEPT and r['type'] == self.RESOURCE_TYPE_CONCEPT:
                                 output_file.write(json.dumps(r))
                                 output_file.write('\n')
                             elif resource_type == self.RESOURCE_TYPE_MAPPING and r['type'] == self.RESOURCE_TYPE_MAPPING:
@@ -438,6 +443,30 @@ class DatimSync(datimbase.DatimBase):
 
         return reference_key, reference_json
 
+    def get_collection_json(self, owner_id='', collection_owner_type='', collection_id='', name='', full_name='',
+                            short_code='', default_locale='en', external_id='', collection_type='',
+                            public_access='View', supported_locales='en', extras=None):
+        collection_owner_stem = datimbase.DatimBase.owner_type_to_stem(collection_owner_type, self.OWNER_STEM_ORGS)
+        collection_url = '/%s/%s/collections/%s/' % (collection_owner_stem, owner_id, collection_id)
+        collection_key = collection_url
+        collection_dict = {
+            'type': self.RESOURCE_TYPE_COLLECTION,
+            'id': collection_id,
+            'name': name,
+            'default_locale': default_locale,
+            'short_code': short_code,
+            'external_id': external_id,
+            'public_access': public_access,
+            'full_name': full_name,
+            'collection_type': collection_type,
+            'supported_locales': supported_locales,
+            'owner': owner_id,
+            'owner_type': collection_owner_type
+        }
+        if extras:
+            collection_dict['extras'] = extras
+        return collection_key, collection_dict
+
     def get_concept_reference_json(self, collection_owner_id='', collection_owner_type='', collection_id='',
                                    collection_url='', concept_url='', strip_concept_version=False):
         """ Returns an "importable" python dictionary for an OCL Reference with the specified attributes """
@@ -500,7 +529,7 @@ class DatimSync(datimbase.DatimBase):
 
     def run(self, sync_mode=None, resource_types=None):
         """
-        Performs a diff between DATIM DHIS2 and OCL and optionally imports the differences into OCL
+        Performs a diff between DATIM DHIS2 and OCL and imports the differences into OCL
         :param sync_mode: Mode to run the sync operation. See SYNC_MODE constants
         :param resource_types: List of resource types to include in the sync operation. See RESOURCE_TYPE constants
         :return:
@@ -528,6 +557,13 @@ class DatimSync(datimbase.DatimBase):
             self.load_datasets_from_ocl()
         else:
             self.vlog(1, 'SKIPPING: SYNC_LOAD_DATASETS set to "False"')
+            if self.DHIS2_QUERIES:
+                for dhis2_query_key in self.DHIS2_QUERIES:
+                    if 'active_dataset_ids' in self.DHIS2_QUERIES[dhis2_query_key]:
+                        self.active_dataset_keys = self.DHIS2_QUERIES[dhis2_query_key]['active_dataset_ids']
+                        self.str_active_dataset_ids = ','.join(self.active_dataset_keys)
+                        self.vlog(1, 'INFO: Using hardcoded active dataset IDs: %s' % self.str_active_dataset_ids)
+                        break
 
         # STEP 2 of 12: Load new exports from DATIM-DHIS2
         # NOTE: This step occurs regardless of sync mode
@@ -594,9 +630,13 @@ class DatimSync(datimbase.DatimBase):
         self.dhis2_diff = {}
         for import_batch_key in self.IMPORT_BATCHES:
             self.dhis2_diff[import_batch_key] = {}
-            for resource_type in self.DEFAULT_SYNC_RESOURCE_TYPES:
+            for resource_type in self.sync_resource_types:
                 self.dhis2_diff[import_batch_key][resource_type] = {}
-        self.transform_dhis2_exports(conversion_attr={'ocl_dataset_repos': self.ocl_dataset_repos})
+        conversion_attr = {
+            'ocl_dataset_repos': self.ocl_dataset_repos,
+            'active_dataset_keys': self.active_dataset_keys,
+        }
+        self.transform_dhis2_exports(conversion_attr=conversion_attr)
 
         # STEP 6 of 12: Prepare OCL exports for diff
         # NOTE: This step occurs regardless of sync mode
@@ -604,7 +644,7 @@ class DatimSync(datimbase.DatimBase):
         self.ocl_diff = {}
         for import_batch_key in self.IMPORT_BATCHES:
             self.ocl_diff[import_batch_key] = {}
-            for resource_type in self.DEFAULT_SYNC_RESOURCE_TYPES:
+            for resource_type in self.sync_resource_types:
                 self.ocl_diff[import_batch_key][resource_type] = {}
         self.prepare_ocl_exports(cleaning_attr={})
 

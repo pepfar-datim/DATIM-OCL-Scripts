@@ -14,6 +14,11 @@ import datimbase
 import datimshow
 
 class DatimSyncTest(datimbase.DatimBase):
+    """
+    Class to validate synchronizations between DHIS2 and OCL by comparing the resulting metadata presentation
+    formats from each system.
+    """
+
     def __init__(self, oclenv='', oclapitoken='', formats=None, dhis2env='', dhis2uid='', dhis2pwd=''):
         datimbase.DatimBase.__init__(self)
         self.oclenv = oclenv

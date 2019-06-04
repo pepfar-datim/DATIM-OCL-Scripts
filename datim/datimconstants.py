@@ -6,6 +6,33 @@ Static class of constants for the DATIM-OCL project
 class DatimConstants(object):
     """ Static class of constants for the DATIM-OCL project """
 
+    OCL_ETL_DEFINITIONS = {
+        'MER-MSP': {
+            'id': 'MER-MSP',
+            'name': 'DATIM-DHIS2 MER-MSP Indicators',
+            'import': {
+                'ocl_dataset_endpoint': '/orgs/PEPFAR/collections/?verbose=true&limit=200',
+                'fetch_dataset_ids_from_ocl': False,
+                'dataset_ids': [],
+                'repo_active_attribute': 'datim_sync_mer_msp',
+                'query': '/api/dataElements.json?fields=id,code,name,shortName,lastUpdated,description,'
+                         'categoryCombo[id,code,name,lastUpdated,created,'
+                         'categoryOptionCombos[id,code,name,lastUpdated,created]],'
+                         'dataSetElements[*,dataSet[id,name,shortName]]&'
+                         'paging=false&filter=dataSetElements.dataSet.id:in:[{{active_dataset_ids}}]',
+            },
+            'export': {
+                'openhim_endpoint': 'datim_mer_msp',
+                'dhis2_presentation_url': '',
+                'presentation_sort_column': 4,
+                'conversion_method': 'dhis2diff_mer_msp',
+                'show_build_row_method': 'build_mer_msp_indicator_output',
+                'show_headers_key': 'mer_msp',
+                'endpoint': '/orgs/PEPFAR/sources/MER-MSP/',
+            }
+        }
+    }
+
     # Import batch IDs
     IMPORT_BATCH_MOH = 'MOH'  # don't use this one! switching to independent configuration each year
     IMPORT_BATCH_MOH_FY17 = 'MOH-FY17'
@@ -29,21 +56,6 @@ class DatimConstants(object):
         IMPORT_BATCH_MECHANISMS,
         IMPORT_BATCH_TIERED_SUPPORT
     ]
-
-    OCL_ETL_DEFINITIONS = {
-        'MER-MSP': {
-            'id': 'MER-MSP',
-            'sync': {
-                'ocl_dataset_endpoint': '/orgs/PEPFAR/collections/?verbose=true&limit=200',
-                'repo_active_attribute': 'datim_sync_mer_msp',
-            },
-            'export': {
-                'openhim_endpoint': 'datim_mer_msp',
-                'dhis2_presentation_url': '',
-                'presentation_sort_column' = 4
-    },
-        }
-    }
 
     # OpenHIM Endpoints
     OPENHIM_ENDPOINT_MOH = 'datim-moh'  # Don't use this! Switching to independent configurations for each year
@@ -141,11 +153,26 @@ class DatimConstants(object):
         'MER-MSP': {
             'id': 'MER-MSP',
             'name': 'DATIM-DHIS2 MER-MSP Indicators',
+            'fy19': ['zUoy5hk8r0q', 'PyD4x9oFwxJ', 'KWRj80vEfHU', 'fi9yMqWLWVy', 'IZ71Y2mEBJF', 'ndp6aR3e1X3',
+                     'pnlFw2gDGHD', 'gc4KOv8kGlI', 'FsYxodZiXyH', 'iJ4d5HdGiqG', 'GiqB9vjbdwb', 'EbZrNIkuPtc',
+                     'nIHNMxuPUOR', 'C2G7IyPPrvD', 'sBv1dj90IX6', 'HiJieecLXxN', 'dNGGlQyiq9b', 'tTK9BhvS5t3',
+                     'PH3bllbLw8W', 'N4X89PgW01w'],
+            'fy18': ['WbszaIdCi92', 'uN01TT331OP', 'tz1bQ3ZwUKJ', 'BxIx51zpAjh', 'IZ71Y2mEBJF', 'mByGopCrDvL',
+                     'XZfmcxHV4ie', 'jcS5GPoHDE0', 'USbxEt75liS', 'a4FRJ2P4cLf', 'l796jk9SW7q', 'BWBS39fydnX',
+                     'eyI0UOWJnDk', 'X8sn5HE5inC', 'TdLjizPNezI', 'I8v9shsCZDS', 'lXQGzSqmreb', 'Ncq22MRC6gd'],
+            'active_dataset_ids': [
+                    'zUoy5hk8r0q', 'PyD4x9oFwxJ', 'KWRj80vEfHU', 'fi9yMqWLWVy', 'IZ71Y2mEBJF', 'ndp6aR3e1X3',
+                    'pnlFw2gDGHD', 'gc4KOv8kGlI', 'FsYxodZiXyH', 'iJ4d5HdGiqG', 'GiqB9vjbdwb', 'EbZrNIkuPtc',
+                    'nIHNMxuPUOR', 'C2G7IyPPrvD', 'sBv1dj90IX6', 'HiJieecLXxN', 'dNGGlQyiq9b', 'tTK9BhvS5t3',
+                    'PH3bllbLw8W', 'N4X89PgW01w', 'WbszaIdCi92', 'uN01TT331OP', 'tz1bQ3ZwUKJ', 'BxIx51zpAjh',
+                    'IZ71Y2mEBJF', 'mByGopCrDvL', 'XZfmcxHV4ie', 'jcS5GPoHDE0', 'USbxEt75liS', 'a4FRJ2P4cLf',
+                    'l796jk9SW7q', 'BWBS39fydnX', 'eyI0UOWJnDk', 'X8sn5HE5inC', 'TdLjizPNezI', 'I8v9shsCZDS',
+                    'lXQGzSqmreb', 'Ncq22MRC6gd'],
             'query': '/api/dataElements.json?fields=id,code,name,shortName,lastUpdated,description,'
                      'categoryCombo[id,code,name,lastUpdated,created,'
                      'categoryOptionCombos[id,code,name,lastUpdated,created]],'
                      'dataSetElements[*,dataSet[id,name,shortName]]&'
-                     'paging=false&filter=dataSetElements.dataSet.id:in:[{{active_dataset_ids}}]',
+                     'paging=false&filter=dataSetElements.dataSet.id:in:[zUoy5hk8r0q,PyD4x9oFwxJ,KWRj80vEfHU,fi9yMqWLWVy,IZ71Y2mEBJF,ndp6aR3e1X3,pnlFw2gDGHD,gc4KOv8kGlI,FsYxodZiXyH,iJ4d5HdGiqG,GiqB9vjbdwb,EbZrNIkuPtc,nIHNMxuPUOR,C2G7IyPPrvD,sBv1dj90IX6,HiJieecLXxN,dNGGlQyiq9b,tTK9BhvS5t3,PH3bllbLw8W,N4X89PgW01w,WbszaIdCi92,uN01TT331OP,tz1bQ3ZwUKJ,BxIx51zpAjh,IZ71Y2mEBJF,mByGopCrDvL,XZfmcxHV4ie,jcS5GPoHDE0,USbxEt75liS,a4FRJ2P4cLf,l796jk9SW7q,BWBS39fydnX,eyI0UOWJnDk,X8sn5HE5inC,TdLjizPNezI,I8v9shsCZDS,lXQGzSqmreb,Ncq22MRC6gd]',
             'conversion_method': 'dhis2diff_mer_msp'
         }
     }

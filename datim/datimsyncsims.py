@@ -30,8 +30,8 @@ class DatimSyncSims(datimsync.DatimSync):
     SYNC_NAME = 'SIMS'
 
     # Dataset ID settings
-    OCL_DATASET_ENDPOINT = '/orgs/PEPFAR/collections/?q=SIMS&verbose=true&limit=200'
-    REPO_ACTIVE_ATTR = 'datim_sync_sims'
+    OCL_DATASET_ENDPOINT = datimconstants.DatimConstants.OCL_DATASET_ENDPOINT_SIMS
+    REPO_ACTIVE_ATTR = datimconstants.DatimConstants.REPO_ACTIVE_ATTR_SIMS
 
     # File names
     DATASET_REPOSITORIES_FILENAME = 'ocl_dataset_repos_export.json'

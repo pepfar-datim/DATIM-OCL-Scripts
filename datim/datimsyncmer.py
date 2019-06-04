@@ -26,8 +26,8 @@ class DatimSyncMer(datimsync.DatimSync):
     SYNC_NAME = 'MER'
 
     # Dataset ID settings
-    OCL_DATASET_ENDPOINT = '/orgs/PEPFAR/collections/?verbose=true&limit=200'
-    REPO_ACTIVE_ATTR = 'datim_sync_mer'
+    OCL_DATASET_ENDPOINT = datimconstants.DatimConstants.OCL_DATASET_ENDPOINT_MER
+    REPO_ACTIVE_ATTR = datimconstants.DatimConstants.REPO_ACTIVE_ATTR_MER
 
     # File names
     DATASET_REPOSITORIES_FILENAME = 'mer_ocl_dataset_repos_export.json'

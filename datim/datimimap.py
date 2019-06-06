@@ -12,6 +12,7 @@ import requests
 import deepdiff
 import datimimapexport
 import datimbase
+import ocldev.oclconstants
 import ocldev.oclcsvtojsonconverter
 
 
@@ -72,6 +73,7 @@ class DatimImap(object):
     DATIM_IMAP_FORMAT_CSV = 'CSV'
     DATIM_IMAP_FORMAT_JSON = 'JSON'
     DATIM_IMAP_FORMAT_HTML = 'HTML'
+    # DATIM_IMAP_FORMAT_XML = 'XML'
     DATIM_IMAP_FORMATS = [
         DATIM_IMAP_FORMAT_CSV,
         DATIM_IMAP_FORMAT_JSON,
@@ -82,6 +84,7 @@ class DatimImap(object):
     SET_EQUAL_MOH_ID_TO_NULL_DISAG = False
 
     # NOT IMPLEMENTED - May use these to configure handling of null disags for individual IMAP resources
+    """
     DATIM_EMPTY_DISAG_MODE_NULL = 'null'
     DATIM_EMPTY_DISAG_MODE_BLANK = 'blank'
     DATIM_EMPTY_DISAG_MODE_RAW = 'raw'
@@ -90,6 +93,7 @@ class DatimImap(object):
         DATIM_EMPTY_DISAG_MODE_BLANK,
         DATIM_EMPTY_DISAG_MODE_RAW
     ]
+    """
 
     def __init__(self, country_code='', country_org='', country_name='', period='',
                  imap_data=None, do_add_columns_to_csv=True):
@@ -121,7 +125,7 @@ class DatimImap(object):
                                 auto_fix_null_disag=True, convert_to_dict=False, exclude_empty_maps=False)
 
     @staticmethod
-    def get_format_from_string(format_string, default_fmt='CSV'):
+    def get_format_from_string(format_string, default_fmt=DATIM_IMAP_FORMAT_CSV):
         """
         Get the DATIM_IMAP_FORMAT constant from a string
         :param format_string:
@@ -142,6 +146,7 @@ class DatimImap(object):
         :param auto_fix_null_disag: Replace empty disags with 'null_disag' if True
         :param convert_to_dict: Returns the IMAP row as a dict with a unique row key if True
         :param exclude_empty_maps: Returns None if row represents an empty map
+        :param show_null_disag_as_blank:
         :return: Returns list, dict, or None
         """
         row = self.__imap_data[row_number].copy()
@@ -216,6 +221,7 @@ class DatimImap(object):
         :param convert_to_dict: Return a dictionary with a unique key for each row if True
         :param include_extra_info: Add extra pre-processing columns used for import into OCL
         :param auto_fix_null_disag: Replaces empty disags with 'null_disag' if True
+        :param show_null_disag_as_blank:
         :return: <list> or <dict>
         """
         if convert_to_dict:
@@ -269,6 +275,9 @@ class DatimImap(object):
         Return a specific row of the IMAP that matches the specified string row_key.
         Note that rows representing an empty map do not have keys and cannot be matched by this method.
         :param row_key:
+        :param include_extra_info:
+        :param auto_fix_null_disag:
+        :param convert_to_dict:
         :return:
         """
         row_key_dict = DatimImap.parse_imap_row_key(row_key)
@@ -328,7 +337,7 @@ class DatimImap(object):
                 # Store the cleaned up row in this IMAP object
                 self.__imap_data.append(row_to_save)
         else:
-            raise Exception("Cannot set I-MAP data with '%s'" % imap_data)
+            raise Exception("Cannot set IMAP data with '%s'" % imap_data)
 
     @staticmethod
     def uors2u(object, encoding='utf8', errors='strict'):
@@ -454,15 +463,17 @@ class DatimImap(object):
             return row
 
         # Set DATIM attributes
-        row['DATIM Owner Type'] = datimbase.DatimBase.datim_owner_type
-        row['DATIM Owner ID'] = datimbase.DatimBase.datim_owner_id
-        row['DATIM Source ID'] = datimbase.DatimBase.datim_source_id
+        datim_moh_source_id = datimbase.DatimBase.get_datim_moh_source_id(self.period)
+        # datim_moh_source_id = '%s-%s' % (datimbase.DatimBase.DATIM_MOH_SOURCE_ID_BASE, self.period)
+        row['DATIM Owner Type'] = datimbase.DatimBase.DATIM_MOH_OWNER_TYPE
+        row['DATIM Owner ID'] = datimbase.DatimBase.DATIM_MOH_OWNER_ID
+        row['DATIM Source ID'] = datim_moh_source_id
         datim_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(row['DATIM Owner Type'])
 
         # Set country data element attributes
-        row['Country Data Element Owner Type'] = datimbase.DatimBase.country_owner_type
+        row['Country Data Element Owner Type'] = datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE
         row['Country Data Element Owner ID'] = self.country_org
-        row['Country Data Element Source ID'] = datimbase.DatimBase.country_source_id
+        row['Country Data Element Source ID'] = datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID
         country_data_element_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(
             row['Country Data Element Owner Type'])
 
@@ -470,13 +481,13 @@ class DatimImap(object):
         if DatimImap.is_null_disag_row(row):
             row['Country Disaggregate Owner Type'] = datimbase.DatimBase.NULL_DISAG_OWNER_TYPE
             row['Country Disaggregate Owner ID'] = datimbase.DatimBase.NULL_DISAG_OWNER_ID
-            row['Country Disaggregate Source ID'] = datimbase.DatimBase.NULL_DISAG_SOURCE_ID
+            row['Country Disaggregate Source ID'] = datim_moh_source_id
             moh_disag_id = datimbase.DatimBase.NULL_DISAG_ID
             moh_disag_name = datimbase.DatimBase.NULL_DISAG_NAME
         else:
-            row['Country Disaggregate Owner Type'] = datimbase.DatimBase.country_owner_type
+            row['Country Disaggregate Owner Type'] = datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE
             row['Country Disaggregate Owner ID'] = self.country_org
-            row['Country Disaggregate Source ID'] = datimbase.DatimBase.country_source_id
+            row['Country Disaggregate Source ID'] = datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID
             moh_disag_id = row[DatimImap.IMAP_FIELD_MOH_DISAG_ID]
             moh_disag_name = row[DatimImap.IMAP_FIELD_MOH_DISAG_NAME]
         country_disaggregate_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(
@@ -484,10 +495,13 @@ class DatimImap(object):
 
         # Build the collection name
         # TODO: The country collection name should only be used if a collection has not already been defined
-        country_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(datimbase.DatimBase.country_owner_type)
+        country_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(
+            datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE)
         row['DATIM_Disag_Name_Clean'] = '_'.join(
-            row[DatimImap.IMAP_FIELD_DATIM_DISAG_NAME].replace('>', ' gt ').replace('<', ' lt ').replace('|', ' ').replace('+', ' plus ').split())
-        row['Country Collection Name'] = row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID] + ': ' + row[DatimImap.IMAP_FIELD_DATIM_DISAG_NAME]
+            row[DatimImap.IMAP_FIELD_DATIM_DISAG_NAME].replace('>', ' gt ').replace('<', ' lt ').
+                replace('|', ' ').replace('+', ' plus ').split())
+        row['Country Collection Name'] = row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID] + ': ' + row[
+            DatimImap.IMAP_FIELD_DATIM_DISAG_NAME]
 
         # Build the collection ID, replacing the default disag ID from DHIS2 with plain English (i.e. Total)
         if row[DatimImap.IMAP_FIELD_DATIM_DISAG_ID] == datimbase.DatimBase.DATIM_DEFAULT_DISAG_ID:
@@ -499,18 +513,18 @@ class DatimImap(object):
 
         # DATIM mapping
         row['DATIM From Concept URI'] = '/%s/%s/sources/%s/concepts/%s/' % (
-            datim_owner_type_url_part, datimbase.DatimBase.datim_owner_id,
-            datimbase.DatimBase.datim_source_id, row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID])
+            datim_owner_type_url_part, datimbase.DatimBase.DATIM_MOH_OWNER_ID,
+            datim_moh_source_id, row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID])
         row['DATIM To Concept URI'] = '/%s/%s/sources/%s/concepts/%s/' % (
-            datim_owner_type_url_part, datimbase.DatimBase.datim_owner_id,
-            datimbase.DatimBase.datim_source_id, row[DatimImap.IMAP_FIELD_DATIM_DISAG_ID])
-        row['DATIM Map Type'] = datimbase.DatimBase.map_type_country_has_option
+            datim_owner_type_url_part, datimbase.DatimBase.DATIM_MOH_OWNER_ID,
+            datim_moh_source_id, row[DatimImap.IMAP_FIELD_DATIM_DISAG_ID])
+        row['DATIM Map Type'] = datimbase.DatimBase.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION
 
         # Country mapping
         row['Country Map Type'] = row[DatimImap.IMAP_FIELD_OPERATION] + ' OPERATION'
         row['Country From Concept URI'] = '/%s/%s/sources/%s/concepts/%s/' % (
             country_data_element_owner_type_url_part, self.country_org,
-            datimbase.DatimBase.country_source_id, row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID])
+            datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID, row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID])
         row['Country To Concept URI'] = '/%s/%s/sources/%s/concepts/%s/' % (
             country_disaggregate_owner_type_url_part, row['Country Disaggregate Owner ID'],
             row['Country Disaggregate Source ID'], moh_disag_id)
@@ -596,57 +610,49 @@ class DatimImap(object):
         if DatimImap.IMAP_EXTRA_FIELD_NAMES[0] not in row:
             row = self.add_columns_to_row(DatimImap.fix_null_disag_in_row(row))
         defs = [DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_INDICATOR]
-        return DatimImapFactory.generate_import_script_from_csv_row(
-            imap_input=self, csv_row=row, defs=defs)
+        return DatimImapFactory.generate_import_script_from_csv_row(imap_input=self, csv_row=row, defs=defs)
 
     def get_country_indicator_create_json(self, row):
         if DatimImap.IMAP_EXTRA_FIELD_NAMES[0] not in row:
             row = self.add_columns_to_row(DatimImap.fix_null_disag_in_row(row))
         defs = [DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_INDICATOR]
-        return DatimImapFactory.generate_import_script_from_csv_row(
-            imap_input=self, csv_row=row, defs=defs)
+        return DatimImapFactory.generate_import_script_from_csv_row(imap_input=self, csv_row=row, defs=defs)
 
     def get_country_disag_update_json(self, row):
         if DatimImap.IMAP_EXTRA_FIELD_NAMES[0] not in row:
             row = self.add_columns_to_row(DatimImap.fix_null_disag_in_row(row))
         defs = [DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_DISAG]
-        return DatimImapFactory.generate_import_script_from_csv_row(
-            imap_input=self, csv_row=row, defs=defs)
+        return DatimImapFactory.generate_import_script_from_csv_row(imap_input=self, csv_row=row, defs=defs)
 
     def get_country_disag_create_json(self, row):
         if DatimImap.IMAP_EXTRA_FIELD_NAMES[0] not in row:
             row = self.add_columns_to_row(DatimImap.fix_null_disag_in_row(row))
         defs = [DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_DISAG]
-        return DatimImapFactory.generate_import_script_from_csv_row(
-            imap_input=self, csv_row=row, defs=defs)
+        return DatimImapFactory.generate_import_script_from_csv_row(imap_input=self, csv_row=row, defs=defs)
 
     def get_country_collection_create_json(self, row):
         if DatimImap.IMAP_EXTRA_FIELD_NAMES[0] not in row:
             row = self.add_columns_to_row(DatimImap.fix_null_disag_in_row(row))
         defs = [DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_COLLECTION]
-        return DatimImapFactory.generate_import_script_from_csv_row(
-            imap_input=self, csv_row=row, defs=defs)
+        return DatimImapFactory.generate_import_script_from_csv_row(imap_input=self, csv_row=row, defs=defs)
 
     def get_country_operation_mapping_create_json(self, row):
         if DatimImap.IMAP_EXTRA_FIELD_NAMES[0] not in row:
             row = self.add_columns_to_row(DatimImap.fix_null_disag_in_row(row))
         defs = [DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_OPERATION_MAPPING]
-        return DatimImapFactory.generate_import_script_from_csv_row(
-            imap_input=self, csv_row=row, defs=defs)
+        return DatimImapFactory.generate_import_script_from_csv_row(imap_input=self, csv_row=row, defs=defs)
 
     def get_country_datim_mapping_create_json(self, row):
         if DatimImap.IMAP_EXTRA_FIELD_NAMES[0] not in row:
             row = self.add_columns_to_row(DatimImap.fix_null_disag_in_row(row))
         defs = [DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_DATIM_MAPPING]
-        return DatimImapFactory.generate_import_script_from_csv_row(
-            imap_input=self, csv_row=row, defs=defs)
+        return DatimImapFactory.generate_import_script_from_csv_row(imap_input=self, csv_row=row, defs=defs)
 
     def get_country_operation_mapping_retire_json(self, row):
         if DatimImap.IMAP_EXTRA_FIELD_NAMES[0] not in row:
             row = self.add_columns_to_row(DatimImap.fix_null_disag_in_row(row))
         defs = [DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_OPERATION_MAPPING_RETIRED]
-        return DatimImapFactory.generate_import_script_from_csv_row(
-            imap_input=self, csv_row=row, defs=defs)
+        return DatimImapFactory.generate_import_script_from_csv_row(imap_input=self, csv_row=row, defs=defs)
 
 
 class DatimImapFactory(object):
@@ -665,11 +671,11 @@ class DatimImapFactory(object):
 
     @staticmethod
     def endpoint2filename_ocl_export_zip(endpoint):
-        return 'ocl-' + DatimImapFactory._convert_endpoint_to_filename_fmt(endpoint) + '.zip'
+        return 'ocl-%s.zip' % DatimImapFactory._convert_endpoint_to_filename_fmt(endpoint)
 
     @staticmethod
     def endpoint2filename_ocl_export_json(endpoint):
-        return 'ocl-' + DatimImapFactory._convert_endpoint_to_filename_fmt(endpoint) + '-raw.json'
+        return 'ocl-%s-raw.json' % DatimImapFactory._convert_endpoint_to_filename_fmt(endpoint)
 
     @staticmethod
     def get_period_from_version_id(version_id):
@@ -695,6 +701,7 @@ class DatimImapFactory(object):
         """
         Delete the org if it exists. Requires a root API token.
         :param org_id:
+        :param oclenv:
         :param ocl_root_api_token:
         :return:
         """
@@ -705,6 +712,7 @@ class DatimImapFactory(object):
             'Content-Type': 'application/json'
         }
         org_url = "%s/orgs/%s/" % (oclenv, org_id)
+        print('INFO: Checking if org "%s" exists...' % org_url)
         r = requests.get(org_url, headers=oclapiheaders)
         if r.status_code != 200:
             return False
@@ -799,11 +807,11 @@ class DatimImapFactory(object):
     @staticmethod
     def get_new_repo_version_json(owner_type='', owner_id='', repo_type='', repo_id='', released=True,
                                   repo_version_id='', repo_version_desc='Automatically created version'):
-        if repo_type == 'Source':
-            obj_type = 'Source Version'
+        if repo_type == ocldev.oclconstants.OclConstants.RESOURCE_TYPE_SOURCE:
+            obj_type = ocldev.oclconstants.OclConstants.RESOURCE_TYPE_SOURCE_VERSION
             repo_id_key = 'source'
-        elif repo_type == 'Collection':
-            obj_type = 'Collection Version'
+        elif repo_type == ocldev.oclconstants.OclConstants.RESOURCE_TYPE_COLLECTION:
+            obj_type = ocldev.oclconstants.OclConstants.RESOURCE_TYPE_COLLECTION_VERSION
             repo_id_key = 'collection'
         else:
             raise Exception('repo_type must be set to "Source" or "Collection". "%s" provided.' % repo_type)
@@ -910,17 +918,22 @@ class DatimImapFactory(object):
                 # TODO: Compare this against OCL not the original IMAP - low priority
                 if not imap_diff.imap_a.has_country_datim_mapping(csv_row):
                     import_list_narrative.append('Create DATIM mapping: %s, %s --> %s --> %s, %s' % (
-                        csv_row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_CATEGORY], csv_row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID],
-                        datimbase.DatimBase.map_type_country_has_option,
-                        csv_row[DatimImap.IMAP_FIELD_DATIM_DISAG_ID], csv_row[DatimImap.IMAP_FIELD_DATIM_DISAG_NAME]))
+                        csv_row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_CATEGORY],
+                        csv_row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID],
+                        datimbase.DatimBase.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION,
+                        csv_row[DatimImap.IMAP_FIELD_DATIM_DISAG_ID],
+                        csv_row[DatimImap.IMAP_FIELD_DATIM_DISAG_NAME]))
                     import_list += imap_diff.imap_b.get_country_datim_mapping_create_json(csv_row)
 
                 # country operation mapping
                 # TODO: Compare this against OCL not the original IMAP - low priority
                 if not imap_diff.imap_a.has_country_operation_mapping(csv_row):
                     import_list_narrative.append('Create country mapping: %s, %s --> %s --> %s, %s' % (
-                        csv_row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID], csv_row[DatimImap.IMAP_FIELD_MOH_INDICATOR_NAME], csv_row[DatimImap.IMAP_FIELD_OPERATION],
-                        csv_row[DatimImap.IMAP_FIELD_MOH_DISAG_ID], csv_row[DatimImap.IMAP_FIELD_MOH_DISAG_NAME]))
+                        csv_row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID],
+                        csv_row[DatimImap.IMAP_FIELD_MOH_INDICATOR_NAME],
+                        csv_row[DatimImap.IMAP_FIELD_OPERATION],
+                        csv_row[DatimImap.IMAP_FIELD_MOH_DISAG_ID],
+                        csv_row[DatimImap.IMAP_FIELD_MOH_DISAG_NAME]))
                     import_list += imap_diff.imap_b.get_country_operation_mapping_create_json(csv_row)
 
         # Handle 'dictionary_item_removed' - removed country mapping
@@ -932,8 +945,11 @@ class DatimImapFactory(object):
                 # TODO: Retire country operation mapping
                 if imap_diff.imap_a.has_country_operation_mapping(csv_row):
                     import_list_narrative.append('Retire country mapping: %s, %s --> %s --> %s, %s' % (
-                        csv_row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID], csv_row[DatimImap.IMAP_FIELD_MOH_INDICATOR_NAME], csv_row[DatimImap.IMAP_FIELD_OPERATION],
-                        csv_row[DatimImap.IMAP_FIELD_MOH_DISAG_ID], csv_row[DatimImap.IMAP_FIELD_MOH_DISAG_NAME]))
+                        csv_row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID],
+                        csv_row[DatimImap.IMAP_FIELD_MOH_INDICATOR_NAME],
+                        csv_row[DatimImap.IMAP_FIELD_OPERATION],
+                        csv_row[DatimImap.IMAP_FIELD_MOH_DISAG_ID],
+                        csv_row[DatimImap.IMAP_FIELD_MOH_DISAG_NAME]))
                     import_list += imap_diff.imap_a.get_country_operation_mapping_retire_json(csv_row)
 
                 # TODO: Retire country disag
@@ -957,7 +973,8 @@ class DatimImapFactory(object):
                 """
                 country_indicator_id = csv_row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID]
                 country_indicator_name = csv_row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID]
-                if imap_diff.imap_a.has_country_indicator(indicator_id=country_indicator_id, indicator_name=country_indicator_name):
+                if imap_diff.imap_a.has_country_indicator(indicator_id=country_indicator_id,
+                                                          indicator_name=country_indicator_name):
                     import_list_narrative.append('SKIP: Retire country indicator: %s, %s' % (
                         country_indicator_id, country_indicator_name))
                     # import_list += imap_diff.imap_a.get_country_indicator_retire_json(csv_row)
@@ -985,13 +1002,15 @@ class DatimImapFactory(object):
                 # MOH_Indicator_Name
                 if matched_field_name == DatimImap.IMAP_FIELD_MOH_INDICATOR_NAME:
                     import_list_narrative.append('Update country indicator name: %s, %s' % (
-                        csv_row_new[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID], csv_row_new[DatimImap.IMAP_FIELD_MOH_INDICATOR_NAME]))
+                        csv_row_new[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID],
+                        csv_row_new[DatimImap.IMAP_FIELD_MOH_INDICATOR_NAME]))
                     import_list += imap_diff.imap_b.get_country_indicator_update_json(csv_row_new)
 
                 # MOH_Disag_Name
                 if matched_field_name == DatimImap.IMAP_FIELD_MOH_DISAG_NAME:
                     import_list_narrative.append('Update country disag name: %s, %s' % (
-                        csv_row_new[DatimImap.IMAP_FIELD_MOH_DISAG_ID], csv_row_new[DatimImap.IMAP_FIELD_MOH_DISAG_NAME]))
+                        csv_row_new[DatimImap.IMAP_FIELD_MOH_DISAG_ID],
+                        csv_row_new[DatimImap.IMAP_FIELD_MOH_DISAG_NAME]))
                     import_list += imap_diff.imap_b.get_country_disag_update_json(csv_row_new)
 
         # Dedup the import list without changing order
@@ -1017,10 +1036,9 @@ class DatimImapFactory(object):
         datim_csv_converter = DatimMohCsvToJsonConverter(input_list=[csv_row])
         datim_csv_resource_definitions = datim_csv_converter.get_country_csv_resource_definitions(
             country_owner=imap_input.country_org,
-            country_owner_type=datimbase.DatimBase.country_owner_type,
-            country_source=datimbase.DatimBase.country_source_id,
-            datim_map_type=datimbase.DatimBase.map_type_country_has_option,
-            defs=defs)
+            country_owner_type=datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE,
+            country_source=datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID,
+            datim_map_type=datimbase.DatimBase.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION, defs=defs)
         datim_csv_converter.set_resource_definitions(datim_csv_resource_definitions)
         import_list = datim_csv_converter.process_by_definition()
         # Dedup the import list without changing order using list enumeration
@@ -1037,9 +1055,9 @@ class DatimImapFactory(object):
         datim_csv_converter = DatimMohCsvToJsonConverter(input_list=imap_input.get_imap_data(include_extra_info=True))
         datim_csv_resource_definitions = datim_csv_converter.get_country_csv_resource_definitions(
             country_owner=imap_input.country_org,
-            country_owner_type=datimbase.DatimBase.country_owner_type,
-            country_source=datimbase.DatimBase.country_source_id,
-            datim_map_type=datimbase.DatimBase.map_type_country_has_option)
+            country_owner_type=datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE,
+            country_source=datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID,
+            datim_map_type=datimbase.DatimBase.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION)
         datim_csv_converter.set_resource_definitions(datim_csv_resource_definitions)
         import_list = datim_csv_converter.process_by_definition()
         # Dedup the import list using list enumeration
@@ -1130,8 +1148,8 @@ class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConver
                 'id_column':DatimImap.IMAP_FIELD_MOH_INDICATOR_ID,
                 'skip_if_empty_column':DatimImap.IMAP_FIELD_MOH_INDICATOR_ID,
                 ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS:[
-                    {'resource_field':'concept_class', 'value':'Indicator'},
-                    {'resource_field':'datatype', 'value':'Numeric'},
+                    {'resource_field':'concept_class', 'value':datimbase.DatimBase.DATIM_MOH_CONCEPT_CLASS_DE},
+                    {'resource_field':'datatype', 'value':datimbase.DatimBase.DATIM_MOH_DATATYPE_DE},
                     {'resource_field':'owner', 'column':'Country Data Element Owner ID'},
                     {'resource_field':'owner_type', 'column':'Country Data Element Owner Type'},
                     {'resource_field':'source', 'column':'Country Data Element Source ID'},
@@ -1156,8 +1174,8 @@ class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConver
                 'id_column':DatimImap.IMAP_FIELD_MOH_DISAG_ID,
                 'skip_if_empty_column':DatimImap.IMAP_FIELD_MOH_DISAG_ID,
                 ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS:[
-                    {'resource_field':'concept_class', 'value':'Disaggregate'},
-                    {'resource_field':'datatype', 'value':'None'},
+                    {'resource_field':'concept_class', 'value':datimbase.DatimBase.DATIM_MOH_CONCEPT_CLASS_DISAGGREGATE},
+                    {'resource_field':'datatype', 'value':datimbase.DatimBase.DATIM_MOH_DATATYPE_DISAGGREGATE},
                     {'resource_field':'owner', 'column':'Country Disaggregate Owner ID'},
                     {'resource_field':'owner_type', 'column':'Country Disaggregate Owner Type'},
                     {'resource_field':'source', 'column':'Country Disaggregate Source ID'},

@@ -11,6 +11,9 @@ repositories in OCL as described below.
 In order to run this script, the org and source in OCL must already exist (e.g.
 /orgs/PEPFAR/sources/DATIM-MOH-FY18/). Refer to init/importinit.py for more information
 and to import the required starter content.
+
+TODO: Implement new repo versioning model (e.g. FY19.v0)
+TODO: Add "indicator_category_code" attribute for each indicator (e.g. PMTCT_STAT)
 """
 from __future__ import with_statement
 import json
@@ -190,7 +193,7 @@ class DatimSyncMohFy18(datimsync.DatimSync):
 
                     # Build the mapping
                     map_type = self.DATIM_MOH_MAP_TYPE_DE_TO_COC
-                    disaggregate_mapping_key = self.get_mapping_key(
+                    disaggregate_mapping_key = datimsync.DatimSync.get_mapping_key(
                         mapping_owner_type=self.RESOURCE_TYPE_ORGANIZATION, mapping_owner_id=self.DATIM_MOH_ORG_ID,
                         mapping_source_id=self.DATIM_MOH_SOURCE_ID, from_concept_url=de_concept_url,
                         map_type=map_type, to_concept_url=disaggregate_concept_url)

@@ -54,7 +54,7 @@ if has_existing_import(country_code):
     sys.exit(1)
 
 # Pre-process input parameters
-country_org = 'DATIM-MOH-%s' % country_code
+country_org = 'DATIM-MOH-%s-%s' % (country_code, period)
 
 # Debug output
 if verbosity:

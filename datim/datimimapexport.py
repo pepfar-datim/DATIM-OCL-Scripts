@@ -16,7 +16,6 @@ MOH_Disag_Name - Adults (14+) initiated ART
 ** Issues:
 1. Implement long-term method for populating the indicator category column (currently manually set a custom attribute)
 """
-import sys
 import json
 import os
 import requests
@@ -83,19 +82,23 @@ class DatimImapExport(datimbase.DatimBase):
 
         # Initial validation
         if not country_org:
-            msg = 'ERROR: Country organization ID (e.g. "DATIM-MOH-UG") is required, none provided'
+            msg = 'ERROR: Country organization ID (e.g. "DATIM-MOH-UG-FY18") is required, none provided'
+            self.vlog(1, msg)
+            raise Exception(msg)
+        if not period:
+            msg = 'ERROR: Period (e.g. "FY18") is required, none provided'
             self.vlog(1, msg)
             raise Exception(msg)
 
         # STEP 1 of 8: Determine the country period, minor version, and repo version ID (e.g. FY18.v0)
         self.vlog(1, '**** STEP 1 of 8: Determine the country period, minor version, and repo version ID')
         country_owner_endpoint = '/orgs/%s/' % country_org
-        country_source_endpoint = '%ssources/%s/' % (country_owner_endpoint, self.country_source_id)
+        country_source_endpoint = '%ssources/%s/' % (
+            country_owner_endpoint, self.DATIM_MOH_COUNTRY_SOURCE_ID)
         country_source_url = '%s%s' % (self.oclenv, country_source_endpoint)
         if period and version:
             country_version_id = '%s.%s' % (period, version)
         else:
-            country_version_id = ''
             country_version = datimimap.DatimImapFactory.get_repo_latest_period_version(
                 repo_url=country_source_url, period=period, oclapitoken=self.oclapitoken)
             if not country_version:
@@ -106,57 +109,52 @@ class DatimImapExport(datimbase.DatimBase):
             country_version_id = country_version['id']
             period = datimimap.DatimImapFactory.get_period_from_version_id(country_version_id)
         if not period or not country_version_id:
-            msg = 'ERROR: No valid and released version found for the specified country'
+            msg = 'ERROR: No valid and released version found for country org "%s"' % country_org
             self.vlog(1, msg)
             raise DatimUnknownCountryPeriodError(msg)
         self.vlog(1, 'Using version "%s" for country "%s"' % (country_version_id, country_org))
 
-        # STEP 2 of 8: Download PEPFAR/DATIM-MOH source
+        # STEP 2 of 8: Download DATIM-MOH-FYxx source
         self.vlog(1, '**** STEP 2 of 8: Download PEPFAR/DATIM-MOH source for specified period')
-        datim_owner_endpoint = '/orgs/%s/' % (self.datim_owner_id)
-        datim_source_endpoint = '%ssources/%s/' % (datim_owner_endpoint, self.datim_source_id)
+        datim_owner_endpoint = '/orgs/%s/' % self.DATIM_MOH_OWNER_ID
+        datim_moh_source_id = '%s-%s' % (self.DATIM_MOH_SOURCE_ID_BASE, period)
+        datim_source_endpoint = '%ssources/%s/' % (datim_owner_endpoint, datim_moh_source_id)
         datim_source_url = '%s%s' % (self.oclenv, datim_source_endpoint)
         datim_version = datimimap.DatimImapFactory.get_repo_latest_period_version(
             repo_url=datim_source_url, period=period, oclapitoken=self.oclapitoken)
         if not datim_version:
-            msg = 'ERROR: PEPFAR/DATIM-MOH metadata not defined for period "%s"' % period
+            msg = 'ERROR: %s does not exist or no valid repository version defined for period (e.g. FY19.v1)' % (
+                datim_source_endpoint)
             self.vlog(1, msg)
             raise DatimUnknownDatimPeriodError(msg)
         datim_version_id = datim_version['id']
-        datim_source_zipfilename = self.endpoint2filename_ocl_export_zip(datim_source_endpoint)
-        datim_source_jsonfilename = self.endpoint2filename_ocl_export_json(datim_source_endpoint)
+        datim_source_zip_filename = self.endpoint2filename_ocl_export_zip(datim_source_endpoint)
+        datim_source_json_filename = self.endpoint2filename_ocl_export_json(datim_source_endpoint)
         if not self.run_ocl_offline:
             self.get_ocl_export(
                 endpoint=datim_source_endpoint, version=datim_version_id,
-                zipfilename=datim_source_zipfilename, jsonfilename=datim_source_jsonfilename)
+                zipfilename=datim_source_zip_filename, jsonfilename=datim_source_json_filename)
         else:
-            self.vlog(1, 'OCL-OFFLINE: Using local file "%s"...' % datim_source_jsonfilename)
-            if os.path.isfile(self.attach_absolute_data_path(datim_source_jsonfilename)):
-                self.vlog(1, 'OCL-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
-                    datim_source_jsonfilename, os.path.getsize(self.attach_absolute_data_path(datim_source_jsonfilename))))
-            else:
-                msg = 'ERROR: Could not find offline OCL file "%s"' % datim_source_jsonfilename
-                self.vlog(1, msg)
-                raise Exception(msg)
+            self.does_offline_data_file_exist(datim_source_json_filename, exit_if_missing=True)
 
         # STEP 3 of 8: Prepare output with the DATIM-MOH indicator+disag structure
         self.vlog(1, '**** STEP 3 of 8: Prepare output with the DATIM-MOH indicator+disag structure')
         indicators = {}
         disaggregates = {}
-        with open(self.attach_absolute_data_path(datim_source_jsonfilename), 'rb') as handle_datim_source:
+        with open(self.attach_absolute_data_path(datim_source_json_filename), 'rb') as handle_datim_source:
             datim_source = json.load(handle_datim_source)
 
             # Split up the indicator and disaggregate concepts
             for concept in datim_source['concepts']:
-                if concept['concept_class'] == self.concept_class_disaggregate:
+                if concept['concept_class'] == self.DATIM_MOH_CONCEPT_CLASS_DISAGGREGATE:
                     disaggregates[concept['url']] = concept.copy()
-                elif concept['concept_class'] == self.concept_class_indicator:
+                elif concept['concept_class'] == self.DATIM_MOH_CONCEPT_CLASS_DE:
                     indicators[concept['url']] = concept.copy()
                     indicators[concept['url']]['mappings'] = []
 
             # Now iterate through the mappings
             for mapping in datim_source['mappings']:
-                if mapping['map_type'] == self.map_type_datim_has_option:
+                if mapping['map_type'] == self.DATIM_MOH_MAP_TYPE_HAS_OPTION:
                     if mapping['from_concept_url'] not in indicators:
                         msg = 'ERROR: Missing indicator from_concept: %s' % (mapping['from_concept_url'])
                         self.vlog(1, msg)
@@ -167,29 +165,22 @@ class DatimImapExport(datimbase.DatimBase):
 
         # STEP 4 of 8: Download and process country source
         self.vlog(1, '**** STEP 4 of 8: Download and process country source')
-        country_source_zipfilename = self.endpoint2filename_ocl_export_zip(country_source_endpoint)
-        country_source_jsonfilename = self.endpoint2filename_ocl_export_json(country_source_endpoint)
+        country_source_zip_filename = self.endpoint2filename_ocl_export_zip(country_source_endpoint)
+        country_source_json_filename = self.endpoint2filename_ocl_export_json(country_source_endpoint)
         if not self.run_ocl_offline:
             self.get_ocl_export(
                 endpoint=country_source_endpoint, version=country_version_id,
-                zipfilename=country_source_zipfilename, jsonfilename=country_source_jsonfilename)
+                zipfilename=country_source_zip_filename, jsonfilename=country_source_json_filename)
         else:
-            self.vlog(1, 'OCL-OFFLINE: Using local file "%s"...' % country_source_jsonfilename)
-            if os.path.isfile(self.attach_absolute_data_path(country_source_jsonfilename)):
-                self.vlog(1, 'OCL-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
-                    country_source_jsonfilename, os.path.getsize(self.attach_absolute_data_path(country_source_jsonfilename))))
-            else:
-                msg = 'ERROR: Could not find offline OCL file "%s"' % country_source_jsonfilename
-                self.vlog(1, msg)
-                raise Exception(msg)
+            self.does_offline_data_file_exist(country_source_json_filename, exit_if_missing=True)
         country_indicators = {}
         country_disaggregates = {}
-        with open(self.attach_absolute_data_path(country_source_jsonfilename), 'rb') as handle_country_source:
+        with open(self.attach_absolute_data_path(country_source_json_filename), 'rb') as handle_country_source:
             country_source = json.load(handle_country_source)
             for concept in country_source['concepts']:
-                if concept['concept_class'] == self.concept_class_disaggregate:
+                if concept['concept_class'] == self.DATIM_MOH_CONCEPT_CLASS_DISAGGREGATE:
                     country_disaggregates[concept['url']] = concept.copy()
-                elif concept['concept_class'] == self.concept_class_indicator:
+                elif concept['concept_class'] == self.DATIM_MOH_CONCEPT_CLASS_DE:
                     country_indicators[concept['url']] = concept.copy()
 
         # STEP 5 of 8: Download list of country indicator mappings (i.e. collections)
@@ -204,35 +195,28 @@ class DatimImapExport(datimbase.DatimBase):
         # STEP 6 of 8: Process one country collection at a time
         self.vlog(1, '**** STEP 6 of 8: Process one country collection at a time')
         for collection_id, collection in country_collections.items():
-            collection_zipfilename = self.endpoint2filename_ocl_export_zip(collection['url'])
-            collection_jsonfilename = self.endpoint2filename_ocl_export_json(collection['url'])
+            collection_zip_filename = self.endpoint2filename_ocl_export_zip(collection['url'])
+            collection_json_filename = self.endpoint2filename_ocl_export_json(collection['url'])
             if not self.run_ocl_offline:
                 try:
                     self.get_ocl_export(
                         endpoint=collection['url'], version=country_version_id,
-                        zipfilename=collection_zipfilename, jsonfilename=collection_jsonfilename)
+                        zipfilename=collection_zip_filename, jsonfilename=collection_json_filename)
                 except requests.exceptions.HTTPError:
                     # collection or collection version does not exist, so we can safely throw it out
                     continue
             else:
-                self.vlog(1, 'OCL-OFFLINE: Using local file "%s"...' % collection_jsonfilename)
-                if os.path.isfile(self.attach_absolute_data_path(collection_jsonfilename)):
-                    self.vlog(1, 'OCL-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
-                        collection_jsonfilename, os.path.getsize(self.attach_absolute_data_path(collection_jsonfilename))))
-                else:
-                    msg = 'ERROR: Could not find offline OCL file "%s"' % collection_jsonfilename
-                    self.vlog(1, msg)
-                    raise Exception(msg)
+                self.does_offline_data_file_exist(collection_json_filename, exit_if_missing=True)
             operations = []
             datim_pair_mapping = None
             datim_indicator_url = None
             datim_disaggregate_url = None
-            with open(self.attach_absolute_data_path(collection_jsonfilename), 'rb') as handle_country_collection:
+            with open(self.attach_absolute_data_path(collection_json_filename), 'rb') as handle_country_collection:
                 country_collection = json.load(handle_country_collection)
 
                 # Organize the mappings between operations and the datim indicator+disag pair
                 for mapping in country_collection['mappings']:
-                    if mapping['map_type'] == self.map_type_country_has_option:
+                    if mapping['map_type'] == self.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION:
                         if mapping['from_concept_url'] in indicators and mapping['to_concept_url'] in disaggregates:
                             # we're good - the from and to concepts are part of the PEPFAR/DATIM_MOH source
                             datim_pair_mapping = mapping.copy()
@@ -240,8 +224,8 @@ class DatimImapExport(datimbase.DatimBase):
                             datim_disaggregate_url = mapping['to_concept_url']
                         else:
                             # we're not good. not good at all
-                            msg = 'ERROR: The from_concept or to_concept of the "%s" mapping in collection "%s" are not part of "%s" version "%s": %s ' % (
-                                self.map_type_country_has_option, collection_id, self.datim_source_id, period, str(mapping))
+                            msg = 'ERROR: The from_concept or to_concept of the "%s" mapping in collection "%s" is not part of "%s" version "%s": %s ' % (
+                                self.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION, collection_id, datim_moh_source_id, period, str(mapping))
                             self.vlog(1, msg)
                             raise Exception(msg)
                     elif mapping['map_type'] in self.DATIM_IMAP_OPERATIONS:

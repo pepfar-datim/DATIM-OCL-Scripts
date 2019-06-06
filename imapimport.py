@@ -34,7 +34,7 @@ if sys.argv and len(sys.argv) > 5:
         test_mode = True
 
 # Pre-process input parameters
-country_org = 'DATIM-MOH-%s' % country_code
+country_org = 'DATIM-MOH-%s-%s' % (country_code, period)
 country_names = {
         "BW": "Botswana",
         "BI": "Burundi",
@@ -76,9 +76,9 @@ if delete_org_if_exists:
         print('"delete_org_if_exists" is set to True:')
     if not test_mode:
         if verbosity:
-            print('Deleting org "%s" if it exists in 10 seconds...' % country_org)
+            print('Deleting org "%s" if it exists in 5 seconds...' % country_org)
         # Pause briefly to allow user to cancel in case deleting org on accident...
-        time.sleep(10)
+        time.sleep(5)
         result = datim.datimimap.DatimImapFactory.delete_org_if_exists(
             org_id=country_org, oclenv=oclenv, ocl_root_api_token=settings.api_token_staging_root)
         if verbosity:
@@ -90,6 +90,7 @@ if delete_org_if_exists:
         print('Skipping "delete_org_if_exists" step because in "test_mode"')
 
 # Load IMAP from import file
+imap_input = None
 if imap_import_filename.endswith('.json'):
     imap_input = datim.datimimap.DatimImapFactory.load_imap_from_json(
         json_filename=imap_import_filename, period=period,

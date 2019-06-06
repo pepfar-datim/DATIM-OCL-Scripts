@@ -18,16 +18,17 @@ import settings
 
 
 # JSON Lines files to import
-import_filenames_all = {
-    'json_org_and_sources': 'datim_init_all.json',
-    'json_datim_moh': 'datim_init_only_moh.json',
-    'json_collections': 'dhis2datasets.json',
-    'json_tiered_support': 'tiered_support.json',
-}
-import_filenames_datim_moh_only = {
-    'json_datim_moh': 'datim_init_only_moh.json',
-}
-import_filenames = import_filenames_datim_moh_only
+import_filenames_all = [
+    'datim_init_all.json',
+    'datim_init_only_moh.json',
+    'dhis2datasets.json',
+    'tiered_support.json',
+    'code-list-collections-fy18-fy19.json',
+]
+import_filenames_datim_moh_only = [
+    'datim_init_only_moh.json',
+]
+import_filenames = import_filenames_all
 
 # OCL Settings - JetStream Staging user=datim-admin
 ocl_api_url_root = settings.ocl_api_url_staging
@@ -37,9 +38,8 @@ ocl_api_token = settings.api_token_staging_datim_admin
 test_mode = False
 limit = 0
 
-for k in import_filenames:
-    json_filename = import_filenames[k]
+for import_filename in import_filenames:
     ocl_importer = OclFlexImporter(
-        file_path=json_filename, limit=limit, api_url_root=ocl_api_url_root, api_token=ocl_api_token,
+        file_path=import_filename, limit=limit, api_url_root=ocl_api_url_root, api_token=ocl_api_token,
         test_mode=test_mode, do_update_if_exists=False)
     ocl_importer.process()

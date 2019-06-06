@@ -1,10 +1,3 @@
-import csv
-import json
-import requests
-import sys
-import os
-import zipfile
-import pprint
 import datimbase
 
 
@@ -21,13 +14,14 @@ class DatimImapReferenceGenerator(datimbase.DatimBase):
         self.oclapitoken = oclapitoken
 
         # Build MOH source URI (e.g. /orgs/DATIM-MOH-UG/sources/DATIM-Alignment-Indicators/)
-        moh_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(self.country_owner_type)
+        moh_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(self.DATIM_MOH_COUNTRY_OWNER_TYPE)
         if moh_owner_type_url_part:
             self.moh_source_uri = '/%s/%s/sources/%s/' % (
-                moh_owner_type_url_part, self.imap_input.country_org, self.country_source_id)
+                moh_owner_type_url_part, self.imap_input.country_org, self.DATIM_MOH_COUNTRY_SOURCE_ID)
         else:
-            print('ERROR: Invalid owner_type "%s"' % (self.country_owner_type))
-            sys.exit(1)
+            msg = 'ERROR: Invalid owner_type "%s"' % self.DATIM_MOH_COUNTRY_OWNER_TYPE
+            self.log(msg)
+            raise Exception(msg)
 
         self.refs_by_collection = {}
         self.oclapiheaders = {
@@ -52,7 +46,7 @@ class DatimImapReferenceGenerator(datimbase.DatimBase):
             import_json = {
                     'type':'Reference',
                     'owner':self.imap_input.country_org,
-                    'owner_type':self.country_owner_type,
+                    'owner_type':self.DATIM_MOH_COUNTRY_OWNER_TYPE,
                     'collection':c,
                     'data':{'expressions':self.refs_by_collection[c]}
                 }
@@ -68,11 +62,11 @@ class DatimImapReferenceGenerator(datimbase.DatimBase):
         # Add references to DATIM concepts/mappings if first use of this collection
         collection_id = csv_row['Country Collection ID']
         if collection_id not in self.refs_by_collection:
-            # Mapping
+            # DATIM HAS OPTION Mapping
             mapping_id = self.get_mapping_uri_from_export(
                 country_source_export,
                 csv_row['DATIM From Concept URI'],
-                datimbase.DatimBase.map_type_country_has_option,
+                datimbase.DatimBase.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION,
                 csv_row['DATIM To Concept URI'])
             self.refs_by_collection[collection_id] = [mapping_id]
 
@@ -82,7 +76,7 @@ class DatimImapReferenceGenerator(datimbase.DatimBase):
             # Add DATIM To concept
             self.refs_by_collection[collection_id].append(csv_row['DATIM To Concept URI'])
 
-        # Now add the specific mapping reference
+        # Now add the country mapping reference
         mapping_id = self.get_mapping_uri_from_export(
             country_source_export,
             csv_row['Country From Concept URI'],
@@ -91,9 +85,9 @@ class DatimImapReferenceGenerator(datimbase.DatimBase):
         self.refs_by_collection[collection_id].append(mapping_id)
 
         # Add country From-Concept
-        #versioned_uri = self.get_versioned_concept_uri_from_export(
-        #    country_source_export, csv_row['Country From Concept URI'])
-        #self.refs_by_collection[collection_id].append(versioned_uri)
+        # versioned_uri = DatimImapReferenceGenerator.get_versioned_concept_uri_from_export(
+        #     country_source_export, csv_row['Country From Concept URI'])
+        # self.refs_by_collection[collection_id].append(versioned_uri)
         self.refs_by_collection[collection_id].append(csv_row['Country From Concept URI'])
 
         # Add country To-Concept
@@ -102,12 +96,13 @@ class DatimImapReferenceGenerator(datimbase.DatimBase):
             self.refs_by_collection[collection_id].append(
                 datimbase.DatimBase.NULL_DISAG_ENDPOINT)
         else:
-            #versioned_uri = self.get_versioned_concept_uri_from_export(
-            #    country_source_export, csv_row['Country To Concept URI'])
-            #self.refs_by_collection[collection_id].append(versioned_uri)
+            # versioned_uri = DatimImapReferenceGenerator.get_versioned_concept_uri_from_export(
+            #     country_source_export, csv_row['Country To Concept URI'])
+            # self.refs_by_collection[collection_id].append(versioned_uri)
             self.refs_by_collection[collection_id].append(csv_row['Country To Concept URI'])
 
-    def get_versioned_concept_uri_from_export(self, country_source_export, nonversioned_uri):
+    @staticmethod
+    def get_versioned_concept_uri_from_export(country_source_export, nonversioned_uri):
         concept = country_source_export.get_concept_by_uri(nonversioned_uri)
         if concept:
             return concept['version_url']

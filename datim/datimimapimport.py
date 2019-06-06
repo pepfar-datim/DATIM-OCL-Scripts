@@ -20,7 +20,6 @@ TODO: Exclude "null-disag" from the import scripts -- this does not have any eff
 import sys
 import requests
 import json
-import os
 import time
 import pprint
 import datimbase
@@ -29,11 +28,12 @@ import datimimapexport
 import datimimapreferencegenerator
 import ocldev.oclfleximporter
 import ocldev.oclexport
+import ocldev.oclconstants
 
 
 class DatimImapImport(datimbase.DatimBase):
     """
-    Class to import DATIM country indicator mapping metadata from a CSV file into OCL.
+    Class to import DATIM country indicator mapping metadata into OCL.
     """
 
     def __init__(self, oclenv='', oclapitoken='', verbosity=0, run_ocl_offline=False, test_mode=False,
@@ -59,7 +59,7 @@ class DatimImapImport(datimbase.DatimBase):
         :return:
         """
 
-        # Get out of here if variables aren't set
+        # Validate input variables
         if not self.oclapitoken or not self.oclapiheaders:
             msg = 'ERROR: Authorization token must be set'
             self.vlog(1, msg)
@@ -67,33 +67,26 @@ class DatimImapImport(datimbase.DatimBase):
 
         # STEP 1 of 12: Download PEPFAR DATIM metadata export for specified period from OCL
         self.vlog(1, '**** STEP 1 of 12: Download PEPFAR/DATIM-MOH-FY## metadata export from OCL')
-        datim_owner_endpoint = '/orgs/%s/' % self.datim_owner_id
-        datim_source_endpoint = '%ssources/%s/' % (datim_owner_endpoint, self.datim_source_id)
+        self.datim_moh_source_id = '%s-%s' % (self.DATIM_MOH_SOURCE_ID_BASE, imap_input.period)
+        datim_owner_endpoint = '/orgs/%s/' % self.DATIM_MOH_OWNER_ID
+        datim_source_endpoint = '%ssources/%s/' % (datim_owner_endpoint, self.datim_moh_source_id)
         datim_source_version = self.get_latest_version_for_period(
             repo_endpoint=datim_source_endpoint, period=imap_input.period)
         if not datim_source_version:
-            msg = 'ERROR: Could not find released version for period "%s" for source PEPFAR/DATIM-MOH' % (
-                imap_input.period)
+            msg = 'ERROR: Could not find released version for period "%s" for source "%s"' % (
+                imap_input.period, datim_source_endpoint)
             self.vlog(1, msg)
             raise Exception(msg)
-        self.vlog(1, 'Latest version found for period "%s" for source PEPFAR/DATIM-MOH: "%s"' % (
-            imap_input.period, datim_source_version))
-        datim_source_zipfilename = self.endpoint2filename_ocl_export_zip(datim_source_endpoint)
-        datim_source_jsonfilename = self.endpoint2filename_ocl_export_json(datim_source_endpoint)
+        self.vlog(1, 'Latest version found for period "%s" for source "%s": "%s"' % (
+            imap_input.period, datim_source_endpoint, datim_source_version))
+        datim_source_zip_filename = self.endpoint2filename_ocl_export_zip(datim_source_endpoint)
+        datim_source_json_filename = self.endpoint2filename_ocl_export_json(datim_source_endpoint)
         if not self.run_ocl_offline:
             datim_source_export = self.get_ocl_export(
                 endpoint=datim_source_endpoint, version=datim_source_version,
-                zipfilename=datim_source_zipfilename, jsonfilename=datim_source_jsonfilename)
+                zipfilename=datim_source_zip_filename, jsonfilename=datim_source_json_filename)
         else:
-            self.vlog(1, 'OCL-OFFLINE: Using local file "%s"...' % datim_source_jsonfilename)
-            if os.path.isfile(self.attach_absolute_data_path(datim_source_jsonfilename)):
-                self.vlog(1, 'OCL-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
-                    datim_source_jsonfilename, os.path.getsize(self.attach_absolute_data_path(
-                        datim_source_jsonfilename))))
-            else:
-                msg = 'ERROR: Could not find offline OCL file "%s"' % datim_source_jsonfilename
-                self.vlog(1, msg)
-                raise Exception(msg)
+            self.does_offline_data_file_exist(datim_source_json_filename, exit_if_missing=True)
 
         # STEP 2 of 12: Validate input country mapping CSV file
         # NOTE: This currently just verifies that the correct columns exist (order agnostic)
@@ -111,7 +104,8 @@ class DatimImapImport(datimbase.DatimBase):
         try:
             imap_old = datimimap.DatimImapFactory.load_imap_from_ocl(
                 oclenv=self.oclenv, oclapitoken=self.oclapitoken, run_ocl_offline=self.run_ocl_offline,
-                country_code=imap_input.country_code, country_org=imap_input.country_org, verbosity=self.verbosity)
+                country_code=imap_input.country_code, country_org=imap_input.country_org, verbosity=self.verbosity,
+                period=imap_input.period)
             self.vlog(1, '%s CSV rows loaded from the OCL IMAP export' % imap_old.length())
         except requests.exceptions.HTTPError as e:
             imap_old = None
@@ -177,7 +171,7 @@ class DatimImapImport(datimbase.DatimBase):
         current_country_version_id = ''
         country_owner_endpoint = '/orgs/%s/' % imap_input.country_org
         country_source_endpoint = '%ssources/%s/' % (
-            country_owner_endpoint, datimbase.DatimBase.country_source_id)
+            country_owner_endpoint, datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID)
         if do_create_country_source:
             next_country_version_id = '%s.v0' % imap_input.period
         else:
@@ -237,7 +231,7 @@ class DatimImapImport(datimbase.DatimBase):
         # TODO: Pass test_mode to the BulkImport API so that we can get real test results from the server
         self.vlog(1, '**** STEP 9 of 12: Import changes into OCL')
         if import_list and not self.test_mode:
-            self.vlog(1, 'Importing %s changes to OCL...' % len(import_list))
+            self.vlog(1, 'Bulk importing %s changes to OCL...' % len(import_list))
             # TODO: Implement better OclBulkImporter response -- a new class OclBulkImportResponse?
             bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
                 input_list=import_list, api_token=self.oclapitoken, api_url_root=self.oclenv)
@@ -252,17 +246,6 @@ class DatimImapImport(datimbase.DatimBase):
                 # TODO: Need smarter way to handle long running bulk import than just quitting
                 print 'Import is still processing... QUITTING'
                 sys.exit(1)
-
-            '''
-            # JP 2019-04-23: Old OclFlexImporter code replaced by the bulk import code above 
-            importer = ocldev.oclfleximporter.OclFlexImporter(
-                input_list=import_list, api_token=self.oclapitoken, api_url_root=self.oclenv,
-                test_mode=self.test_mode, verbosity=self.verbosity,
-                do_update_if_exists=True, import_delay=0)
-            importer.process()
-            if self.verbosity:
-                importer.import_results.display_report()
-            '''
         elif self.test_mode:
             self.vlog(1, 'Test mode! Skipping import...')
         else:
@@ -321,7 +304,7 @@ class DatimImapImport(datimbase.DatimBase):
 
         # STEP 12 of 12: Import new collection references
         self.vlog(1, '**** STEP 12 of 12: Import new collection references')
-        if ref_import_list:
+        if ref_import_list and not self.test_mode:
 
             # 12a. Get the list of unique collection IDs
             unique_collection_ids = []
@@ -362,30 +345,8 @@ class DatimImapImport(datimbase.DatimBase):
                 # TODO: Need smarter way to handle long running bulk import than just quitting
                 print 'Reference import is still processing... QUITTING'
                 sys.exit(1)
-
-            '''
-            # JP 2019-04-23: Old OclFlexImporter code replaced by the bulk import code above 
-            importer = ocldev.oclfleximporter.OclFlexImporter(
-                input_list=ref_import_list, api_token=self.oclapitoken, api_url_root=self.oclenv,
-                test_mode=self.test_mode, verbosity=self.verbosity, import_delay=0)
-            importer.process()
-            if self.verbosity:
-                importer.import_results.display_report()
-            '''
-
-            '''
-            # JP 2019-04-24: Incorporated creation of new collection versions into the bulk import script above
-            # 12d. Create new version for each unique collection
-            # TODO: Incorporate collection version requests into the bulk import script above
-            self.vlog(1, 'Creating new collection versions...')
-            for collection_id in unique_collection_ids:
-                collection_endpoint = '/orgs/%s/collections/%s/' % (imap_input.country_org, collection_id)
-                collection_version_endpoint = '%s%s/' % (collection_endpoint, next_country_version_id)
-                self.vlog(1, 'Creating collection version: %s' % collection_version_endpoint)
-                datimimap.DatimImapFactory.create_repo_version(
-                    oclenv=self.oclenv, oclapitoken=self.oclapitoken,
-                    repo_endpoint=collection_endpoint, repo_version_id=next_country_version_id)
-            '''
+        elif self.test_mode:
+            self.vlog(1, 'SKIPPING: No collections to update in test mode...')
         else:
             self.vlog(1, 'SKIPPING: No collections updated...')
 
@@ -429,7 +390,7 @@ class DatimImapImport(datimbase.DatimBase):
     def get_country_org_dict(country_org='', country_code='', country_name='', country_public_access='View'):
         """ Get an OCL-formatted dictionary of a country IMAP organization ready to import """
         return {
-            'type': 'Organization',
+            'type': ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION,
             'id': country_org,
             'name': 'DATIM MOH %s' % country_name,
             'location': country_name,
@@ -441,11 +402,11 @@ class DatimImapImport(datimbase.DatimBase):
         """ Get an OCL-formatted dictionary of a country IMAP source ready to import """
         source_name = 'DATIM MOH %s Alignment Indicators' % country_name
         source = {
-            "type": "Source",
-            "id": datimbase.DatimBase.country_source_id,
+            "type": ocldev.oclconstants.OclConstants.RESOURCE_TYPE_SOURCE,
+            "id": datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID,
             "owner_type": "Organization",
             "owner": country_org,
-            "short_code": datimbase.DatimBase.country_source_id,
+            "short_code": datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID,
             "name": source_name,
             "full_name": source_name,
             "source_type": "Dictionary",

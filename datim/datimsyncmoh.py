@@ -167,7 +167,7 @@ class DatimSyncMoh(datimsync.DatimSync):
 
                     # Build the mapping
                     map_type = 'Has Option'
-                    disaggregate_mapping_key = self.get_mapping_key(
+                    disaggregate_mapping_key = datimsync.DatimSync.get_mapping_key(
                         mapping_owner_type=self.RESOURCE_TYPE_ORGANIZATION, mapping_owner_id='PEPFAR',
                         mapping_source_id='DATIM-MOH', from_concept_url=indicator_concept_url, map_type=map_type,
                         to_concept_url=disaggregate_concept_url)

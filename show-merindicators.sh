@@ -1,2 +1,2 @@
 #!/bin/sh
-python /opt/openhim-landing-page/DATIM-Metadata-Project/datimshowmer.py $1 $2
+python /opt/ocl_datim/datimshowmer.py $1 $2

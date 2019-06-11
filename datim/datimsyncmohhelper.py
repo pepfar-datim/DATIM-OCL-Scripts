@@ -17,6 +17,14 @@ class DatimSyncMohHelper(object):
     CLASSIFIER_FY18_FINE_4 = '40-49'
 
     @staticmethod
+    def get_disag_classification(period='', de_code='', de_uid='', coc_name=''):
+        if period == 'FY18':
+            return DatimSyncMohHelper.get_disag_classification_fy18(de_code=de_code, de_uid=de_uid, coc_name=coc_name)
+        elif period == 'FY19':
+            return DatimSyncMohHelper.get_disag_classification_fy18(de_code=de_code, de_uid=de_uid, coc_name=coc_name)
+        return ''
+
+    @staticmethod
     def get_disag_classification_fy18(de_code='', de_uid='', coc_name=''):
         """
         Python implementation of the classification logic embedded in the DHIS2 SqlView

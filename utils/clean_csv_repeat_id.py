@@ -4,29 +4,16 @@ This was required for several of the 2018 IMAP files.
 If MOH_Indicator_ID == MOH_Disag_ID, this is the equivalent of there being no
 disag, so this script simply sets the MOH_Disag_ID and MOH_Disag_Name fields
 to empty strings.
+
+NOTE:
 """
 from __future__ import print_function
 import csv
 import sys
 import datim.datimimap
-import pprint
 
 verbosity = 0
 csv_filename = "csv/KE-FY18-dirty.csv"
-
-IMAP_FIELD_NAMES = [
-    'DATIM_Indicator_Category',
-    'DATIM_Indicator_ID',
-    'DATIM_Disag_ID',
-    'DATIM_Disag_Name',
-    'Operation',
-    'MOH_Indicator_ID',
-    'MOH_Indicator_Name',
-    'MOH_Disag_ID',
-    'MOH_Disag_Name',
-]
-
-# TODO: Accept a command-line argument for the CSV filename
 
 # Load the IMAP CSV
 imap = datim.datimimap.DatimImapFactory.load_imap_from_csv(
@@ -37,7 +24,7 @@ if verbosity >= 2:
 
 # Output a cleaned version
 count = 0
-writer = csv.DictWriter(sys.stdout, fieldnames=IMAP_FIELD_NAMES)
+writer = csv.DictWriter(sys.stdout, fieldnames=datim.datimimap.DatimImap.IMAP_EXPORT_FIELD_NAMES)
 writer.writeheader()
 for row_number in range(imap.length()):
     row = imap.get_row(row_number)

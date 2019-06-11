@@ -216,8 +216,9 @@ class DatimShow(datimbase.DatimBase):
             repo_endpoint = '%s%s/' % (self.DEFAULT_REPO_LIST_ENDPOINT, repo_id)
             show_build_row_method = self.DEFAULT_SHOW_BUILD_ROW_METHOD
         else:
-            self.log('Unrecognized key "%s"' % repo_id)
-            exit(1)
+            msg = 'Unrecognized key "%s"' % repo_id
+            self.log(msg)
+            raise Exception(msg)
         if not repo_title:
             repo_title = repo_id
         if not show_headers_key:
@@ -226,26 +227,20 @@ class DatimShow(datimbase.DatimBase):
         # STEP 1 of 4: Fetch latest version of relevant OCL repository export
         self.vlog(1, '**** STEP 1 of 4: Fetch latest version of relevant OCL repository export')
         self.vlog(1, '%s:' % repo_endpoint)
-        zipfilename = self.endpoint2filename_ocl_export_zip(repo_endpoint)
-        jsonfilename = self.endpoint2filename_ocl_export_json(repo_endpoint)
+        zip_filename = self.endpoint2filename_ocl_export_zip(repo_endpoint)
+        json_filename = self.endpoint2filename_ocl_export_json(repo_endpoint)
         if not self.run_ocl_offline:
-            self.get_ocl_export(endpoint=repo_endpoint, version='latest', zipfilename=zipfilename,
-                                jsonfilename=jsonfilename)
+            self.get_ocl_export(endpoint=repo_endpoint, version='latest', zipfilename=zip_filename,
+                                jsonfilename=json_filename)
         else:
-            self.vlog(1, 'OCL-OFFLINE: Using local file "%s"...' % jsonfilename)
-            if os.path.isfile(self.attach_absolute_data_path(jsonfilename)):
-                self.vlog(1, 'OCL-OFFLINE: File "%s" found containing %s bytes. Continuing...' % (
-                    jsonfilename, os.path.getsize(self.attach_absolute_data_path(jsonfilename))))
-            else:
-                self.log('ERROR: Could not find offline OCL file "%s". Exiting...' % jsonfilename)
-                sys.exit(1)
+            self.does_offline_data_file_exist(json_filename, exit_if_missing=True)
 
         # STEP 2 of 4: Transform OCL export to intermediary state
         self.vlog(1, '**** STEP 2 of 4: Transform to intermediary state')
-        jsonfilename = self.endpoint2filename_ocl_export_json(repo_endpoint)
+        json_filename = self.endpoint2filename_ocl_export_json(repo_endpoint)
         intermediate = self.build_show_grid(
             repo_title=repo_title, repo_subtitle=repo_subtitle, headers=self.headers[show_headers_key],
-            input_filename=jsonfilename, show_build_row_method=show_build_row_method)
+            input_filename=json_filename, show_build_row_method=show_build_row_method)
 
         # STEP 3 of 4: Cache the intermediate output
         self.vlog(1, '**** STEP 3 of 4: Cache the intermediate output')

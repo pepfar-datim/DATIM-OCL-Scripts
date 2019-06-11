@@ -94,7 +94,7 @@ class DatimImapReferenceGenerator(datimbase.DatimBase):
         if csv_row['MOH_Disag_ID'] == datimbase.DatimBase.NULL_DISAG_ID:
             # Add null_disag from PEPFAR/DATIM-MOH source instead
             self.refs_by_collection[collection_id].append(
-                datimbase.DatimBase.NULL_DISAG_ENDPOINT)
+                datimbase.DatimBase.get_datim_moh_null_disag_endpoint(self.imap_input.period))
         else:
             # versioned_uri = DatimImapReferenceGenerator.get_versioned_concept_uri_from_export(
             #     country_source_export, csv_row['Country To Concept URI'])

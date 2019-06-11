@@ -11,7 +11,6 @@ Files:
 * tiered_support.json - Tiered site support content is static so it does not have a sync script. The content can
   simply be imported using this JSON file. Includes Concepts and Mappings for Tiered Site Support. Note that no
   repo versions and no collection references are created for Tiered Site Support
-
 """
 from ocldev.oclfleximporter import OclFlexImporter
 import settings

@@ -18,8 +18,8 @@ import datim.datimshowmoh
 # Default Script Settings
 verbosity = 0  # 0=none, 1=some, 2=all
 run_ocl_offline = False  # Set to true to use local copies of ocl exports
-export_format = datim.datimshow.DatimShow.DATIM_FORMAT_HTML
-period = 'FY19'  # e.g. FY18, FY19
+export_format = datim.datimshow.DatimShow.DATIM_FORMAT_CSV
+period = ''  # e.g. FY18, FY19
 
 # OCL Settings - JetStream Staging user=datim-admin
 oclenv = settings.ocl_api_url_staging

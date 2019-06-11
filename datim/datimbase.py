@@ -65,11 +65,13 @@ class DatimBase(object):
         DATIM_IMAP_FORMAT_HTML
     ]
 
-    # DATIM MOH Alignment Variables
-    DATIM_MOH_SOURCE_ID_BASE = 'DATIM-MOH'
+    # DATIM MOH Alignment Constants (e.g. /orgs/PEPFAR/sources/DATIM-MOH-FY18)
     DATIM_MOH_OWNER_ID = 'PEPFAR'
     DATIM_MOH_OWNER_TYPE = 'Organization'
-    DATIM_MOH_COUNTRY_OWNER = 'DATIM-MOH-xx'  # Where xx is replaced by the country code (e.g. RW)
+    DATIM_MOH_SOURCE_ID_BASE = 'DATIM-MOH'  # Fiscal year is appended to this, e.g. 'DATIM-MOH-FY18'
+
+    # DATIM MOH Country Constants (e.g. /orgs/DATIM-MOH-RW-FY18/sources/DATIM-Alignment-Indicators/)
+    DATIM_MOH_COUNTRY_OWNER = 'DATIM-MOH-xx'  # Where xx is replaced by the country code and fiscal year (e.g. RW-FY18)
     DATIM_MOH_COUNTRY_OWNER_TYPE = 'Organization'
     DATIM_MOH_COUNTRY_SOURCE_ID = 'DATIM-Alignment-Indicators'
     DATIM_MOH_CONCEPT_CLASS_DE = 'Data Element'
@@ -78,25 +80,12 @@ class DatimBase(object):
     DATIM_MOH_DATATYPE_DISAGGREGATE = 'None'
     DATIM_MOH_MAP_TYPE_HAS_OPTION = 'Has Option'
     DATIM_MOH_MAP_TYPE_COUNTRY_OPTION = 'DATIM HAS OPTION'
-    #datim_owner_id = 'PEPFAR'
-    #datim_owner_type = 'Organization'
-    #country_owner = 'DATIM-MOH-xx'
-    #country_owner_type = 'Organization'
-    #country_source_id = 'DATIM-Alignment-Indicators'
-    #concept_class_indicator = 'Indicator'
-    #concept_class_disaggregate = 'Disaggregate'
-    #map_type_datim_has_option = 'Has Option'
-    #map_type_country_has_option = 'DATIM HAS OPTION
 
-    # DATIM-MOH NULL Disag Attributes (used only by DATIM-MOH)
-    NULL_DISAG_OWNER_TYPE = 'Organization'
-    NULL_DISAG_OWNER_ID = 'PEPFAR'
-    NULL_DISAG_SOURCE_ID = 'DATIM-MOH'
+    # DATIM-MOH NULL Disag ID and Name (used only by DATIM-MOH)
     NULL_DISAG_ID = 'null-disag'
-    NULL_DISAG_ENDPOINT = '/orgs/PEPFAR/sources/DATIM-MOH/concepts/null-disag/'
     NULL_DISAG_NAME = 'Null Disaggregate'
 
-    # DATIM-MOH Default DISAG values
+    # DATIM-MOH Default/Total disag values (used only by DATIM-MOH for auto-replacement)
     DATIM_DEFAULT_DISAG_ID = 'HllvX50cXC0'
     DATIM_DEFAULT_DISAG_REPLACEMENT_NAME = 'Total'
 
@@ -451,4 +440,29 @@ class DatimBase(object):
 
     @staticmethod
     def get_datim_moh_source_id(period):
+        """
+        Get the DATIM-MOH source ID given a period (e.g. DATIM-MOH-FY18)
+        :param period:
+        :return:
+        """
         return '%s-%s' % (DatimBase.DATIM_MOH_SOURCE_ID_BASE, period)
+
+    @staticmethod
+    def get_datim_moh_source_endpoint(period):
+        """
+        Get the DATIM-MOH source endpoint given a period (e.g. /orgs/PEPFAR/sources/DATIM-MOH-FY18/)
+        :param period:
+        :return:
+        """
+        return '/%s/%s/sources/%s/' % (DatimBase.owner_type_to_stem(DatimBase.DATIM_MOH_OWNER_TYPE),
+                                       DatimBase.DATIM_MOH_OWNER_ID, DatimBase.get_datim_moh_source_id(period))
+
+    @staticmethod
+    def get_datim_moh_null_disag_endpoint(period):
+        """
+        Get the DATIM-MOH null disag endpoint for the given period (e.g.
+        /orgs/PEPFAR/sources/DATIM-MOH-FY18/concepts/null-disag/)
+        :param period:
+        :return:
+        """
+        return '%sconcepts/%s/' % (DatimBase.get_datim_moh_source_endpoint(period), DatimBase.NULL_DISAG_ID)

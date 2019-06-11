@@ -32,7 +32,7 @@ oclenv = settings.ocl_api_url_staging
 oclapitoken = settings.api_token_staging_datim_admin
 
 # Local development environment settings
-sync_mode = datim.datimsync.DatimSync.SYNC_MODE_BUILD_IMPORT_SCRIPT  # Set which operation is performed by this script
+sync_mode = datim.datimsync.DatimSync.SYNC_MODE_FULL_IMPORT  # Set which operation is performed by this script
 verbosity = 2  # 0=none, 1=some, 2=all
 import_limit = 0  # Number of resources to import; 0=all
 import_delay = 3  # Number of seconds to delay between each import request

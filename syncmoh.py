@@ -32,7 +32,7 @@ oclapitoken = settings.api_token_staging_datim_admin
 sync_mode = datim.datimsync.DatimSync.SYNC_MODE_BUILD_IMPORT_SCRIPT  # Set which operation is performed by the sync script
 verbosity = 2  # 0=none, 1=some, 2=all
 import_limit = 0  # Number of resources to import; 0=all
-import_delay = 3  # Number of seconds to delay between each import request
+import_delay = 0  # Number of seconds to delay between each import request
 compare2previousexport = False  # Set to False to ignore the previous export; set to True only after a full import
 run_dhis2_offline = False  # Set to true to use local copies of dhis2 exports
 run_ocl_offline = False  # Set to true to use local copies of ocl exports

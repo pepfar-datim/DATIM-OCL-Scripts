@@ -18,6 +18,7 @@ import requests
 import os
 import sys
 import pprint
+import time
 from requests.auth import HTTPBasicAuth
 from shutil import copyfile
 import deepdiff
@@ -751,13 +752,30 @@ class DatimSync(datimbase.DatimBase):
             self.vlog(1, 'SKIPPING: Diff check only')
 
         # STEP 10 of 12: Perform the import into OCL
-        # TODO: Switch to use OCL bulk import API
+        # TODO: Add test_mode support to bulk import
         # NOTE: This step occurs in TEST and FULL IMPORT modes
         # NOTE: Required step in "complete rebuild" mode
         self.vlog(1, '**** STEP 10 of 12: Perform the import in OCL')
         num_import_rows_processed = 0
         ocl_importer = None
-        if sync_mode in [DatimSync.SYNC_MODE_TEST_IMPORT, DatimSync.SYNC_MODE_FULL_IMPORT]:
+        if sync_mode in [DatimSync.SYNC_MODE_FULL_IMPORT]:
+            bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
+                file_path=self.attach_absolute_data_path(self.NEW_IMPORT_SCRIPT_FILENAME),
+                api_token=self.oclapitoken, api_url_root=self.oclenv)
+            task_id = bulk_import_response.json()['task']
+            import_results = ocldev.oclfleximporter.OclBulkImporter.get_bulk_import_results(
+                task_id=task_id, api_url_root=self.oclenv, api_token=self.oclapitoken,
+                delay_seconds=30, max_wait_seconds=15*60)
+            if import_results:
+                if self.verbosity:
+                    self.vlog(self.verbosity, import_results.display_report())
+            else:
+                # TODO: Need smarter way to handle long running bulk import than just quitting
+                msg = 'Import is still processing... QUITTING'
+                self.log(msg)
+                raise Exception(msg)
+
+            """
             test_mode = False
             if sync_mode == DatimSync.SYNC_MODE_TEST_IMPORT:
                 test_mode = True
@@ -767,7 +785,10 @@ class DatimSync(datimbase.DatimBase):
                 do_update_if_exists=False, verbosity=self.verbosity, limit=self.import_limit,
                 import_delay=self.import_delay)
             num_import_rows_processed = ocl_importer.process()
+            """
             self.vlog(1, 'Import records processed:', num_import_rows_processed)
+        elif sync_mode == DatimSync.SYNC_MODE_TEST_IMPORT:
+            self.vlog(1, 'SKIPPING: Test mode...')
         elif sync_mode == DatimSync.SYNC_MODE_DIFF_ONLY:
             self.vlog(1, 'SKIPPING: Diff check only...')
         elif sync_mode == DatimSync.SYNC_MODE_BUILD_IMPORT_SCRIPT:

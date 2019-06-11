@@ -65,11 +65,10 @@ class DatimImapImport(datimbase.DatimBase):
             self.vlog(1, msg)
             raise Exception(msg)
 
-        # STEP 1 of 12: Download PEPFAR DATIM metadata export for specified period from OCL
+        # STEP 1 of 12: Download /orgs/PEPFAR/sources/DATIM-MOH-FY##/ export for specified period from OCL
         self.vlog(1, '**** STEP 1 of 12: Download PEPFAR/DATIM-MOH-FY## metadata export from OCL')
-        self.datim_moh_source_id = '%s-%s' % (self.DATIM_MOH_SOURCE_ID_BASE, imap_input.period)
-        datim_owner_endpoint = '/orgs/%s/' % self.DATIM_MOH_OWNER_ID
-        datim_source_endpoint = '%ssources/%s/' % (datim_owner_endpoint, self.datim_moh_source_id)
+        self.datim_moh_source_id = datimbase.DatimBase.get_datim_moh_source_id(imap_input.period)
+        datim_source_endpoint = datimbase.DatimBase.get_datim_moh_source_endpoint(imap_input.period)
         datim_source_version = self.get_latest_version_for_period(
             repo_endpoint=datim_source_endpoint, period=imap_input.period)
         if not datim_source_version:
@@ -244,8 +243,9 @@ class DatimImapImport(datimbase.DatimBase):
                     self.vlog(self.verbosity, import_results.display_report())
             else:
                 # TODO: Need smarter way to handle long running bulk import than just quitting
-                print 'Import is still processing... QUITTING'
-                sys.exit(1)
+                msg = 'Import is still processing... QUITTING'
+                self.log(msg)
+                raise Exception(msg)
         elif self.test_mode:
             self.vlog(1, 'Test mode! Skipping import...')
         else:
@@ -343,8 +343,9 @@ class DatimImapImport(datimbase.DatimBase):
                 self.vlog(1, ref_import_results.display_report())
             else:
                 # TODO: Need smarter way to handle long running bulk import than just quitting
-                print 'Reference import is still processing... QUITTING'
-                sys.exit(1)
+                msg = 'Reference import is still processing... QUITTING'
+                self.log(msg)
+                raise Exception(msg)
         elif self.test_mode:
             self.vlog(1, 'SKIPPING: No collections to update in test mode...')
         else:

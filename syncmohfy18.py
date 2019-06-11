@@ -29,10 +29,10 @@ oclenv = settings.ocl_api_url_staging
 oclapitoken = settings.api_token_staging_datim_admin
 
 # Local development environment settings
-sync_mode = datim.datimsync.DatimSync.SYNC_MODE_FULL_IMPORT  # Set which sync operation is performed
+sync_mode = datim.datimsync.DatimSync.SYNC_MODE_BUILD_IMPORT_SCRIPT  # Set which sync operation is performed
 verbosity = 2  # 0=none, 1=some, 2=all
 import_limit = 0  # Number of resources to import; 0=all
-import_delay = 1  # Number of seconds to delay between each import request
+import_delay = 0  # Number of seconds to delay between each import request
 compare2previousexport = False  # Set to False to ignore the previous export; set to True only after a full import
 run_dhis2_offline = False  # Set to true to use local copies of dhis2 exports
 run_ocl_offline = False  # Set to true to use local copies of ocl exports
@@ -46,17 +46,17 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
     oclenv = os.environ['OCL_ENV']
     oclapitoken = os.environ['OCL_API_TOKEN']
     if "IMPORT_LIMIT" in os.environ:
-      import_limit = os.environ['IMPORT_LIMIT']
+        import_limit = os.environ['IMPORT_LIMIT']
     if "IMPORT_DELAY" in os.environ:
-      import_delay = float(os.environ['IMPORT_DELAY'])
+        import_delay = float(os.environ['IMPORT_DELAY'])
     if "COMPARE_PREVIOUS_EXPORT" in os.environ:
-      compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
+        compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']
     if "SYNC_MODE" in os.environ:
-      sync_mode = os.environ['SYNC_MODE']
+        sync_mode = os.environ['SYNC_MODE']
     if "RUN_DHIS2_OFFLINE" in os.environ:
-      run_dhis2_offline = os.environ['RUN_DHIS2_OFFLINE'] in ['true', 'True']
+        run_dhis2_offline = os.environ['RUN_DHIS2_OFFLINE'] in ['true', 'True']
     if "RUN_OCL_OFFLINE" in os.environ:
-      run_ocl_offline = os.environ['RUN_OCL_OFFLINE'] in ['true', 'True']
+        run_ocl_offline = os.environ['RUN_OCL_OFFLINE'] in ['true', 'True']
 
 # Create sync object and run
 datim_sync = datim.datimsyncmohfy18.DatimSyncMohFy18(

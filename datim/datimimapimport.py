@@ -91,12 +91,11 @@ class DatimImapImport(datimbase.DatimBase):
         # NOTE: This currently just verifies that the correct columns exist (order agnostic)
         # TODO: Validate that DATIM indicator/disag IDs in the provided IMAP are valid
         self.vlog(1, '**** STEP 2 of 12: Validate input country mapping CSV file')
-        if imap_input.is_valid():
-            self.vlog(1, 'Required fields are defined in the provided IMAP CSV')
+        is_valid = imap_input.is_valid()
+        if type(is_valid) == str:
+            self.vlog(1, 'The following warnings were found in the provided IMAP CSV:\n%s' % is_valid)
         else:
-            msg = 'Missing required fields in the provided IMAP CSV'
-            self.vlog(1, msg)
-            raise Exception(msg)
+            self.vlog(1, 'The provided IMAP CSV passed validation')
 
         # STEP 3 of 12: Fetch latest available IMAP export from OCL for the specified country
         self.vlog(1, '**** STEP 3 of 12: Fetch latest available IMAP export from OCL for the specified country')

@@ -381,19 +381,66 @@ class DatimImap(object):
         :return:
         """
         # TODO: Update DatimImap.is_valid to work with new get_row model
-        if self.__imap_data:
-            line_number = 0
-            for row in self.__imap_data:
-                line_number += 1
-                for field_name in self.IMAP_IMPORT_FIELD_NAMES:
-                    if field_name not in row:
-                        if throw_exception_on_error:
-                            raise Exception("Missing field '%s' on row %s of input file" % (
-                                field_name, line_number))
-                        else:
-                            return False
+
+        warnings = []
+        errors = []
+        if not self.__imap_data:
             return True
-        return False
+
+        # Check for missing fields
+        line_number = 0
+        for row in self.__imap_data:
+            line_number += 1
+            for field_name in self.IMAP_IMPORT_FIELD_NAMES:
+                if field_name not in row:
+                    errors.append("ERROR: Missing field '%s' on row %s of input file" % (field_name, line_number))
+
+        # Check for reused ID between disag and indicator column
+        # NOTE: ID can be reused within th same column, but not between columns
+        disag_id = {}
+        indicator_id = {}
+        for row in self.__imap_data:
+            if self.IMAP_FIELD_MOH_DISAG_ID in row and row[self.IMAP_FIELD_MOH_DISAG_ID]:
+                disag_id[row[self.IMAP_FIELD_MOH_DISAG_ID]] = True
+            if self.IMAP_FIELD_MOH_INDICATOR_ID in row and row[self.IMAP_FIELD_MOH_INDICATOR_ID]:
+                indicator_id[row[self.IMAP_FIELD_MOH_INDICATOR_ID]] = True
+        reused_ids = disag_id.viewkeys() & indicator_id.viewkeys()
+        for reused_id in reused_ids:
+            errors.append('ERROR: ID "%s" cannot be reused in both the "%s" and "%s" columns' % (
+                reused_id, self.IMAP_FIELD_MOH_DISAG_ID, self.IMAP_FIELD_MOH_INDICATOR_ID))
+
+        # Check for reused IDs with different names in MOH indicator or disag columns
+        disag_id = {}
+        id_warnings = {}
+        indicator_id = {}
+        for row in self.__imap_data:
+            if self.IMAP_FIELD_MOH_DISAG_ID in row and self.IMAP_FIELD_MOH_DISAG_NAME in row and row[self.IMAP_FIELD_MOH_DISAG_ID]:
+                if row[self.IMAP_FIELD_MOH_DISAG_ID] in disag_id:
+                    if disag_id[row[self.IMAP_FIELD_MOH_DISAG_ID]] != row[self.IMAP_FIELD_MOH_DISAG_NAME]:
+                        id_warnings[row[self.IMAP_FIELD_MOH_DISAG_ID]] = 'WARNING: Mismatch in names for country disaggregate with ID "%s". Only the last name matching this ID will be used.' % row[self.IMAP_FIELD_MOH_DISAG_ID]
+                else:
+                    disag_id[row[self.IMAP_FIELD_MOH_DISAG_ID]] = row[self.IMAP_FIELD_MOH_DISAG_NAME]
+            if self.IMAP_FIELD_MOH_INDICATOR_ID in row and self.IMAP_FIELD_MOH_INDICATOR_NAME in row and row[self.IMAP_FIELD_MOH_INDICATOR_ID]:
+                if row[self.IMAP_FIELD_MOH_INDICATOR_ID] in indicator_id:
+                    if indicator_id[row[self.IMAP_FIELD_MOH_INDICATOR_ID]] != row[self.IMAP_FIELD_MOH_INDICATOR_NAME]:
+                        id_warnings[row[self.IMAP_FIELD_MOH_INDICATOR_ID]] = 'WARNING: Mismatch in names for country indicator with ID "%s". Only the last name matching this ID will be used.' % row[self.IMAP_FIELD_MOH_INDICATOR_ID]
+                else:
+                    indicator_id[row[self.IMAP_FIELD_MOH_INDICATOR_ID]] = row[self.IMAP_FIELD_MOH_INDICATOR_NAME]
+        for id_warning_key in id_warnings:
+            warnings.append(id_warnings[id_warning_key])
+
+        # Handle errors
+        msg = ''
+        for error_msg in errors:
+            msg += error_msg + '\n'
+        for warning_msg in warnings:
+            msg += warning_msg + '\n'
+        if errors:
+            if throw_exception_on_error:
+                raise Exception(msg)
+            else:
+                return False
+        return True
 
     def display(self, fmt=DATIM_IMAP_FORMAT_CSV, sort=False, exclude_empty_maps=False, include_extra_info=False,
                 auto_fix_null_disag=False, show_null_disag_as_blank=True):

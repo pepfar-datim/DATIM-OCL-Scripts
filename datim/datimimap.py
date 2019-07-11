@@ -50,25 +50,47 @@ class DatimImap(object):
     IMAP_EXPORT_FIELD_NAMES = list(IMAP_IMPORT_FIELD_NAMES) + [IMAP_FIELD_MOH_CLASSIFICATION]
 
     # Additional fields generated and used by OCL to support the import process
+    IMAP_EXTRA_FIELD_MODIFIED_MOH_INDICATOR_ID = 'Modified MOH_Indicator_ID'
+    IMAP_EXTRA_FIELD_MODIFIED_MOH_DISAG_ID = 'Modified MOH_Disag_ID'
+    IMAP_EXTRA_FIELD_MOH_COLLECTION_ID = 'Country Collection ID'
+    IMAP_EXTRA_FIELD_MOH_MAP_TYPE = 'Country Map Type'
+    IMAP_EXTRA_FIELD_MOH_COLLECTION_NAME = 'Country Collection Name'
+    IMAP_EXTRA_FIELD_MOH_FROM_CONCEPT_URI = 'Country From Concept URI'
+    IMAP_EXTRA_FIELD_MOH_TO_CONCEPT_URI = 'Country To Concept URI'
+    IMAP_EXTRA_FIELD_DATIM_FROM_CONCEPT_URI = 'DATIM From Concept URI'
+    IMAP_EXTRA_FIELD_DATIM_TO_CONCEPT_URI = 'DATIM To Concept URI'
+    IMAP_EXTRA_FIELD_DATIM_DISAG_NAME_CLEAN = 'DATIM_Disag_Name_Clean'
+    IMAP_EXTRA_FIELD_DATIM_OWNER_TYPE = 'DATIM Owner Type'
+    IMAP_EXTRA_FIELD_DATIM_OWNER_ID = 'DATIM Owner ID'
+    IMAP_EXTRA_FIELD_DATIM_SOURCE_ID = 'DATIM Source ID'
+    IMAP_EXTRA_FIELD_DATIM_MAP_TYPE = 'DATIM Map Type'
+    IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_OWNER_TYPE = 'Country Data Element Owner Type'
+    IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_OWNER_ID = 'Country Data Element Owner ID'
+    IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_SOURCE_ID = 'Country Data Element Source ID'
+    IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_TYPE = 'Country Disaggregate Owner Type'
+    IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_ID = 'Country Disaggregate Owner ID'
+    IMAP_EXTRA_FIELD_MOH_DISAG_SOURCE_ID = 'Country Disaggregate Source ID'
     IMAP_EXTRA_FIELD_NAMES = [
-        'Country Collection ID',
-        'Country Map Type',
-        'Country Collection Name',
-        'Country To Concept URI',
-        'DATIM From Concept URI',
-        'Country From Concept URI',
-        'DATIM To Concept URI',
-        'DATIM_Disag_Name_Clean',
-        'DATIM Owner Type',
-        'DATIM Owner ID',
-        'DATIM Source ID',
-        'DATIM Map Type',
-        'Country Data Element Owner Type',
-        'Country Data Element Owner ID',
-        'Country Data Element Source ID',
-        'Country Disaggregate Owner Type',
-        'Country Disaggregate Owner ID',
-        'Country Disaggregate Source ID',
+        IMAP_EXTRA_FIELD_MODIFIED_MOH_INDICATOR_ID,
+        IMAP_EXTRA_FIELD_MODIFIED_MOH_DISAG_ID,
+        IMAP_EXTRA_FIELD_MOH_COLLECTION_ID,
+        IMAP_EXTRA_FIELD_MOH_MAP_TYPE,
+        IMAP_EXTRA_FIELD_MOH_COLLECTION_NAME,
+        IMAP_EXTRA_FIELD_MOH_TO_CONCEPT_URI,
+        IMAP_EXTRA_FIELD_DATIM_FROM_CONCEPT_URI,
+        IMAP_EXTRA_FIELD_MOH_FROM_CONCEPT_URI,
+        IMAP_EXTRA_FIELD_DATIM_TO_CONCEPT_URI,
+        IMAP_EXTRA_FIELD_DATIM_DISAG_NAME_CLEAN,
+        IMAP_EXTRA_FIELD_DATIM_OWNER_TYPE,
+        IMAP_EXTRA_FIELD_DATIM_OWNER_ID,
+        IMAP_EXTRA_FIELD_DATIM_SOURCE_ID,
+        IMAP_EXTRA_FIELD_DATIM_MAP_TYPE,
+        IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_OWNER_TYPE,
+        IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_OWNER_ID,
+        IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_SOURCE_ID,
+        IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_TYPE,
+        IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_ID,
+        IMAP_EXTRA_FIELD_MOH_DISAG_SOURCE_ID,
     ]
 
     # Name of custom attribute in DATIM_MOH indicator concepts in OCL that contains the indicator category value
@@ -86,20 +108,15 @@ class DatimImap(object):
         DATIM_IMAP_FORMAT_HTML
     ]
 
+    # Prefixes added to country data element/disag IDs in OCL to allow reuse of IDs by different resource types
+    IMAP_MOH_DATA_ELEMENT_ID_PREFIX = 'de-'
+    IMAP_MOH_DISAG_ID_PREFIX = 'disag-'
+
+    # Country operation map type postfix
+    IMAP_MOH_MAP_TYPE_OPERATION_POSTFIX = ' OPERATION'
+
     # Set to True to treat equal MOH_Indicator_ID and MOH_Disag_ID values in the same row as a null MOH disag
     SET_EQUAL_MOH_ID_TO_NULL_DISAG = False
-
-    # NOT IMPLEMENTED - May use these to configure handling of null disags for individual IMAP resources
-    """
-    DATIM_EMPTY_DISAG_MODE_NULL = 'null'
-    DATIM_EMPTY_DISAG_MODE_BLANK = 'blank'
-    DATIM_EMPTY_DISAG_MODE_RAW = 'raw'
-    DATIM_EMPTY_DISAG_MODES = [
-        DATIM_EMPTY_DISAG_MODE_NULL,
-        DATIM_EMPTY_DISAG_MODE_BLANK,
-        DATIM_EMPTY_DISAG_MODE_RAW
-    ]
-    """
 
     def __init__(self, country_code='', country_org='', country_name='', period='',
                  imap_data=None, do_add_columns_to_csv=True):
@@ -376,7 +393,8 @@ class DatimImap(object):
 
     def is_valid(self, throw_exception_on_error=True):
         """
-        This method really needs some work...
+        Return whether the DatimImap mappings are valid. Checks that required fields are defined and that names match
+        when an ID is reused.
         :param throw_exception_on_error:
         :return:
         """
@@ -395,6 +413,7 @@ class DatimImap(object):
                 if field_name not in row:
                     errors.append("ERROR: Missing field '%s' on row %s of input file" % (field_name, line_number))
 
+        '''JP 2019-07-11: Removing this check because IDs can now be reused between disag and indicator columns
         # Check for reused ID between disag and indicator column
         # NOTE: ID can be reused within th same column, but not between columns
         disag_id = {}
@@ -408,6 +427,7 @@ class DatimImap(object):
         for reused_id in reused_ids:
             errors.append('ERROR: ID "%s" cannot be reused in both the "%s" and "%s" columns' % (
                 reused_id, self.IMAP_FIELD_MOH_DISAG_ID, self.IMAP_FIELD_MOH_INDICATOR_ID))
+        '''
 
         # Check for reused IDs with different names in MOH indicator or disag columns
         disag_id = {}
@@ -528,72 +548,80 @@ class DatimImap(object):
         if not row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID]:
             return row
 
+        # Create the modified MOH indicator+disag IDs
+        # NOTE: These are modified so that an MOH indicator and disag may reuse the same ID
+        if row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID]:
+            row[DatimImap.IMAP_EXTRA_FIELD_MODIFIED_MOH_INDICATOR_ID] = '%s%s' % (
+                DatimImap.IMAP_MOH_DATA_ELEMENT_ID_PREFIX, row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID])
+        if row[DatimImap.IMAP_FIELD_MOH_DISAG_ID]:
+            row[DatimImap.IMAP_EXTRA_FIELD_MODIFIED_MOH_DISAG_ID] = '%s%s' % (
+                DatimImap.IMAP_MOH_DISAG_ID_PREFIX, row[DatimImap.IMAP_FIELD_MOH_DISAG_ID])
+
         # Set DATIM attributes
         datim_moh_source_id = datimbase.DatimBase.get_datim_moh_source_id(self.period)
-        # datim_moh_source_id = '%s-%s' % (datimbase.DatimBase.DATIM_MOH_SOURCE_ID_BASE, self.period)
-        row['DATIM Owner Type'] = datimbase.DatimBase.DATIM_MOH_OWNER_TYPE
-        row['DATIM Owner ID'] = datimbase.DatimBase.DATIM_MOH_OWNER_ID
-        row['DATIM Source ID'] = datim_moh_source_id
-        datim_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(row['DATIM Owner Type'])
+        row[DatimImap.IMAP_EXTRA_FIELD_DATIM_OWNER_TYPE] = datimbase.DatimBase.DATIM_MOH_OWNER_TYPE
+        row[DatimImap.IMAP_EXTRA_FIELD_DATIM_OWNER_ID] = datimbase.DatimBase.DATIM_MOH_OWNER_ID
+        row[DatimImap.IMAP_EXTRA_FIELD_DATIM_SOURCE_ID] = datim_moh_source_id
+        datim_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(row[DatimImap.IMAP_EXTRA_FIELD_DATIM_OWNER_TYPE])
 
         # Set country data element attributes
-        row['Country Data Element Owner Type'] = datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE
-        row['Country Data Element Owner ID'] = self.country_org
-        row['Country Data Element Source ID'] = datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID
+        row[DatimImap.IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_OWNER_TYPE] = datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE
+        row[DatimImap.IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_OWNER_ID] = self.country_org
+        row[DatimImap.IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_SOURCE_ID] = datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID
         country_data_element_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(
-            row['Country Data Element Owner Type'])
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_OWNER_TYPE])
 
         # Set country disag attributes, handling the null disag case
         if DatimImap.is_null_disag_row(row):
-            row['Country Disaggregate Owner Type'] = datimbase.DatimBase.DATIM_MOH_OWNER_TYPE
-            row['Country Disaggregate Owner ID'] = datimbase.DatimBase.DATIM_MOH_OWNER_ID
-            row['Country Disaggregate Source ID'] = datim_moh_source_id
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_TYPE] = datimbase.DatimBase.DATIM_MOH_OWNER_TYPE
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_ID] = datimbase.DatimBase.DATIM_MOH_OWNER_ID
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_SOURCE_ID] = datim_moh_source_id
             moh_disag_id = datimbase.DatimBase.NULL_DISAG_ID
             moh_disag_name = datimbase.DatimBase.NULL_DISAG_NAME
         else:
-            row['Country Disaggregate Owner Type'] = datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE
-            row['Country Disaggregate Owner ID'] = self.country_org
-            row['Country Disaggregate Source ID'] = datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID
-            moh_disag_id = row[DatimImap.IMAP_FIELD_MOH_DISAG_ID]
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_TYPE] = datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_ID] = self.country_org
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_SOURCE_ID] = datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID
+            moh_disag_id = row[DatimImap.IMAP_EXTRA_FIELD_MODIFIED_MOH_DISAG_ID]
             moh_disag_name = row[DatimImap.IMAP_FIELD_MOH_DISAG_NAME]
         country_disaggregate_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(
-            row['Country Disaggregate Owner Type'])
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_TYPE])
 
         # Build the collection name
         # TODO: The country collection name should only be used if a collection has not already been defined
         country_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(
             datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE)
-        row['DATIM_Disag_Name_Clean'] = '_'.join(
+        row[DatimImap.IMAP_EXTRA_FIELD_DATIM_DISAG_NAME_CLEAN] = '_'.join(
             row[DatimImap.IMAP_FIELD_DATIM_DISAG_NAME].replace('>', ' gt ').replace('<', ' lt ').
                 replace('|', ' ').replace('+', ' plus ').split())
-        row['Country Collection Name'] = row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID] + ': ' + row[
+        row[DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_NAME] = row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID] + ': ' + row[
             DatimImap.IMAP_FIELD_DATIM_DISAG_NAME]
 
         # Build the collection ID, replacing the default disag ID from DHIS2 with plain English (i.e. Total)
         if row[DatimImap.IMAP_FIELD_DATIM_DISAG_ID] == datimbase.DatimBase.DATIM_DEFAULT_DISAG_ID:
-            row['Country Collection ID'] = (
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_ID] = (
                 row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID] + '_' + datimbase.DatimBase.DATIM_DEFAULT_DISAG_REPLACEMENT_NAME).replace('_', '-')
         else:
-            row['Country Collection ID'] = (
-                row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID] + '_' + row['DATIM_Disag_Name_Clean']).replace('_', '-')
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_ID] = (
+                row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID] + '_' + row[DatimImap.IMAP_EXTRA_FIELD_DATIM_DISAG_NAME_CLEAN]).replace('_', '-')
 
         # DATIM mapping
-        row['DATIM From Concept URI'] = '/%s/%s/sources/%s/concepts/%s/' % (
+        row[DatimImap.IMAP_EXTRA_FIELD_DATIM_FROM_CONCEPT_URI] = '/%s/%s/sources/%s/concepts/%s/' % (
             datim_owner_type_url_part, datimbase.DatimBase.DATIM_MOH_OWNER_ID,
             datim_moh_source_id, row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID])
-        row['DATIM To Concept URI'] = '/%s/%s/sources/%s/concepts/%s/' % (
+        row[DatimImap.IMAP_EXTRA_FIELD_DATIM_TO_CONCEPT_URI] = '/%s/%s/sources/%s/concepts/%s/' % (
             datim_owner_type_url_part, datimbase.DatimBase.DATIM_MOH_OWNER_ID,
             datim_moh_source_id, row[DatimImap.IMAP_FIELD_DATIM_DISAG_ID])
-        row['DATIM Map Type'] = datimbase.DatimBase.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION
+        row[DatimImap.IMAP_EXTRA_FIELD_DATIM_MAP_TYPE] = datimbase.DatimBase.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION
 
         # Country mapping
-        row['Country Map Type'] = row[DatimImap.IMAP_FIELD_OPERATION] + ' OPERATION'
-        row['Country From Concept URI'] = '/%s/%s/sources/%s/concepts/%s/' % (
+        row[DatimImap.IMAP_EXTRA_FIELD_MOH_MAP_TYPE] = row[DatimImap.IMAP_FIELD_OPERATION] + DatimImap.IMAP_MOH_MAP_TYPE_OPERATION_POSTFIX
+        row[DatimImap.IMAP_EXTRA_FIELD_MOH_FROM_CONCEPT_URI] = '/%s/%s/sources/%s/concepts/%s/' % (
             country_data_element_owner_type_url_part, self.country_org,
-            datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID, row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID])
-        row['Country To Concept URI'] = '/%s/%s/sources/%s/concepts/%s/' % (
-            country_disaggregate_owner_type_url_part, row['Country Disaggregate Owner ID'],
-            row['Country Disaggregate Source ID'], moh_disag_id)
+            datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID, row[DatimImap.IMAP_EXTRA_FIELD_MODIFIED_MOH_INDICATOR_ID])
+        row[DatimImap.IMAP_EXTRA_FIELD_MOH_TO_CONCEPT_URI] = '/%s/%s/sources/%s/concepts/%s/' % (
+            country_disaggregate_owner_type_url_part, row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_ID],
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_SOURCE_ID], moh_disag_id)
 
         return row
 
@@ -789,7 +817,6 @@ class DatimImapFactory(object):
         print(r)
         return True
 
-
     @staticmethod
     def get_repo_latest_period_version(repo_url='', period='', oclapitoken='', released=True):
         """
@@ -802,7 +829,7 @@ class DatimImapFactory(object):
             'Authorization': 'Token ' + oclapitoken,
             'Content-Type': 'application/json'
         }
-        repo_versions_url = '%sversions/?limit=100' % (repo_url)
+        repo_versions_url = '%sversions/?limit=100' % repo_url
         r = requests.get(repo_versions_url, headers=oclapiheaders)
         r.raise_for_status()
         repo_versions = r.json()
@@ -1196,7 +1223,6 @@ class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConver
     CSV_RESOURCE_DEF_MOH_DATIM_MAPPING_RETIRED = 'MOH-Datim-Mapping-Retired'
     CSV_RESOURCE_DEF_MOH_OPERATION_MAPPING_RETIRED = 'MOH-Mapping-Operation-Retired'
 
-
     @staticmethod
     def get_country_csv_resource_definitions(country_owner='', country_owner_type='',
                                              country_source='', datim_map_type='', defs=None):
@@ -1213,70 +1239,70 @@ class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConver
             {
                 'definition_name': DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_INDICATOR,
                 'is_active': True,
-                'resource_type':'Concept',
-                'id_column':DatimImap.IMAP_FIELD_MOH_INDICATOR_ID,
-                'skip_if_empty_column':DatimImap.IMAP_FIELD_MOH_INDICATOR_ID,
-                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS:[
-                    {'resource_field':'concept_class', 'value':datimbase.DatimBase.DATIM_MOH_CONCEPT_CLASS_DE},
-                    {'resource_field':'datatype', 'value':datimbase.DatimBase.DATIM_MOH_DATATYPE_DE},
-                    {'resource_field':'owner', 'column':'Country Data Element Owner ID'},
-                    {'resource_field':'owner_type', 'column':'Country Data Element Owner Type'},
-                    {'resource_field':'source', 'column':'Country Data Element Source ID'},
-                    {'resource_field':'retired', 'value':False},
+                'resource_type': 'Concept',
+                'id_column': DatimImap.IMAP_EXTRA_FIELD_MODIFIED_MOH_INDICATOR_ID,
+                'skip_if_empty_column': DatimImap.IMAP_FIELD_MOH_INDICATOR_ID,
+                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS: [
+                    {'resource_field': 'concept_class', 'value': datimbase.DatimBase.DATIM_MOH_CONCEPT_CLASS_DE},
+                    {'resource_field': 'datatype', 'value': datimbase.DatimBase.DATIM_MOH_DATATYPE_DE},
+                    {'resource_field': 'owner', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_OWNER_ID},
+                    {'resource_field': 'owner_type', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_OWNER_TYPE},
+                    {'resource_field': 'source', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_SOURCE_ID},
+                    {'resource_field': 'retired', 'value': False},
                 ],
-                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_SUB_RESOURCES:{
+                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_SUB_RESOURCES: {
                     'names':[
                         [
-                            {'resource_field':'name', 'column':DatimImap.IMAP_FIELD_MOH_INDICATOR_NAME},
-                            {'resource_field':'locale', 'value':'en'},
-                            {'resource_field':'locale_preferred', 'value':'True'},
-                            {'resource_field':'name_type', 'value':'Fully Specified'},
+                            {'resource_field': 'name', 'column': DatimImap.IMAP_FIELD_MOH_INDICATOR_NAME},
+                            {'resource_field': 'locale', 'value': 'en'},
+                            {'resource_field': 'locale_preferred', 'value': 'True'},
+                            {'resource_field': 'name_type', 'value': 'Fully Specified'},
                         ],
                     ],
-                    'descriptions':[]
+                    'descriptions': []
                 },
             },
             {
                 'definition_name': DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_DISAG,
                 'is_active': True,
-                'resource_type':'Concept',
-                'id_column':DatimImap.IMAP_FIELD_MOH_DISAG_ID,
-                'skip_if_empty_column':DatimImap.IMAP_FIELD_MOH_DISAG_ID,
-                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS:[
-                    {'resource_field':'concept_class', 'value':datimbase.DatimBase.DATIM_MOH_CONCEPT_CLASS_DISAGGREGATE},
-                    {'resource_field':'datatype', 'value':datimbase.DatimBase.DATIM_MOH_DATATYPE_DISAGGREGATE},
-                    {'resource_field':'owner', 'column':'Country Disaggregate Owner ID'},
-                    {'resource_field':'owner_type', 'column':'Country Disaggregate Owner Type'},
-                    {'resource_field':'source', 'column':'Country Disaggregate Source ID'},
-                    {'resource_field':'retired', 'value':False},
+                'resource_type': 'Concept',
+                'id_column': DatimImap.IMAP_EXTRA_FIELD_MODIFIED_MOH_DISAG_ID,
+                'skip_if_empty_column': DatimImap.IMAP_FIELD_MOH_DISAG_ID,
+                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS: [
+                    {'resource_field': 'concept_class', 'value': datimbase.DatimBase.DATIM_MOH_CONCEPT_CLASS_DISAGGREGATE},
+                    {'resource_field': 'datatype', 'value': datimbase.DatimBase.DATIM_MOH_DATATYPE_DISAGGREGATE},
+                    {'resource_field': 'owner', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_ID},
+                    {'resource_field': 'owner_type', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_TYPE},
+                    {'resource_field': 'source', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_SOURCE_ID},
+                    {'resource_field': 'retired', 'value': False},
                 ],
-                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_SUB_RESOURCES:{
+                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_SUB_RESOURCES: {
                     'names':[
                         [
-                            {'resource_field':'name', 'column':DatimImap.IMAP_FIELD_MOH_DISAG_NAME},
-                            {'resource_field':'locale', 'value':'en'},
-                            {'resource_field':'locale_preferred', 'value':'True'},
-                            {'resource_field':'name_type', 'value':'Fully Specified'},
+                            {'resource_field': 'name', 'column': DatimImap.IMAP_FIELD_MOH_DISAG_NAME},
+                            {'resource_field': 'locale', 'value': 'en'},
+                            {'resource_field': 'locale_preferred', 'value': 'True'},
+                            {'resource_field': 'name_type', 'value': 'Fully Specified'},
                         ],
                     ],
-                    'descriptions':[]
+                    'descriptions': []
                 },
             },
             {
                 'definition_name': DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_DATIM_MAPPING,
                 'is_active': True,
-                'resource_type':'Mapping',
-                'id_column':None,
-                'skip_if_empty_column':DatimImap.IMAP_FIELD_MOH_DISAG_ID,
-                'internal_external': {'value':ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.INTERNAL_MAPPING_ID},
-                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS:[
-                    {'resource_field':'from_concept_url', 'column':'DATIM From Concept URI'},
-                    {'resource_field':'map_type', 'value':datim_map_type},
-                    {'resource_field':'to_concept_url', 'column':'DATIM To Concept URI'},
-                    {'resource_field':'owner', 'value':country_owner},
-                    {'resource_field':'owner_type', 'value':country_owner_type},
-                    {'resource_field':'source', 'value':country_source},
-                    {'resource_field':'retired', 'value':False},
+                'resource_type': 'Mapping',
+                'id_column': None,
+                'skip_if_empty_column': DatimImap.IMAP_FIELD_MOH_DISAG_ID,
+                'internal_external': {'value': ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.INTERNAL_MAPPING_ID},
+                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS: [
+                    {'resource_field': 'from_concept_url', 'column': DatimImap.IMAP_EXTRA_FIELD_DATIM_FROM_CONCEPT_URI},
+                    {'resource_field': 'map_type', 'value': datim_map_type},
+                    {'resource_field': 'to_concept_url', 'column': DatimImap.IMAP_EXTRA_FIELD_DATIM_TO_CONCEPT_URI},
+                    {'resource_field': 'owner', 'value': country_owner},
+                    {'resource_field': 'owner_type', 'value': country_owner_type},
+                    {'resource_field': 'source', 'value': country_source},
+                    {'resource_field': 'retired', 'value': False},
                 ]
             },
             {
@@ -1285,27 +1311,27 @@ class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConver
                 'resource_type': 'Mapping',
                 'id_column': None,
                 'skip_if_empty_column': DatimImap.IMAP_FIELD_OPERATION,
-                'internal_external': {'value':ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.INTERNAL_MAPPING_ID},
-                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS:[
-                    {'resource_field':'from_concept_url', 'column':'Country From Concept URI'},
-                    {'resource_field':'map_type', 'column':'Country Map Type'},
-                    {'resource_field':'to_concept_url', 'column':'Country To Concept URI'},
-                    {'resource_field':'owner', 'value':country_owner},
-                    {'resource_field':'owner_type', 'value':country_owner_type},
-                    {'resource_field':'source', 'value':country_source},
-                    {'resource_field':'retired', 'value':False},
+                'internal_external': {'value': ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.INTERNAL_MAPPING_ID},
+                ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS: [
+                    {'resource_field': 'from_concept_url', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_FROM_CONCEPT_URI},
+                    {'resource_field': 'map_type', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_MAP_TYPE},
+                    {'resource_field': 'to_concept_url', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_TO_CONCEPT_URI},
+                    {'resource_field': 'owner', 'value': country_owner},
+                    {'resource_field': 'owner_type', 'value': country_owner_type},
+                    {'resource_field': 'source', 'value': country_source},
+                    {'resource_field': 'retired', 'value': False},
                 ]
             },
             {
                 'definition_name': DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_OPERATION_MAPPING_RETIRED,
-                'is_active': True,
+                'is_active': False,
                 'resource_type': 'Mapping',
                 'id_column': None,
                 'internal_external': {'value': ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.INTERNAL_MAPPING_ID},
                 ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS: [
-                    {'resource_field': 'from_concept_url', 'column': 'Country From Concept URI'},
-                    {'resource_field': 'map_type', 'column': 'Country Map Type'},
-                    {'resource_field': 'to_concept_url', 'column': 'Country To Concept URI'},
+                    {'resource_field': 'from_concept_url', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_FROM_CONCEPT_URI},
+                    {'resource_field': 'map_type', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_MAP_TYPE},
+                    {'resource_field': 'to_concept_url', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_TO_CONCEPT_URI},
                     {'resource_field': 'owner', 'value': country_owner},
                     {'resource_field': 'owner_type', 'value': country_owner_type},
                     {'resource_field': 'source', 'value': country_source},
@@ -1319,16 +1345,16 @@ class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConver
                 'id_column': 'Country Collection ID',
                 'skip_if_empty_column': 'Country Collection ID',
                 ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS: [
-                    {'resource_field':'full_name', 'column':'Country Collection Name'},
-                    {'resource_field':'name', 'column':'Country Collection Name'},
-                    {'resource_field':'short_code', 'column':'Country Collection ID'},
-                    {'resource_field':'collection_type', 'value':'Subset'},
-                    {'resource_field':'supported_locales', 'value':'en'},
-                    {'resource_field':'public_access', 'value':'View'},
-                    {'resource_field':'default_locale', 'value':'en'},
-                    {'resource_field':'description', 'value':''},
-                    {'resource_field':'owner', 'value':country_owner},
-                    {'resource_field':'owner_type', 'value':country_owner_type},
+                    {'resource_field': 'full_name', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_NAME},
+                    {'resource_field': 'name', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_NAME},
+                    {'resource_field': 'short_code', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_ID},
+                    {'resource_field': 'collection_type', 'value': 'Subset'},
+                    {'resource_field': 'supported_locales', 'value': 'en'},
+                    {'resource_field': 'public_access', 'value': 'View'},
+                    {'resource_field': 'default_locale', 'value': 'en'},
+                    {'resource_field': 'description', 'value': ''},
+                    {'resource_field': 'owner', 'value': country_owner},
+                    {'resource_field': 'owner_type', 'value': country_owner_type},
                 ]
             }
         ]

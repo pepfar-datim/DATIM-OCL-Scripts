@@ -116,7 +116,7 @@ class DatimImapExport(datimbase.DatimBase):
             raise DatimUnknownCountryPeriodError(msg)
         self.vlog(1, 'Using version "%s" for country "%s"' % (country_version_id, country_org))
 
-        # STEP 2 of 8: Download DATIM-MOH source for specified period (e.g. DATIM-MOH-FY18)
+        # STEP 2 of 8: Download DATIM-MOH-xx source for specified period (e.g. DATIM-MOH-FY18)
         self.vlog(1, '**** STEP 2 of 8: Download DATIM-MOH source for specified period (e.g. DATIM-MOH-FY18)')
         datim_moh_source_id = datimbase.DatimBase.get_datim_moh_source_id(period)
         datim_source_endpoint = datimbase.DatimBase.get_datim_moh_source_endpoint(period)
@@ -138,8 +138,8 @@ class DatimImapExport(datimbase.DatimBase):
         else:
             self.does_offline_data_file_exist(datim_source_json_filename, exit_if_missing=True)
 
-        # STEP 3 of 8: Prepare output with the DATIM-MOH indicator+disag structure
-        self.vlog(1, '**** STEP 3 of 8: Prepare output with the DATIM-MOH indicator+disag structure')
+        # STEP 3 of 8: Pre-process DATIM-MOH indicator+disag structure (before loading country source)
+        self.vlog(1, '**** STEP 3 of 8: Pre-process DATIM-MOH indicator+disag structure')
         indicators = {}
         disaggregates = {}
         with open(self.attach_absolute_data_path(datim_source_json_filename), 'rb') as handle_datim_source:
@@ -166,6 +166,7 @@ class DatimImapExport(datimbase.DatimBase):
                         mapping['map_type'], str(mapping)))
 
         # STEP 4 of 8: Download and process country source
+        # NOTE: This returns the individual country concepts and mappings
         self.vlog(1, '**** STEP 4 of 8: Download and process country source')
         country_source_zip_filename = self.endpoint2filename_ocl_export_zip(country_source_endpoint)
         country_source_json_filename = self.endpoint2filename_ocl_export_json(country_source_endpoint)
@@ -185,9 +186,11 @@ class DatimImapExport(datimbase.DatimBase):
                 elif concept['concept_class'] == self.DATIM_MOH_CONCEPT_CLASS_DE:
                     country_indicators[concept['url']] = concept.copy()
 
-        # STEP 5 of 8: Download list of country indicator mappings (i.e. collections)
+        # STEP 5 of 8: Download list of country indicator+disag mappings (i.e. collections)
+        # NOTE: This returns the collections that define how individual concepts/mappings from the country source
+        # combine to map country indicator+disag pairs to DATIM indicator+disag pairs
         # TODO: Make this one work offline
-        self.vlog(1, '**** STEP 5 of 8: Download list of country indicator mappings (i.e. collections)')
+        self.vlog(1, '**** STEP 5 of 8: Download list of country indicator+disag mappings (i.e. collections)')
         country_collections_endpoint = '%scollections/' % country_owner_endpoint
         if self.run_ocl_offline:
             self.vlog(1, 'WARNING: Offline not supported here yet. Taking this ship online!')
@@ -306,9 +309,11 @@ class DatimImapExport(datimbase.DatimBase):
                         if 'operations' in mapping and mapping['operations']:
                             row[datimimap.DatimImap.IMAP_FIELD_OPERATION] = DatimImapExport.map_type_to_operator(
                                 operation['map_type'])
-                            row[datimimap.DatimImap.IMAP_FIELD_MOH_INDICATOR_ID] = operation['from_concept_code']
+                            row[datimimap.DatimImap.IMAP_FIELD_MOH_INDICATOR_ID] = DatimImapExport.get_clean_indicator_id(
+                                operation['from_concept_code'])
                             row[datimimap.DatimImap.IMAP_FIELD_MOH_INDICATOR_NAME] = operation['from_concept_name']
-                            row[datimimap.DatimImap.IMAP_FIELD_MOH_DISAG_ID] = operation['to_concept_code']
+                            row[datimimap.DatimImap.IMAP_FIELD_MOH_DISAG_ID] = DatimImapExport.get_clean_disag_id(
+                                operation['to_concept_code'])
                             row[datimimap.DatimImap.IMAP_FIELD_MOH_DISAG_NAME] = operation['to_concept_name']
                         rows.append(row)
                 else:
@@ -319,5 +324,19 @@ class DatimImapExport(datimbase.DatimBase):
         return datimimap.DatimImap(imap_data=rows, country_code=country_code, country_org=country_org, period=period)
 
     @staticmethod
+    def get_clean_disag_id(disag_id):
+        return DatimImapExport.remove_prefix_if_exists(disag_id, datimimap.DatimImap.IMAP_MOH_DISAG_ID_PREFIX)
+
+    @staticmethod
+    def get_clean_indicator_id(disag_id):
+        return DatimImapExport.remove_prefix_if_exists(disag_id, datimimap.DatimImap.IMAP_MOH_DATA_ELEMENT_ID_PREFIX)
+
+    @staticmethod
+    def remove_prefix_if_exists(original_string, prefix):
+        if original_string[:len(prefix)] == prefix:
+            return original_string[len(prefix):]
+        return original_string
+
+    @staticmethod
     def map_type_to_operator(map_type):
-        return map_type.replace(' OPERATION', '')
+        return map_type.replace(datimimap.DatimImap.IMAP_MOH_MAP_TYPE_OPERATION_POSTFIX, '')

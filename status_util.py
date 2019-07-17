@@ -18,7 +18,7 @@ try:
         }
     else:
         import_status = get_import_status(sys.argv[1])
-        result = str(import_status.result)
+        result = (import_status.result).encode(encoding="utf-8", errors="strict")
         status_code = STATUS_CODE_OK
         if import_status.status == 'PENDING':
             result = "Pending status could be because of an invalid import id, please confirm that it's correct"
@@ -31,10 +31,10 @@ try:
             RESPONSE_FIELD_STATUS: import_status.status,
             RESPONSE_FIELD_RESULT: result
         }
-except Exception:
+except Exception, e:
     response = {
         RESPONSE_FIELD_STATUS_CODE: STATUS_CODE_ERROR,
-        RESPONSE_FIELD_RESULT: 'An error occurred'
+        RESPONSE_FIELD_RESULT: str(e)
     }
 
 print json.dumps(response)

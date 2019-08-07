@@ -20,9 +20,9 @@ import datim.datimsyncmohfy19
 
 
 # DATIM DHIS2 Settings
-dhis2env = settings.dhis2env_vshioshvili
-dhis2uid = settings.dhis2uid_vshioshvili
-dhis2pwd = settings.dhis2pwd_vshioshvili
+dhis2env = settings.dhis2env
+dhis2uid = settings.dhis2uid
+dhis2pwd = settings.dhis2pwd
 
 # OCL Settings - staging user=datim-admin
 oclenv = settings.ocl_api_url_staging

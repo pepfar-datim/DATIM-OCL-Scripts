@@ -32,16 +32,24 @@ ocl_api_url_staging = 'https://api.staging.openconceptlab.org'
 ocl_api_url_qa = 'https://api.qa.openconceptlab.org'
 api_url_root = ocl_api_url_root = ocl_api_url_staging
 
-# DATIM DHIS2 Credentials
+# DATIM DHIS2 Credentials for different environments
 dhis2env_devde = 'https://dev-de.datim.org'
-dhis2uid_devde = 'paynejd'
+dhis2uid_devde = 'system_ocl_metadata_sync'
 dhis2pwd_devde = ''
 dhis2env_triage = 'https://triage.datim.org'
-dhis2uid_triage = 'paynejd'
+dhis2uid_triage = 'system_ocl_metadata_sync'
 dhis2pwd_triage = ''
 dhis2env_testgeoalign = 'https://test.geoalign.datim.org'
 dhis2uid_testgeoalign = 'system_ocl_metadata_sync'
 dhis2pwd_testgeoalign = ''
+dhis2env_geoalign = 'https://geoalign.datim.org'
+dhis2uid_geoalign = 'system_ocl_metadata_sync'
+dhis2pwd_geoalign = ''
+
+# DATIM DHIS2 Settings
+dhis2env = dhis2env_testgeoalign
+dhis2uid = dhis2env_testgeoalign
+dhis2pwd = dhis2env_testgeoalign
 
 # Set to True to allow updates to existing objects
 do_update_if_exists = False

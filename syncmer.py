@@ -19,9 +19,9 @@ import datim.datimsyncmer
 
 
 # DATIM DHIS2 Settings
-dhis2env = settings.dhis2env_devde
-dhis2uid = settings.dhis2uid_devde
-dhis2pwd = settings.dhis2pwd_devde
+dhis2env = settings.dhis2env
+dhis2uid = settings.dhis2uid
+dhis2pwd = settings.dhis2pwd
 
 # OCL Settings - JetStream Staging user=datim-admin
 oclenv = settings.ocl_api_url_staging

@@ -23,9 +23,9 @@ import datim.datimsyncmermsp
 
 
 # DATIM DHIS2 Settings
-dhis2env = settings.dhis2env_triage
-dhis2uid = settings.dhis2uid_triage
-dhis2pwd = settings.dhis2pwd_triage
+dhis2env = settings.dhis2env
+dhis2uid = settings.dhis2uid
+dhis2pwd = settings.dhis2pwd
 
 # OCL Settings - JetStream Staging user=datim-admin
 oclenv = settings.ocl_api_url_staging

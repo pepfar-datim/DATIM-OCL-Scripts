@@ -194,7 +194,6 @@ importer_collections = OclFlexImporter(
 importer_collections.process()
 
 
-
 # Code to import JSON into OCL using the fancy new ocldev package
 import json
 import ocldev.oclfleximporter
@@ -204,6 +203,7 @@ with open('fy18_import_list.json') as ifile:
     import_list = json.load(ifile)
 importer = ocldev.oclfleximporter.OclFlexImporter(input_list=import_list, api_url_root=oclenv, api_token=oclapitoken, test_mode=False)
 importer.process()
+
 
 
 # Code to retire matching mappings using the fancy new ocldev package
@@ -243,3 +243,27 @@ payload = { "references": refs }
 r = requests.delete(collection_ref_url, json=payload, headers=oclapiheaders)
 r.raise_for_status()
 print r.text
+
+
+# get list of orgs and delete those with IDs that match a certain string
+import settings
+import requests
+oclenv = 'https://api.staging.openconceptlab.org'
+oclapitoken = settings.api_token_staging_root
+oclapiheaders = {
+    'Authorization': 'Token ' + oclapitoken,
+    'Content-Type': 'application/json'
+}
+orgs_url = oclenv + '/orgs/?limit=130'
+orgs_response = requests.get(orgs_url, headers=oclapiheaders)
+orgs = orgs_response.json()
+for org in orgs:
+    if org['id'][:10] == 'DATIM-MOH-':
+        delete_url = oclenv + org['url']
+        print '**********', org['id']
+        print '  DELETE', delete_url
+        delete_response = requests.delete(delete_url, headers=oclapiheaders)
+        print delete_response.status_code
+        print ''        
+    else:
+        print org['id'], '\n'

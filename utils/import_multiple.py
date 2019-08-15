@@ -50,10 +50,10 @@ org_remove_list = [
 ]
 
 # OCL Settings
-ocl_env = settings.ocl_api_url_staging
+ocl_env = settings.ocl_env
 #oclapitoken = settings.api_token_staging_datim_admin
-# staging root token
-oclapitoken = 'a61ba53ed7b8b26ece8fcfc53022b645de0ec055'
+# root token
+oclapitoken = settings.ocl_root_api_token
 oclapiheaders = {
     'Authorization': 'Token ' + oclapitoken,
     'Content-Type': 'application/json'

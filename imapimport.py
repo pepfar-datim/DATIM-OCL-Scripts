@@ -21,8 +21,8 @@ delete_org_if_exists = False  # Be very careful with this option!
 country_public_access = 'None'  # Set visibility of country org/repos. None, View, or Edit supported
 
 # OCL Settings
-oclenv = settings.ocl_api_url_staging
-oclapitoken = settings.api_token_staging_datim_admin
+oclenv = settings.oclenv
+oclapitoken = settings.oclapitoken
 
 # Optionally set arguments from the command line
 if sys.argv and len(sys.argv) > 5:
@@ -80,7 +80,7 @@ if delete_org_if_exists:
         # Pause briefly to allow user to cancel in case deleting org on accident...
         time.sleep(5)
         result = datim.datimimap.DatimImapFactory.delete_org_if_exists(
-            org_id=country_org, oclenv=oclenv, ocl_root_api_token=settings.api_token_staging_root)
+            org_id=country_org, oclenv=oclenv, ocl_root_api_token=settings.ocl_root_api_token)
         if verbosity:
             if result:
                 print('Org successfully deleted.')

@@ -22,8 +22,8 @@ verbosity = 0
 run_ocl_offline = False
 
 # OCL Settings - JetStream Staging user=datim-admin
-oclenv = settings.ocl_api_url_staging
-oclapitoken = settings.api_token_staging_datim_admin
+oclenv = settings.oclenv
+oclapitoken = settings.oclapitoken
 
 # Optionally set arguments from the command line
 if sys.argv and len(sys.argv) > 6:

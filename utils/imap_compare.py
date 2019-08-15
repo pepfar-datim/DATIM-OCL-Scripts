@@ -29,8 +29,8 @@ imap_b_country_code = 'CM'
 imap_b_country_name = 'Cameroon'
 imap_b_period = 'FY19'
 imap_b_filename = ''  # 'csv/TZ-FY18-20190610-export3.csv'
-imap_b_ocl_env = settings.ocl_api_url_staging
-imap_b_ocl_api_token = settings.api_token_staging_datim_admin
+imap_b_ocl_env = settings.oclenv
+imap_b_ocl_api_token = settings.oclapitoken
 imap_b_country_org = 'DATIM-MOH-%s-%s' % (imap_b_country_code, imap_b_period)
 
 # Load IMAP A

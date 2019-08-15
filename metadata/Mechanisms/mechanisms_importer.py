@@ -1,6 +1,7 @@
 '''
 Script to import PEPFAR mechanisms
 '''
+import settings
 from json_flex_import import ocl_json_flex_import
 
 
@@ -8,13 +9,13 @@ from json_flex_import import ocl_json_flex_import
 import_file_path = 'mechanisms_zendesk_20170804.json'
 
 # API Token of the user account to use for importing
-api_token = '23c5888470d4cb14d8a3c7f355f4cdb44000679a'
+api_token = settings.oclapitoken
 
 # URL root - no slash at the end
 api_url_production = 'https://api.openconceptlab.org'
 api_url_staging = 'https://api.staging.openconceptlab.org'
 api_url_showcase = 'https://api.showcase.openconceptlab.org'
-api_url_root = api_url_staging
+api_url_root = settings.oclenv
 
 # Set to True to allow updates to existing objects
 do_update_if_exists = False

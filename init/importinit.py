@@ -30,8 +30,8 @@ import_filenames_datim_moh_only = [
 import_filenames = import_filenames_all
 
 # OCL Settings - JetStream Staging user=datim-admin
-ocl_api_url_root = settings.ocl_api_url_staging
-ocl_api_token = settings.api_token_staging_datim_admin
+ocl_api_url_root = settings.oclenv
+ocl_api_token = settings.oclapitoken
 
 # Recommend running with test mode set to True before running for real
 test_mode = False

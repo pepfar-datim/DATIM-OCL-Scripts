@@ -368,12 +368,16 @@ class DatimBase(object):
         # Get the export
         url_ocl_export = self.oclenv + endpoint + repo_version_id + '/export/'
         self.vlog(1, 'Export URL:', url_ocl_export)
-        r = requests.get(url_ocl_export, headers=self.oclapiheaders)
+        # JP: 2019-08-16: Temporarily removed auth token from export request
+        # r = requests.get(url_ocl_export, headers=self.oclapiheaders)
+        r = requests.get(url_ocl_export, headers={'Content-Type': 'application/json'})
         r.raise_for_status()
         if r.status_code == 204:
             # Create the export and try one more time...
             self.vlog(1, 'WARNING: Export does not exist for "%s". Creating export...' % url_ocl_export)
-            new_export_request = requests.post(url_ocl_export, headers=self.oclapiheaders)
+            # JP: 2019-08-16: Temporarily removed auth token from export request
+            # new_export_request = requests.post(url_ocl_export, headers=self.oclapiheaders)
+            new_export_request = requests.post(url_ocl_export, headers={'Content-Type': 'application/json'})
             if new_export_request.status_code == 202:
                 # Wait for export to be processed then try to fetch it
                 self.vlog(1, 'INFO: Waiting 30 seconds while export is being generated...')

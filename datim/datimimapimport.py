@@ -234,6 +234,8 @@ class DatimImapImport(datimbase.DatimBase):
             bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
                 input_list=import_list, api_token=self.oclapitoken, api_url_root=self.oclenv)
             task_id = bulk_import_response.json()['task']
+            if self.verbosity:
+                self.vlog(self.verbosity, 'BULK IMPORT TASK ID: %s' % task_id)
             import_results = ocldev.oclfleximporter.OclBulkImporter.get_bulk_import_results(
                 task_id=task_id, api_url_root=self.oclenv, api_token=self.oclapitoken,
                 delay_seconds=5, max_wait_seconds=500)

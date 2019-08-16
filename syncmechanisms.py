@@ -21,8 +21,8 @@ dhis2uid = settings.dhis2uid
 dhis2pwd = settings.dhis2pwd
 
 # OCL Settings - JetStream Staging user=datim-admin
-oclenv = settings.ocl_api_url_staging
-oclapitoken = settings.api_token_staging_datim_admin
+oclenv = settings.oclenv
+oclapitoken = settings.oclapitoken
 
 # Local development environment settings
 sync_mode = datim.datimsync.DatimSync.SYNC_MODE_BUILD_IMPORT_SCRIPT  # Set which operation is performed by the sync script

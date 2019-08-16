@@ -18,7 +18,7 @@ verbosity = 2  # Set to 0 to hide all debug info, or 2 to show all debug info
 run_ocl_offline = False  # Not currently supported
 test_mode = False  # If true, generates the import script but does not actually import it
 delete_org_if_exists = False  # Be very careful with this option!
-country_public_access = 'None'  # Set visibility of country org/repos. None, View, or Edit supported
+country_public_access = 'View'  # Set visibility of country org/repos. None, View, or Edit supported
 
 # OCL Settings
 oclenv = settings.oclenv

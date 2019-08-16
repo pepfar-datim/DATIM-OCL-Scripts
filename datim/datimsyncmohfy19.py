@@ -75,6 +75,10 @@ class DatimSyncMohFy19(datimsync.DatimSync):
             'Content-Type': 'application/json'
         }
 
+    @staticmethod
+    def get_indicator_category_code(data_element_id):
+        return '_'.join(data_element_id.split('_')[:2])
+
     def dhis2diff_moh(self, dhis2_query_def=None, conversion_attr=None):
         """
         Convert new DHIS2 MOH export to the diff format
@@ -112,7 +116,7 @@ class DatimSyncMohFy19(datimsync.DatimSync):
                     'retired': False,
                     'external_id': de['id'],  # dataelementuid
                     'descriptions': None,
-                    'extras': None,
+                    'extras': {'indicator_category_code': DatimSyncMohFy19.get_indicator_category_code(de_concept_id)},
                     'names': [
                         {
                             'name': de['name'],

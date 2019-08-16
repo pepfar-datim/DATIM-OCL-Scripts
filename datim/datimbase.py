@@ -357,6 +357,8 @@ class DatimBase(object):
         if version == 'latest':
             url_latest_version = self.oclenv + endpoint + 'latest/'
             self.vlog(1, 'Latest version request URL:', url_latest_version)
+            # JP: 2019-08-16: Temporarily removed auth token from export request
+            # r = requests.get(url_latest_version, headers={'Content-Type': 'application/json'})
             r = requests.get(url_latest_version, headers=self.oclapiheaders)
             r.raise_for_status()
             latest_version_attr = r.json()
@@ -382,7 +384,9 @@ class DatimBase(object):
                 # Wait for export to be processed then try to fetch it
                 self.vlog(1, 'INFO: Waiting 30 seconds while export is being generated...')
                 time.sleep(30)
-                r = requests.get(url_ocl_export, headers=self.oclapiheaders)
+                # JP: 2019-08-16: Temporarily removed auth token from export request
+                # r = requests.get(url_ocl_export, headers=self.oclapiheaders)
+                r = requests.get(url_ocl_export, headers={'Content-Type': 'application/json'})
                 r.raise_for_status()
             else:
                 msg = 'ERROR: Unable to generate export for "%s"' % url_ocl_export

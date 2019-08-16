@@ -51,6 +51,11 @@ dhis2env = dhis2env_testgeoalign
 dhis2uid = dhis2env_testgeoalign
 dhis2pwd = dhis2env_testgeoalign
 
+#OCL API Settings
+oclenv = ocl_api_url_staging
+oclapitoken = api_token_staging_datim_admin
+ocl_root_api_token = api_token_staging_root
+
 # Set to True to allow updates to existing objects
 do_update_if_exists = False
 

@@ -9,8 +9,8 @@ from pprint import pprint
 
 
 # JetStream staging
-oclenv = settings.ocl_api_url_staging
-oclapitoken = settings.api_token_staging_datim_admin
+oclenv = settings.oclenv
+oclapitoken = settings.oclapitoken
 endpoint = '/orgs/PEPFAR/collections/'
 oclapiheaders = {
     'Authorization': 'Token ' + oclapitoken,
@@ -197,7 +197,7 @@ importer_collections.process()
 # Code to import JSON into OCL using the fancy new ocldev package
 import json
 import ocldev.oclfleximporter
-oclenv = 'https://api.staging.openconceptlab.org'
+oclenv = settings.oclenv
 oclapitoken = 'enter-value-here'
 with open('fy18_import_list.json') as ifile:
     import_list = json.load(ifile)
@@ -211,7 +211,7 @@ import json
 import requests
 import ocldev.oclexport
 import ocldev.oclfleximporter
-oclenv = 'https://api.staging.openconceptlab.org'
+oclenv = settings.oclenv
 oclapitoken = 'enter-value-here'
 oclapiheaders = {
     'Authorization': 'Token ' + oclapitoken,
@@ -219,7 +219,7 @@ oclapiheaders = {
 }
 with open('mappings_to_retire.json') as ifile:
     mr = json.load(ifile)
-datim_moh_export = ocldev.oclexport.OclExportFactory.load_export(repo_version_url='https://api.staging.openconceptlab.org/orgs/PEPFAR/sources/DATIM-MOH/FY18.alpha/', oclapitoken=oclapitoken)
+datim_moh_export = ocldev.oclexport.OclExportFactory.load_export(repo_version_url=settings.oclenv+'/orgs/PEPFAR/sources/DATIM-MOH/FY18.alpha/', oclapitoken=oclapitoken)
 for partial_map in mr:
     full_maps = datim_moh_export.get_mappings(from_concept_uri=partial_map['from_concept_url'], to_concept_uri=partial_map['to_concept_url'], map_type=partial_map['map_type'])
     if len(full_maps) == 1:
@@ -230,7 +230,7 @@ for partial_map in mr:
 
 
 # Delete all references in a collection
-collection_url = 'https://api.staging.openconceptlab.org/users/paynejd/collections/MyCollection/'
+collection_url = settings.oclenv + '/users/paynejd/collections/MyCollection/'
 collection_ref_url = '%sreferences/' % collection_url
 r = requests.get(collection_url, headers=oclapiheaders)
 r.raise_for_status()
@@ -248,8 +248,8 @@ print r.text
 # get list of orgs and delete those with IDs that match a certain string
 import settings
 import requests
-oclenv = 'https://api.staging.openconceptlab.org'
-oclapitoken = settings.api_token_staging_root
+oclenv = settings.oclenv
+oclapitoken = settings.ocl_root_api_token
 oclapiheaders = {
     'Authorization': 'Token ' + oclapitoken,
     'Content-Type': 'application/json'

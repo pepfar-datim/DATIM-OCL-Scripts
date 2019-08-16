@@ -22,13 +22,13 @@ export_format = datim.datimshow.DatimShow.DATIM_FORMAT_CSV
 period = ''  # e.g. FY18, FY19
 
 # OCL Settings - JetStream Staging user=datim-admin
-oclenv = settings.ocl_api_url_staging
-oclapitoken = settings.api_token_staging_datim_admin
+oclenv = settings.oclenv
+oclapitoken = settings.oclapitoken
 
 # Optionally set arguments from the command line
 if sys.argv and len(sys.argv) > 2:
     export_format = datim.datimshow.DatimShow.get_format_from_string(sys.argv[1])
-    repo_id = sys.argv[2]
+    period = sys.argv[2]
 
 # Create Show object and run
 datim_show = datim.datimshowmoh.DatimShowMoh(

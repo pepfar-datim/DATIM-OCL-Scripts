@@ -11,7 +11,6 @@ The import script creates OCL-formatted JSON consisting of:
     Country Collections, one per mapping to DATIM indicator+disag pair
     References for each concept and mapping added to each collection
 
-TODO: Improve validation step
 TODO: Move country collection reconstruction and version creation into a separate process that this class uses
 TODO: Add "clean up" functionality to retire unused resources
 TODO: Query collections by their mappings, not ID -- names are not consistent coming from DHIS2
@@ -189,28 +188,26 @@ class DatimImapImport(datimbase.DatimBase):
         self.vlog(1, 'Next country version number for period "%s": "%s"' % (
             imap_input.period, next_country_version_id))
 
-        # STEP 7 of 12: Generate import script for the country org and source, if missing
-        self.vlog(1, '**** STEP 7 of 12: Generate country org and source if missing')
+        # STEP 7 of 12: Generate country org and source import scripts if they do not exist
+        self.vlog(1, '**** STEP 7 of 12: Generate country org and source if they do not exist')
         import_list = []
         if do_create_country_org:
-            org = DatimImapImport.get_country_org_dict(country_org=imap_input.country_org,
-                                                       country_code=imap_input.country_code,
-                                                       country_name=imap_input.country_name,
-                                                       country_public_access=self.country_public_access)
+            org = DatimImapImport.get_country_org_dict(
+                country_org=imap_input.country_org, country_code=imap_input.country_code,
+                country_name=imap_input.country_name, country_public_access=self.country_public_access)
             import_list.append(org)
             self.vlog(1, 'Country org import script generated:', json.dumps(org))
         if do_create_country_source:
-            source = DatimImapImport.get_country_source_dict(country_org=imap_input.country_org,
-                                                             country_code=imap_input.country_code,
-                                                             country_name=imap_input.country_name,
-                                                             country_public_access=self.country_public_access)
+            source = DatimImapImport.get_country_source_dict(
+                country_org=imap_input.country_org, country_code=imap_input.country_code,
+                country_name=imap_input.country_name, country_public_access=self.country_public_access)
             import_list.append(source)
             self.vlog(1, 'Country source import script generated:', json.dumps(source))
         if not do_create_country_org and not do_create_country_source:
             self.vlog(1, 'Skipping...')
 
-        # STEP 8 of 12: Generate import script for the country source concepts and mappings
-        self.vlog(1, '**** STEP 8 of 12: Generate import script for the country source concepts and mappings')
+        # STEP 8 of 12: Generate import script for the country concepts and mappings
+        self.vlog(1, '**** STEP 8 of 12: Generate import script for the country concepts and mappings')
         if imap_diff:
             self.vlog(1, 'Creating import script based on the delta...')
             add_to_import_list = datimimap.DatimImapFactory.generate_import_script_from_diff(imap_diff)
@@ -253,6 +250,7 @@ class DatimImapImport(datimbase.DatimBase):
             self.vlog(1, 'Nothing to import! Skipping...')
 
         # STEP 10 of 12: Create new country source version
+        # TODO: Incorporate creation of new country source version into the bulk import in STEP 9
         self.vlog(1, '**** STEP 10 of 12: Create new country source version')
         if import_list and not self.test_mode:
             datimimap.DatimImapFactory.create_repo_version(
@@ -337,6 +335,8 @@ class DatimImapImport(datimbase.DatimBase):
             bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
                 input_list=ref_import_list, api_token=self.oclapitoken, api_url_root=self.oclenv)
             ref_task_id = bulk_import_response.json()['task']
+            if self.verbosity:
+                self.vlog(self.verbosity, 'BULK IMPORT TASK ID: %s' % ref_task_id)
             ref_import_results = ocldev.oclfleximporter.OclBulkImporter.get_bulk_import_results(
                 task_id=ref_task_id, api_url_root=self.oclenv, api_token=self.oclapitoken,
                 delay_seconds=6, max_wait_seconds=500)

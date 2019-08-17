@@ -357,8 +357,6 @@ class DatimBase(object):
         if version == 'latest':
             url_latest_version = self.oclenv + endpoint + 'latest/'
             self.vlog(1, 'Latest version request URL:', url_latest_version)
-            # JP: 2019-08-16: Temporarily removed auth token from export request
-            # r = requests.get(url_latest_version, headers={'Content-Type': 'application/json'})
             r = requests.get(url_latest_version, headers=self.oclapiheaders)
             r.raise_for_status()
             latest_version_attr = r.json()
@@ -370,23 +368,17 @@ class DatimBase(object):
         # Get the export
         url_ocl_export = self.oclenv + endpoint + repo_version_id + '/export/'
         self.vlog(1, 'Export URL:', url_ocl_export)
-        # JP: 2019-08-16: Temporarily removed auth token from export request
-        # r = requests.get(url_ocl_export, headers=self.oclapiheaders)
-        r = requests.get(url_ocl_export, headers={'Content-Type': 'application/json'})
+        r = requests.get(url_ocl_export, headers=self.oclapiheaders)
         r.raise_for_status()
         if r.status_code == 204:
             # Create the export and try one more time...
             self.vlog(1, 'WARNING: Export does not exist for "%s". Creating export...' % url_ocl_export)
-            # JP: 2019-08-16: Temporarily removed auth token from export request
-            # new_export_request = requests.post(url_ocl_export, headers=self.oclapiheaders)
-            new_export_request = requests.post(url_ocl_export, headers={'Content-Type': 'application/json'})
+            new_export_request = requests.post(url_ocl_export, headers=self.oclapiheaders)
             if new_export_request.status_code == 202:
                 # Wait for export to be processed then try to fetch it
                 self.vlog(1, 'INFO: Waiting 30 seconds while export is being generated...')
                 time.sleep(30)
-                # JP: 2019-08-16: Temporarily removed auth token from export request
-                # r = requests.get(url_ocl_export, headers=self.oclapiheaders)
-                r = requests.get(url_ocl_export, headers={'Content-Type': 'application/json'})
+                r = requests.get(url_ocl_export, headers=self.oclapiheaders)
                 r.raise_for_status()
             else:
                 msg = 'ERROR: Unable to generate export for "%s"' % url_ocl_export

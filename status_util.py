@@ -26,6 +26,9 @@ try:
         if import_status.status == 'STARTED':
             result = "This task id is currently being processed"
             status_code = STATUS_CODE_ACCEPTED
+        else:
+            result = (import_status.result).encode(encoding="utf-8", errors="strict")
+            status_code = STATUS_CODE_OK
         response = {
             RESPONSE_FIELD_STATUS_CODE: status_code,
             RESPONSE_FIELD_STATUS: import_status.status,

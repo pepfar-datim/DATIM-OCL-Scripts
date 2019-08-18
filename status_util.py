@@ -18,8 +18,6 @@ try:
         }
     else:
         import_status = get_import_status(sys.argv[1])
-        result = (import_status.result).encode(encoding="utf-8", errors="strict")
-        status_code = STATUS_CODE_OK
         if import_status.status == 'PENDING':
             result = "Pending status could be because of an invalid import id, please confirm that it's correct"
             status_code = STATUS_CODE_NOT_FOUND

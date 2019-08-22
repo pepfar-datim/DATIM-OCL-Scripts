@@ -18,8 +18,6 @@ period (e.g. FY17). Export follows the format of the country mapping CSV templat
 1. Implement long-term method for populating the indicator category column (currently manually set a custom attribute)
 """
 import json
-import os
-import requests
 import datimbase
 import datimimap
 import datimsyncmohhelper
@@ -43,6 +41,13 @@ class DatimImapExport(datimbase.DatimBase):
     """
 
     def __init__(self, oclenv='', oclapitoken='', verbosity=0, run_ocl_offline=False):
+        """
+        Initialize an DatimImapExport object
+        :param oclenv: Base URL for the OCL environment with hanging slash omitted, e.g. https://api.openconceptlab.org
+        :param oclapitoken: API token of the OCL user account making the export request
+        :param verbosity: Verbosity level (0=none, 1=some, 2=tons)
+        :param run_ocl_offline:
+        """
         datimbase.DatimBase.__init__(self)
         self.verbosity = verbosity
         self.oclenv = oclenv
@@ -67,6 +72,12 @@ class DatimImapExport(datimbase.DatimBase):
 
     @staticmethod
     def get_format_from_string(format_string, default_fmt='CSV'):
+        """
+        Get one of the DatimImapExport.DATIM_IMAP_FORMAT constants from a string
+        :param format_string:
+        :param default_fmt:
+        :return:
+        """
         for fmt in DatimImapExport.DATIM_IMAP_FORMATS:
             if format_string.lower() == fmt.lower():
                 return fmt
@@ -80,6 +91,12 @@ class DatimImapExport(datimbase.DatimBase):
         then 'FY17.v1' would be returned.
         If period is not specified, version is ignored and the latest released version of the repository
         is returned regardless of period.
+        :param period: FY18, FY19
+        :param version: (Optional) Specify country minor version number (e.g. v3, v4). Alternatively set to "latest"
+            (or simply leave blank) to automatically retrieve the latest version for the specified period.
+        :param country_org: DATIM-MOH-UA-FY19
+        :param country_code: UA
+        :return:
         """
 
         # Initial validation
@@ -92,14 +109,15 @@ class DatimImapExport(datimbase.DatimBase):
             self.vlog(1, msg)
             raise Exception(msg)
 
-        # STEP 1 of 8: Determine the country period, minor version, and repo version ID (e.g. FY18.v0)
-        self.vlog(1, '**** STEP 1 of 8: Determine the country period, minor version, and repo version ID')
+        # STEP 1 of 7: Determine the country period, minor version, and repo version ID (e.g. FY18.v0)
+        self.vlog(1, '**** STEP 1 of 7: Determine the country period, minor version, and repo version ID')
         country_owner_endpoint = '/orgs/%s/' % country_org  # e.g. /orgs/DATIM-MOH-RW-FY18/
         country_source_endpoint = '%ssources/%s/' % (
             country_owner_endpoint, self.DATIM_MOH_COUNTRY_SOURCE_ID)
         country_source_url = '%s%s' % (self.oclenv, country_source_endpoint)
         if period and version:
             country_version_id = '%s.%s' % (period, version)
+            country_minor_version = version
         else:
             country_version = datimimap.DatimImapFactory.get_repo_latest_period_version(
                 repo_url=country_source_url, period=period, oclapitoken=self.oclapitoken)
@@ -110,14 +128,15 @@ class DatimImapExport(datimbase.DatimBase):
                 raise DatimUnknownCountryPeriodError(msg)
             country_version_id = country_version['id']
             period = datimimap.DatimImapFactory.get_period_from_version_id(country_version_id)
+            country_minor_version = datimimap.DatimImapFactory.get_minor_version_from_version_id(country_version_id)
         if not period or not country_version_id:
             msg = 'ERROR: No valid and released version found for country org "%s"' % country_org
             self.vlog(1, msg)
             raise DatimUnknownCountryPeriodError(msg)
         self.vlog(1, 'Using version "%s" for country "%s"' % (country_version_id, country_org))
 
-        # STEP 2 of 8: Download DATIM-MOH-xx source for specified period (e.g. DATIM-MOH-FY18)
-        self.vlog(1, '**** STEP 2 of 8: Download DATIM-MOH source for specified period (e.g. DATIM-MOH-FY18)')
+        # STEP 2 of 7: Download DATIM-MOH-xx source for specified period (e.g. DATIM-MOH-FY18)
+        self.vlog(1, '**** STEP 2 of 7: Download DATIM-MOH source for specified period (e.g. DATIM-MOH-FY18)')
         datim_moh_source_id = datimbase.DatimBase.get_datim_moh_source_id(period)
         datim_source_endpoint = datimbase.DatimBase.get_datim_moh_source_endpoint(period)
         datim_source_url = '%s%s' % (self.oclenv, datim_source_endpoint)
@@ -138,8 +157,8 @@ class DatimImapExport(datimbase.DatimBase):
         else:
             self.does_offline_data_file_exist(datim_source_json_filename, exit_if_missing=True)
 
-        # STEP 3 of 8: Pre-process DATIM-MOH indicator+disag structure (before loading country source)
-        self.vlog(1, '**** STEP 3 of 8: Pre-process DATIM-MOH indicator+disag structure')
+        # STEP 3 of 7: Pre-process DATIM-MOH indicator+disag structure (before loading country source)
+        self.vlog(1, '**** STEP 3 of 7: Pre-process DATIM-MOH indicator+disag structure')
         indicators = {}
         disaggregates = {}
         with open(self.attach_absolute_data_path(datim_source_json_filename), 'rb') as handle_datim_source:
@@ -165,9 +184,9 @@ class DatimImapExport(datimbase.DatimBase):
                     self.vlog(1, 'SKIPPING: Unrecognized map type "%s" for mapping: %s' % (
                         mapping['map_type'], str(mapping)))
 
-        # STEP 4 of 8: Download and process country source
+        # STEP 4 of 7: Download and process country source
         # NOTE: This returns the individual country concepts and mappings
-        self.vlog(1, '**** STEP 4 of 8: Download and process country source')
+        self.vlog(1, '**** STEP 4 of 7: Download and process country source')
         country_source_zip_filename = self.endpoint2filename_ocl_export_zip(country_source_endpoint)
         country_source_json_filename = self.endpoint2filename_ocl_export_json(country_source_endpoint)
         if not self.run_ocl_offline:
@@ -186,86 +205,67 @@ class DatimImapExport(datimbase.DatimBase):
                 elif concept['concept_class'] == self.DATIM_MOH_CONCEPT_CLASS_DE:
                     country_indicators[concept['url']] = concept.copy()
 
-        # STEP 5 of 8: Download list of country indicator+disag mappings (i.e. collections)
+        # STEP 5 of 7: Async download of country indicator+disag collections
         # NOTE: This returns the collections that define how individual concepts/mappings from the country source
         # combine to map country indicator+disag pairs to DATIM indicator+disag pairs
-        # TODO: Make this one work offline
-        self.vlog(1, '**** STEP 5 of 8: Download list of country indicator+disag mappings (i.e. collections)')
+        self.vlog(1, '**** STEP 5 of 7: Async download of country indicator+disag mappings')
         country_collections_endpoint = '%scollections/' % country_owner_endpoint
         if self.run_ocl_offline:
             self.vlog(1, 'WARNING: Offline not supported here yet. Taking this ship online!')
-        country_collections = self.get_ocl_repositories(
-            endpoint=country_collections_endpoint, require_external_id=False, active_attr_name=None)
+        country_collections = self.get_ocl_exports_async(
+            endpoint=country_collections_endpoint, period=period, version=country_minor_version)
 
-        # STEP 6 of 8: Process one country collection at a time
-        self.vlog(1, '**** STEP 6 of 8: Process one country collection at a time')
-        for collection_id, collection in country_collections.items():
-            collection_zip_filename = self.endpoint2filename_ocl_export_zip(collection['url'])
-            collection_json_filename = self.endpoint2filename_ocl_export_json(collection['url'])
-            if not self.run_ocl_offline:
-                try:
-                    self.get_ocl_export(
-                        endpoint=collection['url'], version=country_version_id,
-                        zipfilename=collection_zip_filename, jsonfilename=collection_json_filename)
-                except requests.exceptions.HTTPError:
-                    # collection or collection version does not exist, so we can safely throw it out
-                    continue
-            else:
-                self.does_offline_data_file_exist(collection_json_filename, exit_if_missing=True)
+        # STEP 6 of 7: Process one country collection at a time
+        self.vlog(1, '**** STEP 6 of 7: Process one country collection at a time')
+        datim_moh_null_disag_endpoint = datimbase.DatimBase.get_datim_moh_null_disag_endpoint(period)
+        for collection_version_export_url, collection_version in country_collections.items():
+            collection_id = collection_version['collection']['id']
             operations = []
-            datim_pair_mapping = None
             datim_indicator_url = None
             datim_disaggregate_url = None
-            datim_moh_null_disag_endpoint = datimbase.DatimBase.get_datim_moh_null_disag_endpoint(period)
-            with open(self.attach_absolute_data_path(collection_json_filename), 'rb') as handle_country_collection:
-                country_collection = json.load(handle_country_collection)
 
-                # Organize the mappings between operations and the datim indicator+disag pair
-                for mapping in country_collection['mappings']:
-                    if mapping['map_type'] == self.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION:
-                        if mapping['from_concept_url'] in indicators and mapping['to_concept_url'] in disaggregates:
-                            # we're good - the from and to concepts are part of the PEPFAR/DATIM_MOH source
-                            datim_pair_mapping = mapping.copy()
-                            datim_indicator_url = mapping['from_concept_url']
-                            datim_disaggregate_url = mapping['to_concept_url']
-                        elif mapping['from_concept_url'] not in indicators:
-                            # uhoh. this is no good
-                            msg = 'ERROR: from_concept "%s" of the "%s" mapping in collection "%s" is not part of "%s" version "%s": %s ' % (
+            # Organize the mappings between operations and the datim indicator+disag pair
+            for mapping in collection_version['mappings']:
+                if mapping['map_type'] == self.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION:
+                    if mapping['from_concept_url'] in indicators and mapping['to_concept_url'] in disaggregates:
+                        # we're good - the from and to concepts are part of the PEPFAR/DATIM_MOH source
+                        # JP 2019-08-22 not currently using: datim_pair_mapping = mapping.copy()
+                        datim_indicator_url = mapping['from_concept_url']
+                        datim_disaggregate_url = mapping['to_concept_url']
+                    else:
+                        # uhoh this is no good -- indicator or disag not defined in the PEPFAR source version
+                        if mapping['from_concept_url'] not in indicators:
+                            msg = 'ERROR: from_concept "%s" of the "%s" mapping in collection "%s" is not part of "%s" version "%s": %s' % (
                                 mapping['from_concept_url'], self.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION, collection_id,
                                 datim_moh_source_id, period, str(mapping))
-                            self.vlog(1, msg)
-                            raise Exception(msg)
                         elif mapping['to_concept_url'] not in disaggregates:
-                            # we're not good. not good at all
-                            msg = 'ERROR: to_concept "%s" of the "%s" mapping in collection "%s" is not part of "%s" version "%s": %s ' % (
+                            msg = 'ERROR: to_concept "%s" of the "%s" mapping in collection "%s" is not part of "%s" version "%s": %s' % (
                                 mapping['to_concept_url'], self.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION, collection_id,
                                 datim_moh_source_id, period, str(mapping))
-                            self.vlog(1, msg)
-                            raise Exception(msg)
-                    elif mapping['map_type'] in self.DATIM_IMAP_OPERATIONS:
-                        if (mapping['from_concept_url'] in country_indicators and
-                                (mapping['to_concept_url'] in country_disaggregates or
-                                 mapping['to_concept_url'] == datim_moh_null_disag_endpoint)):
-                            # we're good - we have a valid mapping operation
-                            operations.append(mapping)
-                        elif mapping['from_concept_url'] not in country_indicators:
-                            # uhoh. this is no good - we are missing the country indicator concept
-                            msg = 'ERROR: from_concept "%s" not found in country source for operation mapping: %s' % (
-                                mapping['from_concept_url'], str(mapping))
-                            self.vlog(1, msg)
-                            raise Exception(msg)
-                        elif (mapping['to_concept_url'] not in country_disaggregates and
-                              mapping['to_concept_url'] != datim_moh_null_disag_endpoint):
-                            # also not good - we are missing the disag concept
-                            msg = 'ERROR: to_concept "%s" not found in country source for operation mapping: %s' % (
-                                mapping['to_concept_url'], str(mapping))
-                            self.vlog(1, msg)
-                            raise Exception(msg)
-                    else:
-                        # also not good - we don't know what to do with this map type
-                        msg = 'ERROR: Invalid map_type "%s" in collection "%s".' % (mapping['map_type'], collection_id)
                         self.vlog(1, msg)
                         raise Exception(msg)
+                elif mapping['map_type'] in self.DATIM_IMAP_OPERATIONS:
+                    if (mapping['from_concept_url'] in country_indicators and
+                            (mapping['to_concept_url'] in country_disaggregates or
+                             mapping['to_concept_url'] == datim_moh_null_disag_endpoint)):
+                        # we're good - we have a valid mapping operation
+                        operations.append(mapping)
+                    else:
+                        # uhoh. this is no good - we are missing the country indicator or disag concept
+                        if mapping['from_concept_url'] not in country_indicators:
+                            msg = 'ERROR: from_concept "%s" not found in country source for operation mapping: %s' % (
+                                mapping['from_concept_url'], str(mapping))
+                        elif (mapping['to_concept_url'] not in country_disaggregates and
+                              mapping['to_concept_url'] != datim_moh_null_disag_endpoint):
+                            msg = 'ERROR: to_concept "%s" not found in country source for operation mapping: %s' % (
+                                mapping['to_concept_url'], str(mapping))
+                        self.vlog(1, msg)
+                        raise Exception(msg)
+                else:
+                    # also not good - we don't know what to do with this map type
+                    msg = 'ERROR: Invalid map_type "%s" in collection "%s".' % (mapping['map_type'], collection_id)
+                    self.vlog(1, msg)
+                    raise Exception(msg)
 
             # Save the set of operations in the relevant datim indicator mapping, or skip if indicator has no mappings
             if datim_indicator_url in indicators:
@@ -274,11 +274,8 @@ class DatimImapExport(datimbase.DatimBase):
                             datim_indicator_mapping['to_concept_url'] == datim_disaggregate_url):
                         datim_indicator_mapping['operations'] = operations
 
-        # STEP 7 of 8: Cache the results
-        self.vlog(1, '**** STEP 7 of 8: SKIPPING -- Cache the results')
-
-        # STEP 8 of 8: Convert to tabular format
-        self.vlog(1, '**** STEP 8 of 8: Convert to tabular format')
+        # STEP 7 of 7: Convert to tabular format
+        self.vlog(1, '**** STEP 7 of 7: Convert to tabular format')
         rows = []
         for indicator_id, indicator in indicators.items():
             for mapping in indicator['mappings']:

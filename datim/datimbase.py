@@ -1,14 +1,19 @@
+"""
+Base class providing common functionality for DATIM indicator and country mapping synchronization and presentation.
+"""
 from __future__ import with_statement
 import os
 import itertools
 import functools
 import operator
 import requests
+import grequests
 import sys
 import zipfile
 import time
 import datetime
 import json
+from StringIO import StringIO
 import settings
 import ocldev.oclconstants
 
@@ -223,7 +228,7 @@ class DatimBase(object):
         return False
 
     def get_ocl_repositories(self, endpoint=None, key_field='id', require_external_id=True,
-                             active_attr_name='__datim_sync'):
+                             active_attr_name='__datim_sync', limit=110):
         """
         Gets repositories from OCL using the provided URL, optionally filtering by external_id and a
         custom attribute indicating active status. Note that only one repository is returned per unique
@@ -234,7 +239,8 @@ class DatimBase(object):
         filtered_repos = {}
         next_url = self.oclenv + endpoint
         while next_url:
-            response = requests.get(next_url, headers=self.oclapiheaders)
+            response = requests.get(next_url, headers=self.oclapiheaders, params={"limit": str(limit)})
+            self.vlog(2, "Fetching repositories for '%s' from OCL: %s" % (endpoint, response.url))
             response.raise_for_status()
             repos = response.json()
             for repo in repos:
@@ -303,7 +309,7 @@ class DatimBase(object):
     def increment_ocl_versions(self, import_results=None):
         """
         Increment version for OCL repositories that were modified according to the provided import results object
-        TODO: Refactor so that objetc references are valid
+        TODO: Refactor so that object references are valid
         :param import_results:
         :return:
         """
@@ -341,7 +347,61 @@ class DatimBase(object):
             self.vlog(1, '[OCL Export %s of %s] %s: Created new repository version "%s"' % (
                 cnt, len(self.OCL_EXPORT_DEFS), ocl_export_key, repo_version_endpoint))
 
-    def get_ocl_export(self, endpoint='', version='', zipfilename='', jsonfilename=''):
+    def get_ocl_exports_async(self, endpoint='', period='', version=''):
+        """
+        Retrieves all matching exports at the specified 'collections' or 'sources' endpoint
+        :param endpoint: e.g. /orgs/DATIM-MOH-UA-FY19/collections/
+        :param period: e.g. FY18, FY19
+        :param version: Required, and does not support "latest" (e.g. v2, v3)
+        :return: <dict> repository_version_url: repository_version_export
+        """
+        country_version_id = '%s.%s' % (period, version)
+        country_collections = self.get_ocl_repositories(
+            endpoint=endpoint, require_external_id=False, active_attr_name=None)
+        self.vlog(1, '%s repositories returned for endpoint "%s"' % (len(country_collections), endpoint))
+        country_collection_urls = []
+        for collection_id, collection in country_collections.items():
+            url_ocl_export = '%s%s%s/export/' % (self.oclenv, collection['url'], country_version_id)
+            # self.vlog(1, 'Export URL:', url_ocl_export)
+            country_collection_urls.append(url_ocl_export)
+        export_rs = (grequests.get(url, headers=self.oclapiheaders) for url in country_collection_urls)
+        export_responses = grequests.map(export_rs, size=6)
+        # self.vlog(1, 'Results of async query:\n%s' % export_responses)
+        collection_results = {}
+        for export_response in export_responses:
+            original_export_url = export_response.url
+            if export_response.history and export_response.history[0] and export_response.history[0].url:
+                original_export_url = export_response.history[0].url
+            if export_response.status_code == 404:
+                # Repository version does not exist, so we can safely skip this one
+                self.vlog(2, '[%s NOT FOUND] %s' % (export_response.status_code, export_response.url))
+                continue
+            elif export_response.status_code == 204:
+                # Export not cached for this repository version, so we need to generate it first
+                self.vlog(2, '[%s MISSING EXPORT] %s' % (export_response.status_code, export_response.url))
+                export_response = self.generate_repository_version_export(original_export_url)
+            else:
+                export_response.raise_for_status()
+
+            if export_response.status_code == 200:
+                # Cached export successfully retrieved for this repository version
+                self.vlog(2, '[%s FOUND] %s' % (export_response.status_code, original_export_url))
+                export_string_handle = StringIO(export_response.content)
+                zipref = zipfile.ZipFile(export_string_handle, "r")
+                if 'export.json' in zipref.namelist():
+                    collection_results[original_export_url] = json.loads(zipref.read('export.json'))
+                    zipref.close()
+                else:
+                    zipref.close()
+                    errmsg = 'ERROR: Invalid repository export for "%s": export.json not found.' % original_export_url
+                    self.vlog(1, errmsg)
+                    raise Exception(errmsg)
+        self.vlog(1, '%s repository exports for version "%s" retrieved at endpoint "%s"' % (
+            len(collection_results), country_version_id, endpoint))
+        return collection_results
+
+    def get_ocl_export(self, endpoint='', version='', zipfilename='', jsonfilename='', delay_seconds=10,
+                                           max_wait_seconds=120):
         """
         Fetches an export of the specified repository version and saves to file.
         Use version="latest" to fetch the most recent released repo version.
@@ -370,20 +430,18 @@ class DatimBase(object):
         self.vlog(1, 'Export URL:', url_ocl_export)
         r = requests.get(url_ocl_export, headers=self.oclapiheaders)
         r.raise_for_status()
-        if r.status_code == 204:
-            # Create the export and try one more time...
+        if r.status_code == 200:
+            # Export successfully retrieved
+            pass
+        elif r.status_code == 204:
+            # Export does not exist, so let's attempt to generate the export and retrieve it...
             self.vlog(1, 'WARNING: Export does not exist for "%s". Creating export...' % url_ocl_export)
-            new_export_request = requests.post(url_ocl_export, headers=self.oclapiheaders)
-            if new_export_request.status_code == 202:
-                # Wait for export to be processed then try to fetch it
-                self.vlog(1, 'INFO: Waiting 30 seconds while export is being generated...')
-                time.sleep(30)
-                r = requests.get(url_ocl_export, headers=self.oclapiheaders)
-                r.raise_for_status()
-            else:
-                msg = 'ERROR: Unable to generate export for "%s"' % url_ocl_export
-                self.vlog(1, msg)
-                raise Exception(msg)
+            r = self.generate_repository_version_export(repo_export_url=url_ocl_export, delay_seconds=delay_seconds,
+                                           max_wait_seconds=max_wait_seconds)
+        else:
+            msg = 'ERROR: Unrecognized response from OCL: %s' % str(r.status_code)
+            self.vlog(1, msg)
+            raise Exception(msg)
 
         # Write compressed export to file
         with open(self.attach_absolute_data_path(zipfilename), 'wb') as handle:
@@ -399,6 +457,50 @@ class DatimBase(object):
         self.vlog(1, 'Export decompressed to "%s"' % jsonfilename)
 
         return True
+
+    def generate_repository_version_export(self, repo_export_url, do_wait_until_cached=True, delay_seconds=10,
+                                           max_wait_seconds=120):
+        """
+        Generate a cached repository version export in OCL and optionally wait until processing of the export is
+        completed. Returns True if the request is submitted successfully and "do_wait_until_cached"==False. Returns
+        the Response object with the cached export if "do_wait_until_cached"==True. Otherwise fails with exception.
+        :param repo_export_url:
+        :param do_wait_until_cached:
+        :param delay_seconds:
+        :param max_wait_seconds:
+        :return: <Response>
+        """
+        # Make the initial request
+        request_create_export = requests.post(repo_export_url, headers=self.oclapiheaders)
+        request_create_export.raise_for_status()
+        if request_create_export.status_code != 202:
+            msg = 'ERROR: %s error generating export for "%s"' % (request_create_export.status_code, repo_export_url)
+            self.vlog(1, msg)
+            raise Exception(msg)
+
+        # Optionally wait for export to be processed and then retrieve it
+        if do_wait_until_cached:
+            start_time = time.time()
+            while time.time() - start_time + delay_seconds < max_wait_seconds:
+                self.vlog(1, 'INFO: Delaying %s seconds while export is being generated...' % str(delay_seconds))
+                time.sleep(delay_seconds)
+                r = requests.get(repo_export_url, headers=self.oclapiheaders)
+                r.raise_for_status()
+                if r.status_code == 200:
+                    return r
+                elif r.status_code == 204:
+                    continue
+                else:
+                    msg = 'ERROR: %s error generating export for "%s"' % (
+                        request_create_export.status_code, repo_export_url)
+                    self.vlog(1, msg)
+                    raise Exception(msg)
+            msg = 'ERROR: Export taking too long to process. Exiting...'
+            self.vlog(1, msg)
+            raise Exception(msg)
+        else:
+            # Otherwise just return True that the request was successfully submitted
+            return True
 
     @staticmethod
     def find_nth(haystack, needle, n):

@@ -808,6 +808,9 @@ class DatimImapFactory(object):
         org_url = "%s/orgs/%s/" % (oclenv, org_id)
         print('INFO: Checking if org "%s" exists...' % org_url)
         r = requests.get(org_url, headers=oclapiheaders)
+        if r.status_code == 404:
+            return False
+        r.raise_for_status()
         if r.status_code != 200:
             return False
 
@@ -944,7 +947,7 @@ class DatimImapFactory(object):
         r.raise_for_status()
 
     @staticmethod
-    def generate_import_script_from_diff(imap_diff):
+    def generate_import_script_from_diff(imap_diff, verbose=True):
         """
         Return a list of JSON imports representing the diff
         :param imap_diff: IMAP diff used to generate the import script
@@ -1080,16 +1083,18 @@ class DatimImapFactory(object):
                 """
 
         # Handle 'values_changed' - updated name for country indicator or disag
+        # NOTE: Names changes to DATIM indicator/disags are ignored
         if 'values_changed' in diff_data:
-            regex_pattern = "^root\[\'([a-zA-Z0-9\-_]+,[a-zA-Z0-9\-_]+,[a-zA-Z0-9\-_]+,[a-zA-Z0-9\-_]+,[a-zA-Z0-9\-_]+,[a-zA-Z0-9\-_]+,[a-zA-Z0-9\-_]+)\'\]\[\'(MOH_Disag_Name|MOH_Indicator_Name)\'\]$"
+            regex_pattern = r"^root\[\'([a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+)\'\]\[\'(MOH_Disag_Name|MOH_Indicator_Name)\'\]$"
             for diff_key in diff_data['values_changed'].keys():
+                # Parse the diff resource key
                 regex_result = re.match(regex_pattern, diff_key)
                 if not regex_result:
                     continue
                 row_key = regex_result.group(1)
                 matched_field_name = regex_result.group(2)
 
-                #csv_row_old = imap_diff.imap_a.get_imap_row_by_key(row_key)
+                # JP 2019-08-22 not currently used: csv_row_old = imap_diff.imap_a.get_imap_row_by_key(row_key)
                 csv_row_new = imap_diff.imap_b.get_imap_row_by_key(row_key)
 
                 # MOH_Indicator_Name
@@ -1111,11 +1116,17 @@ class DatimImapFactory(object):
         import_list_narrative_dedup = []
         [import_list_narrative_dedup.append(i) for i in import_list_narrative if not import_list_narrative_dedup.count(i)]
 
-        pprint.pprint(import_list_narrative_dedup)
+        # Display additional debug info
+        if verbose:
+            for i in range(0, len(import_list_dedup)):
+                print '[%s of %s] %s -- %s' % (
+                    i + 1, len(import_list_dedup), import_list_narrative_dedup[i], import_list_dedup[i])
+
         return import_list_dedup
 
     @staticmethod
-    def generate_import_script_from_csv_row(imap_input=None, csv_row=None, defs=None, do_add_columns_to_csv=True):
+    def generate_import_script_from_csv_row(imap_input=None, csv_row=None, defs=None, do_add_columns_to_csv=True,
+                                            verbose=False):
         """
         Return a list of JSON imports representing the CSV row
         :param imap_input:
@@ -1134,12 +1145,19 @@ class DatimImapFactory(object):
             datim_map_type=datimbase.DatimBase.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION, defs=defs)
         datim_csv_converter.set_resource_definitions(datim_csv_resource_definitions)
         import_list = datim_csv_converter.process_by_definition()
+
         # Dedup the import list without changing order using list enumeration
         import_list_dedup = [i for n, i in enumerate(import_list) if i not in import_list[n + 1:]]
+
+        # Display additional debug info
+        if verbose:
+            for i in range(0, len(import_list_dedup)):
+                print '[%s of %s] %s' % (i + 1, len(import_list_dedup), import_list_dedup[i])
+
         return import_list_dedup
 
     @staticmethod
-    def generate_import_script_from_csv(imap_input):
+    def generate_import_script_from_csv(imap_input, verbose=True):
         """
         Return a list of JSON imports representing the entire CSV
         :param imap_input:
@@ -1154,8 +1172,15 @@ class DatimImapFactory(object):
             datim_map_type=datimbase.DatimBase.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION)
         datim_csv_converter.set_resource_definitions(datim_csv_resource_definitions)
         import_list = datim_csv_converter.process_by_definition()
+
         # Dedup the import list using list enumeration
         import_list_dedup = [i for n, i in enumerate(import_list) if i not in import_list[n + 1:]]
+
+        # Display additional debug info
+        if verbose:
+            for i in range(0, len(import_list_dedup)):
+                print '[%s of %s] %s' % (i + 1, len(import_list_dedup), import_list_dedup[i])
+
         return import_list_dedup
 
     @staticmethod
@@ -1195,12 +1220,21 @@ class DatimImapDiff(object):
                                  exclude_classification=True, convert_to_dict=True),
             verbose_level=2)
 
-        # Remove the Total vs. default differences
+        # Post-processing Step 1: Remove the Total vs. default differences
         if 'values_changed' in self.__diff_data:
-            for key in self.__diff_data['values_changed'].keys():
-                if (self.__diff_data['values_changed'][key]['new_value'] == 'Total' and
-                        self.__diff_data['values_changed'][key]['old_value'] == 'default'):
-                    del(self.__diff_data['values_changed'][key])
+            for diff_key in self.__diff_data['values_changed'].keys():
+                if (self.__diff_data['values_changed'][diff_key]['new_value'] == 'Total' and
+                        self.__diff_data['values_changed'][diff_key]['old_value'] == 'default'):
+                    del(self.__diff_data['values_changed'][diff_key])
+
+        # Post-processing Step 2: Remove name discrepancies in the DATIM indicator and disag names
+        if 'values_changed' in self.__diff_data:
+            regex_pattern = r"^root\[\'([a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+)\'\]\[\'(DATIM_Disag_Name)\'\]$"
+            for diff_key in self.__diff_data['values_changed'].keys():
+                # Parse the diff resource key
+                regex_result = re.match(regex_pattern, diff_key)
+                if regex_result is not None:
+                    del(self.__diff_data['values_changed'][diff_key])
 
     def get_diff(self):
         """
@@ -1208,6 +1242,15 @@ class DatimImapDiff(object):
         :return:
         """
         return self.__diff_data
+
+    def display(self):
+        for diff_category in self.__diff_data.keys():
+            print '** DIFF CATEGORY: %s' % diff_category
+            i = 0
+            for resource_diff_key, resource_diff in self.__diff_data[diff_category].items():
+                i += 1
+                print '    [%s of %s] %s -- %s' % (
+                    i, len(self.__diff_data[diff_category]), resource_diff_key, resource_diff)
 
 
 class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter):

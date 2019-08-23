@@ -13,9 +13,10 @@ import json
 
 
 # Default Script Settings
+export_format = datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV  # CSV, JSON and HTML are supported
 country_code = ''  # e.g. RW, LS, etc.
-export_format = datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_JSON  # CSV, JSON and HTML are supported
 period = ''  # e.g. FY17, FY18, etc.
+version = ''  # Leave blank to fetch latest for period, or specify country minor version number (e.g. v0, v1, v2, etc.)
 exclude_empty_maps = True
 include_extra_info = False
 verbosity = 0
@@ -59,15 +60,15 @@ country_org = 'DATIM-MOH-%s-%s' % (country_code, period)
 # Debug output
 if verbosity:
     print('\n\n' + '*' * 100)
-    print('** [EXPORT] Country Code: %s, Org: %s, Format: %s, Period: %s, Exclude Empty Maps: %s, Verbosity: %s' % (
-        country_code, country_org, export_format, period, str(exclude_empty_maps), str(verbosity)))
+    print('** [EXPORT] Country Code: %s, Org: %s, Format: %s, Period: %s, Version: %s, Exclude Empty Maps: %s, Verbosity: %s' % (
+        country_code, country_org, export_format, period, version, str(exclude_empty_maps), str(verbosity)))
     print('*' * 100)
 
 # Generate the IMAP export
 datim_imap_export = datim.datimimapexport.DatimImapExport(
     oclenv=oclenv, oclapitoken=oclapitoken, verbosity=verbosity, run_ocl_offline=run_ocl_offline)
 try:
-    imap = datim_imap_export.get_imap(period=period, country_org=country_org, country_code=country_code)
+    imap = datim_imap_export.get_imap(period=period, version=version, country_org=country_org, country_code=country_code)
 except requests.exceptions.HTTPError as e:
     print(e)
     sys.exit(1)

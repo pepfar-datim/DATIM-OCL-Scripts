@@ -247,6 +247,7 @@ class DatimImapImport(datimbase.DatimBase):
                 oclenv=self.oclenv, oclapitoken=self.oclapitoken, imap_input=imap_input)
             country_source_export = ocldev.oclexport.OclExportFactory.load_export(
                 repo_version_url=country_next_version_url, oclapitoken=self.oclapitoken)
+            self.vlog(1, 'INFO: Successfully retrieved export of new source version "%s"' % country_next_version_url)
             ref_import_list = refgen.process_imap(country_source_export=country_source_export)
             pprint.pprint(ref_import_list)
         elif not import_list:

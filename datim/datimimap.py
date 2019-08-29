@@ -1005,19 +1005,18 @@ class DatimImapFactory(object):
             is_repo_version_processing = True
             country_version_processing_url = '%s%s%s/processing/' % (oclenv, repo_endpoint, repo_version_id)
             while is_repo_version_processing:
-                r = requests.get(country_version_processing_url, headers=oclapiheaders)
-                r.raise_for_status()
                 if verbose:
-                    print 'INFO: Source version processing status for "%s" %s' % (
-                        country_version_processing_url, r.text)
+                    print 'INFO: Delaying %s seconds while source version is processing' % delay_interval_seconds
+                time.sleep(delay_interval_seconds)
+                r = requests.get(country_version_processing_url, headers=oclapiheaders)
+                if verbose:
+                    print 'INFO: Source version processing status for "%s": %s, Processing Status = %s' % (
+                        country_version_processing_url, r.status_code, r.text)
+                r.raise_for_status()
                 if r.text == 'False':
                     is_repo_version_processing = False
                     if verbose:
                         print 'INFO: Source version processing is complete'
-                else:
-                    if verbose:
-                        print 'INFO: Delaying %s seconds while source version is processing' % delay_interval_seconds
-                    time.sleep(delay_interval_seconds)
 
         return True
 

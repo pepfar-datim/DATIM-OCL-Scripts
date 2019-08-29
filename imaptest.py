@@ -514,6 +514,8 @@ print '  ocl_api_env = %s' % ocl_api_env
 print '*' * 100
 datim.datimimaptests.DatimImapTests.display_test_summary(imap_tests)
 
-#imap_tester = datim.datimimaptests.DatimImapTests()
-#imap_tester.run_tests(imap_tests)
-#imap_tester.display_test_results()
+# Run the tests and display the results
+imap_tester = datim.datimimaptests.DatimImapTests()
+imap_tester.run_tests(imap_tests)
+imap_tester.display_test_results()
+

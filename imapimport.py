@@ -10,7 +10,7 @@ import datim.datimimapimport
 
 
 # Default Script Settings
-country_code = ''  # e.g. RW
+country_code = ''  # e.g. RW, UA --- note that DATIM expects 2-letter country codes
 period = ''  # e.g. FY18, FY19
 imap_import_filename = ''  # e.g. RW-FY18.csv or RW-FY18.json
 country_name = ''  # e.g. Rwanda
@@ -80,25 +80,14 @@ if delete_org_if_exists:
         # Pause briefly to allow user to cancel in case deleting org on accident...
         time.sleep(5)
         result = datim.datimimap.DatimImapFactory.delete_org_if_exists(
-            org_id=country_org, oclenv=oclenv, ocl_root_api_token=settings.ocl_root_api_token)
-        if verbosity:
-            if result:
-                print('Org successfully deleted.')
-            else:
-                print('Org does not exist.')
+            org_id=country_org, oclenv=oclenv, ocl_root_api_token=settings.api_token_staging_root, verbose=verbosity)
     elif verbosity:
-        print('Skipping "delete_org_if_exists" step because in "test_mode"')
+        print('Skipping "delete_org_if_exists" step because "test_mode" is enabled')
 
 # Load IMAP from import file
-imap_input = None
-if imap_import_filename.endswith('.json'):
-    imap_input = datim.datimimap.DatimImapFactory.load_imap_from_json(
-        json_filename=imap_import_filename, period=period,
-        country_org=country_org, country_name=country_name, country_code=country_code)
-elif imap_import_filename.endswith('.csv'):
-    imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(
-        csv_filename=imap_import_filename, period=period,
-        country_org=country_org, country_name=country_name, country_code=country_code)
+imap_input = datim.datimimap.DatimImapFactory.load_imap_from_file(
+    imap_filename=imap_import_filename, period=period,
+    country_org=country_org, country_name=country_name, country_code=country_code)
 if verbosity and imap_input:
     print('IMAP import file "%s" loaded successfully' % imap_import_filename)
 elif not imap_input:

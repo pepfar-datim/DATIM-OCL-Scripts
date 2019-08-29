@@ -1,0 +1,115 @@
+DATIM_Indicator_Category,DATIM_Indicator_ID,DATIM_Disag_Name,DATIM_Disag_ID,Operation,MOH_Indicator_Name,MOH_Indicator_ID,MOH_Disag_Name,MOH_Disag_ID
+HTS_TST,HTS_TST_N_MOH,Total,HllvX50cXC0,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | <1 | Female,pCFCaOLScdv,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / <1 / Female,Pos_F_0-1
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 1-4 | Female,xzoIG0AwsNB,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 1-4 / Female,Pos_F_1-4
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 5-9 | Female,UggtNScQMVl,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 5-9 / Female,Pos_F_5-9
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 10-14 | Female,hXgqQX95TVa,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 10-14 / Female,Pos_F_10-14
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 15-19 | Female,wJCVvM7o6xm,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 15-19 / Female,Pos_F_15-19
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 20-24 | Female,tvOcOPhIdRH,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 20-24 / Female,Pos_F_20-24
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 25-29 | Female,BLWV93S2HJ0,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 25-29 / Female,Pos_F_25-29
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 30-34 | Female,bxqrio2gHOj,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 30-34 / Female,Pos_F_30-34
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 35-39 | Female,MuaoVfC9rYL,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 35-39 / Female,Pos_F_35-39
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 40-45 | Female,d3rKRkxJP1v,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 45-49 | Female,ERDcFrmlT0J,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 45-49 / Female,Pos_F_45-49
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 50+ | Female,GlfLlD3wSQj,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 50+ / Female,Pos_F_50
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | <1 | Male,cXdSJvbabBT,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / <1 / Male,Pos_M_0-1
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 1-4 | Male,tBoWuTd0ERY,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 1-4 / Male,Pos_M_1-4
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 5-9 | Male,wLMOUM9mfTV,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 5-9 / Male,Pos_M_5-9
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 10-14 | Male,KRoQaA91sv5,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 10-14 / Male,Pos_M_10-14
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 15-19 | Male,wpck6pSRDer,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 15-19 / Male,Pos_M_15-19
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 20-24 | Male,BitB2nKfWBK,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 20-24 / Male,Pos_M_20-24
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 25-29 | Male,NRZfd73Ypo8,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 25-29 / Male,Pos_M_25-29
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 30-34 | Male,kLd3OnUYTr5,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 30-34 / Male,Pos_M_30-34
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 35-39 | Male,wnsHEWFSqzG,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 35-39 / Male,Pos_M_35-39
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 40-45 | Male,HTcrEM69sst,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 45-49 | Male,OOCHuTdTJEQ,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 45-49 / Male,Pos_M_45-49
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 50+ | Male,WDpiIZ8UjB8,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Positive / 50+ / Male,Pos_M_50
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | <1 | Female,Gvo9takmOXx,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / <1 / Female,Neg_F_0-1
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 1-4 | Female,xTNM0wWDzo0,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 1-4 / Female,Neg_F_1-4
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 5-9 | Female,EFah6yBFc3J,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 5-9 / Female,Neg_F_5-9
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 10-14 | Female,tIhxMfmPrU5,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 10-14 / Female,Neg_F_10-14
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 15-19 | Female,NJclydByUvA,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 15-19 / Female,Neg_F_15-19
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 20-24 | Female,fysQ3RXzbzW,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 20-24 / Female,Neg_F_20-24
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 25-29 | Female,TCwxcGgIeqE,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 25-29 / Female,Neg_F_25-29
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 30-34 | Female,oKgx2Sw4qUL,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 30-34 / Female,Neg_F_30-34
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 35-39 | Female,Sf6GWp5gNx2,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 35-39 / Female,Neg_F_35-39
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 40-45 | Female,fsnxvho9fiG,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 45-49 | Male,i0RFyIDccSm,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 45-49 / Male,Neg_M_45-49
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 50+ | Female,i4lSbrUVcpe,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 50+ / Female,Neg_F_50
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | <1 | Male,iomLts0rFcj,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / <1 / Male,Neg_M_0-1
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 1-4 | Male,uPpiUkMhH6j,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 1-4 / Male,Neg_M_1-4
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 5-9 | Male,NpsmKYKl0mt,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 5-9 / Male,Neg_M_5-9
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 10-14 | Male,Kjn4IWLfG2G,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 10-14 / Male,Neg_M_10-14
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 15-19 | Male,eyTROtsEW5a,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 15-19 / Male,Neg_M_15-19
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 20-24 | Male,QS3vNL5WySH,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 20-24 / Male,Neg_M_20-24
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 25-29 | Male,lGNNK7ZYDGP,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 25-29 / Male,Neg_M_25-29
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 30-34 | Male,kZ5sEz94kJE,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 30-34 / Male,Neg_M_30-34
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 35-39 | Male,wO7RB8C1sal,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 35-39 / Male,Neg_M_35-39
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 40-45 | Male,RLLUx3DHJan,ADD,,,,
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 50+ | Male,ip5uMUT73Qu,ADD,"Number of individuals who received HIV Testing Services (HTS) and received their test results, disaggregated by HIV result",HTS_TST,Negative / 50+ / Male,Neg_M_50
+PMTCT_ART,PMTCT_ART_N_MOH,Total,HllvX50cXC0,ADD,,,,
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex,Total,Jwb1SWomgpk,ADD,,,,
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex_KnownNewPosNewNeg,KnownPositives,o0gcwyuh7mU,ADD,,,,
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex_KnownNewPosNewNeg,NewlyTestedPositives,pc4W2rmWK4q,ADD,,,,
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex_KnownNewPosNewNeg,NewNegatives,PCasMOWl24Y,ADD,,,,
+TX_CURR,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,<15 | Female,chrwpNxHlQQ,ADD,,,,
+TX_CURR,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,15+ | Female,Yf1BiWq71NE,ADD,,,,
+TX_CURR,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,<15 | Male,zHSL7ATXJib,ADD,,,,
+TX_CURR,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,15+ | Male,XX7hDj6iz0D,ADD,,,,
+TX_CURR,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,<15 | SexUnknown,uURluLqPIJ5,ADD,,,,
+TX_CURR,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,15+ | SexUnknown,qli3maq9Ot7,ADD,,,,
+TX_CURR,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,AgeUnknown | Female,P9UIhogYbAa,ADD,,,,
+TX_CURR,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,AgeUnknown | Male,UN9ZOZLLVqN,ADD,,,,
+TX_CURR,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,AgeUnknown | SexUnknown,Gfje2jHn5TY,ADD,,,,
+TX_CURR,TB_PREV_N_MOH_TherapyType_NewExArt_HIV,Previously Enrolled on ART | Alternative TPT Regimen,raHUwj8Q9Hf,ADD,,,,
+TX_CURR,TB_PREV_N_MOH_TherapyType_NewExArt_HIV,Newly enrolled on ART | Alternative TPT Regimen,Qq1kGcQENms,ADD,,,,
+TX_CURR,TB_PREV_N_MOH_TherapyType_NewExArt_HIV,Previously Enrolled on ART | IPT,ujD0vlLsULk,ADD,,,,
+TX_CURR,TB_PREV_N_MOH_TherapyType_NewExArt_HIV,Newly enrolled on ART | IPT,xTbmPjpd5sB,ADD,,,,
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,<1 | Female,y3VqNEK9n95,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,<1 | Female,TX_CURR_F_0-1
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,1-4 | Female,PPoL5AnEAQf,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,1-4 | Female,TX_CURR_F_1-4
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,5-9 | Female,hiUhhVpgUMg,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,5-9 | Female,TX_CURR_F_5-9
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,10-14 | Female,dFjZira5vTX,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,10-14 | Female,TX_CURR_F_10-14
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,15-19 | Female,wW6G5NC8Wd1,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,15-19 | Female,TX_CURR_F_15-19
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,20-24 | Female,Xn5oUNVSMWA,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,20-24 | Female,TX_CURR_F_20-24
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,25-29 | Female,RMA75iIp8Wd,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,25-29 | Female,TX_CURR_F_25-29
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,30-34 | Female,j0yodS3zbnW,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,30-34 | Female,TX_CURR_F_30-34
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,35-39 | Female,OBbZvcHg2HL,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,35-39 | Female,TX_CURR_F_35-39
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,40-44 | Female,eOn9JgfkB4F,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,40-44 | Female,TX_CURR_F_40-44
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,45-49 | Female,POkbpo4D13c,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,45-49 | Female,TX_CURR_F_45-49
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,50+ | Female,kGlGj9LDonu,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,50+ | Female,TX_CURR_F_50
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,<1 | Male,SeijxYK8F4b,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,<1 | Male,TX_CURR_M_0-1
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,1-4 | Male,jbrs9Qk6f9b,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,1-4 | Male,TX_CURR_M_1-4
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,5-9 | Male,IxSwaxNCt1n,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,5-9 | Male,TX_CURR_M_5-9
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,10-14 | Male,ljBmGJpAsZh,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,10-14 | Male,TX_CURR_M_10-14
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,15-19 | Male,x1r1vfZQLFj,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,15-19 | Male,TX_CURR_M_15-19
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,20-24 | Male,VdA970UlzlX,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,20-24 | Male,TX_CURR_M_20-24
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,25-29 | Male,R9wcT5vQ7tR,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,25-29 | Male,TX_CURR_M_25-29
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,30-34 | Male,B8JEL3qeQiw,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,30-34 | Male,TX_CURR_M_30-34
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,35-39 | Male,ytvrDZdNAhc,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,35-39 | Male,TX_CURR_M_35-39
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,40-44 | Male,qdYU6NoIpY1,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,40-44 | Male,TX_CURR_M_40-44
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,45-49 | Male,WjX1mRJp9NV,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,45-49 | Male,TX_CURR_M_45-49
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,50+ | Male,FgwkSYUXq8x,ADD,Number of adults and children currently receiving antiretroviral therapy (ART),TX_CURR,50+ | Male,TX_CURR_M_50
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,<1 | Female,y3VqNEK9n95,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,<1 / Female,TX_NEW_F_0-1
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,1-4 | Female,PPoL5AnEAQf,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,1-4 / Female,TX_NEW_F_1-4
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,5-9 | Female,hiUhhVpgUMg,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,5-9 / Female,TX_NEW_F_5-9
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,10-14 | Female,dFjZira5vTX,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,10-14 Female,TX_NEW_F_10-14
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,15-19 | Female,wW6G5NC8Wd1,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,15-19 Female,TX_NEW_F_15-19
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,20-24 | Female,Xn5oUNVSMWA,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,20-24 Female,TX_NEW_F_20-24
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,25-29 | Female,RMA75iIp8Wd,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,25-29 Female,TX_NEW_F_25-29
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,30-34 | Female,j0yodS3zbnW,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,30-34 Female,TX_NEW_F_30-34
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,35-39 | Female,OBbZvcHg2HL,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,35-39 Female,TX_NEW_F_35-39
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,40-44 | Female,eOn9JgfkB4F,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,40-44 Female,TX_NEW_F_40-44
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,45-49 | Female,POkbpo4D13c,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,45-49 Female,TX_NEW_F_45-49
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,50+ | Female,kGlGj9LDonu,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,50+ Female,TX_NEW_F_50
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,<1 | Male,SeijxYK8F4b,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,<1 / Male,TX_NEW_M_0-1
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,1-4 | Male,jbrs9Qk6f9b,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,1-4 / Male,TX_NEW_M_1-4
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,5-9 | Male,IxSwaxNCt1n,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,5-9 / Male,TX_NEW_M_5-9
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,10-14 | Male,ljBmGJpAsZh,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,10-14 Male,TX_NEW_M_10-14
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,15-19 | Male,x1r1vfZQLFj,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,15-19 Male,TX_NEW_M_15-19
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,20-24 | Male,VdA970UlzlX,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,20-24 Male,TX_NEW_M_20-24
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,25-29 | Male,R9wcT5vQ7tR,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,25-29 Male,TX_NEW_M_25-29
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,30-34 | Male,B8JEL3qeQiw,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,30-34 Male,TX_NEW_M_30-34
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,35-39 | Male,ytvrDZdNAhc,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,35-39 Male,TX_NEW_M_35-39
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,40-44 | Male,qdYU6NoIpY1,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,40-44 Male,TX_NEW_M_40-44
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,45-49 | Male,WjX1mRJp9NV,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,45-49 Male,TX_NEW_M_45-49
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,50+ | Male,FgwkSYUXq8x,ADD,Number of adults and children newly enrolled on antiretroviral therapy (ART),TX_NEW,50+ Male,TX_NEW_M_50

@@ -191,7 +191,7 @@ class DatimConstants(object):
         }
     }
 
-    # MOH-FY18 DHIS2 Queries
+    # MOH-FY18 DHIS2 Queries - these are the FY18 PEPFAR gold standard data elements & disags that countries map to
     MOH_FY18_DHIS2_QUERIES = {
         'MOH-FY18': {
             'id': 'MOH-FY18',
@@ -205,7 +205,7 @@ class DatimConstants(object):
         }
     }
 
-    # MOH-FY19 DHIS2 Queries
+    # MOH-FY19 DHIS2 Queries - these are the FY19 PEPFAR gold standard data elements & disags that countries map to
     # TODO: Verify that MOH-FY19 DHIS2 Queries works
     # NOTE: https://vshioshvili.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:OBhi1PUW3OL
     # https://vshioshvili.datim.org/api/dataElements.json?fields=id,code,name,shortName,lastUpdated,description,categoryCombo[id,code,name,lastUpdated,created,categoryOptionCombos[id,code,name,lastUpdated,created]],dataSetElements[*,dataSet[id,name,shortName]]&paging=false&filter=dataSetElements.dataSet.id:in:[OBhi1PUW3OL]

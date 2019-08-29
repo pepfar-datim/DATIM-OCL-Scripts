@@ -7,9 +7,12 @@ import datim.datimimapimport
 
 # Shared settings -- these are used for all tests
 period = 'FY19'
-ocl_api_env = settings.ocl_api_url_staging
-ocl_api_token = settings.api_token_staging_datim_admin
-ocl_api_root_token = settings.api_token_staging_root
+ocl_api_env = settings.oclenv
+ocl_api_token = settings.oclapitoken
+ocl_api_root_token = settings.ocl_root_api_token
+# ocl_api_env = settings.ocl_api_url_staging
+# ocl_api_token = settings.api_token_staging_datim_admin
+# ocl_api_root_token = settings.api_token_staging_root
 # ocl_api_env = settings.ocl_api_url_production
 # ocl_api_token = settings.api_token_production_datim_admin
 # ocl_api_root_token = settings.api_token_production_root

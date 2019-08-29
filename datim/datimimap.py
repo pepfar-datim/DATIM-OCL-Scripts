@@ -6,6 +6,7 @@ import StringIO
 import csv
 import json
 import re
+import time
 import pprint
 from operator import itemgetter
 import requests
@@ -118,13 +119,14 @@ class DatimImap(object):
     # Set to True to treat equal MOH_Indicator_ID and MOH_Disag_ID values in the same row as a null MOH disag
     SET_EQUAL_MOH_ID_TO_NULL_DISAG = False
 
-    def __init__(self, country_code='', country_org='', country_name='', period='',
+    def __init__(self, country_code='', country_org='', country_name='', period='', version=None,
                  imap_data=None, do_add_columns_to_csv=True):
         """ Constructor for DatimImap class """
         self.country_code = country_code
         self.country_org = country_org
         self.country_name = country_name
         self.period = period
+        self.version = version
         self.do_add_columns_to_csv = do_add_columns_to_csv
         self.__imap_data = None
         self.set_imap_data(imap_data)
@@ -772,26 +774,52 @@ class DatimImapFactory(object):
         return 'ocl-%s-raw.json' % DatimImapFactory._convert_endpoint_to_filename_fmt(endpoint)
 
     @staticmethod
-    def get_period_from_version_id(version_id):
-        if DatimImapFactory.is_valid_period_version_id(version_id):
-            return version_id[:version_id.find('.')]
+    def get_period_from_version_id(imap_version_id):
+        """
+        Returns period string, e.g. "FY19", for an IMAP version, e.g. "FY19.v0".
+        :param imap_version_id:
+        :return:
+        """
+        if DatimImapFactory.is_valid_period_version_id(imap_version_id):
+            return imap_version_id[:imap_version_id.find('.')]
         return ''
 
     @staticmethod
-    def get_minor_version_from_version_id(version_id):
-        if DatimImapFactory.is_valid_period_version_id(version_id):
-            return version_id[version_id.find('.') + 1:]
+    def get_minor_version_from_version_id(imap_version_id):
+        """
+        Returns minor version string, e.g. "v0", for an IMAP version, e.g. "FY19.v0".
+        :param imap_version_id:
+        :return:
+        """
+        if DatimImapFactory.is_valid_period_version_id(imap_version_id):
+            return imap_version_id[imap_version_id.find('.') + 1:]
         return ''
 
     @staticmethod
-    def is_valid_period_version_id(version_id):
-        period_position = version_id.find('.')
-        if period_position > 0 and len(version_id) > 2 and len(version_id) - period_position > 1:
+    def get_minor_version_number_from_version_id(imap_version_id):
+        """
+        Returns minor version number as an integer given an IMAP version. For example, "FY19.v0" will return 0.
+        :param imap_version_id:
+        :return:
+        """
+        if DatimImapFactory.is_valid_period_version_id(imap_version_id):
+            return int(imap_version_id[imap_version_id.find('.v') + 2:])
+        return None
+
+    @staticmethod
+    def is_valid_period_version_id(imap_version_id):
+        """
+        Returns whether the given IMAP version ID is valid. Expected format is "FY##.v#".
+        :param imap_version_id:
+        :return:
+        """
+        period_position = imap_version_id.find('.')
+        if period_position > 0 and len(imap_version_id) > 2 and len(imap_version_id) - period_position > 1:
             return True
         return False
 
     @staticmethod
-    def delete_org_if_exists(org_id, oclenv='', ocl_root_api_token=''):
+    def delete_org_if_exists(org_id, oclenv='', ocl_root_api_token='', verbose=False):
         """
         Delete the org if it exists. Requires a root API token.
         :param org_id:
@@ -806,19 +834,28 @@ class DatimImapFactory(object):
             'Content-Type': 'application/json'
         }
         org_url = "%s/orgs/%s/" % (oclenv, org_id)
-        print('INFO: Checking if org "%s" exists...' % org_url)
+        if verbose:
+            print('INFO: Checking if org "%s" exists...' % org_url)
         r = requests.get(org_url, headers=oclapiheaders)
         if r.status_code == 404:
+            if verbose:
+                print('Org "%s" not found. Could not delete.' % org_id)
             return False
         r.raise_for_status()
         if r.status_code != 200:
+            if verbose:
+                print('Unrecognized response code: "%s". Could not delete.' % r.status_code)
             return False
 
         # Delete the org
         r = requests.delete(org_url, headers=oclapiheaders)
         r.raise_for_status()
-        print(r)
-        return True
+        if r.status_code == 204:
+            if verbose:
+                print('Org "%s" successfully deleted. Continuing...' % org_id)
+            return True
+
+        return False
 
     @staticmethod
     def get_repo_latest_period_version(repo_url='', period='', oclapitoken='', released=True):
@@ -848,6 +885,19 @@ class DatimImapFactory(object):
                 if period == current_period:
                     return repo_version
         return None
+
+    @staticmethod
+    def load_imap_from_file(imap_filename='', country_code='', country_org='', country_name='', period=''):
+        if imap_filename.endswith('.json'):
+            return DatimImapFactory.load_imap_from_json(
+                json_filename=imap_filename, period=period,
+                country_org=country_org, country_name=country_name, country_code=country_code)
+        elif imap_filename.endswith('.csv'):
+            return DatimImapFactory.load_imap_from_csv(
+                csv_filename=imap_filename, period=period,
+                country_org=country_org, country_name=country_name, country_code=country_code)
+        else:
+            raise Exception('ERROR: Unrecognized file extension "%s". Must be ".json" or ".csv".' % imap_filename)
 
     @staticmethod
     def load_imap_from_json(json_filename='', country_code='', country_org='', country_name='', period=''):
@@ -923,13 +973,17 @@ class DatimImapFactory(object):
         return new_version_data
 
     @staticmethod
-    def create_repo_version(oclenv='', oclapitoken='', repo_endpoint='', repo_version_id=''):
+    def create_repo_version(oclenv='', oclapitoken='', repo_endpoint='', repo_version_id='',
+                            delay_until_processed=False, delay_interval_seconds=10, verbose=0):
         """
         Create a new repository version
         :param oclenv:
         :param oclapitoken:
         :param repo_endpoint:
         :param repo_version_id:
+        :param delay_until_processed:
+        :param delay_interval_seconds:
+        :param verbose:
         :return:
         """
         oclapiheaders = {
@@ -946,11 +1000,32 @@ class DatimImapFactory(object):
             repo_version_url, data=json.dumps(new_version_data), headers=oclapiheaders)
         r.raise_for_status()
 
+        if delay_until_processed:
+            is_repo_version_processing = True
+            country_version_processing_url = '%s%s%s/processing/' % (oclenv, repo_endpoint, repo_version_id)
+            while is_repo_version_processing:
+                r = requests.get(country_version_processing_url, headers=oclapiheaders)
+                r.raise_for_status()
+                if verbose:
+                    print 'INFO: Source version processing status for "%s" %s' % (
+                        country_version_processing_url, r.text)
+                if r.text == 'False':
+                    is_repo_version_processing = False
+                    if verbose:
+                        print 'INFO: Source version processing is complete'
+                else:
+                    if verbose:
+                        print 'INFO: Delaying %s seconds while source version is processing' % delay_interval_seconds
+                    time.sleep(delay_interval_seconds)
+
+        return True
+
     @staticmethod
     def generate_import_script_from_diff(imap_diff, verbose=True):
         """
         Return a list of JSON imports representing the diff
         :param imap_diff: IMAP diff used to generate the import script
+        :param verbose:
         :return list: Ordered list of dictionaries ready for import
         """
         import_list = []
@@ -1242,6 +1317,13 @@ class DatimImapDiff(object):
         :return:
         """
         return self.__diff_data
+
+    def get_num_diffs(self):
+        num = 0
+        for diff_category in self.__diff_data.keys():
+            for resource_diff_key, resource_diff in self.__diff_data[diff_category].items():
+                num += 1
+        return num
 
     def display(self):
         for diff_category in self.__diff_data.keys():

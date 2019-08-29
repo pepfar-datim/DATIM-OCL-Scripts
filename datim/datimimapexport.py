@@ -318,7 +318,8 @@ class DatimImapExport(datimbase.DatimBase):
                     rows.append(row_base.copy())
 
         # Generate and return the IMAP object
-        return datimimap.DatimImap(imap_data=rows, country_code=country_code, country_org=country_org, period=period)
+        return datimimap.DatimImap(imap_data=rows, country_code=country_code, country_org=country_org,
+                                   period=period, version=country_version_id)
 
     @staticmethod
     def get_clean_disag_id(disag_id):

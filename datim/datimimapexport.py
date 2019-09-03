@@ -21,6 +21,7 @@ import json
 import datimbase
 import datimimap
 import datimsyncmohhelper
+import utils.timer
 
 
 class DatimUnknownCountryPeriodError(Exception):
@@ -110,6 +111,8 @@ class DatimImapExport(datimbase.DatimBase):
             raise Exception(msg)
 
         # STEP 1 of 7: Determine the country period, minor version, and repo version ID (e.g. FY18.v0)
+        imap_timer = utils.timer.Timer()
+        imap_timer.start()
         self.vlog(1, '**** STEP 1 of 7: Determine the country period, minor version, and repo version ID')
         country_owner_endpoint = '/orgs/%s/' % country_org  # e.g. /orgs/DATIM-MOH-RW-FY18/
         country_source_endpoint = '%ssources/%s/' % (
@@ -136,6 +139,7 @@ class DatimImapExport(datimbase.DatimBase):
         self.vlog(1, 'Using version "%s" for country "%s"' % (country_version_id, country_org))
 
         # STEP 2 of 7: Download DATIM-MOH-xx source for specified period (e.g. DATIM-MOH-FY18)
+        imap_timer.lap(label='Step 1')
         self.vlog(1, '**** STEP 2 of 7: Download DATIM-MOH source for specified period (e.g. DATIM-MOH-FY18)')
         datim_moh_source_id = datimbase.DatimBase.get_datim_moh_source_id(period)
         datim_source_endpoint = datimbase.DatimBase.get_datim_moh_source_endpoint(period)
@@ -158,6 +162,7 @@ class DatimImapExport(datimbase.DatimBase):
             self.does_offline_data_file_exist(datim_source_json_filename, exit_if_missing=True)
 
         # STEP 3 of 7: Pre-process DATIM-MOH indicator+disag structure (before loading country source)
+        imap_timer.lap(label='Step 2')
         self.vlog(1, '**** STEP 3 of 7: Pre-process DATIM-MOH indicator+disag structure')
         indicators = {}
         disaggregates = {}
@@ -186,6 +191,7 @@ class DatimImapExport(datimbase.DatimBase):
 
         # STEP 4 of 7: Download and process country source
         # NOTE: This returns the individual country concepts and mappings
+        imap_timer.lap(label='Step 3')
         self.vlog(1, '**** STEP 4 of 7: Download and process country source')
         country_source_zip_filename = self.endpoint2filename_ocl_export_zip(country_source_endpoint)
         country_source_json_filename = self.endpoint2filename_ocl_export_json(country_source_endpoint)
@@ -208,6 +214,7 @@ class DatimImapExport(datimbase.DatimBase):
         # STEP 5 of 7: Async download of country indicator+disag collections
         # NOTE: This returns the collections that define how individual concepts/mappings from the country source
         # combine to map country indicator+disag pairs to DATIM indicator+disag pairs
+        imap_timer.lap(label='Step 4')
         self.vlog(1, '**** STEP 5 of 7: Async download of country indicator+disag mappings')
         country_collections_endpoint = '%scollections/' % country_owner_endpoint
         if self.run_ocl_offline:
@@ -216,6 +223,7 @@ class DatimImapExport(datimbase.DatimBase):
             endpoint=country_collections_endpoint, period=period, version=country_minor_version)
 
         # STEP 6 of 7: Process one country collection at a time
+        imap_timer.lap(label='Step 5')
         self.vlog(1, '**** STEP 6 of 7: Process one country collection at a time')
         datim_moh_null_disag_endpoint = datimbase.DatimBase.get_datim_moh_null_disag_endpoint(period)
         for collection_version_export_url, collection_version in country_collections.items():
@@ -275,6 +283,7 @@ class DatimImapExport(datimbase.DatimBase):
                         datim_indicator_mapping['operations'] = operations
 
         # STEP 7 of 7: Convert to tabular format
+        imap_timer.lap(label='Step 6')
         self.vlog(1, '**** STEP 7 of 7: Convert to tabular format')
         rows = []
         for indicator_id, indicator in indicators.items():
@@ -316,6 +325,13 @@ class DatimImapExport(datimbase.DatimBase):
                 else:
                     # Country has not mapped to this indicator+disag pair, so just add the blank row
                     rows.append(row_base.copy())
+
+        # Stop the timer
+        imap_timer.stop(label='Step 7')
+
+        # Display debug information
+        self.vlog(2, '**** IMAP EXPORT SUMMARY')
+        self.vlog(2, '** IMAP export time breakdown:\n', imap_timer)
 
         # Generate and return the IMAP object
         return datimimap.DatimImap(imap_data=rows, country_code=country_code, country_org=country_org,

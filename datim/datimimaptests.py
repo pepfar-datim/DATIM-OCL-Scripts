@@ -4,11 +4,11 @@ Script to test IMAP imports and exports for FY18 and FY19
 Supported Test Actions: IMPORT, EXPORT, COMPARE, DROP
 Supported Test Assertions:
 """
-import time
 import requests
 import datim.datimimap
 import datim.datimimapexport
 import datim.datimimapimport
+import utils.timer
 
 
 class DatimImapTests:
@@ -34,6 +34,7 @@ class DatimImapTests:
         self.__current_test_num = None
         self.__total_test_count = None
         self.__tests = None
+        self.__timer = None
 
     def get_test_summary(self, test_args):
         summary = '\n\n%s\n' % ('*' * 100)
@@ -226,6 +227,13 @@ class DatimImapTests:
             DatimImapTests.assert_num_diff(result, test_args.get('assert_num_diff'))
 
     def run_test(self, test_args):
+        """ Run a test """
+
+        # Skip if set to inactive
+        if "is_active" in test_args and not test_args["is_active"]:
+            print 'SKIPPING: "is_active" set to False'
+            return
+
         # Pre-process args
         test_type = test_args['test_type']
         if 'country_org' not in test_args:
@@ -236,12 +244,9 @@ class DatimImapTests:
         if test_type not in DatimImapTests.DATIM_OCL_TEST_TYPES:
             raise Exception('Invalid test_type "%s" with args: %s' % (test_type, test_args))
 
-        # Skip if set to inactive
-        if "is_active" in test_args and not test_args["is_active"]:
-            print 'SKIPPING: "is_active" set to False'
-            return
-
         # Run the test and save the result
+        if self.__timer and self.__timer.running:
+            self.__timer.lap(label='%s--Start' % test_args['test_id'])
         result = None
         try:
             if test_type == DatimImapTests.DATIM_OCL_TEST_TYPE_EXPORT:
@@ -264,6 +269,10 @@ class DatimImapTests:
         if "do_display_result" not in test_args or test_args["do_display_result"]:
             print result
 
+        # Record the lap time
+        if self.__timer and self.__timer.running:
+            self.__timer.lap(label='%s--Stop' % test_args['test_id'])
+
     def display_test_results(self):
         if not self.__tests:
             return False
@@ -276,14 +285,20 @@ class DatimImapTests:
                 DatimImapTests.process_assertions_for_test(result, test)
             else:
                 print 'INFO: No result for test "%s"' % test['test_id']
+        if self.__timer:
+            print '\n**** SUMMARY OF PROCESSING TIMES:'
+            print self.__timer
 
     def run_tests(self, tests):
+        self.__timer = utils.timer.Timer()
         self.__tests = list(tests)
         self.__current_test_num = 0
         self.__total_test_count = len(tests)
+        self.__timer.start()
         for test in self.__tests:
             self.__current_test_num += 1
             self.run_test(test_args=test)
+        self.__timer.stop()
 
     @staticmethod
     def display_test_summary(tests):

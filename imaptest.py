@@ -511,7 +511,7 @@ imap_tests = imap_test_two_imports
 
 # Debug output
 print '*' * 100
-print 'SCRIPT SETTINGS:'
+print 'IMAP TEST SCRIPT SETTINGS:'
 print '  ocl_api_env = %s' % ocl_api_env
 print '*' * 100
 datim.datimimaptests.DatimImapTests.display_test_summary(imap_tests)

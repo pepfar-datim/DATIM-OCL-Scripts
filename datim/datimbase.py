@@ -471,9 +471,22 @@ class DatimBase(object):
         :return: <Response>
         """
         # Make the initial request
-        request_create_export = requests.post(repo_export_url, headers=self.oclapiheaders)
-        request_create_export.raise_for_status()
-        if request_create_export.status_code != 202:
+        request_create_export = requests.post(repo_export_url, headers=self.oclapiheaders, allow_redirects=True)
+        do_delay_on_first_loop = True
+        if request_create_export.status_code == 409:
+            # 409 conflict means that repo export is already being processed, so go ahead
+            if not do_wait_until_cached:
+                self.vlog(1, 'INFO: Unable to generate repository export due to 409 conflict: %s.' % repo_export_url)
+                return None
+            else:
+                self.vlog(1, 'INFO: Repository export already processing: %s.' % repo_export_url)
+        elif request_create_export.status_code == 202:
+            self.vlog(1, 'INFO: Generating repository export: %s.' % repo_export_url)
+            do_delay_on_first_loop = False
+        elif request_create_export.status_code == 303:
+            self.vlog(1, 'INFO: Repository export already exists: %s.' % repo_export_url)
+            do_delay_on_first_loop = False
+        else:
             msg = 'ERROR: %s error generating export for "%s"' % (request_create_export.status_code, repo_export_url)
             self.vlog(1, msg)
             raise Exception(msg)
@@ -483,7 +496,9 @@ class DatimBase(object):
             start_time = time.time()
             while time.time() - start_time + delay_seconds < max_wait_seconds:
                 self.vlog(1, 'INFO: Delaying %s seconds while export is being generated...' % str(delay_seconds))
-                time.sleep(delay_seconds)
+                if do_delay_on_first_loop:
+                    time.sleep(delay_seconds)
+                    do_delay_on_first_loop = False
                 r = requests.get(repo_export_url, headers=self.oclapiheaders)
                 r.raise_for_status()
                 if r.status_code == 200:

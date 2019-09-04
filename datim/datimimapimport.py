@@ -340,13 +340,13 @@ class DatimImapImport(datimbase.DatimBase):
             if ref_import_results.has_error_status_code():
                 has_warnings = True
                 self.vlog(1, 'WARNING: Country reference import completed with one or more warnings')
+        self.vlog(2, '** IMAP import time breakdown:\n', imap_timer)
         if has_warnings:
             self.vlog(1, 'WARNING: IMAP import process complete with one or more warnings!')
             return DatimImapImport.DATIM_IMAP_RESULT_WARNING
         else:
             self.vlog(1, 'INFO: IMAP import process completed successfully!')
             return DatimImapImport.DATIM_IMAP_RESULT_SUCCESS
-        self.vlog(2, '** IMAP import time breakdown:\n', imap_timer)
 
     def clear_collection_references(self, collection_url='', batch_size=25):
         """ Clear all references for the specified collection """

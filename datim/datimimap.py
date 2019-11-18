@@ -1419,7 +1419,7 @@ class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConver
                 'resource_type': 'Mapping',
                 'id_column': None,
                 'skip_if_empty_column': DatimImap.IMAP_FIELD_MOH_DISAG_ID,
-                'internal_external': {'value': ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.INTERNAL_MAPPING_ID},
+                'internal_external': {'value': ocldev.oclconstants.OclConstants.MAPPING_TARGET_INTERNAL},
                 ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS: [
                     {'resource_field': 'from_concept_url', 'column': DatimImap.IMAP_EXTRA_FIELD_DATIM_FROM_CONCEPT_URI},
                     {'resource_field': 'map_type', 'value': datim_map_type},
@@ -1436,7 +1436,7 @@ class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConver
                 'resource_type': 'Mapping',
                 'id_column': None,
                 'skip_if_empty_column': DatimImap.IMAP_FIELD_OPERATION,
-                'internal_external': {'value': ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.INTERNAL_MAPPING_ID},
+                'internal_external': {'value': ocldev.oclconstants.OclConstants.MAPPING_TARGET_INTERNAL},
                 ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS: [
                     {'resource_field': 'from_concept_url', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_FROM_CONCEPT_URI},
                     {'resource_field': 'map_type', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_MAP_TYPE},
@@ -1452,7 +1452,7 @@ class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConver
                 'is_active': False,
                 'resource_type': 'Mapping',
                 'id_column': None,
-                'internal_external': {'value': ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.INTERNAL_MAPPING_ID},
+                'internal_external': {'value': ocldev.oclconstants.OclConstants.MAPPING_TARGET_INTERNAL},
                 ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS: [
                     {'resource_field': 'from_concept_url', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_FROM_CONCEPT_URI},
                     {'resource_field': 'map_type', 'column': DatimImap.IMAP_EXTRA_FIELD_MOH_MAP_TYPE},

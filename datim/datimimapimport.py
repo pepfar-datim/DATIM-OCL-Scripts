@@ -218,13 +218,13 @@ class DatimImapImport(datimbase.DatimBase):
                 input_list=import_list, api_token=self.oclapitoken, api_url_root=self.oclenv)
             task_id = bulk_import_response.json()['task']
             if self.verbosity:
-                self.vlog(self.verbosity, 'BULK IMPORT TASK ID: %s' % task_id)
+                self.vlog(1, 'BULK IMPORT TASK ID: %s' % task_id)
             import_results = ocldev.oclfleximporter.OclBulkImporter.get_bulk_import_results(
                 task_id=task_id, api_url_root=self.oclenv, api_token=self.oclapitoken,
                 delay_seconds=5, max_wait_seconds=800)
             if import_results:
                 if self.verbosity:
-                    self.vlog(self.verbosity, import_results.display_report())
+                    self.vlog(1, import_results.display_report())
             else:
                 # TODO: Need smarter way to handle long running bulk import than just quitting
                 msg = 'Import taking too long to process... QUITTING'
@@ -308,7 +308,7 @@ class DatimImapImport(datimbase.DatimBase):
                 input_list=ref_import_list, api_token=self.oclapitoken, api_url_root=self.oclenv)
             ref_task_id = bulk_import_response.json()['task']
             if self.verbosity:
-                self.vlog(self.verbosity, 'BULK IMPORT TASK ID: %s' % ref_task_id)
+                self.vlog(1, 'BULK IMPORT TASK ID: %s' % ref_task_id)
             ref_import_results = ocldev.oclfleximporter.OclBulkImporter.get_bulk_import_results(
                 task_id=ref_task_id, api_url_root=self.oclenv, api_token=self.oclapitoken,
                 delay_seconds=6, max_wait_seconds=800)

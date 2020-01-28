@@ -255,3 +255,14 @@ class DatimShow(datimbase.DatimBase):
         # STEP 4 of 4: Transform to requested format and stream
         self.vlog(1, '**** STEP 4 of 4: Transform to requested format and stream')
         self.transform_to_format(intermediate, export_format)
+
+    def getByDataElementIds(self, data_element_ids='', export_format=''):
+        """
+        Change "get" to a router function that routes the request to getByDataElementIds or getByExport
+        Get the a repository in the specified format
+        :param data_element_ids: ID of the datim element id's
+        :param export_format: One of the supported export formats. See DATIM_FORMAT constants
+        :return:
+        """
+        return None
+    

@@ -4,7 +4,6 @@ Shared class for custom presentations (i.e. shows) of DATIM metadata
 import csv
 import sys
 import json
-import os
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import SubElement
 from xml.etree.ElementTree import tostring
@@ -28,7 +27,8 @@ class DatimShow(datimbase.DatimBase):
         DATIM_FORMAT_CSV
     ]
 
-    # Set to True to only allow presentation of OCL repositories that have been explicitly defined in the code
+    # Set to True to only allow presentation of OCL repositories explicitly
+    # defined in OCL_EXPORT_DEFS
     REQUIRE_OCL_EXPORT_DEFINITION = False
 
     # Set the default presentation row building method
@@ -42,7 +42,10 @@ class DatimShow(datimbase.DatimBase):
         self.run_ocl_offline = False
         self.cache_intermediate = True
 
-    def build_show_grid(self, repo_title='', repo_subtitle='', headers='', input_filename='', show_build_row_method=''):
+    def build_show_grid(self, repo_title='', repo_subtitle='', headers='',
+                        concepts_with_mappings=None, input_filename='',
+                        show_build_row_method=''):
+        """ Builds the intermediate export from source data """
         # Setup the headers
         intermediate = {
             'title': repo_title,
@@ -54,39 +57,54 @@ class DatimShow(datimbase.DatimBase):
         intermediate['width'] = len(intermediate['headers'])
 
         # Read in the content from the file saved to disk
-        with open(self.attach_absolute_data_path(input_filename), 'rb') as input_file:
-            ocl_export_raw = json.load(input_file)
+        if input_filename:
+            with open(self.attach_absolute_data_path(input_filename), 'rb') as input_file:
+                ocl_export_raw = json.load(input_file)
+                raw_concepts_dict = {ocl_export_raw['concepts'][i]['url']: ocl_export_raw[
+                    'concepts'][i] for i in range(len(ocl_export_raw['concepts']))}
+                raw_mappings = ocl_export_raw['mappings']
 
-            # convert concepts to a dict for quick lookup
-            concepts_dict = {ocl_export_raw['concepts'][i]['url']: ocl_export_raw['concepts'][i] for i in range(
-                len(ocl_export_raw['concepts']))}
+                # add the to_concepts to the mappings so that they are available to the
+                # "show_build_row_method" method
+                for i in range(len(raw_mappings)):
+                    to_concept_url = raw_mappings[i]['to_concept_url']
+                    if to_concept_url in raw_concepts_dict:
+                        raw_mappings[i]['to_concept'] = raw_concepts_dict[to_concept_url]
 
-            # add the to_concepts to the mappings so that they are available to the "show_build_row_method" method
-            for i in range(len(ocl_export_raw['mappings'])):
-                to_concept_url = ocl_export_raw['mappings'][i]['to_concept_url']
-                if to_concept_url in concepts_dict:
-                    ocl_export_raw['mappings'][i]['to_concept'] = concepts_dict[to_concept_url]
+                # Add the mappings to the from concepts
+                for concept_id in raw_concepts_dict:
+                    concept = raw_concepts_dict[concept_id]
+                    concept['mappings'] = [mapping for mapping in raw_mappings if str(
+                        mapping["from_concept_url"]) == concept['url']]
 
-            for c in ocl_export_raw['concepts']:
-                direct_mappings = [item for item in ocl_export_raw['mappings'] if str(
-                    item["from_concept_url"]) == c['url']]
+                concepts_with_mappings = raw_concepts_dict.values()
+
+        elif concepts_with_mappings:
+            # These are already in the correct format
+            pass
+        else:
+            raise Exception('Must provide either "input_filename" or "concepts_with_mappings".')
+
+        if concepts_with_mappings:
+            for concept in concepts_with_mappings:
                 result = getattr(self, show_build_row_method)(
-                    c, headers=headers, direct_mappings=direct_mappings, repo_title=repo_title,
-                    repo_subtitle=repo_subtitle)
+                    concept, headers=headers, direct_mappings=concept['mappings'],
+                    repo_title=repo_title, repo_subtitle=repo_subtitle)
                 if result:
-                    if type(result) is dict:
+                    if isinstance(result, dict):
                         intermediate['rows'].append(result)
-                    elif type(result) is list:
+                    elif isinstance(result, list):
                         for item in result:
                             intermediate['rows'].append(item)
             intermediate['height'] = len(intermediate['rows'])
         return intermediate
 
-    def default_show_build_row(self, concept, headers=None, direct_mappings=None, repo_title='', repo_subtitle=''):
+    def default_show_build_row(self, concept, headers=None, direct_mappings=None,
+                               repo_title='', repo_subtitle=''):
         """ Default method for building one output row in the presentation layer """
         row = {}
-        for h in headers:
-            row[h['column']] = ''
+        for header in headers:
+            row[header['column']] = ''
         row[headers[0]['column']] = str(concept)
         return row
 
@@ -107,6 +125,7 @@ class DatimShow(datimbase.DatimBase):
             self.transform_to_csv(content)
 
     def transform_to_html(self, content):
+        """ Transform intermediate export to HTML """
         css = ('<style tye="text/css">.gridDiv {font-family:sans-serif, arial;}'
                'table.gridTable {border-collapse: collapse; font-size: 11pt;}'
                '.gridTable th,.gridTable td {padding: 8px 4px 7px 4px; border: 1px solid #e7e7e7;}'
@@ -116,18 +135,19 @@ class DatimShow(datimbase.DatimBase):
         if 'subtitle' in content and content['subtitle']:
             sys.stdout.write('<h4>%s</h4>\n' % content['subtitle'].encode('utf-8'))
         sys.stdout.write('<table class="gridTable">\n<thead><tr>')
-        for h in content['headers']:
-            sys.stdout.write('<th>%s</th>' % str(h['name']))
+        for header in content['headers']:
+            sys.stdout.write('<th>%s</th>' % str(header['name']))
         sys.stdout.write('</tr></thead>\n<tbody>')
         for row in content['rows']:
             sys.stdout.write('\n<tr>')
-            for h in content['headers']:
-                sys.stdout.write('<td>%s</td>' % str(row[h['name']].encode('utf-8')))
+            for header in content['headers']:
+                sys.stdout.write('<td>%s</td>' % str(row[header['name']].encode('utf-8')))
         sys.stdout.write('</tr>')
         sys.stdout.write('\n</tbody></table></div>')
         sys.stdout.flush()
 
     def transform_to_json(self, content):
+        """ Transform intermediate export to JSON """
         # convert the rows to lists in the same column order as the headers
         reduced_rows = []
         for row in content['rows']:
@@ -140,17 +160,19 @@ class DatimShow(datimbase.DatimBase):
         sys.stdout.flush()
 
     def xml_dict_clean(self, intermediate_data):
+        """ Cleans data for XML export """
         new_dict = {}
-        for k, v in intermediate_data.iteritems():
-            if isinstance(v, bool):
-                if v:
-                    v = "true"
+        for key, value in intermediate_data.iteritems():
+            if isinstance(value, bool):
+                if value:
+                    value = "true"
                 else:
-                    v = "false"
-            new_dict[k] = str(v)
+                    value = "false"
+            new_dict[key] = str(value)
         return new_dict
 
     def transform_to_xml(self, content):
+        """ Transform intermediate export to XML """
         top_attr = {
             'title': content['title'],
             'subtitle': content['subtitle'],
@@ -159,32 +181,34 @@ class DatimShow(datimbase.DatimBase):
         }
         top = Element('grid', top_attr)
         headers = SubElement(top, 'headers')
-        for h in content['headers']:
-            SubElement(headers, 'header', self.xml_dict_clean(h))
+        for header in content['headers']:
+            SubElement(headers, 'header', self.xml_dict_clean(header))
         rows = SubElement(top, 'rows')
         for row_values in content['rows']:
             row = SubElement(rows, 'row')
             for field_name in row_values:
                 field = SubElement(row, 'field')
                 field.text = row_values[field_name]
-        print(tostring(top))
+        print tostring(top)
 
     def transform_to_csv(self, content):
+        """ Transform intermediate export to CSV """
         fieldnames = []
-        for h in content['headers']:
-            fieldnames.append(h['name'])
-        w = csv.DictWriter(sys.stdout, fieldnames=fieldnames)
-        w.writeheader()
+        for header in content['headers']:
+            fieldnames.append(header['name'])
+        writer = csv.DictWriter(sys.stdout, fieldnames=fieldnames)
+        writer.writeheader()
         for row in content['rows']:
             # convert to utf-8 encoded strings
             row_utf8 = {}
-            for k in row:
-                row_utf8[k] = row[k].encode('utf-8')
-            w.writerow(row_utf8)
+            for key in row:
+                row_utf8[key] = row[key].encode('utf-8')
+            writer.writerow(row_utf8)
         sys.stdout.flush()
 
     @staticmethod
     def get_format_from_string(format_string, default_fmt='html'):
+        """ Return DATIM Presentation format constant that matches a string """
         for fmt in DatimShow.PRESENTATION_FORMATS:
             if format_string.lower() == fmt.lower():
                 return fmt
@@ -192,7 +216,7 @@ class DatimShow(datimbase.DatimBase):
 
     def get(self, repo_id='', export_format=''):
         """
-        Get the a repository in the specified format
+        Get the repository in the specified format
         :param repo_id: ID of the repo that matches an OCL_EXPORT_DEF key
         :param export_format: One of the supported export formats. See DATIM_FORMAT constants
         :return:
@@ -239,16 +263,17 @@ class DatimShow(datimbase.DatimBase):
         self.vlog(1, '**** STEP 2 of 4: Transform to intermediary state')
         json_filename = self.endpoint2filename_ocl_export_json(repo_endpoint)
         intermediate = self.build_show_grid(
-            repo_title=repo_title, repo_subtitle=repo_subtitle, headers=self.headers[show_headers_key],
-            input_filename=json_filename, show_build_row_method=show_build_row_method)
+            repo_title=repo_title, repo_subtitle=repo_subtitle,
+            headers=self.headers[show_headers_key], input_filename=json_filename,
+            show_build_row_method=show_build_row_method)
 
         # STEP 3 of 4: Cache the intermediate output
         self.vlog(1, '**** STEP 3 of 4: Cache the intermediate output')
         if self.cache_intermediate:
-            intermediate_json_filename = self.endpoint2filename_ocl_export_intermediate_json(repo_endpoint)
-            with open(self.attach_absolute_data_path(intermediate_json_filename), 'wb') as output_file:
+            filename = self.endpoint2filename_ocl_export_intermediate_json(repo_endpoint)
+            with open(self.attach_absolute_data_path(filename), 'wb') as output_file:
                 output_file.write(json.dumps(intermediate))
-                self.vlog(1, 'Processed OCL export saved to "%s"' % intermediate_json_filename)
+                self.vlog(1, 'Processed OCL export saved to "%s"' % filename)
         else:
             self.vlog(1, 'SKIPPING: "cache_intermediate" set to "false"')
 

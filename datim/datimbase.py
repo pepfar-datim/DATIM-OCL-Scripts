@@ -1,19 +1,20 @@
 """
-Base class providing common functionality for DATIM indicator and country mapping synchronization and presentation.
+Base class providing common functionality for DATIM indicator and
+country mapping synchronization and presentation.
 """
 from __future__ import with_statement
 import os
 import itertools
 import functools
 import operator
-import requests
-import grequests
 import sys
 import zipfile
 import time
 import datetime
 import json
 from StringIO import StringIO
+import requests
+import grequests
 import settings
 import ocldev.oclconstants
 
@@ -76,7 +77,7 @@ class DatimBase(object):
     DATIM_MOH_SOURCE_ID_BASE = 'DATIM-MOH'  # Fiscal year is appended to this, e.g. 'DATIM-MOH-FY18'
 
     # DATIM MOH Country Constants (e.g. /orgs/DATIM-MOH-RW-FY18/sources/DATIM-Alignment-Indicators/)
-    DATIM_MOH_COUNTRY_OWNER = 'DATIM-MOH-xx'  # Where xx is replaced by the country code and fiscal year (e.g. RW-FY18)
+    DATIM_MOH_COUNTRY_OWNER = 'DATIM-MOH-xx'  # xx replaced by country code & FY, eg RW-FY18
     DATIM_MOH_COUNTRY_OWNER_TYPE = 'Organization'
     DATIM_MOH_COUNTRY_SOURCE_ID = 'DATIM-Alignment-Indicators'
     DATIM_MOH_CONCEPT_CLASS_DE = 'Data Element'
@@ -95,7 +96,7 @@ class DatimBase(object):
     DATIM_DEFAULT_DISAG_REPLACEMENT_NAME = 'Total'
 
     # Location to save temporary data files
-    # NOTE: File system permissions must be set for this project to read and write from this subfolder
+    # NOTE: File system permissions must be set for this project to read/write from this subfolder
     DATA_SUBFOLDER_NAME = 'data'
 
     # Set the root directory
@@ -120,7 +121,9 @@ class DatimBase(object):
         self.datim_moh_source_id = ''
 
     def vlog(self, verbose_level=0, *args):
-        """ Output log information if verbosity setting is equal or greater than this verbose level """
+        """
+        Output log information if verbosity setting is equal or greater than this verbose level
+        """
         if self.verbosity < verbose_level:
             return
         sys.stdout.write('[' + str(datetime.datetime.now()) + '] ')
@@ -178,11 +181,15 @@ class DatimBase(object):
 
     @staticmethod
     def filename_diff_result(import_batch_name):
-        return '%s-diff-results-%s.json' % (import_batch_name, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+        return '%s-diff-results-%s.json' % (
+            import_batch_name, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 
     @staticmethod
     def repo_type_to_stem(repo_type, default_repo_stem=None):
-        """ Get a repo stem (e.g. sources, collections) given a fully specified repo type (e.g. Source, Collection) """
+        """
+        Get a repo stem (e.g. sources, collections) given a fully specified repo type
+        (e.g. Source, Collection)
+        """
         if repo_type == ocldev.oclconstants.OclConstants.RESOURCE_TYPE_SOURCE:
             return ocldev.oclconstants.OclConstants.REPO_STEM_SOURCES
         elif repo_type == ocldev.oclconstants.OclConstants.RESOURCE_TYPE_COLLECTION:
@@ -218,7 +225,7 @@ class DatimBase(object):
         """
         self.vlog(1, 'INFO: Offline mode: Checking for local file "%s"...' % filename)
         if os.path.isfile(self.attach_absolute_data_path(filename)):
-            self.vlog(1, 'INFO: Offline mode: File "%s" found containing %s bytes. Continuing...' % (
+            self.vlog(1, 'INFO: Offline mode: "%s" found containing %s bytes. Continuing...' % (
                 filename, os.path.getsize(self.attach_absolute_data_path(filename))))
             return True
         elif exit_if_missing:
@@ -230,23 +237,25 @@ class DatimBase(object):
     def get_ocl_repositories(self, endpoint=None, key_field='id', require_external_id=True,
                              active_attr_name='__datim_sync', limit=110):
         """
-        Gets repositories from OCL using the provided URL, optionally filtering by external_id and a
-        custom attribute indicating active status. Note that only one repository is returned per unique
-        value of key_field. Meaning, if key_field='external_id' and more than one repository is returned
-        by OCL with the same value for external_id, only one of those repositories will be returned by
-        this method.
+        Gets repositories from OCL using the provided URL, optionally filtering by
+        external_id and a custom attribute indicating active status. Note that only
+        one repository is returned per unique value of key_field. Meaning, if
+        key_field='external_id' and more than one repository is returned by OCL
+        with the same value for external_id, only one of those repositories will
+        be returned by this method.
         """
         filtered_repos = {}
         next_url = self.oclenv + endpoint
         while next_url:
-            response = requests.get(next_url, headers=self.oclapiheaders, params={"limit": str(limit)})
+            response = requests.get(
+                next_url, headers=self.oclapiheaders, params={"limit": str(limit)})
             self.vlog(2, "Fetching repositories for '%s' from OCL: %s" % (endpoint, response.url))
             response.raise_for_status()
             repos = response.json()
             for repo in repos:
                 if (not require_external_id or ('external_id' in repo and repo['external_id'])) and (
                         not active_attr_name or (repo['extras'] and active_attr_name in repo['extras'] and repo[
-                        'extras'][active_attr_name])):
+                            'extras'][active_attr_name])):
                     filtered_repos[repo[key_field]] = repo
             next_url = ''
             if 'next' in response.headers and response.headers['next'] and response.headers['next'] != 'None':
@@ -254,7 +263,9 @@ class DatimBase(object):
         return filtered_repos
 
     def load_datasets_from_ocl(self):
-        """ Fetch the OCL repositories corresponding to the DHIS2 datasets defined in each sync object """
+        """
+        Fetch the OCL repositories corresponding to the DHIS2 datasets defined in each sync object
+        """
         # TODO: Refactor so that object references are valid
 
         # Load the datasets using OCL_DATASET_ENDPOINT
@@ -271,10 +282,12 @@ class DatimBase(object):
                 self.DATASET_REPOSITORIES_FILENAME))
         else:
             # Load the files offline (from a local cache) if they exist
-            self.vlog(1, 'OCL-OFFLINE: Loading repositories from "%s"' % self.DATASET_REPOSITORIES_FILENAME)
+            self.vlog(1, 'OCL-OFFLINE: Loading repositories from "%s"' % (
+                self.DATASET_REPOSITORIES_FILENAME))
             with open(self.attach_absolute_data_path(self.DATASET_REPOSITORIES_FILENAME), 'rb') as handle:
                 self.ocl_dataset_repos = json.load(handle)
-            self.vlog(1, 'OCL-OFFLINE: Repositories successfully loaded:', len(self.ocl_dataset_repos))
+            self.vlog(
+                1, 'OCL-OFFLINE: Repositories successfully loaded:', len(self.ocl_dataset_repos))
 
         # Extract list of DHIS2 dataset IDs from the repository attributes
         if self.ocl_dataset_repos:
@@ -308,7 +321,8 @@ class DatimBase(object):
 
     def increment_ocl_versions(self, import_results=None):
         """
-        Increment version for OCL repositories that were modified according to the provided import results object
+        Increment version for OCL repositories that were modified according to the provided
+        import results object
         TODO: Refactor so that object references are valid
         :param import_results:
         :return:
@@ -358,13 +372,15 @@ class DatimBase(object):
         country_version_id = '%s.%s' % (period, version)
         country_collections = self.get_ocl_repositories(
             endpoint=endpoint, require_external_id=False, active_attr_name=None)
-        self.vlog(1, '%s repositories returned for endpoint "%s"' % (len(country_collections), endpoint))
+        self.vlog(1, '%s repositories returned for endpoint "%s"' % (
+            len(country_collections), endpoint))
         country_collection_urls = []
         for collection_id, collection in country_collections.items():
             url_ocl_export = '%s%s%s/export/' % (self.oclenv, collection['url'], country_version_id)
             # self.vlog(1, 'Export URL:', url_ocl_export)
             country_collection_urls.append(url_ocl_export)
-        export_rs = (grequests.get(url, headers=self.oclapiheaders) for url in country_collection_urls)
+        export_rs = (
+            grequests.get(url, headers=self.oclapiheaders) for url in country_collection_urls)
         export_responses = grequests.map(export_rs, size=6)
         # self.vlog(1, 'Results of async query:\n%s' % export_responses)
         collection_results = {}
@@ -374,11 +390,13 @@ class DatimBase(object):
                 original_export_url = export_response.history[0].url
             if export_response.status_code == 404:
                 # Repository version does not exist, so we can safely skip this one
-                self.vlog(2, '[%s NOT FOUND] %s' % (export_response.status_code, export_response.url))
+                self.vlog(2, '[%s NOT FOUND] %s' % (
+                    export_response.status_code, export_response.url))
                 continue
             elif export_response.status_code == 204:
                 # Export not cached for this repository version, so we need to generate it first
-                self.vlog(2, '[%s MISSING EXPORT] %s' % (export_response.status_code, export_response.url))
+                self.vlog(2, '[%s MISSING EXPORT] %s' % (
+                    export_response.status_code, export_response.url))
                 export_response = self.generate_repository_version_export(original_export_url)
             else:
                 export_response.raise_for_status()
@@ -393,21 +411,23 @@ class DatimBase(object):
                     zipref.close()
                 else:
                     zipref.close()
-                    errmsg = 'ERROR: Invalid repository export for "%s": export.json not found.' % original_export_url
+                    errmsg = 'ERROR: Invalid export for "%s": export.json not found.' % (
+                        original_export_url)
                     self.vlog(1, errmsg)
                     raise Exception(errmsg)
         self.vlog(1, '%s repository exports for version "%s" retrieved at endpoint "%s"' % (
             len(collection_results), country_version_id, endpoint))
         return collection_results
 
-    def get_ocl_export(self, endpoint='', version='', zipfilename='', jsonfilename='', delay_seconds=10,
-                                           max_wait_seconds=120):
+    def get_ocl_export(self, endpoint='', version='', zipfilename='', jsonfilename='',
+                       delay_seconds=10, max_wait_seconds=120):
         """
         Fetches an export of the specified repository version and saves to file.
         Use version="latest" to fetch the most recent released repo version.
-        Note that if the export is not already cached, it will attempt to generate the export and
-        wait for 30 seconds before trying again. If the export still does not exist, this method will fail.
-        :param endpoint: endpoint must point to the repo endpoint only, e.g. '/orgs/myorg/sources/mysource/'
+        Note that if the export is not already cached, it will attempt to generate
+        the export and wait for 30 seconds before trying again. If the export still
+        does not exist, this method will fail.
+        :param endpoint: endpoint for repo only, e.g. '/orgs/myorg/sources/mysource/'
         :param version: repo version ID or "latest"
         :param zipfilename: Filename to save the compressed OCL export to
         :param jsonfilename: Filename to save the decompressed OCL-JSON export to
@@ -417,9 +437,9 @@ class DatimBase(object):
         if version == 'latest':
             url_latest_version = self.oclenv + endpoint + 'latest/'
             self.vlog(1, 'Latest version request URL:', url_latest_version)
-            r = requests.get(url_latest_version, headers=self.oclapiheaders)
-            r.raise_for_status()
-            latest_version_attr = r.json()
+            response = requests.get(url_latest_version, headers=self.oclapiheaders)
+            response.raise_for_status()
+            latest_version_attr = response.json()
             repo_version_id = latest_version_attr['id']
             self.vlog(1, 'Latest version ID:', repo_version_id)
         else:
@@ -435,9 +455,11 @@ class DatimBase(object):
             pass
         elif r.status_code == 204:
             # Export does not exist, so let's attempt to generate the export and retrieve it...
-            self.vlog(1, 'WARNING: Export does not exist for "%s". Creating export...' % url_ocl_export)
-            r = self.generate_repository_version_export(repo_export_url=url_ocl_export, delay_seconds=delay_seconds,
-                                           max_wait_seconds=max_wait_seconds)
+            self.vlog(
+                1, 'WARNING: Export does not exist for "%s". Creating export...' % url_ocl_export)
+            r = self.generate_repository_version_export(
+                repo_export_url=url_ocl_export, delay_seconds=delay_seconds,
+                max_wait_seconds=max_wait_seconds)
         else:
             msg = 'ERROR: Unrecognized response from OCL: %s' % str(r.status_code)
             self.vlog(1, msg)
@@ -453,17 +475,19 @@ class DatimBase(object):
         zipref = zipfile.ZipFile(self.attach_absolute_data_path(zipfilename))
         zipref.extractall(os.path.join(self.__location__, self.DATA_SUBFOLDER_NAME))
         zipref.close()
-        os.rename(self.attach_absolute_data_path('export.json'), self.attach_absolute_data_path(jsonfilename))
+        os.rename(self.attach_absolute_data_path('export.json'),
+                  self.attach_absolute_data_path(jsonfilename))
         self.vlog(1, 'Export decompressed to "%s"' % jsonfilename)
 
         return True
 
-    def generate_repository_version_export(self, repo_export_url, do_wait_until_cached=True, delay_seconds=10,
-                                           max_wait_seconds=120):
+    def generate_repository_version_export(self, repo_export_url, do_wait_until_cached=True,
+                                           delay_seconds=10, max_wait_seconds=120):
         """
-        Generate a cached repository version export in OCL and optionally wait until processing of the export is
-        completed. Returns True if the request is submitted successfully and "do_wait_until_cached"==False. Returns
-        the Response object with the cached export if "do_wait_until_cached"==True. Otherwise fails with exception.
+        Generate a cached repository version export in OCL and optionally wait until processing
+        of the export is completed. Returns True if the request is submitted successfully and
+        "do_wait_until_cached"==False. Returns the Response object with the cached export if
+        "do_wait_until_cached"==True. Otherwise fails with exception.
         :param repo_export_url:
         :param do_wait_until_cached:
         :param delay_seconds:
@@ -471,12 +495,13 @@ class DatimBase(object):
         :return: <Response>
         """
         # Make the initial request
-        request_create_export = requests.post(repo_export_url, headers=self.oclapiheaders, allow_redirects=True)
+        request_create_export = requests.post(
+            repo_export_url, headers=self.oclapiheaders, allow_redirects=True)
         do_delay_on_first_loop = True
         if request_create_export.status_code == 409:
             # 409 conflict means that repo export is already being processed, so go ahead
             if not do_wait_until_cached:
-                self.vlog(1, 'INFO: Unable to generate repository export due to 409 conflict: %s.' % repo_export_url)
+                self.vlog(1, 'INFO: Unable to generate export: 409 conflict: %s.' % repo_export_url)
                 return None
             else:
                 self.vlog(1, 'INFO: Repository export already processing: %s.' % repo_export_url)
@@ -487,7 +512,8 @@ class DatimBase(object):
             self.vlog(1, 'INFO: Repository export already exists: %s.' % repo_export_url)
             do_delay_on_first_loop = False
         else:
-            msg = 'ERROR: %s error generating export for "%s"' % (request_create_export.status_code, repo_export_url)
+            msg = 'ERROR: %s error generating export for "%s"' % (
+                request_create_export.status_code, repo_export_url)
             self.vlog(1, msg)
             raise Exception(msg)
 
@@ -495,7 +521,8 @@ class DatimBase(object):
         if do_wait_until_cached:
             start_time = time.time()
             while time.time() - start_time + delay_seconds < max_wait_seconds:
-                self.vlog(1, 'INFO: Delaying %s seconds while export is being generated...' % str(delay_seconds))
+                self.vlog(1, 'INFO: Delaying %s seconds while export is being generated...' % str(
+                    delay_seconds))
                 if do_delay_on_first_loop:
                     time.sleep(delay_seconds)
                     do_delay_on_first_loop = False
@@ -539,19 +566,22 @@ class DatimBase(object):
 
     def get_latest_version_for_period(self, repo_endpoint='', period=''):
         """
-        For DATIM-MOH, fetch the latest version (including subversion) of a repository for the specified period.
-        For example, if period is 'FY17', and 'FY17.v0' and 'FY17.v1' versions have been defined in OCL,
-        then 'FY17.v1' would be returned. Note that this method requires that OCL return the versions
-        ordered by date_created descending.
+        For DATIM-MOH, fetch the latest version (including subversion) of a repository
+        for the specified period. For example, if period is 'FY17', and 'FY17.v0' and
+        'FY17.v1' versions have been defined in OCL, then 'FY17.v1' would be returned.
+        Note that this method requires that OCL return the versions ordered by
+        date_created descending.
         """
         repo_versions_url = '%s%sversions/?limit=0' % (self.oclenv, repo_endpoint)
-        self.vlog(1, 'Fetching latest repository version for period "%s": %s' % (period, repo_versions_url))
+        self.vlog(1, 'Fetching latest repository version for period "%s": %s' % (
+            period, repo_versions_url))
         r = requests.get(repo_versions_url, headers=self.oclapiheaders)
         repo_versions = r.json()
         for repo_version in repo_versions:
             if repo_version['id'] == 'HEAD' or repo_version['released'] is not True:
                 continue
-            if len(repo_version['id']) > len(period) and repo_version['id'][:len(period)] == period:
+            if (len(repo_version['id']) > len(period) and
+                    repo_version['id'][:len(period)] == period):
                 return repo_version['id']
         return None
 
@@ -567,12 +597,13 @@ class DatimBase(object):
     @staticmethod
     def get_datim_moh_source_endpoint(period):
         """
-        Get the DATIM-MOH source endpoint given a period (e.g. /orgs/PEPFAR/sources/DATIM-MOH-FY18/)
+        Get the DATIM-MOH source endpoint for a period (eg /orgs/PEPFAR/sources/DATIM-MOH-FY18/)
         :param period:
         :return:
         """
-        return '/%s/%s/sources/%s/' % (DatimBase.owner_type_to_stem(DatimBase.DATIM_MOH_OWNER_TYPE),
-                                       DatimBase.DATIM_MOH_OWNER_ID, DatimBase.get_datim_moh_source_id(period))
+        return '/%s/%s/sources/%s/' % (
+            DatimBase.owner_type_to_stem(DatimBase.DATIM_MOH_OWNER_TYPE),
+            DatimBase.DATIM_MOH_OWNER_ID, DatimBase.get_datim_moh_source_id(period))
 
     @staticmethod
     def get_datim_moh_null_disag_endpoint(period):
@@ -582,4 +613,5 @@ class DatimBase(object):
         :param period:
         :return:
         """
-        return '%sconcepts/%s/' % (DatimBase.get_datim_moh_source_endpoint(period), DatimBase.NULL_DISAG_ID)
+        return '%sconcepts/%s/' % (
+            DatimBase.get_datim_moh_source_endpoint(period), DatimBase.NULL_DISAG_ID)

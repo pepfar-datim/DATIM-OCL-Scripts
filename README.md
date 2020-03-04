@@ -1,3 +1,8 @@
+**Installation**
+
+Please run `pip install -r requirements.txt` to install the required imports
+
+
 **Changes Made**
 File: csv_to_json_flex
 

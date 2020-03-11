@@ -7,20 +7,9 @@ Supported Collections: Refer to DatimConstants.MER_OCL_EXPORT_DEFS (there are mo
 
 This script fetches an export from OCL for the latest released version of the specified collection.
 If it seems like you're looking at old data, check the collection version first.
-"""
-import sys
-import settings
-import datim.datimshow
-import datim.datimshowmsp
 
-
-# Default Script Settings
-verbosity = 0  # 0=none, 1=some, 2=all
-run_ocl_offline = False  # Set to true to use local copies of ocl exports
-export_format = datim.datimshow.DatimShow.DATIM_FORMAT_CSV
-# repo_id = 'MER-R-COMMUNITY-BASED'  # e.g. MER-R-Operating-Unit-Level-IM-FY17Q2
-repo_id = ''
-data_element_ids = [
+Example value for repo: MER-R-COMMUNITY-BASED
+Example data element IDs: [
     'MQYi9hco9WG',  # DATIM TB_PREV_N_DSD_Age_Therapy_NewExArt_HIV_TARGET
     'kqhj1NfxHvi',  # DATIM VMMC_CIRC_NAT_N_NAT_Age_Sex
     'P8B3VcejEjn',  # PDH HTS_TST_POS (N, DSD, VCT/AgeLessThanTen/Result)
@@ -28,19 +17,81 @@ data_element_ids = [
     'kGCGnEJE7hy',  # PDH HTS_INDEX_FAC (N, TA) TARGET: Number of index cases tested
 ]
 
-# OCL Settings - JetStream Staging user=datim-admin
-oclenv = settings.oclenv
-oclapitoken = settings.oclapitoken
+Example command line:
+python showmsp.py --env=staging --repo="MER-R-COMMUNITY-BASED" -v2 --msp-org=PEPFAR-Test6
+    --msp-source=MER-Test6 -t="your-token-here" -fxml
+python showmsp.py --env=staging --dataelements="ljoZhkWOvx1,cObJTp3DWdY" -v2
+    --msp-org=PEPFAR-Test6 --msp-source=MER-Test6 -t="your-token-here" -fcsv
 
-# Optionally set arguments from the command line
-if sys.argv and len(sys.argv) > 2:
-    export_format = datim.datimshow.DatimShow.get_format_from_string(sys.argv[1])
-    repo_id = sys.argv[2]
-    data_element_ids = sys.argv[3]
+"""
+import argparse
+import datim.datimshow
+import datim.datimshowmsp
 
-# Create Show object and run
+
+# Script constants
+SCRIPT_VERSION = '0.1.0'
+OCL_ENVIRONMENTS = {
+    'qa': 'https://api.qa.openconceptlab.org',
+    'staging': 'https://api.staging.openconceptlab.org',
+    'production': 'https://api.openconceptlab.org',
+    'demo': 'https://api.demo.openconceptlab.org',
+}
+
+
+# Argument parser validation functions
+def arg_parser_ocl_environment(string):
+    """ Arg parser function for processing OCL enviroment setting """
+    if string not in OCL_ENVIRONMENTS:
+        raise argparse.ArgumentTypeError(
+            'Argument "env" must be %s' % ', '.join(OCL_ENVIRONMENTS.keys()))
+    return OCL_ENVIRONMENTS[string]
+
+
+def arg_parser_data_element_ids(string):
+    """ Arg parser function for processing data element IDs """
+    dirty_data_element_ids = string.split(',')
+    output_data_element_ids = []
+    for dirty_data_element_id in dirty_data_element_ids:
+        output_data_element_ids.append(dirty_data_element_id.strip())
+    return output_data_element_ids
+
+
+def arg_parser_export_format(format_string):
+    """ Arg parser function for determining export format """
+    return datim.datimshow.DatimShow.get_format_from_string(format_string, default_fmt='csv')
+
+
+# Script argument parser
+parser = argparse.ArgumentParser(
+    "MSP Data Element Exporter",
+    description="Export MSP Data Elements from OCL")
+group_env = parser.add_mutually_exclusive_group(required=True)
+group_env.add_argument('--env', help='Name of the OCL API environment',
+                       type=arg_parser_ocl_environment)
+group_env.add_argument('--envurl', help='URL of the OCL API environment')
+parser.add_argument('--msp-org', help='MSP Organization ID in OCL', default='PEPFAR')
+parser.add_argument('--msp-source', help='MSP Organization ID in OCL', default='MER')
+parser.add_argument('-t', '--token', help='OCL API token')
+parser.add_argument('-f', '--format', help='Export format: CSV, HTML, JSON, XML', default="CSV",
+                    type=arg_parser_export_format)
+parser.add_argument(
+    '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
+group_data_elements = parser.add_mutually_exclusive_group(required=True)
+group_data_elements.add_argument('--dataelements', help='IDs of the data elements to export',
+                                 type=arg_parser_data_element_ids)
+group_data_elements.add_argument('--repo', help='ID of the repository to export')
+args = parser.parse_args()
+ocl_env_url = args.env if args.env else args.envurl
+
+# Display debug output
+if args.verbosity > 1:
+    print args, ocl_env_url
+
+# Create DatimMspShow object and run
 datim_show = datim.datimshowmsp.DatimShowMsp(
-    oclenv=oclenv, oclapitoken=oclapitoken, run_ocl_offline=run_ocl_offline, verbosity=verbosity)
+    oclenv=ocl_env_url, oclapitoken=args.token,
+    run_ocl_offline=False, verbosity=args.verbosity)
 datim_show.get(
-    data_element_ids=data_element_ids, repo_id=repo_id, export_format=export_format,
-    owner='PEPFAR-Test6', source='MER-Test6')
+    data_element_ids=args.dataelements, repo_id=args.repo, export_format=args.format,
+    owner=args.msp_org, source=args.msp_source)

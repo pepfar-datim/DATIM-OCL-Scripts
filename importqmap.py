@@ -23,7 +23,8 @@ OCL_ENVIRONMENTS = {
 # Argument parser validation functions
 def ocl_environment(string):
     if string not in OCL_ENVIRONMENTS:
-        raise argparse.ArgumentTypeError('Argument "env" must be %s' % ', '.join(OCL_ENVIRONMENTS.keys()))
+        raise argparse.ArgumentTypeError('Argument "env" must be %s' % (
+            ', '.join(OCL_ENVIRONMENTS.keys())))
     return OCL_ENVIRONMENTS[string]
 
 
@@ -34,6 +35,8 @@ group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('--env', help='Name of the OCL API environment', type=ocl_environment)
 group.add_argument('--envurl', help='URL of the OCL API environment')
 parser.add_argument('-t', '--token', help='OCL API token', required=True)
+parser.add_argument(
+    '--admin-token', help='OCL API administrative token required to delete existing repositories')
 parser.add_argument('--testmode', action="store_true", help='Enable test mode', default=False)
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
@@ -54,7 +57,7 @@ if args.verbosity > 1:
 # Process the qmap import
 bulk_import_task_id = qmap.import_qmap(
     domain=args.domain, ocl_env_url=ocl_env_url, ocl_api_token=args.token,
-    test_mode=args.testmode, verbosity=args.verbosity)
+    test_mode=args.testmode, verbosity=args.verbosity, ocl_api_admin_token=args.admin_token)
 
 if bulk_import_task_id:
     print 'Bulk import task ID:', bulk_import_task_id

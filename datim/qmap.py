@@ -37,6 +37,9 @@ class Qmap(object):
     def export_qmap(domain='', qmap_id='', ocl_env_url='', ocl_api_token='', verbosity=0):
         """ Export Qmap from OCL """
 
+        # Clean the qmap_id
+        qmap_id = Qmap._clean_org_and_source_id(qmap_id)
+
         # Verify that the specified domain/qmap_id exist as org/source in OCL
         try:
             if not Qmap.check_if_qmap_source_exists(
@@ -155,7 +158,7 @@ class Qmap(object):
         return ""
 
     def import_qmap(self, domain='', ocl_env_url='', ocl_api_token='', test_mode=False,
-                    verbosity=0):
+                    verbosity=0, ocl_api_admin_token=''):
         """ Import Qmap into OCL """
 
         # Determine if we need to create a new org
@@ -197,14 +200,20 @@ class Qmap(object):
 
         # Exit now if in test mode
         if test_mode:
-            print "\nTEST MODE: Skipping import"
+            if verbosity:
+                print "\nTEST MODE: Skipping import"
             return None
 
         # Delete source if it already exists
         # TODO: Shift to updating source in place in the future
         if does_source_exist:
+            if verbosity:
+                if not ocl_api_admin_token:
+                    ocl_api_admin_token = ocl_api_token
+                print '\nDeleting existing source "%s" for domain "%s"...' % (
+                    self.clean_name, domain)
             Qmap.delete_source(domain=domain, qmap_id=self.clean_name,
-                               ocl_env_url=ocl_env_url, ocl_api_token=ocl_api_token)
+                               ocl_env_url=ocl_env_url, ocl_api_token=ocl_api_admin_token)
 
         # Submit the bulk import
         import_response = ocldev.oclfleximporter.OclBulkImporter.post(
@@ -351,7 +360,8 @@ class Qmap(object):
             'attr:path': qmap_item['path'],
             'extmap_type[01]': 'Same As',
             'extmap_to_source_url[01]': ocldev.oclconstants.OclConstants.get_repository_url(
-                owner_id=qmap_questionnaire.owner, repository_id=qmap_questionnaire.source),
+                owner_id=qmap_questionnaire.owner, repository_id=qmap_questionnaire.source,
+                include_trailing_slash=True),
             'extmap_to_concept_id[01]': Qmap._convert_to_questionnaire_concept_id(qmap_item),
         }
         return concept

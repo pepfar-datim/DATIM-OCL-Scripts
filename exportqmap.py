@@ -49,3 +49,5 @@ if args.verbosity > 1:
 qmap = datim.qmap.Qmap.export_qmap(
     domain=args.domain, qmap_id=args.qmapid, ocl_env_url=ocl_env_url, ocl_api_token=args.token,
     verbosity=args.verbosity)
+
+print qmap

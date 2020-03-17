@@ -65,8 +65,8 @@ class Qmap(object):
                 domain, qmap_id)
             raise Exception(err_msg)
 
-        # Build QMAP JSON
-        pprint.pprint(Qmap.build_qmap_from_ocl_export(qmap_export=qmap_export))
+        # Build QMAP object
+        return Qmap(qmap_json=Qmap.build_qmap_from_ocl_export(qmap_export=qmap_export))
 
     @staticmethod
     def check_if_qmap_source_exists(domain='', qmap_id='', ocl_env_url='', ocl_api_token=''):

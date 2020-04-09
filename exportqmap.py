@@ -5,6 +5,8 @@ a point of service system (POS) and a FHIR Questionnaire.
 python exportqmap.py -dmAtches3 --qmapid=HIV-example-map --env=staging
 """
 import argparse
+import json
+import ocldev.oclexport
 import datim.qmap
 
 
@@ -46,8 +48,15 @@ if args.verbosity > 1:
     print args
 
 # Process the qmap export
-qmap = datim.qmap.Qmap.export_qmap(
-    domain=args.domain, qmap_id=args.qmapid, ocl_env_url=ocl_env_url, ocl_api_token=args.token,
-    verbosity=args.verbosity)
-
-print qmap
+try:
+    qmap = datim.qmap.Qmap.export_qmap(
+        domain=args.domain, qmap_id=args.qmapid,
+        ocl_env_url=ocl_env_url, ocl_api_token=args.token,
+        verbosity=args.verbosity)
+    # Export successful -- Return 200 status code and print this
+    print qmap
+except ocldev.oclexport.OclExportNotAvailableError as export_error:
+    # Export not yet ready -- Return 204 status code
+    print json.dumps({
+        "message": "QMAP export not available. Try requesting again later."
+    })

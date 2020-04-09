@@ -4,7 +4,6 @@ a point of service system (POS) to a FHIR Questionnaire.
 """
 import re
 import json
-import pprint
 import requests
 import ocldev.oclconstants
 import ocldev.oclexport
@@ -69,22 +68,42 @@ class Qmap(object):
         return Qmap(qmap_json=Qmap.build_qmap_from_ocl_export(qmap_export=qmap_export))
 
     @staticmethod
-    def check_if_qmap_source_exists(domain='', qmap_id='', ocl_env_url='', ocl_api_token=''):
-        qmap_repo_url = '%s%s' % (ocl_env_url, ocldev.oclconstants.OclConstants.get_repository_url(
-            owner_id=domain, repository_id=qmap_id, include_trailing_slash=True))
+    def get_ocl_resource(ocl_resource_url='', ocl_api_token=''):
         ocl_api_headers = {'Content-Type': 'application/json'}
         if ocl_api_token:
             ocl_api_headers['Authorization'] = 'Token ' + ocl_api_token
-        response = requests.get(qmap_repo_url, headers=ocl_api_headers)
+        response = requests.get(ocl_resource_url, headers=ocl_api_headers)
         try:
             response.raise_for_status()
+            return response.json()
         except:
-            return False
-        qmap_source = response.json()
-        if "extras" in qmap_source and "qmap_version" in qmap_source["extras"]:
+            return None
+
+    @staticmethod
+    def check_if_questionnaire_source_exists(domain='', questionnaireuid='',
+                                             ocl_env_url='', ocl_api_token=''):
+        questionnaire_repo_url = '%s%s' % (
+            ocl_env_url, ocldev.oclconstants.OclConstants.get_repository_url(
+                owner_id=domain, repository_id=questionnaireuid, include_trailing_slash=True))
+        questionnaire_source = Qmap.get_ocl_resource(
+            ocl_resource_url=questionnaire_repo_url, ocl_api_token=ocl_api_token)
+        if questionnaire_source:
+            # TODO: Validate that this is a valid Questionnaire source, throw Exception if not
             return True
-        raise Exception('Source "%s" exists but is not configured as a QMAP source' % (
-            qmap_repo_url))
+        return False
+
+    @staticmethod
+    def check_if_qmap_source_exists(domain='', qmap_id='', ocl_env_url='', ocl_api_token=''):
+        qmap_repo_url = '%s%s' % (ocl_env_url, ocldev.oclconstants.OclConstants.get_repository_url(
+            owner_id=domain, repository_id=qmap_id, include_trailing_slash=True))
+        qmap_source = Qmap.get_ocl_resource(
+            ocl_resource_url=qmap_repo_url, ocl_api_token=ocl_api_token)
+        if qmap_source:
+            if "extras" in qmap_source and "qmap_version" in qmap_source["extras"]:
+                return True
+            raise Exception('Source "%s" exists but is not configured as a QMAP source' % (
+                qmap_repo_url))
+        return False
 
     @staticmethod
     def check_if_org_exists(domain='', ocl_env_url='', ocl_api_token=''):
@@ -158,7 +177,7 @@ class Qmap(object):
         return ""
 
     def import_qmap(self, domain='', ocl_env_url='', ocl_api_token='', test_mode=False,
-                    verbosity=0, ocl_api_admin_token=''):
+                    verbosity=0, ocl_api_admin_token='', fhir_server_url=''):
         """ Import Qmap into OCL """
 
         # Determine if we need to create a new org
@@ -170,29 +189,64 @@ class Qmap(object):
 
         # Determine if the source already exists
         does_source_exist = False
-        do_create_source = True
+        do_create_qmap_source = True
         if Qmap.check_if_qmap_source_exists(
                 domain=domain, qmap_id=self.clean_name,
                 ocl_env_url=ocl_env_url, ocl_api_token=ocl_api_token):
             does_source_exist = True
 
+        # Fetch the questionnaire resource from the FHIR server
+        qmap_questionnaire = fhir.Questionnaire.load_from_fhir_server(
+            fhir_server_url=fhir_server_url, questionnaire_id=self.questionnaireuid)
+        if not qmap_questionnaire:
+            raise Exception("Could not load questionnaire '%s'" % qmap_questionnaire.url)
+
+        # Determine if Questionnaire source already exists
+        do_create_questionnaire_source = False
+        if not Qmap.check_if_questionnaire_source_exists(
+                domain=domain, questionnaireuid=self.questionnaireuid,
+                ocl_env_url=ocl_env_url, ocl_api_token=ocl_api_token):
+            do_create_questionnaire_source = True
+
         # Generate the resources for import
         qmap_csv_resources = self.generate_import_script(
-            domain=domain, do_create_org=do_create_org, do_create_source=do_create_source)
+            domain=domain, do_create_org=do_create_org,
+            do_create_qmap_source=do_create_qmap_source,
+            do_create_questionnaire_source=do_create_questionnaire_source,
+            qmap_questionnaire=qmap_questionnaire)
         qmap_json_resources = qmap_csv_resources.convert_to_ocl_formatted_json()
 
         # Display debug output
         if verbosity:
-            print '\n**** Org and source in OCL:'
-            print '  Org "%s" already exists: %s' % (domain, str(does_org_exist))
-            print '  Source "%s" already exists: %s' % (self.clean_name, str(does_source_exist))
+            print '\n**** QMAP Org and sources in OCL:'
+
+            # Org
+            if do_create_org:
+                print '  mAtches Domain org "%s" does not exist...will create' % domain
+            else:
+                print '  mAtches Domain org "%s" already exists. No action required.' % domain
+
+            # QMAP source
             if does_source_exist:
-                print '  Existing source "%s" will be deleted and recreated...' % self.clean_name
+                print '  QMAP Source "%s" already exists. Will delete and recreate...' % (
+                    self.clean_name)
+            else:
+                print '  QMAP Source "%s" does not exist...will create' % self.clean_name
+
+            # Questionnaire Source
+            if do_create_questionnaire_source:
+                print '  Questionnaire Source "%s" does not exist...will create' % (
+                    qmap_questionnaire.source)
+            else:
+                print '  Questionnaire Source "%s" already exists. No action required.' % (
+                    qmap_questionnaire.source)
+
             print '\n**** CSV Resources:'
             qmap_csv_resources.display_as_csv()
             print '\n**** Converted JSON Resources:'
             for resource in qmap_json_resources:
                 print json.dumps(resource)
+            print ''
 
         # Validate
         qmap_csv_resources.validate()
@@ -204,7 +258,7 @@ class Qmap(object):
                 print "\nTEST MODE: Skipping import"
             return None
 
-        # Delete source if it already exists
+        # Delete QMAP source if it already exists
         # TODO: Shift to updating source in place in the future
         if does_source_exist:
             if verbosity:
@@ -239,19 +293,16 @@ class Qmap(object):
         raise Exception("Unexpected response code when deleting source '%s': %s" % (
             qmap_repo_url, response.status_code))
 
-    def generate_import_script(self, domain='', do_create_org=True, do_create_source=True):
+    def generate_import_script(self, domain='', do_create_org=True, do_create_qmap_source=True,
+                               do_create_questionnaire_source=True, qmap_questionnaire=None):
         """ Generate OCL-formatted CSV import script """
-
-        # Load the questionnaire
-        questionnaire_filename = 'qmap-questionnaires/%s.json' % self.questionnaireuid
-        qmap_questionnaire = fhir.Questionnaire.load_from_file(questionnaire_filename)
 
         # Instantiate the resource list and add org and source resources
         qmap_csv_resources = ocldev.oclresourcelist.OclCsvResourceList()
         if do_create_org:
             qmap_csv_resources.append(self._get_csv_resource_organization(
                 org_id=domain, name=domain, custom_attr={"qmap_org": True}))
-        if do_create_source:
+        if do_create_qmap_source:
             qmap_csv_resources.append(self._get_csv_resource_source(
                 source_id=self.clean_name,
                 name=self.name,
@@ -259,7 +310,16 @@ class Qmap(object):
                 external_id=self.uid,
                 custom_attr={'questionnaireuid': self.questionnaireuid,
                              'qmap_version': Qmap.QMAP_VERSION,
-                             'questionnaire': json.dumps(qmap_questionnaire.to_json())}
+                             'questionnaire': qmap_questionnaire.to_json()}
+            ))
+        if do_create_questionnaire_source:
+            qmap_csv_resources.append(self._get_csv_resource_source(
+                source_id=qmap_questionnaire.source,
+                name=qmap_questionnaire.title,
+                owner_id=qmap_questionnaire.owner,
+                source_type="External",
+                external_id=qmap_questionnaire.url,
+                custom_attr={'questionnaire': qmap_questionnaire.to_json()}
             ))
 
         # Build the Qmap CSV concepts with their mappings for Qmap headers
@@ -331,7 +391,7 @@ class Qmap(object):
         return csv_resource
 
     def _get_csv_resource_source(self, source_id='', name='', owner_id='', external_id='',
-                                 custom_attr=None):
+                                 source_type='', custom_attr=None):
         """ Get OCL-formatted CSV Source resource """
         csv_resource = {
             "resource_type": "Source",
@@ -340,6 +400,8 @@ class Qmap(object):
             "owner_id": owner_id,
             "external_id": external_id,
         }
+        if source_type:
+            csv_resource['source_type'] = source_type
         if custom_attr:
             for key in custom_attr:
                 csv_resource['attr:%s' % key] = custom_attr[key]

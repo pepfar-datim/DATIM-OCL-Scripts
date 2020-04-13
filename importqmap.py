@@ -59,21 +59,30 @@ if args.verbosity > 1:
     pprint.pprint(json.loads(str(qmap)))
 
 # Process the qmap import
-bulk_import_task_id = qmap.import_qmap(
-    domain=args.domain, ocl_env_url=ocl_env_url, ocl_api_token=args.token,
-    test_mode=args.testmode, verbosity=args.verbosity, ocl_api_admin_token=args.admin_token,
-    fhir_server_url=args.fhir_url)
-
-if bulk_import_task_id:
+output_json = None
+try:
+    bulk_import_task_id = qmap.import_qmap(
+        domain=args.domain, ocl_env_url=ocl_env_url, ocl_api_token=args.token,
+        test_mode=args.testmode, verbosity=args.verbosity, ocl_api_admin_token=args.admin_token,
+        fhir_server_url=args.fhir_url)
+except Exception as e:
     output_json = {
-        "message": ("QMAP successfully queued for bulk import into OCL. Request QMAP export "
-                    "after bulk import is processed or request import status."),
-        "bulk_import_task_id": bulk_import_task_id,
-        "bulk_import_status_url": "%s/manage/bulkimport/?task=%s" % (
-            ocl_env_url, bulk_import_task_id),
-        "fhir_server_url": args.fhir_url,
+        "message": str(e),
+        "status": "Error"
     }
-    if args.qmap_api_root:
-        output_json["qmap_export_url"] = '%s%s/%s/' % (
-            args.qmap_api_root, args.domain, qmap.clean_name)
+else:
+    if bulk_import_task_id:
+        output_json = {
+            "message": ("QMAP successfully queued for bulk import into OCL. Request QMAP export "
+                        "after bulk import is processed or request import status."),
+            "bulk_import_task_id": bulk_import_task_id,
+            "bulk_import_status_url": "%s/manage/bulkimport/?task=%s" % (
+                ocl_env_url, bulk_import_task_id),
+            "fhir_server_url": args.fhir_url,
+        }
+        if args.qmap_api_root:
+            output_json["qmap_export_url"] = '%s%s/%s/' % (
+                args.qmap_api_root, args.domain, qmap.clean_name)
+
+if output_json:
     print json.dumps(output_json)

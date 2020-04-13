@@ -1,0 +1,120 @@
+{
+    "name": "Test",
+    "created": "2020-03-27T11:42:45.801Z",
+    "updated": "2020-03-27T11:42:45.801Z",
+    "uid": "a34nvd",
+    "questionnaireuid": "http://datim.org/fhir/Questionnaire/PLM-FP-Questionnaire",
+    "complete": true,
+    "map": {
+        "headers": {
+            "PatientNum": {
+                "path": [
+                    {
+                        "linkid": "/Patient",
+                        "text": "Patient ID"
+                    },
+                    {
+                        "linkid": "/Patient/id",
+                        "text": "Patient ID"
+                    }
+                ],
+                "valueType": "string"
+            },
+            "DOB": {
+                "path": [
+                    {
+                        "linkid": "/Patient",
+                        "text": "Patient ID"
+                    },
+                    {
+                        "linkid": "/Patient/birthDate",
+                        "text": "Birth Date"
+                    }
+                ],
+                "valueType": "date"
+            },
+            "Gender": {
+                "path": [
+                    {
+                        "linkid": "/Patient",
+                        "text": "Patient ID"
+                    },
+                    {
+                        "linkid": "/Patient/gender",
+                        "text": "Gender"
+                    }
+                ],
+                "valueType": "choice",
+                "choiceMap": {
+                    "Male": "male",
+                    "Female": "female",
+                    "Unknown": "unknown"
+                }
+            },
+            "LocationCode": {
+                "path": [
+                    {
+                        "linkid": "/Encounter",
+                        "text": "Encounter"
+                    },
+                    {
+                        "linkid": "/Encounter/location",
+                        "text": "Location ID"
+                    }
+                ],
+                "valueType": "string"
+            },
+            "ModernMethod": {
+                "path": [
+                    {
+                        "linkid": "/MedicationStatement",
+                        "text": "MedicationStatement"
+                    },
+                    {
+                        "linkid": "/MedicationStatement/method",
+                        "text": "Family Planning Modern Method"
+                    }
+                ],
+                "valueType": "choice",
+                "choiceMap": {
+                    "LA27901-0": "LA27901-0",
+                    "LA27902-8": "LA27902-8",
+                    "LA27903-6": "LA27903-6",
+                    "LA27904-4": "LA27904-4",
+                    "LA27905-1": "LA27905-1",
+                    "LA14534-4": "LA14534-4",
+                    "LA27907-7": "LA27907-7",
+                    "LA27908-5": "LA27908-5",
+                    "LA27909-3": "LA27909-3",
+                    "LA16581-3": "LA16581-3",
+                    "LA27911-9": "LA27911-9",
+                    "LA27912-7": "LA27912-7",
+                    "LA27913-5": "LA27913-5",
+                    "LA27914-3": "LA27914-3",
+                    "LA14549-2": "LA14549-2",
+                    "LA27916-8": "LA27916-8",
+                    "LA27917-6": "LA27917-6",
+                    "LA27918-4": "LA27918-4",
+                    "LA27919-2": "LA27919-2",
+                    "LA27920-0": "LA27920-0",
+                    "LA27921-8": "LA27921-8",
+                    "LA27922-6": "LA27922-6"
+                }
+            },
+            "ModernMethodStart": {
+                "path": [
+                    {
+                        "linkid": "/MedicationStatement",
+                        "text": "MedicationStatement"
+                    },
+                    {
+                        "linkid": "/MedicationStatement/startDate",
+                        "text": "Family Planning Modern Method Start Date"
+                    }
+                ],
+                "valueType": "dateTime"
+            }
+        },
+        "constants": {}
+    }
+}

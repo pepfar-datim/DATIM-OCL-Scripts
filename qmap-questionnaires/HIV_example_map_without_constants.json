@@ -3,7 +3,7 @@
 	"created": "2020-02-17T11:24:50.683Z",
 	"updated": "2020-02-17T11:24:50.683Z",
 	"uid": "K33t41",
-	"questionnaireuid": "HIVque",
+	"questionnaireuid": "http://datim.org/fhir/Questionnaire/PLM-HIV-Questionnaire",
 	"complete": true,
 	"map": {
 		"headers": {
@@ -37,9 +37,9 @@
 				}],
 				"valueType": "choice",
 				"choiceMap": {
-					"M": "male",
-					"F": "female",
-					"U": "unknown"
+					"Male": "male",
+					"Female": "female",
+					"Unknown": "unknown"
 				}
 			},
 			"LocationCode": {

@@ -67,12 +67,13 @@ try:
         fhir_server_url=args.fhir_url)
 except Exception as e:
     output_json = {
-        "message": str(e),
-        "status": "Error"
+        "status": "Error",
+        "message": str(e)
     }
 else:
     if bulk_import_task_id:
         output_json = {
+            "status": "Success",
             "message": ("QMAP successfully queued for bulk import into OCL. Request QMAP export "
                         "after bulk import is processed or request import status."),
             "bulk_import_task_id": bulk_import_task_id,

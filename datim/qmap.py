@@ -199,7 +199,8 @@ class Qmap(object):
         qmap_questionnaire = fhir.Questionnaire.load_from_fhir_server(
             fhir_server_url=fhir_server_url, questionnaire_id=self.questionnaireuid)
         if not qmap_questionnaire:
-            raise Exception("Could not load questionnaire '%s'" % qmap_questionnaire.url)
+            raise Exception("Could not load questionnaire '%s' from '%s'" % (
+                self.questionnaireuid, fhir_server_url))
 
         # Determine if Questionnaire source already exists
         do_create_questionnaire_source = False

@@ -44,7 +44,6 @@ ocl_env_url = args.env if args.env else args.env_url
 
 # Display debug output
 if args.verbosity > 1:
-    import pprint
     print args
 
 # Process the qmap export
@@ -53,10 +52,16 @@ try:
         domain=args.domain, qmap_id=args.qmapid,
         ocl_env_url=ocl_env_url, ocl_api_token=args.token,
         verbosity=args.verbosity)
-    # Export successful -- Return 200 status code and print this
+    # Export successful -- Return 200 status code and print (as JSON)
     print qmap
 except ocldev.oclexport.OclExportNotAvailableError as export_error:
     # Export not yet ready -- Return 204 status code
     print json.dumps({
+        "status": "Not Available",
         "message": "QMAP export not available. Try requesting again later."
+    })
+except Exception as e:
+    print json.dumps({
+        "status": "Error",
+        "message": str(e)
     })

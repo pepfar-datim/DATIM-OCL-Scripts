@@ -8,7 +8,8 @@ python importqmap.py -dmAtches4 --env=staging -t="your-token-here" --testmode -v
 import json
 import argparse
 import datim.qmap
-
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # suppressing urllib error
 
 # Script constants
 APP_VERSION = '0.1.0'

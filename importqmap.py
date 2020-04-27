@@ -2,14 +2,31 @@
 Script to import a QMAP into OCL. A QMAP is a JSON representation of a mapping between
 a point of service system (POS) and a FHIR Questionnaire.
 
-python importqmap.py -dmAtches4 --env=staging -t="your-token-here" --testmode -v1
-    qmap-questionnaires/HIV_example_map_with_constants.json
+Example Command:
+    python importqmap.py -d="mAtches4" --env=staging -t="your-token-here" -v2
+        --fhir-url="https://test.ohie.datim.org/hapi-fhir-jpaserver/fhir/"
+        --qmap-api-root="https://testlohie.datimlorg:5000/plm-qmap/"
+        qmap-questionnaires/HIV_example_map_with_constants.json
+
+Example Output:
+{
+    "status": "Success",
+    "message": "QMAP successfully queued for bulk import into OCL. Request QMAP export after bulk import is processed or request import status.",
+    "fhir_server_url": "https://test.ohie.datim.org/hapi-fhir-jpaserver/fhir/",
+    "qmap_export_url": "https://test.ohie.datim.org:5000/plm-qmap/mAtches4/9ffjifkd/",
+    "qmap_import_status_url": "https://test.ohie.datim.org:5000/plm-qmap/:domain/qmaps?task=efijfkfijdkdifjeijfjekifjej",
+    "ocl_bulk_import_status_url": "https://api.staging.openconceptlab.org/manage/bulkimport/?task=efijfkfijdkdifjeijfjekifjej",
+    "ocl_bulk_import_task_id": "efijfkfijdkdifjeijfjekifjej"
+}
 """
 import json
 import argparse
 import datim.qmap
 import urllib3
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # suppressing urllib error
+
+
+# Suppress urllib error due to invalid SSL certificate
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Script constants
 APP_VERSION = '0.1.0'
@@ -77,14 +94,16 @@ else:
             "status": "Success",
             "message": ("QMAP successfully queued for bulk import into OCL. Request QMAP export "
                         "after bulk import is processed or request import status."),
-            "bulk_import_task_id": bulk_import_task_id,
-            "bulk_import_status_url": "%s/manage/bulkimport/?task=%s" % (
+            "ocl_bulk_import_task_id": bulk_import_task_id,
+            "ocl_bulk_import_status_url": "%s/manage/bulkimport/?task=%s" % (
                 ocl_env_url, bulk_import_task_id),
             "fhir_server_url": args.fhir_url,
         }
         if args.qmap_api_root:
-            output_json["qmap_export_url"] = '%s%s/%s/' % (
-                args.qmap_api_root, args.domain, qmap.clean_name)
+            output_json["qmap_export_url"] = '%s%s/qmaps/%s/' % (
+                args.qmap_api_root, args.domain, qmap.uid)
+            output_json["qmap_import_status_url"] = '%s%s/qmaps/?importId=%s' % (
+                args.qmap_api_root, args.domain, bulk_import_task_id)
 
 if output_json:
     print json.dumps(output_json)

@@ -2,7 +2,87 @@
 Script to export a QMAP from OCL. A QMAP is a JSON representation of a mapping between
 a point of service system (POS) and a FHIR Questionnaire.
 
-python exportqmap.py -dmAtches3 --qmapid=HIV-example-map --env=staging
+Example Command:
+    python exportqmap.py -d="mAtches3" --qmapid=qmapid --env=staging
+
+Example mediator request:
+    https://test.ohie.datim.org:5000/plm-qmap/mAtches3f/qmaps/4CmFkf/
+
+Example Output:
+{
+    "uid": "4CmFkf",
+    "name": "HIV_example_map",
+    "questionnaireuid": "http://datim.org/fhir/Questionnaire/PLM-HIV-Questionnaire",
+    "complete": true,
+    "created": "2020-04-27T12:57:37.889",
+    "updated": "2020-04-27T12:57:37.889",
+    "map": {
+        "headers": {
+            "DateObserved": {
+                "path": [
+                    {"linkid": "/Observation", "text": "Practitioner"},
+                    {"linkid": "/Observation/date", "text": "Observation Date"}
+                ],
+                "valueType": "dateTime"
+            },
+            "DOB": {
+                "path": [
+                    {"linkid": "/Patient", "text": "Patient ID"},
+                    {"linkid": "/Patient/birthDate", "text": "Birth Date"}
+                ],
+                "valueType": "date"
+            },
+            "VLC": {
+                "path": [
+                    {"linkid": "/Observation", "text": "Practitioner"},
+                    {"linkid": "/Observation/viralLoad", "text": "Viral Load Count"}
+                ],
+                "valueType": "integer"
+            },
+            "PractitionerCode": {
+                "path": [
+                    {"linkid": "/Observation", "text": "Practitioner"},
+                    {"linkid": "/Observation/performer", "text": "Practitioner ID"}
+                ],
+                "valueType": "string"
+            },
+            "ART_Start": {
+                "path": [
+                    {"linkid": "/MedicationStatement", "text": "MedicationStatement"},
+                    {"linkid": "/MedicationStatement/startDate", "text": "ART Start Date"}
+                ],
+                "valueType": "dateTime"
+            },
+            "LocationCode": {
+                "path": [
+                    {"linkid": "/Encounter", "text": "Encounter"},
+                    {"linkid": "/Encounter/location", "text": "Location ID"}
+                ],
+                "valueType": "string"
+            }
+        },
+        "constants": {
+            "/Patient/gender": {
+                "path": [
+                    {"linkid": "/Patient", "text": "Patient ID"},
+                    {"linkid": "/Patient/gender", "text": "Gender"}
+                ],
+                "valueType": "choice",
+                "code": "female",
+                "display": "Female"
+            },
+            "/Patient/id": {
+                "path": [
+                    {"linkid": "/Patient", "text": "Patient ID"},
+                    {"linkid": "/Patient/id", "text": "Patient ID"}
+                ],
+                "valueType": "string",
+                "code": "123",
+                "display": "123"
+            }
+        }
+    }
+}
 """
 import argparse
 import json

@@ -191,7 +191,7 @@ class Qmap(object):
         does_source_exist = False
         do_create_qmap_source = True
         if Qmap.check_if_qmap_source_exists(
-                domain=domain, qmap_id=self.clean_name,
+                domain=domain, qmap_id=self.uid,
                 ocl_env_url=ocl_env_url, ocl_api_token=ocl_api_token):
             does_source_exist = True
 
@@ -229,10 +229,9 @@ class Qmap(object):
 
             # QMAP source
             if does_source_exist:
-                print '  QMAP Source "%s" already exists. Will delete and recreate...' % (
-                    self.clean_name)
+                print '  QMAP Source "%s" already exists. Will delete and recreate...' % self.uid
             else:
-                print '  QMAP Source "%s" does not exist...will create' % self.clean_name
+                print '  QMAP Source "%s" does not exist...will create' % self.uid
 
             # Questionnaire Source
             if do_create_questionnaire_source:
@@ -265,9 +264,8 @@ class Qmap(object):
             if verbosity:
                 if not ocl_api_admin_token:
                     ocl_api_admin_token = ocl_api_token
-                print '\nDeleting existing source "%s" for domain "%s"...' % (
-                    self.clean_name, domain)
-            Qmap.delete_source(domain=domain, qmap_id=self.clean_name,
+                print '\nDeleting existing source "%s" for domain "%s"...' % (self.uid, domain)
+            Qmap.delete_source(domain=domain, qmap_id=self.uid,
                                ocl_env_url=ocl_env_url, ocl_api_token=ocl_api_admin_token)
 
         # Submit the bulk import
@@ -305,7 +303,7 @@ class Qmap(object):
                 org_id=domain, name=domain, custom_attr={"qmap_org": True}))
         if do_create_qmap_source:
             qmap_csv_resources.append(self._get_csv_resource_source(
-                source_id=self.clean_name,
+                source_id=self.uid,
                 name=self.name,
                 owner_id=domain,
                 external_id=self.uid,
@@ -326,13 +324,13 @@ class Qmap(object):
         # Build the Qmap CSV concepts with their mappings for Qmap headers
         for qmap_key, qmap_item in self.headers.items():
             pos_header_concept = self._generate_pos_header_concept_and_mapping(
-                qmap_key=qmap_key, qmap_item=qmap_item, owner=domain, source=self.clean_name,
+                qmap_key=qmap_key, qmap_item=qmap_item, owner=domain, source=self.uid,
                 qmap_questionnaire=qmap_questionnaire,
                 owner_type=ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION)
             qmap_csv_resources.append(pos_header_concept)
             if 'choiceMap' in qmap_item:
                 pos_header_choices = self._generate_pos_choice_concepts_and_mappings(
-                    qmap_key=qmap_key, qmap_item=qmap_item, owner=domain, source=self.clean_name,
+                    qmap_key=qmap_key, qmap_item=qmap_item, owner=domain, source=self.uid,
                     qmap_questionnaire=qmap_questionnaire,
                     owner_type=ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION)
                 qmap_csv_resources.append(pos_header_choices)
@@ -340,7 +338,7 @@ class Qmap(object):
         # Build concepts/mappings for Qmap constants
         for qmap_key, qmap_item in self.constants.items():
             _pos_constant_concept = self._generate_pos_constant_concept_and_mapping(
-                qmap_key=qmap_key, qmap_item=qmap_item, owner=domain, source=self.clean_name,
+                qmap_key=qmap_key, qmap_item=qmap_item, owner=domain, source=self.uid,
                 qmap_questionnaire=qmap_questionnaire,
                 owner_type=ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION)
             qmap_csv_resources.append(_pos_constant_concept)
@@ -349,7 +347,7 @@ class Qmap(object):
         qmap_csv_resources.append(self._get_csv_resource_repo_version(
             owner_id=domain, owner_type=ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION,
             repo_type=ocldev.oclconstants.OclConstants.RESOURCE_TYPE_SOURCE,
-            repo_id=self.clean_name, version_id="v1.0", description="Auto-generated version"))
+            repo_id=self.uid, version_id="v1.0", description="Auto-generated version"))
 
         return qmap_csv_resources
 
@@ -508,6 +506,7 @@ class Qmap(object):
 
     @property
     def clean_name(self):
+        """ Returns name cleaned so that it can be used as an ID in OCL """
         return Qmap._clean_org_and_source_id(self._qmap['name'])
 
     @property

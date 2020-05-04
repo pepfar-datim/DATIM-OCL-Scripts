@@ -57,6 +57,8 @@ if args.verbosity > 1:
 oclenv = settings.oclenv
 oclapitoken = settings.oclapitoken
 
+if args.token:
+    oclapitoken=args.token
 # Exit if import is already in process
 # TODO: Fix this so that it is automatically skipped if not run in an async environment
 if has_existing_import(args.country_code):

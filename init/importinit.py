@@ -4,7 +4,7 @@ Before running, edit import_filenames variable with the list of files you wish t
 
 Files:
 * datim_init_all.json - Do this first - imports PEPFAR Org and sources for MER,SIMS,Mechanisms,Tiered-Site-Support
-* datim_init_only_moh.json - imports DATIM-MOH sources, collections, and null-disag concepts for both FY18 and FY19
+* datim_init_only_moh.json - imports DATIM-MOH sources, collections, and null_disag concepts for both FY18 and FY19
 * dhis2datasets.json - imports OCL collections that stay in sync with a DHIS2 Dataset must be pre-defined in OCL.
   Required for MER, SIMS, and Tiered Site Support (not needed for DATIM-MOH or Mechanisms). Includes collections and
   their initial empty repo versions.

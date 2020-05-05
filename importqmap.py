@@ -2,7 +2,7 @@
 Script to import a QMAP into OCL. A QMAP is a JSON representation of a mapping between
 a point of service system (POS) and a FHIR Questionnaire.
 
-Example Command:
+Example Usage:
     python importqmap.py -d="mAtches4" --env=staging -t="your-token-here" -v2
         --fhir-url="https://test.ohie.datim.org/hapi-fhir-jpaserver/fhir/"
         --qmap-api-root="https://testlohie.datimlorg:5000/plm-qmap/"

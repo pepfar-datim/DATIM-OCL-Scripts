@@ -2,6 +2,15 @@
 Script to generate a country mapping export for a specified country (e.g. UG) and
 period (e.g. FY17). Export follows the format of the country mapping CSV template,
 though JSON format is also supported.
+
+Example Usage:
+* To request an export as CSV:
+    python imapexport.py -c="BI" --env=staging -p=FY19 -t="my-token-here" -v0 -f=CSV
+* To request an export as JSON:
+    python imapexport.py -c="BI" --env=staging -p=FY19 -t="my-token-here" -v0 -f=JSON
+* To see all options:
+    python imapexport.py -h
+
 """
 import sys
 import settings
@@ -58,7 +67,8 @@ oclenv = settings.oclenv
 oclapitoken = settings.oclapitoken
 
 if args.token:
-    oclapitoken=args.token
+    oclapitoken = args.token
+
 # Exit if import is already in process
 # TODO: Fix this so that it is automatically skipped if not run in an async environment
 if has_existing_import(args.country_code):
@@ -81,9 +91,12 @@ if args.verbosity:
 
 # Generate the IMAP export
 datim_imap_export = datim.datimimapexport.DatimImapExport(
-    oclenv=oclenv, oclapitoken=oclapitoken, verbosity=args.verbosity, run_ocl_offline=args.run_ocl_offline)
+    oclenv=oclenv, oclapitoken=oclapitoken, verbosity=args.verbosity,
+    run_ocl_offline=args.run_ocl_offline)
 try:
-    imap = datim_imap_export.get_imap(period=args.period, version=args.country_version, country_org=country_org, country_code=args.country_code)
+    imap = datim_imap_export.get_imap(
+        period=args.period, version=args.country_version, country_org=country_org,
+        country_code=args.country_code)
 except requests.exceptions.HTTPError as e:
     print(e)
     sys.exit(1)

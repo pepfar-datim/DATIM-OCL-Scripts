@@ -88,7 +88,7 @@ class DatimBase(object):
     DATIM_MOH_MAP_TYPE_COUNTRY_OPTION = 'DATIM HAS OPTION'
 
     # DATIM-MOH NULL Disag ID and Name (used only by DATIM-MOH)
-    NULL_DISAG_ID = 'null-disag'
+    NULL_DISAG_ID = 'null_disag'
     NULL_DISAG_NAME = 'Null Disaggregate'
 
     # DATIM-MOH Default/Total disag values (used only by DATIM-MOH for auto-replacement)
@@ -609,7 +609,7 @@ class DatimBase(object):
     def get_datim_moh_null_disag_endpoint(period):
         """
         Get the DATIM-MOH null disag endpoint for the given period (e.g.
-        /orgs/PEPFAR/sources/DATIM-MOH-FY18/concepts/null-disag/)
+        /orgs/PEPFAR/sources/DATIM-MOH-FY18/concepts/null_disag/)
         :param period:
         :return:
         """

@@ -54,15 +54,19 @@ class DatimImapReferenceGenerator(datimbase.DatimBase):
         return import_list
 
     def generate_reference(self, csv_row, country_source_export):
-        """ Generate collection references and other required resources for a single CSV row """
+        """
+        Generate the collection references and other required resources for a single CSV row.
+        Each CSV row is represented by
+        """
 
+        # Do nothing if no collection is associated with this row
         if 'Country Collection ID' not in csv_row or not csv_row['Country Collection ID']:
             return
 
         # Add references to DATIM concepts/mappings if first use of this collection
         collection_id = csv_row['Country Collection ID']
         if collection_id not in self.refs_by_collection:
-            # DATIM HAS OPTION Mapping
+            # Get the DATIM HAS OPTION Mapping
             mapping_id = self.get_mapping_uri_from_export(
                 country_source_export,
                 csv_row['DATIM From Concept URI'],
@@ -70,13 +74,13 @@ class DatimImapReferenceGenerator(datimbase.DatimBase):
                 csv_row['DATIM To Concept URI'])
             self.refs_by_collection[collection_id] = [mapping_id]
 
-            # Add DATIM From concept
+            # Add reference to DATIM From-Concept
             self.refs_by_collection[collection_id].append(csv_row['DATIM From Concept URI'])
 
-            # Add DATIM To concept
+            # Add reference to DATIM To-Concept
             self.refs_by_collection[collection_id].append(csv_row['DATIM To Concept URI'])
 
-        # Now add the country mapping reference
+        # Add reference to the country ADD or SUBTRACT mapping
         mapping_id = self.get_mapping_uri_from_export(
             country_source_export,
             csv_row['Country From Concept URI'],
@@ -84,13 +88,13 @@ class DatimImapReferenceGenerator(datimbase.DatimBase):
             csv_row['Country To Concept URI'])
         self.refs_by_collection[collection_id].append(mapping_id)
 
-        # Add country From-Concept
+        # Add reference to country From-Concept
         # versioned_uri = DatimImapReferenceGenerator.get_versioned_concept_uri_from_export(
         #     country_source_export, csv_row['Country From Concept URI'])
         # self.refs_by_collection[collection_id].append(versioned_uri)
         self.refs_by_collection[collection_id].append(csv_row['Country From Concept URI'])
 
-        # Add country To-Concept
+        # Add reference to country To-Concept
         if csv_row['MOH_Disag_ID'] == datimbase.DatimBase.NULL_DISAG_ID:
             # Add null_disag from PEPFAR/DATIM-MOH source instead
             self.refs_by_collection[collection_id].append(
@@ -108,7 +112,9 @@ class DatimImapReferenceGenerator(datimbase.DatimBase):
             return concept['version_url']
         return ''
 
-    def get_mapping_uri_from_export(self, country_source_export, from_concept_uri, map_type, to_concept_uri):
+    def get_mapping_uri_from_export(self, country_source_export, from_concept_uri,
+                                    map_type, to_concept_uri):
+        """ Returns the URL for a specific mapping from an OCL repository export """
         mappings = country_source_export.get_mappings(
             from_concept_uri=from_concept_uri, to_concept_uri=to_concept_uri, map_type=map_type)
         if len(mappings) == 1:

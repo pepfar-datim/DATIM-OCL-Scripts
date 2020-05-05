@@ -2,7 +2,7 @@
 Script to export a QMAP from OCL. A QMAP is a JSON representation of a mapping between
 a point of service system (POS) and a FHIR Questionnaire.
 
-Example Command:
+Example Usage:
     python exportqmap.py -d="mAtches3" --qmapid=qmapid --env=staging
 
 Example mediator request:

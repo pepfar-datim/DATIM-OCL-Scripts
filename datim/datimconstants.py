@@ -6,6 +6,7 @@ Static class of constants for the DATIM-OCL project
 class DatimConstants(object):
     """ Static class of constants for the DATIM-OCL project """
 
+    # NOT IN USE: First iteration of new method for defining ETL
     OCL_ETL_DEFINITIONS = {
         'MER-MSP': {
             'id': 'MER-MSP',

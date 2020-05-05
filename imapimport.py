@@ -1,6 +1,7 @@
 """
-Script to import a CSV or JSON country mapping import file into OCL for a specified country (e.g. UG) and
-period (e.g. FY17, FY18, FY19). Import file must follow the format of the country mapping template.
+Script to import a CSV or JSON country mapping import file into OCL for a specified country
+(e.g. UG) and period (e.g. FY17, FY18, FY19). Import file must follow the format of the country
+mapping template.
 """
 import sys
 import time
@@ -10,7 +11,7 @@ import datim.datimimapimport
 
 
 # Default Script Settings
-country_code = ''  # e.g. RW, UA --- note that DATIM expects 2-letter country codes
+country_code = ''  # e.g. RW, UA - DATIM expects 2-letter country codes, but OCL accepts any length
 period = ''  # e.g. FY18, FY19
 imap_import_filename = ''  # e.g. RW-FY18.csv or RW-FY18.json
 country_name = ''  # e.g. Rwanda
@@ -23,6 +24,7 @@ country_public_access = 'View'  # Set visibility of country org/repos. None, Vie
 # OCL Settings
 oclenv = settings.oclenv
 oclapitoken = settings.oclapitoken
+ocl_api_admin_token = settings.api_token_staging_datim_admin
 
 # Optionally set arguments from the command line
 if sys.argv and len(sys.argv) > 5:
@@ -62,6 +64,8 @@ country_names = {
     }
 if not country_name and country_code in country_names:
     country_name = country_names[country_code]
+if not country_name:
+    country_name = country_code
 
 # Debug output
 if verbosity:
@@ -80,7 +84,8 @@ if delete_org_if_exists:
         # Pause briefly to allow user to cancel in case deleting org on accident...
         time.sleep(5)
         result = datim.datimimap.DatimImapFactory.delete_org_if_exists(
-            org_id=country_org, oclenv=oclenv, ocl_root_api_token=settings.api_token_staging_root, verbose=verbosity)
+            org_id=country_org, oclenv=oclenv, ocl_root_api_token=ocl_api_admin_token,
+            verbose=verbosity)
     elif verbosity:
         print('Skipping "delete_org_if_exists" step because "test_mode" is enabled')
 

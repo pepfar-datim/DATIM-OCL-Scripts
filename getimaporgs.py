@@ -1,3 +1,20 @@
+"""
+Returns list of country Indicator Mapping (IMAP) organizations available in the specified
+OCL environment. This is determined by the 'datim_moh_object' == True custom attribute of
+the org. Orgs typically have an ID in the format 'DATIM-MOH-xx-FYyy', where 'xx' is the
+country code (eg. CM, BI, UG) and 'yy' is the fiscal year (eg. 18, 19, 20), though this is
+not required by this script. Optional arguments 'period_filter' and 'country_code_filter'
+may be either a string or a list and will filter the country list accordingly. For example,
+setting period_filter to ['FY18', 'FY19'] will only return IMAP orgs from those fiscal years.
+Similarly, setting country_code_filter to ['UG', 'BI', 'UA'] will only return those three
+matching country codes.
+
+Example Usage:
+    python getimaporgs.py --env=staging -v2 -t="your-token-here" --format=text
+
+Arguments:
+   --format=[csv,json,text]
+"""
 import requests
 import datim.datimimap
 import datim.datimimapexport
@@ -18,7 +35,8 @@ OCL_ENVIRONMENTS = {
 # Argument parser validation functions
 def ocl_environment(string):
     if string not in OCL_ENVIRONMENTS:
-        raise argparse.ArgumentTypeError('Argument "env" must be %s' % ', '.join(OCL_ENVIRONMENTS.keys()))
+        raise argparse.ArgumentTypeError(
+            'Argument "env" must be %s' % ', '.join(OCL_ENVIRONMENTS.keys()))
     return OCL_ENVIRONMENTS[string]
 
 
@@ -45,13 +63,15 @@ if args.verbosity > 1:
 
 def get_imap_orgs(ocl_env_url, ocl_api_token, period_filter='', country_code_filter=''):
     """
-    Returns list of country Indicator Mapping organizations available in the specified OCL environment.
-    This is determined by the 'datim_moh_object' == True custom attribute of the org. Orgs typically have an
-    ID in the format 'DATIM-MOH-xx-FYyy', where 'xx' is the country code (eg. CM, BI, UG) and 'yy' is the
-    fiscal year (eg. 18, 19, 20). Optional arguments 'period_filter' and 'country_code_filter' may be either
-    a string or a list and will filter the country list accordingly. For example, setting period_filter to
-    ['FY18', 'FY19'] will only return IMAP orgs from those fiscal years. Similarly, setting country_code_filter
-    to ['UG', 'BI', 'UA'] will only return those three matching country codes.
+    Returns list of country Indicator Mapping organizations available in the specified OCL
+    environment. This is determined by the 'datim_moh_object' == True custom attribute of
+    the org. Orgs typically have an ID in the format 'DATIM-MOH-xx-FYyy', where 'xx' is
+    the country code (eg. CM, BI, UG) and 'yy' is the fiscal year (eg. 18, 19, 20).
+    Optional arguments 'period_filter' and 'country_code_filter' may be either a string or
+    a list and will filter the country list accordingly. For example, setting period_filter to
+    ['FY18', 'FY19'] will only return IMAP orgs from those fiscal years. Similarly, setting
+    country_code_filter to ['UG', 'BI', 'UA'] will only return those three matching
+    country codes.
     """
 
     # Prepare the filters

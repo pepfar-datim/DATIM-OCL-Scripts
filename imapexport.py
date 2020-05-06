@@ -13,7 +13,6 @@ Example Usage:
 
 """
 import sys
-import settings
 import requests
 import datim.datimimap
 import datim.datimimapexport

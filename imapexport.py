@@ -97,8 +97,12 @@ try:
     imap = datim_imap_export.get_imap(
         period=args.period, version=args.country_version, country_org=country_org,
         country_code=args.country_code)
-except requests.exceptions.HTTPError as e:
-    print(e)
+except (requests.exceptions.HTTPError, Exception) as e:
+    output = {
+        'status': 'Error',
+        'message': str(e)
+    }
+    print json.dumps(output)
     sys.exit(1)
 else:
     imap.display(fmt=args.format, sort=True, exclude_empty_maps=args.exclude_empty_maps,

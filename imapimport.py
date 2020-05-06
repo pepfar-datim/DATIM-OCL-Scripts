@@ -62,21 +62,6 @@ parser.add_argument(
     'file', type=argparse.FileType('r'), help='IMAP JSON document, eg "BI-FY19.csv"')
 args = parser.parse_args()
 
-# with args.file as imap_file:
-#     imap_json = json.load(imap_file)
-#     imap = datim.qmap.Qmap(qmap_json=qmap_json)
-
-# Default Script Settings
-# country_code = 'BI'  # e.g. RW, UA - DATIM expects 2-letter code, but OCL accepts any length
-# period = 'FY19'  # e.g. FY18, FY19
-# imap_import_filename = 'csv/BI-FY19.csv'  # e.g. RW-FY18.csv or RW-FY18.json
-# country_name = ''  # e.g. Rwanda
-# verbosity = 2  # Set to 0 to hide all debug info, or 2 to show all debug info
-# run_ocl_offline = False  # Not currently supported
-# test_mode = False  # If true, generates the import script but does not actually import it
-# delete_org_if_exists = True  # Be very careful with this option!
-# country_public_access = 'View'  # Set visibility of country org/repos. None, View, Edit supported
-
 # Pre-process input parameters
 ocl_admin_api_token = args.admin_token
 if not ocl_admin_api_token:

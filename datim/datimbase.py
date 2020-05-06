@@ -88,7 +88,7 @@ class DatimBase(object):
     DATIM_MOH_MAP_TYPE_COUNTRY_OPTION = 'DATIM HAS OPTION'
 
     # DATIM-MOH NULL Disag ID and Name (used only by DATIM-MOH)
-    NULL_DISAG_ID = 'null_disag'
+    NULL_DISAG_ID = 'null-disag'
     NULL_DISAG_NAME = 'Null Disaggregate'
 
     # DATIM-MOH Default/Total disag values (used only by DATIM-MOH for auto-replacement)
@@ -385,6 +385,9 @@ class DatimBase(object):
         # self.vlog(1, 'Results of async query:\n%s' % export_responses)
         collection_results = {}
         for export_response in export_responses:
+            if not export_response:
+                self.vlog(0, 'WARNING: Export response returned None')
+                continue
             original_export_url = export_response.url
             if export_response.history and export_response.history[0] and export_response.history[0].url:
                 original_export_url = export_response.history[0].url

@@ -45,15 +45,22 @@ parser.add_argument('-c', '--country_code', help='Country code', required=True)
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('--env', help='Name of the OCL API environment', type=ocl_environment)
 group.add_argument('--envurl', help='URL of the OCL API environment')
-parser.add_argument('-p','--period', help='Period', required=True)
-parser.add_argument('-t', '--token', help='OCL API token', required=False)
-parser.add_argument('-f', '--format', help='Format of the export', default=datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV,required=False)
+parser.add_argument('-p', '--period', help='Period', required=True)
+parser.add_argument('-t', '--token', help='OCL API token', required=False, default='')
+parser.add_argument(
+    '-f', '--format', help='Format of the export',
+    default=datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV, required=False)
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
-parser.add_argument('--country_version', help='country minor version number (e.g. v0, v1, v2, etc.)', default='',required=False)
-parser.add_argument('--exclude_empty_maps', help='to exclude empty maps', default=True,required=False)
-parser.add_argument('--include_extra_info', help='to include extra info', default=False,required=False)
-parser.add_argument('--run_ocl_offline', help='to run ocl offline', default=False,required=False)
+parser.add_argument(
+    '--country_version', help='country minor version number (e.g. v0, v1, v2, etc.)',
+    default='', required=False)
+parser.add_argument(
+    '--exclude_empty_maps', help='to exclude empty maps', default=True, required=False)
+parser.add_argument(
+    '--include_extra_info', help='to include extra info', default=False, required=False)
+parser.add_argument(
+    '--run_ocl_offline', help='to run ocl offline', default=False, required=False)
 parser.add_argument('--version', action='version', version='%(prog)s v' + APP_VERSION)
 args = parser.parse_args()
 ocl_env_url = args.env if args.env else args.env_url
@@ -62,22 +69,15 @@ ocl_env_url = args.env if args.env else args.env_url
 if args.verbosity > 1:
     print args
 
-# OCL Settings - JetStream Staging user=datim-admin
-oclenv = settings.oclenv
-oclapitoken = settings.oclapitoken
-
-if args.token:
-    oclapitoken = args.token
-
 # Exit if import is already in process
 # TODO: Fix this so that it is automatically skipped if not run in an async environment
-if has_existing_import(args.country_code):
-    response = {
-            'status_code': 409,
-            'result': 'There is an import already in progress for this country code'
-        }
-    print json.dumps(response)
-    sys.exit(1)
+# if has_existing_import(args.country_code):
+#     response = {
+#             'status_code': 409,
+#             'result': 'There is an import already in progress for this country code'
+#         }
+#     print json.dumps(response)
+#     sys.exit(1)
 
 # Pre-process input parameters
 country_org = 'DATIM-MOH-%s-%s' % (args.country_code, args.period)
@@ -91,7 +91,7 @@ if args.verbosity:
 
 # Generate the IMAP export
 datim_imap_export = datim.datimimapexport.DatimImapExport(
-    oclenv=oclenv, oclapitoken=oclapitoken, verbosity=args.verbosity,
+    oclenv=ocl_env_url, oclapitoken=args.token, verbosity=args.verbosity,
     run_ocl_offline=args.run_ocl_offline)
 try:
     imap = datim_imap_export.get_imap(

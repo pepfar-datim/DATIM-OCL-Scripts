@@ -14,7 +14,7 @@ The import script creates OCL-formatted JSON consisting of:
 TODO: Move country collection reconstruction and version creation into a separate process that this class uses
 TODO: Add "clean up" functionality to retire unused resources
 TODO: Query collections by their mappings, not ID -- names are not consistent coming from DHIS2
-TODO: Exclude "null-disag" from the import scripts -- this does not have any effect, its just an unnecessary step
+TODO: Exclude "null-disag" update from the import scripts -- this does not have any effect, its just an unnecessary step
 """
 import requests
 import json
@@ -150,13 +150,19 @@ class DatimImapImport(datimbase.DatimBase):
         import_list = []
         if not imap_old:
             org = DatimImapImport.get_country_org_dict(
-                country_org=imap_input.country_org, country_code=imap_input.country_code,
-                country_name=imap_input.country_name, country_public_access=self.country_public_access)
+                country_org=imap_input.country_org,
+                country_code=imap_input.country_code,
+                country_name=imap_input.country_name,
+                country_public_access=self.country_public_access,
+                period=imap_input.period)
             import_list.append(org)
             self.vlog(1, 'Country org import script generated:', json.dumps(org))
             source = DatimImapImport.get_country_source_dict(
-                country_org=imap_input.country_org, country_code=imap_input.country_code,
-                country_name=imap_input.country_name, country_public_access=self.country_public_access)
+                country_org=imap_input.country_org,
+                country_code=imap_input.country_code,
+                country_name=imap_input.country_name,
+                country_public_access=self.country_public_access,
+                period=imap_input.period)
             import_list.append(source)
             self.vlog(1, 'Country source import script generated:', json.dumps(source))
         else:
@@ -247,8 +253,8 @@ class DatimImapImport(datimbase.DatimBase):
         elif self.test_mode:
             self.vlog(1, 'SKIPPING: New country source version not created in test mode...')
         elif not import_list:
-            self.vlog(1, 'SKIPPING: No resources imported into the source...')
             # TODO: Note that the source version should still be incremented if references are added to collections
+            self.vlog(1, 'SKIPPING: No resources imported into the source...')
 
         # STEP 10 of 11: Generate JSON for ALL references for ALL country collections
         imap_timer.lap(label='Step 9')
@@ -383,7 +389,8 @@ class DatimImapImport(datimbase.DatimBase):
             r.raise_for_status()
 
     @staticmethod
-    def get_country_org_dict(country_org='', country_code='', country_name='', country_public_access='View', period=''):
+    def get_country_org_dict(country_org='', country_code='', country_name='',
+                             country_public_access='View', period=''):
         """ Get an OCL-formatted dictionary of a country IMAP organization ready to import """
         return {
             'type': ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION,
@@ -391,12 +398,16 @@ class DatimImapImport(datimbase.DatimBase):
             'name': 'DATIM MOH %s' % country_name,
             'location': country_name,
             'public_access': country_public_access,
-            "extras": {"datim_moh_object": True, "datim_moh_period": period}
+            "extras": {
+                "datim_moh_object": True,
+                "datim_moh_period": period,
+                "datim_moh_country_code": country_code,
+            }
         }
 
     @staticmethod
-    def get_country_source_dict(country_org='', country_code='', country_name='', country_public_access='View',
-                                period=''):
+    def get_country_source_dict(country_org='', country_code='', country_name='',
+                                country_public_access='View', period=''):
         """ Get an OCL-formatted dictionary of a country IMAP source ready to import """
         source_name = 'DATIM MOH %s Alignment Indicators' % country_name
         source = {
@@ -411,7 +422,10 @@ class DatimImapImport(datimbase.DatimBase):
             "default_locale": "en",
             "supported_locales": "en",
             "public_access": country_public_access,
-            "extras": {"datim_moh_object": True, "datim_moh_period": period}
-
+            "extras": {
+                "datim_moh_object": True,
+                "datim_moh_period": period,
+                "datim_moh_country_code": country_code,
+            }
         }
         return source

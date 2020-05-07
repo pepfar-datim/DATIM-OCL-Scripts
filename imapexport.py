@@ -39,27 +39,29 @@ def ocl_environment(string):
 
 
 # Script argument parser
-parser = argparse.ArgumentParser("imap", description="Export IMAP from OCL")
-parser.add_argument('-c', '--country_code', help='Country code', required=True)
+parser = argparse.ArgumentParser("imap-export", description="Export IMAP from OCL")
+parser.add_argument('-c', '--country_code', help='Country code, eg "UG", "BI"', required=True)
 group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('--env', help='Name of the OCL API environment', type=ocl_environment)
+group.add_argument(
+    '--env', help='Name of the OCL API environment: production, staging, demo, qa',
+    type=ocl_environment)
 group.add_argument('--envurl', help='URL of the OCL API environment')
-parser.add_argument('-p', '--period', help='Period', required=True)
+parser.add_argument('-p', '--period', help='Period, eg "FY18"', required=True)
 parser.add_argument('-t', '--token', help='OCL API token', required=False, default='')
 parser.add_argument(
-    '-f', '--format', help='Format of the export',
+    '-f', '--format', help='Format of the export: JSON, XML, CSV, HTML',
     default=datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV, required=False)
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
 parser.add_argument(
-    '--country_version', help='country minor version number (e.g. v0, v1, v2, etc.)',
+    '--country_version', help='Country version number (e.g. v0, v1, v2, etc.)',
     default='', required=False)
 parser.add_argument(
-    '--exclude_empty_maps', help='to exclude empty maps', default=True, required=False)
+    '--exclude_empty_maps', help='Excludes empty maps', default=True, required=False)
 parser.add_argument(
-    '--include_extra_info', help='to include extra info', default=False, required=False)
+    '--include_extra_info', help='Includes extra columns', default=False, required=False)
 parser.add_argument(
-    '--run_ocl_offline', help='to run ocl offline', default=False, required=False)
+    '--run_ocl_offline', help='Runs OCL offline', default=False, required=False)
 parser.add_argument('--version', action='version', version='%(prog)s v' + APP_VERSION)
 args = parser.parse_args()
 ocl_env_url = args.env if args.env else args.env_url

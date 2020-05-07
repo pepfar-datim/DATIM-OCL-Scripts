@@ -6,3 +6,5 @@ data/*
 logs/*
 
 *.pyc
+datim/.DS_Store
+.DS_Store

@@ -169,7 +169,7 @@ class DatimImap(object):
         :param row_number: 0-based row number of the IMAP to return
         :param include_extra_info: Adds extra columns if True
         :param exclude_classification: Excludes classification column if True
-        :param auto_fix_null_disag: Replace empty disags with 'null_disag' if True
+        :param auto_fix_null_disag: Replace empty disags with 'null-disag' if True
         :param convert_to_dict: Returns the IMAP row as a dict with a unique row key if True
         :param exclude_empty_maps: Returns None if row represents an empty map
         :param show_null_disag_as_blank:
@@ -258,7 +258,7 @@ class DatimImap(object):
         :param exclude_classification: Optionally exclude the classification column
         :param convert_to_dict: Return a dictionary with a unique key for each row if True
         :param include_extra_info: Add extra pre-processing columns used for import into OCL
-        :param auto_fix_null_disag: Replaces empty disags with 'null_disag' if True
+        :param auto_fix_null_disag: Replaces empty disags with 'null-disag' if True
         :param show_null_disag_as_blank:
         :return: <list> or <dict>
         """
@@ -472,7 +472,7 @@ class DatimImap(object):
         :param sort: default=False; Set to True to sort by DATIM indicator+disag followed by Country indicator+disag
         :param exclude_empty_maps: Rows with empty maps are excluded from the results if True.
         :param include_extra_info: Add extra pre-processing columns
-        :param auto_fix_null_disag: Replaces empty disags with 'null_disag' if True
+        :param auto_fix_null_disag: Replaces empty disags with 'null-disag' if True
         :param show_null_disag_as_blank: Replaces null_disag with empty string if True
         :return: None
         """
@@ -643,7 +643,7 @@ class DatimImap(object):
     def has_country_disag(self, disag_id='', disag_name=''):
         """
         Returns whether the specified country disag is defined in the IMAP.
-        To match a null_disag in the IMAP, set disag_id to the actual null disag value (e.g. "null_disag")
+        To match a null_disag in the IMAP, set disag_id to the actual null disag value (e.g. "null-disag")
         rather than an empty string or by repeating the country indicator ID.
         Note that empty map rows are ignored.
         :param disag_id:

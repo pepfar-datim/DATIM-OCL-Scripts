@@ -16,8 +16,6 @@ Arguments:
    --format=[csv,json,text]
 """
 import requests
-import datim.datimimap
-import datim.datimimapexport
 import json
 import argparse
 
@@ -42,14 +40,14 @@ def ocl_environment(string):
 
 # Script argument parser
 parser = argparse.ArgumentParser("imap-orgs", description="Export IMAP country list from OCL")
-parser.add_argument('-c', '--country_code', help='Country code', required=False, default='')
+parser.add_argument('-c', '--country_code', help='Country code, eg "UG", "BI"', required=False, default='')
 group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('--env', help='Name of the OCL API environment', type=ocl_environment)
+group.add_argument('--env', help='Name of the OCL API environment: production, staging, demo, qa', type=ocl_environment)
 group.add_argument('--envurl', help='URL of the OCL API environment')
-parser.add_argument('-p','--period', help='Period', required=False, default='')
+parser.add_argument('-p','--period', help='Period, eg "FY18", "FY19"', required=False, default='')
 parser.add_argument('-t', '--token', help='OCL API token', required=False)
-parser.add_argument('-f', '--format', help='Format of the export',
-                    default=datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV, required=False)
+parser.add_argument('-f', '--format', help='Format of the export: csv, json, text',
+                    default='text', required=False)
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
 parser.add_argument('--version', action='version', version='%(prog)s v' + APP_VERSION)
@@ -82,6 +80,8 @@ def get_imap_orgs(ocl_env_url, ocl_api_token, period_filter='', country_code_fil
         if not isinstance(country_code_filter, list):
             country_code_filter = [country_code_filter]
 
+    # Retrieve list of all orgs from OCL
+    # TODO: Implement OCL's custom attribute API filter when supported
     ocl_api_headers = {'Content-Type': 'application/json'}
     if ocl_api_token:
         ocl_api_headers['Authorization'] = 'Token ' + ocl_api_token
@@ -89,6 +89,8 @@ def get_imap_orgs(ocl_env_url, ocl_api_token, period_filter='', country_code_fil
     response = requests.get(url_all_orgs, headers=ocl_api_headers)
     response.raise_for_status()
     ocl_all_orgs = response.json()
+
+    # Filter orgs based on custom attributes and specified filters
     ocl_moh_orgs = []
     for ocl_org in ocl_all_orgs:
         if 'extras' in ocl_org and ocl_org['extras'] and 'datim_moh_object' in ocl_org['extras'] and ocl_org['extras']['datim_moh_object']:
@@ -121,7 +123,7 @@ ocl_imap_orgs = get_imap_orgs(
     ocl_env_url=ocl_env_url, ocl_api_token=args.token,
     period_filter=period_filter, country_code_filter=country_code_filter)
 
-# Display
+# Display the results
 if isinstance(ocl_imap_orgs, list):
     output_format = args.format.lower()
     if output_format == 'csv':

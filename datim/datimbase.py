@@ -17,6 +17,8 @@ import requests
 import grequests
 import settings
 import ocldev.oclconstants
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 
 class DatimBase(object):
@@ -273,7 +275,9 @@ class DatimBase(object):
             # Fetch the repositories from OCL
             self.vlog(1, 'Request URL:', self.oclenv + self.OCL_DATASET_ENDPOINT)
             self.ocl_dataset_repos = self.get_ocl_repositories(
-                endpoint=self.OCL_DATASET_ENDPOINT, key_field='external_id', active_attr_name=self.REPO_ACTIVE_ATTR)
+                endpoint=self.OCL_DATASET_ENDPOINT,
+                key_field='external_id',
+                active_attr_name=self.REPO_ACTIVE_ATTR)
             with open(self.attach_absolute_data_path(self.DATASET_REPOSITORIES_FILENAME), 'wb') as output_file:
                 output_file.write(json.dumps(self.ocl_dataset_repos))
             self.vlog(1, 'Repositories retrieved from OCL matching key "%s": %s' % (
@@ -369,36 +373,51 @@ class DatimBase(object):
         :param version: Required, and does not support "latest" (e.g. v2, v3)
         :return: <dict> repository_version_url: repository_version_export
         """
+
+        # Generate list of all collection export URLs for the org
         country_version_id = '%s.%s' % (period, version)
         country_collections = self.get_ocl_repositories(
-            endpoint=endpoint, require_external_id=False, active_attr_name=None)
+            endpoint=endpoint, require_external_id=False, active_attr_name='')
         self.vlog(1, '%s repositories returned for endpoint "%s"' % (
             len(country_collections), endpoint))
-        country_collection_urls = []
+        export_urls = []
         for collection_id, collection in country_collections.items():
             url_ocl_export = '%s%s%s/export/' % (self.oclenv, collection['url'], country_version_id)
-            # self.vlog(1, 'Export URL:', url_ocl_export)
-            country_collection_urls.append(url_ocl_export)
+            self.vlog(1, 'Export URL:', url_ocl_export)
+            export_urls.append(url_ocl_export)
+
+        # Define exception handler for async requests
+        def export_exception_handler(request, exception):
+            print('Request failed:', str(request), str(exception))
+
+        # Submit sync export requests with auto-retry in case of connection pooling errors
+        s = requests.Session()
+        retries = Retry(total=5, backoff_factor=0.2)
+        s.mount('http://', HTTPAdapter(max_retries=retries))
+        s.mount('https://', HTTPAdapter(max_retries=retries))
         export_rs = (
-            grequests.get(url, headers=self.oclapiheaders) for url in country_collection_urls)
-        export_responses = grequests.map(export_rs, size=6)
-        # self.vlog(1, 'Results of async query:\n%s' % export_responses)
+            grequests.get(url, headers=self.oclapiheaders, session=s) for url in export_urls)
+        export_responses = grequests.map(
+            export_rs, size=2, exception_handler=export_exception_handler)
+        self.vlog(1, 'Results of async query:\n%s' % export_responses)
+
+        # Process collection export results
         collection_results = {}
         for export_response in export_responses:
-            if not export_response:
-                self.vlog(0, 'WARNING: Export response returned None')
+            if export_response is None:
+                self.vlog(1, 'WARNING: Export value is None')
                 continue
             original_export_url = export_response.url
             if export_response.history and export_response.history[0] and export_response.history[0].url:
                 original_export_url = export_response.history[0].url
             if export_response.status_code == 404:
                 # Repository version does not exist, so we can safely skip this one
-                self.vlog(2, '[%s NOT FOUND] %s' % (
-                    export_response.status_code, export_response.url))
+                self.vlog(1, '[%s NOT FOUND] %s -- Current IMAP %s has no mapping for this data element, so we can safely skip' % (
+                    export_response.status_code, export_response.url, country_version_id))
                 continue
             elif export_response.status_code == 204:
                 # Export not cached for this repository version, so we need to generate it first
-                self.vlog(2, '[%s MISSING EXPORT] %s' % (
+                self.vlog(1, '[%s MISSING EXPORT] %s -- Export not yet cached. Generating...' % (
                     export_response.status_code, export_response.url))
                 export_response = self.generate_repository_version_export(original_export_url)
             else:

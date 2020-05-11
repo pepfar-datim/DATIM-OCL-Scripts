@@ -5,9 +5,9 @@ stored as a source and represents a single QMAP submission.
 
 Example Usage:
 - Get list of orgs in OCL that correspond with a QMAP domain:
-    python getqmaprepos.py --env=staging -v2 --format=text
+    python getqmaprepos.py --env=staging --format=text
 - Get list of sources in OCL for a specified QMAP domain:
-    python getqmaprepos.py --env=staging -v2 -d=mAtches3 --format=text
+    python getqmaprepos.py --env=staging -d=mAtches3 --format=text
 
 Arguments:
   -h, --help            show this help message and exit

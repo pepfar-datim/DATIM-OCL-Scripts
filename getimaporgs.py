@@ -10,7 +10,12 @@ Similarly, setting country_code_filter to ['UG', 'BI', 'UA'] will only return th
 matching country codes.
 
 Example Usage:
-    python getimaporgs.py --env=staging -v2 -t="your-token-here" --format=text
+- To get list of all IMAP orgs (for all country codes and periods):
+    python getimaporgs.py --env=staging -t="your-token-here" --format=text
+- Filter list of IMAP orgs by period:
+    python getimaporgs.py --env=staging -t="your-token-here" --format=text --period=FY18,FY19
+- Filter list of IMAP orgs by country code:
+    python getimaporgs.py --env=staging -t="your-token-here" --format=text --country_code=BI
 
 Arguments:
   -h, --help            show this help message and exit

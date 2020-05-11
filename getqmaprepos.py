@@ -1,6 +1,32 @@
+"""
+Returns a list of OCL organizations corresponding to QMAP domains or a list
+of QMAP repositories for a specified QMAP domain. A QMAP repository in OCL is
+stored as a source and represents a single QMAP submission.
+
+Example Usage:
+- Get list of orgs in OCL that correspond with a QMAP domain:
+    python getqmaprepos.py --env=staging -v2 --format=text
+- Get list of sources in OCL for a specified QMAP domain:
+    python getqmaprepos.py --env=staging -v2 -d=mAtches3 --format=text
+
+Arguments:
+  -h, --help            show this help message and exit
+  -d DOMAIN, --domain DOMAIN
+                        QMAP domain ID, eg "mAtches"
+  --env ENV             Name of the OCL API environment: production, staging,
+                        demo, qa
+  --envurl ENVURL       URL of the OCL API environment
+  -t TOKEN, --token TOKEN
+                        OCL API token
+  --format FORMAT       Format of bulk import results to return from OCL
+  -v VERBOSITY, --verbosity VERBOSITY
+                        Verbosity level: 0 (default), 1, or 2
+  --version             show program's version number and exit
+"""
 import json
 import requests
 import argparse
+import iol
 
 
 # Script constants
@@ -104,11 +130,19 @@ if result_type == 'Organization':
     if output_format == 'text':
         for ocl_org in filtered_results:
             print '%s' % (ocl_org['id'])
+    elif output_format == 'csv':
+        print iol.get_as_csv(
+            filtered_results, start_columns=['id','name'],
+            exclude_columns=['members_url', 'collections_url', 'sources_url', 'uuid', 'members'])
     else:
         print json.dumps(filtered_results)
 elif result_type == 'Source':
     if output_format == 'text':
         for ocl_source in filtered_results:
             print '%s: %s %s (%s)' % (ocl_source['id'], ocl_source['name'], ocl_source['extras']['questionnaireuid'], ocl_source['extras']['qmap_version'])
+    elif output_format == 'csv':
+        print iol.get_as_csv(
+            filtered_results, start_columns=['id', 'owner', 'full_name'],
+            exclude_columns=['versions_url', 'uuid', 'mappings_url', 'concepts_url', 'custom_validation_schema', 'owne_type'])
     else:
         print json.dumps(filtered_results)

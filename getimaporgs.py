@@ -13,11 +13,26 @@ Example Usage:
     python getimaporgs.py --env=staging -v2 -t="your-token-here" --format=text
 
 Arguments:
-   --format=[csv,json,text]
+  -h, --help            show this help message and exit
+  -c COUNTRY_CODE, --country_code COUNTRY_CODE
+                        Country code, eg "UG", "BI"
+  --env ENV             Name of the OCL API environment: production, staging,
+                        demo, qa
+  --envurl ENVURL       URL of the OCL API environment
+  -p PERIOD, --period PERIOD
+                        Period, eg "FY18", "FY19"
+  -t TOKEN, --token TOKEN
+                        OCL API token
+  -f FORMAT, --format FORMAT
+                        Format of the export: csv, json, text
+  -v VERBOSITY, --verbosity VERBOSITY
+                        Verbosity level: 0 (default), 1, or 2
+  --version             show program's version number and exit
 """
 import requests
 import json
 import argparse
+import iol
 
 
 # Script constants
@@ -127,29 +142,9 @@ ocl_imap_orgs = get_imap_orgs(
 if isinstance(ocl_imap_orgs, list):
     output_format = args.format.lower()
     if output_format == 'csv':
-        if ocl_imap_orgs:
-            csv_columns = ocl_imap_orgs[0].keys()
-            csv_columns.remove('extras')
-            csv_columns.remove('id')
-            csv_columns.remove('name')
-            csv_columns.insert(0, 'name')
-            csv_columns.insert(0, 'id')
-            for ocl_org in ocl_imap_orgs:
-                for attr_key in ocl_org['extras']:
-                    if ('attr:%s' % attr_key) not in csv_columns:
-                        csv_columns.append('attr:%s' % attr_key)
-            import csv
-            import io
-            output_stream = io.BytesIO()
-            writer = csv.DictWriter(output_stream, fieldnames=csv_columns)
-            writer.writeheader()
-            for ocl_org in ocl_imap_orgs:
-                csv_row = ocl_org.copy()
-                del csv_row['extras']
-                for attr_key in ocl_org['extras']:
-                    csv_row['attr:%s' % attr_key] = ocl_org['extras'][attr_key]
-                writer.writerow(csv_row)
-            print output_stream.getvalue().strip('\r\n')
+        print iol.get_as_csv(
+            ocl_imap_orgs, start_columns=['id', 'name'],
+            exclude_columns=['members_url', 'collections_url', 'sources_url', 'uuid', 'members'])
     elif output_format == 'text':
         for ocl_org in ocl_imap_orgs:
             print '%s: %s %s %s' % (

@@ -108,8 +108,6 @@ if args.verbosity:
     print '  country_org =', country_org
     print '  import_filename =', imap_import_filename
 
-exit()
-
 # (Optionally) Delete org if it exists
 if args.delete_existing_org:
     if args.verbosity:

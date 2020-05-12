@@ -831,9 +831,11 @@ class DatimImapFactory(object):
 
         # Check if org exists
         oclapiheaders = {
-            'Authorization': 'Token ' + ocl_root_api_token,
             'Content-Type': 'application/json'
         }
+        if ocl_root_api_token:
+            oclapiheaders['Authorization'] = 'Token %s' % str(ocl_root_api_token)
+        print oclapiheaders
         org_url = "%s/orgs/%s/" % (oclenv, org_id)
         if verbose:
             print('INFO: Checking if org "%s" exists...' % org_url)

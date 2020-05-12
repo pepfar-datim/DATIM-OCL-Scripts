@@ -290,4 +290,3 @@ class DatimShow(datimbase.DatimBase):
         :return:
         """
         return None
-    

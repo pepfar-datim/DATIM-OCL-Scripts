@@ -56,9 +56,10 @@ class DatimShowMsp(datimshow.DatimShow):
         self.verbosity = verbosity
         self.cache_intermediate = cache_intermediate
         self.oclapiheaders = {
-            'Authorization': 'Token ' + self.oclapitoken,
             'Content-Type': 'application/json'
         }
+        if self.oclapitoken:
+            self.oclapiheaders['Authorization'] = 'Token ' + self.oclapitoken
 
     def get(self, data_element_ids=None, repo_id='', export_format='',
             owner='PEPFAR', owner_type='Organization', source='MER'):

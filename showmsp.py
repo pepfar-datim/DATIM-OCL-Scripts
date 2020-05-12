@@ -17,11 +17,13 @@ Example data element IDs: [
     'kGCGnEJE7hy',  # PDH HTS_INDEX_FAC (N, TA) TARGET: Number of index cases tested
 ]
 
-Example command line:
-python showmsp.py --env=staging --repo="MER-R-COMMUNITY-BASED" -v2 --msp-org=PEPFAR-Test6
-    --msp-source=MER-Test6 -t="your-token-here" -fxml
-python showmsp.py --env=staging --dataelements="ljoZhkWOvx1,cObJTp3DWdY" -v2
-    --msp-org=PEPFAR-Test6 --msp-source=MER-Test6 -t="your-token-here" -fcsv
+Example Usage:
+- Export "MER-R-COMMUNITY-BASED" Codelist as HTML
+    python showmsp.py --env=staging --repo="MER-R-COMMUNITY-BASED" --msp-org=PEPFAR-Test6
+        --msp-source=MER-Test6 -t="your-token-here" -fHTML
+- Export data elements list as CSV
+    python showmsp.py --env=staging --dataelements="ljoZhkWOvx1,cObJTp3DWdY"
+        --msp-org=PEPFAR-Test6 --msp-source=MER-Test6 -t="your-token-here" -fcsv
 
 """
 import argparse

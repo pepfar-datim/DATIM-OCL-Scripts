@@ -56,6 +56,8 @@ parser.add_argument(
 parser.add_argument('--version', action='version', version='%(prog)s v' + APP_VERSION)
 parser.add_argument(
     '--format', help='Format of bulk import results to return from OCL', default="summary")
+parser.add_argument(
+    '--domain', help='Domain of bulk import results to return from OCL', required=True)
 args = parser.parse_args()
 ocl_env_url = args.env if args.env else args.env_url
 

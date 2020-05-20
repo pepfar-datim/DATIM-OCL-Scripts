@@ -59,7 +59,7 @@ group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('--env', help='Name of the OCL API environment', type=ocl_environment)
 group.add_argument('--envurl', help='URL of the OCL API environment')
 parser.add_argument('--bulkImportId', help='Bulk Import Status ID', required=False)
-parser.add_argument('-t', '--token', help='OCL API token', required=True)
+parser.add_argument('-t', '--token', help='OCL API token', required=False)
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
 parser.add_argument('--version', action='version', version='%(prog)s v' + APP_VERSION)

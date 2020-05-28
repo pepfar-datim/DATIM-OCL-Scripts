@@ -79,7 +79,7 @@ class DatimShow(datimbase.DatimBase):
 
                 concepts_with_mappings = raw_concepts_dict.values()
 
-        elif concepts_with_mappings:
+        elif isinstance(concepts_with_mappings, list):
             # These are already in the correct format
             pass
         else:

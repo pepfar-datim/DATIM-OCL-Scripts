@@ -1,5 +1,7 @@
 """
-Script to present MSP Metadata in the DATIM codelist format
+Script to present MSP Metadata in the DATIM codelist format.
+Supports display of an entire codelist or a list of data element IDs.
+See showmsp.py for an example of usage.
 
 Supported Formats: html, xml, csv, json
 """
@@ -68,6 +70,7 @@ class DatimShowMsp(datimshow.DatimShow):
         or an entire Code List (repo_id).
         """
         if data_element_ids:
+            self.vlog(1, 'Loading specified data element IDs: %s' % str(data_element_ids))
             if isinstance(data_element_ids, str):
                 data_element_ids = data_element_ids.split(',')
             if not isinstance(data_element_ids, list):
@@ -77,14 +80,14 @@ class DatimShowMsp(datimshow.DatimShow):
                 data_element_url = '%s/%s/%s/sources/%s/concepts/%s/?includeMappings=true' % (
                     self.oclenv, datimbase.DatimBase.owner_type_to_stem(owner_type),
                     owner, source, str(data_element_id.strip()))
+                self.vlog(2, data_element_url)
                 data_element_response = requests.get(data_element_url, headers=self.oclapiheaders)
                 if data_element_response.status_code == 404:
-                    # TODO: Decide how to handle missing IDs. Just skipping for now
+                    self.vlog(1, '404 NOT FOUND')
                     continue
                 # For other errors, go ahead and raise an exception
                 data_element_response.raise_for_status()
                 data_element_results.append(data_element_response.json())
-                # pprint.pprint(data_element_response.json())
             intermediate = self.build_show_grid(
                 repo_title='Custom Query',
                 repo_subtitle='',

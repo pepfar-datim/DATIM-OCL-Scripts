@@ -72,8 +72,8 @@ group_env = parser.add_mutually_exclusive_group(required=True)
 group_env.add_argument('--env', help='Name of the OCL API environment',
                        type=arg_parser_ocl_environment)
 group_env.add_argument('--envurl', help='URL of the OCL API environment')
-parser.add_argument('--msp-org', help='MSP Organization ID in OCL', default='PEPFAR')
-parser.add_argument('--msp-source', help='MSP Organization ID in OCL', default='MER')
+parser.add_argument('--msp-org', help='MSP Organization ID in OCL (default=PEPFAR)', default='PEPFAR')
+parser.add_argument('--msp-source', help='MSP Organization ID in OCL (default=MER)', default='MER')
 parser.add_argument('-t', '--token', help='OCL API token')
 parser.add_argument('-f', '--format', help='Export format: CSV, HTML, JSON, XML', default="CSV",
                     type=arg_parser_export_format)

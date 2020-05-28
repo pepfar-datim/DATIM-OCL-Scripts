@@ -15,6 +15,7 @@ import datim.datimshow
 import datim.datimshowmoh
 import argparse
 
+
 # Script constants
 APP_VERSION = '0.1.0'
 OCL_ENVIRONMENTS = {
@@ -45,17 +46,8 @@ parser.add_argument(
 parser.add_argument('--version', action='version', version='%(prog)s v' + APP_VERSION)
 args = parser.parse_args()
 ocl_env_url = args.env if args.env else args.env_url
-# Default Script Settings
-verbosity = 0  # 0=none, 1=some, 2=all
-run_ocl_offline = False  # Set to true to use local copies of ocl exports
-export_format = datim.datimshow.DatimShow.DATIM_FORMAT_CSV
-period = ''  # e.g. FY18, FY19
-
-# OCL Settings - JetStream Staging user=datim-admin
-#oclenv = settings.oclenv
-#oclapitoken = settings.oclapitoken
 
 # Create Show object and run
 datim_show = datim.datimshowmoh.DatimShowMoh(
-    oclenv=ocl_env_url, oclapitoken=args.token, run_ocl_offline=run_ocl_offline, verbosity=args.verbosity)
+    oclenv=ocl_env_url, oclapitoken=args.token, verbosity=args.verbosity)
 datim_show.get(period=args.period, export_format=args.format)

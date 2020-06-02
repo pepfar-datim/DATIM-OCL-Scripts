@@ -1,15 +1,11 @@
 """
-Class to synchronize DATIM DHIS2 MER-MSP Indicator definitions with OCL
+Class to synchronize DATIM DHIS2 MER-MSP Data Elememnt and Disag definitions with OCL
 The script runs 1 import batch, which consists of two queries to DHIS2, which are
 synchronized with repositories in OCL as described below.
 |-------------|---------|-------------------------------------------------|
 | ImportBatch | DHIS2   | OCL                                             |
 |-------------|---------|-------------------------------------------------|
 | MER-MSP     | MER-MSP | /orgs/PEPFAR/sources/MER-MSP/                   |
-|-------------|---------|-------------------------------------------------|
-
-
-### Confirm whether we will still use these....
 |             |         | /orgs/PEPFAR/collections/MER-*/                 |
 |             |         | /orgs/PEPFAR/collections/HC-*/                  |
 |             |         | /orgs/PEPFAR/collections/Planning-Attributes-*/ |
@@ -32,14 +28,21 @@ class DatimSyncMerMsp(datimsync.DatimSync):
     # ID of the org and source in OCL
     DATIM_MER_MSP_ORG_ID = 'PEPFAR'
     DATIM_MER_MSP_SOURCE_ID = 'MER-MSP'
+    DATIM_MER_MSP_INDICATOR_CONCEPT_CLASS = 'Indicator'
+    DATIM_MER_MSP_INDICATOR_DATATYPE = 'None'
+    DATIM_MER_MSP_MAP_TYPE_INDICATOR_TO_DE = 'Has Data Element'
     DATIM_MER_MSP_DE_CONCEPT_CLASS = 'Data Element'
     DATIM_MER_MSP_DE_DATATYPE = 'Numeric'
+    DATIM_MER_MSP_MAP_TYPE_DE_TO_COC = 'Has Option'
     DATIM_MER_MSP_COC_CONCEPT_CLASS = 'Disaggregate'  # This is the DHIS2 categoryOptionCombo equivalent
     DATIM_MER_MSP_COC_DATATYPE = 'None'
-    DATIM_MER_MSP_MAP_TYPE_DE_TO_COC = 'Has Option'
+
+    DATIM_MER_MSP_NAME_TYPE_FULL = 'Fully Specified'
+    DATIM_MER_MSP_NAME_TYPE_SHORT = 'Short'
+    DATIM_MER_MSP_DESCRIPTION_TYPE_DEFAULT = 'Description'
 
     # Dataset ID settings - Dataset IDs are hardcoded for this one
-    #SYNC_LOAD_DATASETS = False
+    # SYNC_LOAD_DATASETS = False
     OCL_DATASET_ENDPOINT = datimconstants.DatimConstants.OCL_DATASET_ENDPOINT_MER_MSP
     REPO_ACTIVE_ATTR = datimconstants.DatimConstants.REPO_ACTIVE_ATTR_MER_MSP
 
@@ -94,20 +97,23 @@ class DatimSyncMerMsp(datimsync.DatimSync):
 
             # Counts
             num_indicators = 0
+            num_data_elements = 0
             num_disaggregates = 0
-            num_mappings = 0
+            num_mappings_indicator_to_de = 0
+            num_mappings_de_to_disag = 0
             num_indicator_refs = 0
+            num_data_element_refs = 0
             num_disaggregate_refs = 0
 
-            # Iterate through each DataElement and transform to an Indicator concept
+            # Iterate through each DataElement and transform to a Data Element Concept
             for de in new_dhis2_export['dataElements']:
-                indicator_concept_id = de['code']
-                indicator_concept_url = '/orgs/%s/sources/%s/concepts/%s/' % (
-                    self.DATIM_MER_MSP_ORG_ID, self.DATIM_MER_MSP_SOURCE_ID, indicator_concept_id)
-                indicator_concept_key = indicator_concept_url
-                indicator_concept = {
+                de_concept_id = de['code']
+                de_concept_url = '/orgs/%s/sources/%s/concepts/%s/' % (
+                    self.DATIM_MER_MSP_ORG_ID, self.DATIM_MER_MSP_SOURCE_ID, de_concept_id)
+                de_concept_key = de_concept_url
+                de_concept = {
                     'type': ocldev.oclconstants.OclConstants.RESOURCE_TYPE_CONCEPT,
-                    'id': indicator_concept_id,
+                    'id': de_concept_id,
                     'concept_class': self.DATIM_MER_MSP_DE_CONCEPT_CLASS,
                     'datatype': self.DATIM_MER_MSP_DE_DATATYPE,
                     'owner': self.DATIM_MER_MSP_ORG_ID,
@@ -120,14 +126,14 @@ class DatimSyncMerMsp(datimsync.DatimSync):
                     'names': [
                         {
                             'name': de['name'],
-                            'name_type': 'Fully Specified',
+                            'name_type': self.DATIM_MER_MSP_NAME_TYPE_FULL,
                             'locale': 'en',
                             'locale_preferred': True,
                             'external_id': None,
                         },
                         {
                             'name': de['shortName'],
-                            'name_type': 'Short',
+                            'name_type': self.DATIM_MER_MSP_NAME_TYPE_SHORT,
                             'locale': 'en',
                             'locale_preferred': False,
                             'external_id': None,
@@ -135,27 +141,27 @@ class DatimSyncMerMsp(datimsync.DatimSync):
                     ],
                 }
                 if 'description' in de and de['description']:
-                    indicator_concept['descriptions'] = [
+                    de_concept['descriptions'] = [
                         {
                             'description': de['description'],
-                            'description_type': 'Description',
+                            'description_type': self.DATIM_MER_MSP_DESCRIPTION_TYPE_DEFAULT,
                             'locale': 'en',
                             'locale_preferred': True,
                             'external_id': None,
                         }
                     ]
                 self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MER_MSP][
-                    ocldev.oclconstants.OclConstants.RESOURCE_TYPE_CONCEPT][indicator_concept_key] = indicator_concept
-                num_indicators += 1
+                    ocldev.oclconstants.OclConstants.RESOURCE_TYPE_CONCEPT][de_concept_key] = de_concept
+                num_data_elements += 1
 
                 # Build disaggregates concepts and mappings
-                indicator_disaggregate_concept_urls = []
+                de_disaggregate_concept_urls = []
                 for coc in de['categoryCombo']['categoryOptionCombos']:
                     disaggregate_concept_id = coc['id']  # "id" is the same as "code", but "code" is sometimes missing
                     disaggregate_concept_url = '/orgs/%s/sources/%s/concepts/%s/' % (
                         self.DATIM_MER_MSP_ORG_ID, self.DATIM_MER_MSP_SOURCE_ID, disaggregate_concept_id)
                     disaggregate_concept_key = disaggregate_concept_url
-                    indicator_disaggregate_concept_urls.append(disaggregate_concept_url)
+                    de_disaggregate_concept_urls.append(disaggregate_concept_url)
 
                     # Only build the disaggregate concept if it has not already been defined
                     if disaggregate_concept_key not in self.dhis2_diff[
@@ -176,7 +182,7 @@ class DatimSyncMerMsp(datimsync.DatimSync):
                             'names': [
                                 {
                                     'name': coc['name'],
-                                    'name_type': 'Fully Specified',
+                                    'name_type': self.DATIM_MER_MSP_NAME_TYPE_FULL,
                                     'locale': 'en',
                                     'locale_preferred': True,
                                     'external_id': None,
@@ -192,7 +198,7 @@ class DatimSyncMerMsp(datimsync.DatimSync):
                     disaggregate_mapping_key = datimsync.DatimSync.get_mapping_key(
                         mapping_owner_type=ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION,
                         mapping_owner_id=self.DATIM_MER_MSP_ORG_ID, mapping_source_id=self.DATIM_MER_MSP_SOURCE_ID,
-                        from_concept_url=indicator_concept_url, map_type=self.DATIM_MER_MSP_MAP_TYPE_DE_TO_COC,
+                        from_concept_url=de_concept_url, map_type=self.DATIM_MER_MSP_MAP_TYPE_DE_TO_COC,
                         to_concept_url=disaggregate_concept_url)
                     disaggregate_mapping = {
                         'type': ocldev.oclconstants.OclConstants.RESOURCE_TYPE_MAPPING,
@@ -200,7 +206,7 @@ class DatimSyncMerMsp(datimsync.DatimSync):
                         'owner_type': ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION,
                         'source': self.DATIM_MER_MSP_SOURCE_ID,
                         'map_type': self.DATIM_MER_MSP_MAP_TYPE_DE_TO_COC,
-                        'from_concept_url': indicator_concept_url,
+                        'from_concept_url': de_concept_url,
                         'to_concept_url': disaggregate_concept_url,
                         'external_id': None,
                         'extras': None,
@@ -209,10 +215,10 @@ class DatimSyncMerMsp(datimsync.DatimSync):
                     self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MER_MSP][
                         ocldev.oclconstants.OclConstants.RESOURCE_TYPE_MAPPING][
                         disaggregate_mapping_key] = disaggregate_mapping
-                    num_mappings += 1
+                    num_mappings_de_to_disag += 1
 
                 # Iterate through DataSets to transform to build references
-                # NOTE: References are created for the indicator as well as each of its disaggregates and mappings
+                # NOTE: References are created for the data elements as well as each of its disaggregates and mappings
                 for dse in de['dataSetElements']:
                     ds = dse['dataSet']
 
@@ -233,17 +239,17 @@ class DatimSyncMerMsp(datimsync.DatimSync):
                     num_collections += 1
                     """
 
-                    # Build the Indicator concept reference - mappings for this reference will be added automatically
-                    indicator_ref_key, indicator_ref = self.get_concept_reference_json(
+                    # Build the Data Element Concept Reference - mapping references are added automatically
+                    de_ref_key, de_ref = self.get_concept_reference_json(
                         collection_owner_id=self.DATIM_MER_MSP_ORG_ID,
                         collection_owner_type=ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION,
-                        collection_id=collection_id, concept_url=indicator_concept_url)
+                        collection_id=collection_id, concept_url=de_concept_url)
                     self.dhis2_diff[datimconstants.DatimConstants.IMPORT_BATCH_MER_MSP][
-                        ocldev.oclconstants.OclConstants.RESOURCE_TYPE_CONCEPT_REF][indicator_ref_key] = indicator_ref
-                    num_indicator_refs += 1
+                        ocldev.oclconstants.OclConstants.RESOURCE_TYPE_CONCEPT_REF][de_ref_key] = de_ref
+                    num_data_element_refs += 1
 
                     # Build the Disaggregate concept reference
-                    for disaggregate_concept_url in indicator_disaggregate_concept_urls:
+                    for disaggregate_concept_url in de_disaggregate_concept_urls:
                         disaggregate_ref_key, disaggregate_ref = self.get_concept_reference_json(
                             collection_owner_id=self.DATIM_MER_MSP_ORG_ID,
                             collection_owner_type=ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION,
@@ -257,9 +263,14 @@ class DatimSyncMerMsp(datimsync.DatimSync):
                                 disaggregate_ref_key] = disaggregate_ref
                             num_disaggregate_refs += 1
 
-            self.vlog(1, 'DHIS2 export "%s" successfully transformed to %s indicator concepts, '
-                         '%s disaggregate concepts, %s mappings from indicators to disaggregates, '
-                         '%s indicator concept references, and %s disaggregate concept references' % (
-                            dhis2filename_export_new, num_indicators, num_disaggregates, num_mappings,
-                            num_indicator_refs, num_disaggregate_refs))
+            self.vlog(1, 'DHIS2 export "%s" successfully transformed to...\n'
+                         '    %s Concepts: %s Indicators, %s Data Elements, %s Disaggregates\n'
+                         '    %s Mappings: %s Indicators to Data Elements, %s Data Elements to Disaggregates\n'
+                         '    %s Concept References: %s Data Elements, %s Disaggregates' % (
+                            dhis2filename_export_new, (num_indicators + num_data_elements + num_disaggregates),
+                            num_indicators, num_data_elements, num_disaggregates,
+                            (num_mappings_indicator_to_de + num_mappings_de_to_disag),
+                            num_mappings_indicator_to_de, num_mappings_de_to_disag,
+                            (num_data_element_refs + num_disaggregate_refs),
+                            num_data_element_refs, num_disaggregate_refs))
             return True

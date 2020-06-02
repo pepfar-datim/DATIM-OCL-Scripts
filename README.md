@@ -1,21 +1,9 @@
-**Installation**
+## Installation
 
-Please run `pip install -r requirements.txt` to install the required imports
+Please run `pip install -r requirements.txt` to install the required dependencies
 
-
-**Changes Made**
-File: csv_to_json_flex
-
-1) Changed From print ('SKIPPING: '), csv_resource_def['definition_name']
-TO print 'SKIPPING: ', csv_resource_def['definition_name']
-2) Added argument and line for output JSON file
-
-FILE: MER_Indicator etc...
-1) process_by_row() function - remove 30 argument
-2) _init_ - added output_filename argument
-
-### Running the script:
-These scripts need a few variables set before it can run successfully, they can either be set as environmental variables or hard coded in the script. The variables needed are -
+### Environment setup
+The settings for these scripts can be hard-coded or set as environment variables:
  ```
  dhis2env = os.environ['DHIS2_ENV'] # DHIS2 Environment URL
  dhis2uid = os.environ['DHIS2_USER'] # DHIS2 Authentication USER
@@ -25,7 +13,47 @@ These scripts need a few variables set before it can run successfully, they can 
  compare2previousexport = os.environ['COMPARE_PREVIOUS_EXPORT'] in ['true', 'True']  # Whether to compare to previous export
  ```
 
- You need to specify whether you want to use the environmental varialbes or not and pass that as a command line argument. Example -
+ You need to specify whether you want to use the environmental variables or not and pass that as a command line argument. Example -
  ```
  python sims-sync.py true
  ```
+
+## Scripts
+### Shared
+* settings.py
+
+### IMAP
+* imapexport.py
+* imapimport.py
+* showmoh.py
+* MOH Sync Scripts
+    * syncmoh.py
+    * syncmohfy18.py
+    * syncmohfy19.py
+* Test scripts:
+    * imaptest.py
+    * imaptestcompareocl2csv.py
+    * imaptestmediator.py
+
+### QMAP
+* exportqmap.py
+* importqmap.py
+
+### Supporting scripts
+* bulkImportStatus.py
+* celeryconfig.py
+* constants.py
+* import_manager.py
+* import_util.py
+* status_util.py
+
+### Older scripts
+* showmechanisms.py
+* showmer.py
+* showsims.py
+* showtieredsupport.py
+* syncmechanisms.py
+* syncmer.py
+* syncmermsp.py
+* syncsims.py
+* synctest.py

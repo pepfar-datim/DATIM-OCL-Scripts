@@ -1,5 +1,5 @@
 """
-Class to synchronize DATIM DHIS2 MER Indicator definitions with OCL
+Class to synchronize DATIM DHIS2 data element and disaggregate definitions with OCL.
 The script runs 1 import batch, which consists of two queries to DHIS2, which are
 synchronized with repositories in OCL as described below.
 |-------------|--------|-------------------------------------------------|
@@ -44,8 +44,8 @@ class DatimSyncMer(datimsync.DatimSync):
     # OCL Export Definitions
     OCL_EXPORT_DEFS = datimconstants.DatimConstants.MER_OCL_EXPORT_DEFS
 
-    def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='', compare2previousexport=True,
-                 run_dhis2_offline=False, run_ocl_offline=False,
+    def __init__(self, oclenv='', oclapitoken='', dhis2env='', dhis2uid='', dhis2pwd='',
+                 compare2previousexport=True, run_dhis2_offline=False, run_ocl_offline=False,
                  verbosity=0, data_check_only=False, import_test_mode=False, import_limit=0):
         datimsync.DatimSync.__init__(self)
         self.oclenv = oclenv

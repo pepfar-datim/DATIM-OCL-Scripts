@@ -18,7 +18,7 @@ Arguments:
   --envurl ENVURL       URL of the OCL API environment
   -t TOKEN, --token TOKEN
                         OCL API token
-  --format FORMAT       Format of bulk import results to return from OCL
+  --format FORMAT       Format to return from OCL: text, csv, json
   -v VERBOSITY, --verbosity VERBOSITY
                         Verbosity level: 0 (default), 1, or 2
   --version             show program's version number and exit

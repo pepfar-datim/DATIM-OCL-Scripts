@@ -1,0 +1,127 @@
+DATIM_Indicator_Category,DATIM_Indicator_ID,DATIM_Disag_Name,DATIM_Disag_ID,Operation,MOH_Indicator_Name,MOH_Indicator_ID,MOH_Disag_Name,MOH_Disag_ID,Disaggregation Type,Disaggregation Type Selected
+HTS_TST,HTS_TST_N_MOH,Total,HllvX50cXC0,ADD,Total,HMHJTVWtqBX,,,Both,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | <1 | Female,pCFCaOLScdv,ADD,"""Nombre de femmes de moins d'un an  conseillees et testees qui ont un resultat positif """,Z4oQoSxSNTx,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 1-4 | Female,xzoIG0AwsNB,ADD,"""Nombre de femmes de 1-4| ans  conseillees et testees qui ont un resultat positif """,OTzD51K0nvW,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 5-9 | Female,UggtNScQMVl,ADD,"""Nombre de femmes de 5-9| ans  conseillees et tesees qui ont un resultat positif """,ETM7vCs45AD,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 10-14 | Female,hXgqQX95TVa,ADD,"""Nombre de femmes de 10 14 ans  conseillees et testees qui ont un resultat positif """,KnCUI5EOglY,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 15-19 | Female,wJCVvM7o6xm,ADD,"""Nombre de femmes de 15 19| ans  conseillees et testees qui ont un resultat positif """,qjwD4KFIYKr,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 20-24 | Female,tvOcOPhIdRH,ADD,"""Nombre de femmes de 20 24| ans  conseillees et testees qui ont un resultat positif """,CZTdqVBfUUH,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 25-29 | Female,BLWV93S2HJ0,ADD,"""Nombre de femmes de 25-29| ans  conseillees et testees qui ont un resultat positif """,riMlR9lS8VN,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 30-34 | Female,bxqrio2gHOj,ADD,"""Nombre de femmes de 30-34| ans  conseillees et testees qui ont un resultat positif """,xsh5rce70XB,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 35-39 | Female,MuaoVfC9rYL,ADD,"""Nombre de femmes de 35 39 ans  conseillees et testees qui ont un resultat positif """,zVDLT1HLVOZ,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 40-44 | Female,d3rKRkxJP1v,ADD,"""Nombre de femmes de 40-44 ans  conseillees et testees qui ont un resultat positif""",JGDy0QAXMN0,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 45-49 | Female,ERDcFrmlT0J,ADD,"""Nombre de femmes de 45-49 ans  conseillees et testees qui ont un resultat positif""",xtgBLlKqFtX,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 50+ | Female,GlfLlD3wSQj,ADD,"""Nombre de femmes de plus de 50 ans et plus  conseilles et testes qui ont un resultat positif""",SOvbi4dMl8U,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | <1 | Male,cXdSJvbabBT,ADD,"""Nombre de d'homme de plus de moins d'une annee et testes qui ont un resultat positif""",c8NeLBXyoiI,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 1-4 | Male,tBoWuTd0ERY,ADD,"""Nombre d'hommes  de 1-4 ans  conseillees et testees qui ont un resultat positive""",qD2ML82OEs3,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 5-9 | Male,wLMOUM9mfTV,ADD,"""Nombre d'hommes  de 5-9 ans  conseilles et testes qui ont un resultat positif""",l85Lr4z1qiA,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 10-14 | Male,KRoQaA91sv5,ADD,"""Nombre d'hommes de 10 a 14 ans  conseilles et testes qui ont un resultat positif""",N5nAmkHyi8q,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 15-19 | Male,wpck6pSRDer,ADD,"""Nombre d'hommes de de 15 a 19 ans  conseilles et testes qui ont un resultat positif""",q9hN706Syw7,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 20-24 | Male,BitB2nKfWBK,ADD,"""Nombre d'hommes de de 20-24 ans  conseilles et testes qui ont un resultat positif""",kHxBREKggBI,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 25-29 | Male,NRZfd73Ypo8,ADD,"""Nombre d'hommes de de 25  29 ans  conseilles et testes qui ont un resultat positif""",vrsgaohcn9z,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 30-34 | Male,kLd3OnUYTr5,ADD," ""Nombre d'hommes de 30  34 ans conseilles et testes qui ont un resultat positif""",fPPjHOFnvIi,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 35-39 | Male,wnsHEWFSqzG,ADD," ""Nombre d'hommes de de 35  39 ans conseilles et testes qui ont un resultat positif""",YX2Ft3EHqWy,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 40-44 | Male,HTcrEM69sst,ADD,"""Nombre d'hommes de de 40 44 ans  conseilles et testes qui ont un resultat positif""",QD8Pxfehgez,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 45-49 | Male,OOCHuTdTJEQ,ADD,"""Nombre d'hommes de 45 49 ans  conseilles et testes qui ont un resultat positif""",iZB71rp93pr,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 50+ | Male,WDpiIZ8UjB8,ADD,"""Nombre d'hommes de plus de 50 ans et plus   conseilles et testes qui ont un resultat positif""",RpjKkCijwhm,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | <1 | Female,Gvo9takmOXx,ADD,"""Nombre de femmes de moins d'un an  conseillees et testees qui ont un resultat negatif """,jmfgCiD94tC,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 1-4 | Female,xTNM0wWDzo0,ADD,"""Nombre de femmes de 1a 4 ans  conseillees et testees qui ont un resultat negatif """,rBb1yBdVlbf,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 5-9 | Female,EFah6yBFc3J,ADD,"""Nombre de femmes de 5 a 9 ans  conseillees et testees qui ont un resultat negatif """,aryyckh9Ryl,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 10-14 | Female,tIhxMfmPrU5,ADD,"""Nombre de femmes 10 a 14 ans  conseilles et testes qui ont un resultat negatif""",PktLO6VcW0b,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 15-19 | Female,NJclydByUvA,ADD,"""Nombre de femmes de 15 a 19 ans  conseilles et testes qui ont un resultat negatif""",XCKZTfge7nl,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 20-24 | Female,fysQ3RXzbzW,ADD,"""Nombre de jeune fille de 20 a 24 ans  conseilles et testes qui ont un resultat negatif",DJHo8YmbVX3,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 25-29 | Female,TCwxcGgIeqE,ADD,"""Nombre de femmes de 25  29 ans  conseilles et testees qui ont un resultat negatif""",FjJkbYzCBoQ,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 30-34 | Female,oKgx2Sw4qUL,ADD,"""Nombre de femmes de 30  34 ans  conseilles et testes qui ont un resultat negatif""",HTSqqO3a1aT,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 35-39 | Female,Sf6GWp5gNx2,ADD,"""Nombre de femmes de 35  39 ans  conseilles et testes qui ont un resultat negatif""",ZEpmpLQL5rg,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 40-44 | Female,fsnxvho9fiG,ADD,"""Nombre de femmes de 40 a 44 ans  conseillees et testees qui ont un resultat negatif""",o3QHpo08WMJ,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 45-49 | Female,i0RFyIDccSm,ADD,"""Nombre de femmes de 45 a 49 ans  conseillees et testees qui ont un resultat negatif""",IvGZRfascZg,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 50+ | Female,i4lSbrUVcpe,ADD,"""Nombre de femmes de plus de 50 ans et plus conseilles et testes qui ont un resultat negatif""",PwPyaAWfK8j,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | <1 | Male,iomLts0rFcj,ADD,"""Nombre de  hommes de moins d'un an conseilles et testees qui ont un resultat negatif """,Fnfw1KNnwqG,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 1-4 | Male,uPpiUkMhH6j,ADD,"""Nombre d""hommes de 1 a 4 ans  conseillees et testees qui ont un resultat negatif """,cmE32VeI5L2,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 5-9 | Male,NpsmKYKl0mt,ADD,"""Nombre d'hommes de 5 a 9 ans  conseillees et testees qui ont un resultat negatif """,tMdy8a8CyUG,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 10-14 | Male,Kjn4IWLfG2G,ADD,"""Nombre de garcons de 10 14 ans  conseilles et testes qui ont un resultat negatif""",lGfG2QV4ZVe,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 15-19 | Male,eyTROtsEW5a,ADD,"""Nombre de jeune  homme de 15  19 ans  conseilles et testes qui ont un resultat negatif""",MVW1YTY2YIv,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 20-24 | Male,QS3vNL5WySH,ADD,"""Nombre de jeune  homme de 20  24 ans  conseilles et testes qui ont un resultat negatif""",AxpKKqfxOc0,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 25-29 | Male,lGNNK7ZYDGP,ADD,"""Nombre d'hommes de 25  29 ans  conseilles et testes qui ont un resultat negatif""",daI4jhvYIvv,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 30-34 | Male,kZ5sEz94kJE,ADD,"""Nombre d'hommes de 30  34 ans  conseilles et testes qui ont un resultat negatif""",fJSGp9VgBHk,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 35-39 | Male,wO7RB8C1sal,ADD,"""Nombre d'hommes de 35  39 ans  conseilles et testes qui ont un resultat negatif""",FKuvRCzuWgU,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 40-44 | Male,RLLUx3DHJan,ADD,"""Nombre d""hommes de 40  44 ans  conseillees et testees qui ont un resultat negatif """,JnnDyNIhWQ9,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 45-49 | Male,z1V5tDuMQt7,ADD,"""Nombre d""hommes de 45 49 ans  conseillees et testees qui ont un resultat negatif """,t9w9jVqgDi6,,,Fine,Yes
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 50+ | Male,ip5uMUT73Qu,ADD,"""Nombre d'hommes de 50 ans et plus  conseilles et testes qui ont un resultat negatif""",SNVjEZJSwgu,,,Fine,Yes
+PMTCT_ART,PMTCT_ART_N_MOH,Total,HllvX50cXC0,ADD,Nombre de femmes enceintes mises sous ARV pour la protection de l'enfant: Femmes nouvellement mises sous ARV+ Femmes deja sous ARV avant la CPN),bqDAMrm4W3m,,,Both,Yes
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex,Total,Jwb1SWomgpk,ADD,"""Total femmes avec statut connu en CPN",oIJLcTYk9qw,,,Both,Yes
+PMTCT_STAT,PMTCT_STAT_N_MOH_Age_Sex,AgeUnknown,AqQCBlpcH4I,SUBTRACT,,,,,Fine,Yes
+PMTCT_STAT,PMTCT_STAT_N_MOH_Age_Sex,<10,rarComSg9MD,SUBTRACT,,,,,Fine,Yes
+PMTCT_STAT,PMTCT_STAT_N_MOH_Age_Sex,10-14,QazyoPSt2XH,ADD,"""Nombre de femmes enceintes de 10 a 14 ans  vues en CPN et testees pour le VIH ayant recupere les resultats sont inculses aussi les femmes enceintes VIH+ avant la grossesse  Mode de calcul: Femmes enceintes 10 a 14 ans nouvellement testees positif+ femmes enceintes 10 a 14 ans nouvellement testees VIH negatif+ femmes enceintes 10 a 14 ans vues en CPN avec le statut VIH+ connu avant )""",bESAuZqKCSa,,,Fine,Yes
+PMTCT_STAT,PMTCT_STAT_N_MOH_Age_Sex,15-19,UN0vy0VSyHQ,ADD,"""Nombre de femmes enceintes de 15 a 19 ans  vues en CPN et testees pour le VIH ayant recupere les resultats sont inculses aussi les femmes enceintes VIH+ avant la grossesse  Mode de calcul: Femmes enceintes 15 a 19 ans nouvellement testees positif+ femmes enceintes 15 a 19 ans nouvellement testees VIH negatif+ femmes enceintes 15 a 19 ans vues en CPN avec le statut VIH+ connu avant )""",d84aI2IZRiQ,,,Fine,Yes
+PMTCT_STAT,PMTCT_STAT_N_MOH_Age_Sex,20-24,zCrKbLh9x6i,ADD,"""Nombre de femmes enceintes de 20 a 24 ans  vues en CPN et testees pour le VIH ayant recupere les resultats sont inculses aussi les femmes enceintes VIH+ avant la grossesse  Mode de calcul: Femmes enceintes 20 a 24  ans nouvellement testees positif+ femmes enceintes 20 a 24  ans nouvellement testees VIH negatif+ femmes enceintes 20 a 24  ans vues en CPN avec le statut VIH+ connu avant )""",lSDXPwpJ4Dr,,,Fine,Yes
+PMTCT_STAT,PMTCT_STAT_N_MOH_Age_Sex,25-29,AkOKGZjTuJH,ADD,"""Nombre de femmes enceintes de 25 a 29 ans  vues en CPN et testees pour le VIH ayant recupere les resultats sont inculses aussi les femmes enceintes VIH+ avant la grossesse  Mode de calcul: Femmes enceintes25 a 29  ans nouvellement testees positif+ femmes enceintes 25 a 29  ans nouvellement testees VIH negatif+ femmes enceintes 25 a 29  ans vues en CPN avec le statut VIH+ connu avant )""",bifT0mBTber,,,Fine,Yes
+PMTCT_STAT,PMTCT_STAT_N_MOH_Age_Sex,30-34,NujbceGNYiA,ADD,"""Nombre de femmes enceintes de 30 a 34 ans  vues en CPN et testees pour le VIH ayant recupere les resultats sont inculses aussi les femmes enceintes VIH+ avant la grossesse  Mode de calcul: Femmes enceintes 30 a 34   ans nouvellement testees positif+ femmes enceintes 30 a 34  ans nouvellement testees VIH negatif+ femmes enceintes 30 a 34   ans vues en CPN avec le statut VIH+ connu avant )""",O8gUl6NQrWx,,,Fine,Yes
+PMTCT_STAT,PMTCT_STAT_N_MOH_Age_Sex,35-39,Za1ntF1ECu4,ADD,"""Nombre de femmes enceintes de 35 a 39 ans  vues en CPN et testees pour le VIH ayant recupere les resultats sont inculses aussi les femmes enceintes VIH+ avant la grossesse  Mode de calcul: Femmes enceintes 35 a 39   ans nouvellement testees positif+ femmes enceintes 35 a 39  ans nouvellement testees VIH negatif+ femmes enceintes 35 a 39   ans vues en CPN avec le statut VIH+ connu avant )""",Jd40NMViEcc,,,Fine,Yes
+PMTCT_STAT,PMTCT_STAT_N_MOH_Age_Sex,40-44,uEGqYHYtXfS,ADD,"""Nombre de femmes enceintes de 40-44 ans vues en CPN et testees pour le VIH ayant recupere les resultats sont incluses aussi les femmes enceintes VIH+ avant la grossesse """,Qervl6YA2cn,,,Fine,Yes
+PMTCT_STAT,PMTCT_STAT_N_MOH_Age_Sex,45-49,dGTaodokiEE,ADD,"""Nombre de femmes enceintes de 45-49 ans vues en CPN et testees pour le VIH ayant recupere les resultats sont incluses aussi les femmes enceintes VIH+ avant la grossesse "" ",uaSWITf2O7D,,,Fine,Yes
+PMTCT_STAT,PMTCT_STAT_N_MOH_Age_Sex,50+,I4TXHYj3bFL,ADD,"""Nombre de femmes enceintes de 50 ans et plus vues en CPN et testees pour le VIH ayant recupere les resultats sont incluses aussi les femmes enceintes VIH+ avant la grossesse  Mode de calcul: Femmes enceintes 50 ans et plus  ans nouvellement testees positif+ femmes enceintes 50 ans et plus  ans nouvellement testees VIH negatif+ femmes enceintes 50 ans et plus   ans vues en CPN avec le statut VIH+ connu avant )""",KXk3kuugI7z,,,Fine,Yes
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex_KnownNewPosNewNeg,KnownPositives,o0gcwyuh7mU,ADD,"""Nombre de femmes enceintes vues en CPN1  avec le statut VIH+ avant la grossesse""",KUWmKtsuBAI,,,Fine,Yes
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex_KnownNewPosNewNeg,NewlyTestedPositives,pc4W2rmWK4q,ADD,"""Nombre de femmes enceintes vues en CPN1 et testes pour le VIH ayant recuper les resultats dont le result est positif""",qvBoEFKIAQD,,,Fine,Yes
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex_KnownNewPosNewNeg,NewNegatives,PCasMOWl24Y,ADD,"""Nombre de femmes enceintes vues en CPN1 et testes pour le VIH ayant recuper les resultats dont le result est negatif""",PyWQGyyGh97,,,Fine,Yes
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,<15 | Female,chrwpNxHlQQ,ADD,"""Nbre de patients de moins de 15 ans feminin sous ARV ayant termine le traitement preventif de la tuberculose par INH""",ghB2hq0lxgO,,,Coarse,Yes
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,15+ | Female,Yf1BiWq71NE,ADD,"""Nbre de patients de plus de 15 ans feminin sous ARV ayant termine le traitement preventif de la tuberculose par INH""",FOvDyqWMz5k,,,Coarse,Yes
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,<15 | Male,zHSL7ATXJib,ADD,"""Nbre de patients de moins de 15 ans masculin sous ARV ayant termine le traitement preventif de la tuberculose par INH""",LZCkN26gCZM,,,Coarse,Yes
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,15+ | Male,XX7hDj6iz0D,ADD,"""Nbre de patients de plus de 15 ans masculin sous ARV ayant termine le traitement preventif de la tuberculose par INH""",eKnUMp78gU5,,,Coarse,Yes
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,<15 | SexUnknown,uURluLqPIJ5,ADD,,,,,Coarse,Yes
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,15+ | SexUnknown,qli3maq9Ot7,ADD,,,,,Coarse,Yes
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,AgeUnknown | Female,P9UIhogYbAa,ADD,,,,,Coarse,Yes
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,AgeUnknown | Male,UN9ZOZLLVqN,ADD,,,,,Coarse,Yes
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_HIVStatus,AgeUnknown | SexUnknown,Gfje2jHn5TY,ADD,,,,,Coarse,Yes
+TB_PREV,TB_PREV_N_MOH_TherapyType_NewExArt_HIV,Previously Enrolled on ART | Alternative TPT Regimen,raHUwj8Q9Hf,ADD,,,,,Coarse,Yes
+TB_PREV,TB_PREV_N_MOH_TherapyType_NewExArt_HIV,Newly enrolled on ART | Alternative TPT Regimen,Qq1kGcQENms,ADD,,,,,Coarse,Yes
+TB_PREV,TB_PREV_N_MOH_TherapyType_NewExArt_HIV,Previously Enrolled on ART | IPT,ujD0vlLsULk,ADD,"""Ancien cas de PVVIH Sous ARV mis sous INH""",aqru17qw5hi,,,Coarse,Yes
+TB_PREV,TB_PREV_N_MOH_TherapyType_NewExArt_HIV,Newly enrolled on ART | IPT,xTbmPjpd5sB,ADD,"""Nouveau Cas de PVVIH Sous ARV mis sous INH""",sPnyanXYLXy,,,Coarse,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,<1 | Female,y3VqNEK9n95,ADD,"""Total PVVIH sous ARV |<1| F""",dlU5Gvuhho0,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,1-4 | Female,PPoL5AnEAQf,ADD,"""Total PVVIH sous ARV |1-4| F""",znxFMERF02r,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,5-9 | Female,hiUhhVpgUMg,ADD,"""Total PVVIH sous ARV |5-9| F""",WM6xsBefeWm,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,10-14 | Female,dFjZira5vTX,ADD,"""Nombre de fille  de 10 a 14 ans  sous ARV""",S7Ff5SaJcgj,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,15-19 | Female,wW6G5NC8Wd1,ADD,"""Nombre de jeune  fille  de 15 a 19 ans  sous ARV""",UOo0HJUZqDa,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,20-24 | Female,Xn5oUNVSMWA,ADD,"""Nombre de jeune  fille  de 20 a 24 ans  sous ARV""",YEeNY7nxCdl,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,25-29 | Female,RMA75iIp8Wd,ADD,"""Nombre de femmes de 25 a 29 ans  sous ARV""",djO5S7OrWNd,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,30-34 | Female,j0yodS3zbnW,ADD,"""Nombre de femmes de 30 a 34 ans  sous ARV""",emtzZ206g5y,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,35-39 | Female,OBbZvcHg2HL,ADD,"""Nombre de femmes de 35 a 39 ans  sous ARV""",qNoX4vJQUH5,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,40-44 | Female,eOn9JgfkB4F,ADD,"""Total PVVIH sous ARV |40-44| F""",xXSkYGo7aKP,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,45-49 | Female,POkbpo4D13c,ADD,"""Total PVVIH sous ARV |45-49| F""",aGSgS9ykSam,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,50+ | Female,kGlGj9LDonu,ADD,"""Nombre de femmes de plus de 50  ans et plus   sous ARV""",UlP69mYHPsu,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,<1 | Male,SeijxYK8F4b,ADD,"""Total PVVIH sous ARV |<1| M""",IWKjpXSErVj,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,1-4 | Male,jbrs9Qk6f9b,ADD,"""Total PVVIH sous ARV |1-4| M""",qg2zD9AIHZa,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,5-9 | Male,IxSwaxNCt1n,ADD,"""Total PVVIH sous ARV |5-9| M""",jnSHPLCEjpU,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,10-14 | Male,ljBmGJpAsZh,ADD,"""Nombre de garçons de 10 a 14 ans sous ARV""",d3l44U4AzcM,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,15-19 | Male,x1r1vfZQLFj,ADD,"""Nombre de jeune  homme de 15 a 19 ans  sous ARV""",GRNYVvU0CsI,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,20-24 | Male,VdA970UlzlX,ADD,"""Nombre de jeune  homme de 20 a 24 ans  sous ARV""",PelNbVtNS0N,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,25-29 | Male,R9wcT5vQ7tR,ADD,"""Nombre d'hommes de 25 a 29 ans  csous ARV""",DyDBcioM4ej,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,30-34 | Male,B8JEL3qeQiw,ADD,"""Nombre d'hommes de 30 a 34 ans  sous ARV""",Ir5U37txetf,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,35-39 | Male,ytvrDZdNAhc,ADD,"""Nombre d'hommes de 35 a 39 ans  sous ARV""",QTMYSr8ToTa,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,40-44 | Male,qdYU6NoIpY1,ADD,"""Total PVVIH sous ARV |40-44| M""",JyhjtJQgjgH,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,45-49 | Male,WjX1mRJp9NV,ADD,"""Total PVVIH sous ARV |45-49| M""",oDHEqTcyN0T,,,Fine,Yes
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,50+ | Male,FgwkSYUXq8x,ADD,"""Nombre d'hommes de plus de 50 ans  sous ARV""",OPDGtmgUENu,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,<1 | Female,y3VqNEK9n95,ADD,"""File active S/ARV debut protocole |<1| F""",pXyc4c5n1JH,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,1-4 | Female,PPoL5AnEAQf,ADD,"""File active S/ARV debut protocole |1-4|F""",QnNY0T1cYn5,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,5-9 | Female,hiUhhVpgUMg,ADD,"""File active S/ARV debut protocole |5-9| F""",LiK6wzpF4Ft,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,10-14 | Female,dFjZira5vTX,ADD,"""Nombre de fille  de 10 a 14 ans  nouveaux cas(debutants) mis sous ARV""",M1Zyg56JZ0l,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,15-19 | Female,wW6G5NC8Wd1,ADD,"""Nombre de jeune  fille  de 15 a 19 ans  nouveaux cas(debutants) mis sous ARV""",dpxnn0leayG,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,20-24 | Female,Xn5oUNVSMWA,ADD,"""Nombre de jeune  fille  de 20 a 24 ans  nouveaux cas debutants mis sous ARV""",IewbGJ6y4J6,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,25-29 | Female,RMA75iIp8Wd,ADD,"""Nombre de femmes de 25 a 29 ans  nouveaux cas debutants mis sous ARV""",iDdHBsMPu8K,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,30-34 | Female,j0yodS3zbnW,ADD,"""Nombre de femmes de 30 a 34 ans  nouveaux cas(debutants) mis sous ARV""",laAuLJuPY7s,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,35-39 | Female,OBbZvcHg2HL,ADD,"""Nombre de femmes de 35 a 39 ans  nouveaux cas(debutants) mis sous ARV""",vh3zjmPpj1g,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,40-44 | Female,eOn9JgfkB4F,ADD,"""File active S/ARV debut protocole |40 44| F""",bg6Wln5mApl,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,45-49 | Female,POkbpo4D13c,ADD,"""File active S/ARV debut protocole |45 49| F""",OeYI3Fe6Mtq,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,50+ | Female,kGlGj9LDonu,ADD,"""Nombre de femmes de plus de 50  ans et plus   nouveaux cas(debutants) mis sous ARV""",oHGA6LWYuof,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,<1 | Male,SeijxYK8F4b,ADD,"""File active S/ARV debut protocole |<1| M""",dvcCMw0ecp0,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,1-4 | Male,jbrs9Qk6f9b,ADD,"""File active S/ARV debut protocole |1-4| M""",KznJT3ISY4k,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,5-9 | Male,IxSwaxNCt1n,ADD,"""File active S/ARV debut protocole |5-9| M""",zv6pLuOL0QY,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,10-14 | Male,ljBmGJpAsZh,ADD,"""Nombre de garçons de 10 a 14 ans nouveaux cas(debutants) mis sous ARV""",g3vSvtTmJMP,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,15-19 | Male,x1r1vfZQLFj,ADD,"""Nombre de jeune  homme de 15 a 19 ans  nouveaux cas(debutants) mis sous ARV""",V8Cw4MGPOSS,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,20-24 | Male,VdA970UlzlX,ADD,"""Nombre de jeune  homme de 20 a 24 ans  nouveaux cas(debutants) mis sous ARV""",fdMLSDbTrsp,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,25-29 | Male,R9wcT5vQ7tR,ADD,"""Nombre d'hommes de 25 a 29 ans  nouveaux cas(debutants) mis sous ARV""",DiD2jwwp7LG,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,30-34 | Male,B8JEL3qeQiw,ADD,"""Nombre d'hommes de 30 a 34 ans  nouveaux cas(debutants) mis sous ARV""",ExqjdngTqqb,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,35-39 | Male,ytvrDZdNAhc,ADD,"""Nombre d'hommes de 35 a 39 ans  nouveaux cas(debutants) mis sous ARV""",pauNyI6axQy,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,40-44 | Male,qdYU6NoIpY1,ADD,"""File active S/ARV debut protocole |40-44| M""",NYhIm0ok5eg,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,45-49 | Male,WjX1mRJp9NV,ADD,"""File active S/ARV debut protocole |45-49| M""",ZtAZ2OI0JdY,,,Fine,Yes
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,50+ | Male,FgwkSYUXq8x,ADD,"""nombre d'hommes de plus de 50 ans nouveaux cas(debutants) mis sous ARV""",lIZIb5ftSpY,,,Fine,Yes

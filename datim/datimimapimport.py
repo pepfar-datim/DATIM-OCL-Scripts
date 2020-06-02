@@ -94,7 +94,7 @@ class DatimImapImport(datimbase.DatimBase):
         # STEP 2 of 11: Validate input country mapping CSV file
         # NOTE: This currently just verifies that the correct columns exist (order agnostic)
         # TODO: Validate that DATIM indicator/disag IDs in the provided IMAP are valid
-        imap_timer.lap(label='Step 1')
+        imap_timer.lap(label='STEP 1: Download DATIM-MOH-FYxx Export')
         self.vlog(1, '**** STEP 2 of 11: Validate input country mapping CSV file')
         is_valid = imap_input.is_valid()
         if type(is_valid) == str:
@@ -103,7 +103,7 @@ class DatimImapImport(datimbase.DatimBase):
             self.vlog(1, 'The provided IMAP CSV passed validation')
 
         # STEP 3 of 11: Fetch latest available IMAP export from OCL for the specified country
-        imap_timer.lap(label='Step 2')
+        imap_timer.lap(label='STEP 2: Validate country IMAP for import')
         self.vlog(1, '**** STEP 3 of 11: Fetch latest available IMAP export from OCL for the specified country')
         try:
             imap_old = datimimap.DatimImapFactory.load_imap_from_ocl(
@@ -120,7 +120,7 @@ class DatimImapImport(datimbase.DatimBase):
                 imap_input.country_org))
 
         # STEP 4 of 11: Evaluate delta between input and OCL IMAPs
-        imap_timer.lap(label='Step 3')
+        imap_timer.lap(label='STEP 3: Fetch existing country IMAP')
         self.vlog(1, '**** STEP 4 of 11: Evaluate delta between input and OCL IMAPs')
         imap_diff = None
         if imap_old:
@@ -145,7 +145,7 @@ class DatimImapImport(datimbase.DatimBase):
                 print('No DIFF available for the specified country/period\n')
 
         # STEP 5 of 11: Generate country org and source import scripts if they do not exist
-        imap_timer.lap(label='Step 4')
+        imap_timer.lap(label='STEP 4: Evaluate delta between input and OCL IMAP')
         self.vlog(1, '**** STEP 5 of 11: Generate country org and source if they do not exist')
         import_list = []
         if not imap_old:
@@ -169,7 +169,7 @@ class DatimImapImport(datimbase.DatimBase):
             self.vlog(1, 'SKIPPING: Country org and source already exist')
 
         # STEP 6 of 11: Generate import script for the country concepts and mappings
-        imap_timer.lap(label='Step 5')
+        imap_timer.lap(label='STEP 5: Generate country org/source JSON')
         self.vlog(1, '**** STEP 6 of 11: Generate import script for the country concepts and mappings')
         if imap_diff:
             self.vlog(1, 'Creating import script based on the delta...')
@@ -190,7 +190,7 @@ class DatimImapImport(datimbase.DatimBase):
 
         # STEP 7 of 11: Determine next country version number
         # NOTE: The country source and collections all version together
-        imap_timer.lap(label='Step 6')
+        imap_timer.lap(label='STEP 6: Generate import script')
         self.vlog(1, '**** STEP 7 of 11: Determine next country version number')
         if imap_old:
             current_country_version_id = imap_old.version
@@ -214,7 +214,7 @@ class DatimImapImport(datimbase.DatimBase):
         # STEP 8 of 11: Import changes to the source into OCL
         # NOTE: Up to this point, everything above is non-destructive. Changes are committed to OCL as of this step
         # TODO: Pass test_mode to the BulkImport API so that we can get real test results from the server
-        imap_timer.lap(label='Step 7')
+        imap_timer.lap(label='STEP 7: Determine IMAP version number')
         self.vlog(1, '**** STEP 8 of 11: Import changes into OCL')
         import_results = None
         if import_list and not self.test_mode:
@@ -242,7 +242,7 @@ class DatimImapImport(datimbase.DatimBase):
             self.vlog(1, 'SKIPPING: Nothing to import!')
 
         # STEP 9 of 11: Create new country source version
-        imap_timer.lap(label='Step 8')
+        imap_timer.lap(label='STEP 8: Import IMAP into OCL')
         self.vlog(1, '**** STEP 9 of 11: Create new country source version')
         if import_list and not self.test_mode:
             datimimap.DatimImapFactory.create_repo_version(
@@ -257,7 +257,7 @@ class DatimImapImport(datimbase.DatimBase):
             self.vlog(1, 'SKIPPING: No resources imported into the source...')
 
         # STEP 10 of 11: Generate JSON for ALL references for ALL country collections
-        imap_timer.lap(label='Step 9')
+        imap_timer.lap(label='STEP 9: Create new country source version')
         self.vlog(1, '**** STEP 10 of 11: Generate collection references')
         ref_import_list = None
         if import_list and not self.test_mode:
@@ -274,7 +274,7 @@ class DatimImapImport(datimbase.DatimBase):
             self.vlog(1, 'SKIPPING: New version not created in test mode...')
 
         # STEP 11 of 11: Import new collection references
-        imap_timer.lap(label='Step 10')
+        imap_timer.lap(label='STEP 10: Generate collection references')
         self.vlog(1, '**** STEP 11 of 11: Import new collection references')
         ref_import_results = None
         if ref_import_list and not self.test_mode:
@@ -287,7 +287,7 @@ class DatimImapImport(datimbase.DatimBase):
 
             # STEP 11b. Delete all existing references for each collection involved in this import
             # NOTE: Bulk import currently supports Creates & Updates, not Deletes, so doing this one-by-one
-            imap_timer.lap(label='Step 11a')
+            imap_timer.lap(label='STEP 11a: Get list of unique collection IDs in this import')
             self.vlog(1, 'Clearing existing collection references...')
             for collection_id in unique_collection_ids:
                 collection_url = '%s/orgs/%s/collections/%s/' % (
@@ -296,7 +296,7 @@ class DatimImapImport(datimbase.DatimBase):
                 self.clear_collection_references(collection_url=collection_url)
 
             # STEP 11c. Create JSON for new repo version for each unique collection and add to ref_import_list
-            imap_timer.lap(label='Step 11b')
+            imap_timer.lap(label='STEP 11b: Clear all references from collections')
             self.vlog(1, 'Creating JSON for each new collection version...')
             for collection_id in unique_collection_ids:
                 new_repo_version_json = datimimap.DatimImapFactory.get_new_repo_version_json(
@@ -306,7 +306,7 @@ class DatimImapImport(datimbase.DatimBase):
                 ref_import_list.append(new_repo_version_json)
 
             # STEP 11d. Bulk import new references and collection versions
-            imap_timer.lap(label='Step 11c')
+            imap_timer.lap(label='STEP 11c: Create JSON for new collection versions')
             self.vlog(1, 'Importing %s batch(es) of collection references and new collection versions...' % len(
                 ref_import_list))
             # TODO: Implement better OclBulkImporter response -- a new class OclBulkImportResponse?
@@ -325,13 +325,15 @@ class DatimImapImport(datimbase.DatimBase):
                 msg = 'Reference import is still processing... QUITTING'
                 self.log(msg)
                 raise Exception(msg)
+
+            imap_timer.lap(label='STEP 11d: Import references into OCL')
         elif self.test_mode:
             self.vlog(1, 'SKIPPING: No collections to update in test mode...')
         else:
             self.vlog(1, 'SKIPPING: No collections updated...')
 
         # Stop the timer
-        imap_timer.stop(label='Step 11d')
+        imap_timer.stop(label='STOP')
 
         # SHOW SOME FINAL DEBUG OUTPUT
         self.vlog(1, '**** IMAP IMPORT SUMMARY')

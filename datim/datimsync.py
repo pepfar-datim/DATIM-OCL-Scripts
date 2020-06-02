@@ -25,6 +25,7 @@ import deepdiff
 import datimbase
 import ocldev.oclconstants
 import ocldev.oclfleximporter
+import utils.timer
 
 
 class DatimSync(datimbase.DatimBase):
@@ -613,6 +614,8 @@ class DatimSync(datimbase.DatimBase):
         # STEP 1 of 12: Get dataset IDs from OCL or hardcoded in DHIS2 sync configuration
         # NOTE: This step occurs regardless of sync mode
         # NOTE: A "complete rebuild" with hardcoded dataset IDs could skip this step
+        sync_timer = utils.timer.Timer()
+        sync_timer.start()
         self.vlog(1, '**** STEP 1 of 12: Load OCL Collections for Dataset IDs')
         if self.SYNC_LOAD_DATASETS:
             self.load_datasets_from_ocl()
@@ -627,16 +630,18 @@ class DatimSync(datimbase.DatimBase):
                         self.vlog(1, 'INFO: Using hardcoded active dataset IDs: %s' % self.str_active_dataset_ids)
                 self.str_active_dataset_ids = ','.join(self.active_dataset_keys)
 
-        # STEP 2 of 12: Load new exports from DATIM-DHIS2
+        # STEP 2 of 12: Load latest exports from DHIS2 using Dataset IDs from STEP 1
         # NOTE: This step occurs regardless of sync mode
         # NOTE: Required step in "complete rebuild" mode
-        self.vlog(1, '**** STEP 2 of 12: Load latest exports from DHIS2 using Dataset IDs returned from OCL in Step 1')
+        sync_timer.lap(label='Step 1')
+        self.vlog(1, '**** STEP 2 of 12: Load latest exports from DHIS2 using Dataset IDs from STEP 1')
         self.load_dhis2_exports()
 
         # STEP 3 of 12: Quick comparison of current and previous DHIS2 exports
         # Compares new DHIS2 export to most recent previous export from a successful sync that is available
         # NOTE: This step is skipped if in DIFF mode or compare2previousexport is set to False
         # NOTE: A "complete rebuild" mode could skip this step
+        sync_timer.lap(label='Step 2')
         self.vlog(1, '**** STEP 3 of 12: Quick comparison of current and previous DHIS2 exports')
         complete_match = True
         if self.compare2previousexport and sync_mode != DatimSync.SYNC_MODE_DIFF_ONLY:
@@ -668,6 +673,7 @@ class DatimSync(datimbase.DatimBase):
         # STEP 4 of 12: Fetch latest versions of relevant OCL exports
         # NOTE: This step occurs regardless of sync mode
         # NOTE: In "complete rebuild" mode this step could be removed
+        sync_timer.lap(label='Step 3')
         self.vlog(1, '**** STEP 4 of 12: Fetch latest versions of relevant OCL exports')
         cnt = 0
         num_total = len(self.OCL_EXPORT_DEFS)
@@ -686,6 +692,7 @@ class DatimSync(datimbase.DatimBase):
         # STEP 5 of 12: Transform new DHIS2 export to diff/import format
         # NOTE: This step occurs regardless of sync mode
         # NOTE: In "complete rebuild" mode this step is required
+        sync_timer.lap(label='Step 4')
         self.vlog(1, '**** STEP 5 of 12: Transform DHIS2 exports to OCL-formatted JSON')
         self.dhis2_diff = {}
         for import_batch_key in self.IMPORT_BATCHES:
@@ -701,6 +708,7 @@ class DatimSync(datimbase.DatimBase):
         # STEP 6 of 12: Prepare OCL exports for diff
         # NOTE: This step occurs regardless of sync mode
         # NOTE: "Complete rebuild" mode could skip this step
+        sync_timer.lap(label='Step 5')
         self.vlog(1, '**** STEP 6 of 12: Prepare OCL exports for diff')
         self.ocl_diff = {}
         for import_batch_key in self.IMPORT_BATCHES:
@@ -714,6 +722,7 @@ class DatimSync(datimbase.DatimBase):
         # OCL/DHIS2 exports reloaded from file to eliminate unicode type_change diff -- but that may be short sighted!
         # NOTE: This step occurs regardless of sync mode
         # NOTE: Remove this step in "complete rebuild mode"
+        sync_timer.lap(label='Step 6')
         self.vlog(1, '**** STEP 7 of 12: Perform deep diff')
         with open(self.attach_absolute_data_path(self.OCL_CLEANED_EXPORT_FILENAME), 'rb') as file_ocl_diff,\
                 open(self.attach_absolute_data_path(self.DHIS2_CONVERTED_EXPORT_FILENAME), 'rb') as file_dhis2_diff:
@@ -735,6 +744,7 @@ class DatimSync(datimbase.DatimBase):
 
         # STEP 8 of 12: Determine action based on diff result
         # NOTE: This step occurs regardless of sync mode -- processing terminates here if DIFF mode
+        sync_timer.lap(label='Step 7')
         self.vlog(1, '**** STEP 8 of 12: Determine action based on diff result')
         if self.diff_result:
             self.vlog(1, 'One or more differences identified between DHIS2 and OCL...')
@@ -745,6 +755,7 @@ class DatimSync(datimbase.DatimBase):
         # Note that OCL import scripts are JSON-lines files
         # NOTE: This step occurs except in DIFF mode
         # NOTE: Consider building import script from DHIS2 results directly in "complete rebuild" mode
+        sync_timer.lap(label='Step 8')
         self.vlog(1, '**** STEP 9 of 12: Generate import scripts')
         if sync_mode != DatimSync.SYNC_MODE_DIFF_ONLY:
             self.generate_import_scripts(self.diff_result)
@@ -755,6 +766,7 @@ class DatimSync(datimbase.DatimBase):
         # TODO: Add test_mode support to bulk import
         # NOTE: This step occurs in TEST and FULL IMPORT modes
         # NOTE: Required step in "complete rebuild" mode
+        sync_timer.lap(label='Step 9')
         self.vlog(1, '**** STEP 10 of 12: Perform the import in OCL')
         num_import_rows_processed = 0
         ocl_importer = None
@@ -795,6 +807,7 @@ class DatimSync(datimbase.DatimBase):
             self.vlog(1, 'SKIPPING: Building import script only...')
 
         # STEP 11 of 12: Save new DHIS2 export for the next sync attempt
+        sync_timer.lap(label='Step 10')
         self.vlog(1, '**** STEP 11 of 12: Save the DHIS2 export')
         if sync_mode == DatimSync.SYNC_MODE_FULL_IMPORT:
             if num_import_rows_processed:
@@ -809,6 +822,7 @@ class DatimSync(datimbase.DatimBase):
             self.vlog(1, 'SKIPPING: Import test mode enabled...')
 
         # STEP 12 of 12: Manage OCL repository versions
+        sync_timer.lap(label='Step 11')
         self.vlog(1, '**** STEP 12 of 12: Manage OCL repository versions')
         if sync_mode == DatimSync.SYNC_MODE_FULL_IMPORT:
             if num_import_rows_processed:
@@ -820,10 +834,15 @@ class DatimSync(datimbase.DatimBase):
         elif sync_mode == DatimSync.SYNC_MODE_TEST_IMPORT:
             self.vlog(1, 'SKIPPING: Import test mode enabled...')
 
+        # Stop the timer
+        sync_timer.lap(label='Step 12')
+
         # Display debug info
         if self.verbosity >= 2:
-            self.log('**** DEBUG INFO')
+            self.log('**** MER SYNC SUMMARY')
+            self.log('** Sync time breakdown:\n', sync_timer)
             if ocl_importer and ocl_importer.import_results:
+                self.log('** Import summary:\n')
                 print(ocl_importer.import_results.get_detailed_summary())
 
         # Return the diff result (may return something else in the end)

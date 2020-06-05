@@ -48,9 +48,10 @@ class DatimShowMoh(datimshow.DatimShow):
         self.verbosity = verbosity
         self.cache_intermediate = cache_intermediate
         self.oclapiheaders = {
-            'Authorization': 'Token ' + self.oclapitoken,
             'Content-Type': 'application/json'
         }
+        if self.oclapitoken:
+            self.oclapiheaders['Authorization'] = 'Token ' + self.oclapitoken
 
     def get(self, period='', export_format=''):
         """ Overrides underlying method simply to change the parameter name to period and to add validation """

@@ -57,9 +57,9 @@ parser.add_argument(
 parser.add_argument('--public_access', help="Level of public access: View, None", default='View')
 parser.add_argument('--version', action='version', version='%(prog)s v' + APP_VERSION)
 parser.add_argument('--delete_existing_org', action="store_true",
-                    help="Delete existing org if it exists", default=False)
+                    help="Delete existing org if it exists", default=True)
 parser.add_argument(
-    'file', type=argparse.FileType('r'), help='IMAP JSON document, eg "BI-FY19.csv"')
+    'file', type=argparse.FileType('r'), help='IMAP JSON document, eg "BI-FY20.csv"')
 args = parser.parse_args()
 
 # Pre-process input parameters
@@ -103,34 +103,34 @@ if not country_name:
 # Display debug output
 if args.verbosity:
     print args
-    print 'Pre-processed arguments:'
+    print 'INFO: Pre-processed arguments:'
     print '  country_name =', country_name
     print '  country_org =', country_org
     print '  import_filename =', imap_import_filename
 
-# (Optionally) Delete org if it exists
+# Optionally delete org if it exists
 if args.delete_existing_org:
     if args.verbosity:
-        print('"delete_existing_org" is set to True:')
+        print('INFO: "delete_existing_org" is set to True:')
     if not args.test_mode:
-        if args.verbosity:
-            print('Deleting org "%s" if it exists in 5 seconds...' % country_org)
+        # if args.verbosity:
+            # print('Deleting org "%s" if it exists in 5 seconds...' % country_org)
         # Pause briefly to allow user to cancel in case deleting org on accident...
-        time.sleep(5)
+        # time.sleep(5)
         result = datim.datimimap.DatimImapFactory.delete_org_if_exists(
             org_id=country_org, oclenv=ocl_env_url, ocl_root_api_token=args.admin_token,
             verbose=args.verbosity)
     elif args.verbosity:
-        print('Skipping "delete_existing_org" step because "test_mode" is enabled')
+        print('TEST-MODE: Skipping "delete_existing_org" step because "test_mode" is enabled')
 
 # Load IMAP from import file
 imap_input = datim.datimimap.DatimImapFactory.load_imap_from_file(
     imap_filename=imap_import_filename, period=args.period,
     country_org=country_org, country_name=country_name, country_code=args.country_code)
 if args.verbosity and imap_input:
-    print('IMAP import file "%s" loaded successfully' % imap_import_filename)
+    print('INFO: IMAP import file "%s" loaded successfully' % imap_import_filename)
 elif not imap_input:
-    print('Unable to load IMAP import file "%s"' % imap_import_filename)
+    print('ERROR: Unable to load IMAP import file "%s"' % imap_import_filename)
     exit(1)
 
 # Process the IMAP import

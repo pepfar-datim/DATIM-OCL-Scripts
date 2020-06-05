@@ -329,7 +329,8 @@ class DatimSync(datimbase.DatimBase):
 
         # Execute the query
         self.vlog(1, 'Request URL:', url_dhis2_query)
-        r = requests.get(url_dhis2_query, auth=HTTPBasicAuth(self.dhis2uid, self.dhis2pwd))
+        r = requests.get(
+            url_dhis2_query, auth=HTTPBasicAuth(self.dhis2uid, self.dhis2pwd), verify=False)
         r.raise_for_status()
         content_length = 0
         with open(self.attach_absolute_data_path(outputfilename), 'wb') as handle:
@@ -728,19 +729,20 @@ class DatimSync(datimbase.DatimBase):
                 open(self.attach_absolute_data_path(self.DHIS2_CONVERTED_EXPORT_FILENAME), 'rb') as file_dhis2_diff:
             local_ocl_diff = json.load(file_ocl_diff)
             local_dhis2_diff = json.load(file_dhis2_diff)
-            self.diff_result = self.perform_diff(ocl_diff=local_ocl_diff, dhis2_diff=local_dhis2_diff)
 
-        # TODO: Remove the diff_result display after final testing of DATIM FY18 content
+            # JP: This is a slight hack, but gets the job done
+            # Clear OCL content if not comparing to previous import to generate a full import script
+            if not self.compare2previousexport:
+                for import_batch_key in local_ocl_diff:
+                    for resource_type in local_ocl_diff[import_batch_key]:
+                        if local_ocl_diff[import_batch_key][resource_type]:
+                            local_ocl_diff[import_batch_key][resource_type] = {}
+
+            self.diff_result = self.perform_diff(
+                ocl_diff=local_ocl_diff, dhis2_diff=local_dhis2_diff)
+
+        # TODO: Remove the diff_result display after final testing of content
         pprint.pprint(self.diff_result)
-
-        '''
-        # JP (2018-08-29): Unable to serialize NoneType or sets as JSON
-        if self.write_diff_to_file:
-            filename_diff_results = self.filename_diff_result(self.SYNC_NAME)
-            with open(self.attach_absolute_data_path(filename_diff_results), 'wb') as ofile:
-                ofile.write(json.dumps(self.diff_result))
-            self.vlog(1, 'Diff results successfully written to "%s"' % filename_diff_results)
-        '''
 
         # STEP 8 of 12: Determine action based on diff result
         # NOTE: This step occurs regardless of sync mode -- processing terminates here if DIFF mode

@@ -20,16 +20,16 @@ import datim.datimsyncmohfy19
 
 
 # DATIM DHIS2 Settings
-dhis2env = settings.dhis2env
-dhis2uid = settings.dhis2uid
-dhis2pwd = settings.dhis2pwd
+dhis2env = settings.dhis2env_devde
+dhis2uid = settings.dhis2uid_devde
+dhis2pwd = settings.dhis2pwd_devde
 
 # OCL Settings - staging user=datim-admin
 oclenv = settings.oclenv
 oclapitoken = settings.oclapitoken
 
 # Local development environment settings
-sync_mode = datim.datimsync.DatimSync.SYNC_MODE_FULL_IMPORT  # Set which sync operation is performed
+sync_mode = datim.datimsync.DatimSync.SYNC_MODE_BUILD_IMPORT_SCRIPT  # Set which sync operation is performed
 verbosity = 2  # 0=none, 1=some, 2=all
 import_limit = 0  # Number of resources to import; 0=all
 import_delay = 0  # Number of seconds to delay between each import request

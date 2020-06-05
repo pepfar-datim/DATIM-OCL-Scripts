@@ -35,7 +35,7 @@ def ocl_environment(string):
 
 # Script argument parser
 parser = argparse.ArgumentParser("moh", description="Export MOH data from OCL")
-parser.add_argument('-f', '--format', help='Format of Export', required=True)
+parser.add_argument('-f', '--format', help='Format of Export', default='csv')
 parser.add_argument('-p', '--period', help='Period of MOH Export', required=True)
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('--env', help='Name of the OCL API environment', type=ocl_environment)

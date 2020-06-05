@@ -12,17 +12,16 @@ Files:
   simply be imported using this JSON file. Includes Concepts and Mappings for Tiered Site Support. Note that no
   repo versions and no collection references are created for Tiered Site Support
 """
-from ocldev.oclfleximporter import OclFlexImporter
+import ocldev.oclfleximporter
+import ocldev.oclresourcelist
 import settings
 
 
-# JSON Lines files to import
+# Edit this list to import the files that you need
 import_filenames_all = [
-    'datim_init_all.json',
-    'datim_init_only_moh.json',
-    'dhis2datasets.json',
-    'tiered_support.json',
-    'code-list-collections-fy18-fy19.json',
+    'init/pepfar_org.json',
+    'init/datim_moh_fy18.json',
+    'init/datim_moh_fy19.json',
 ]
 import_filenames_datim_moh_only = [
     'datim_init_only_moh.json',
@@ -30,15 +29,22 @@ import_filenames_datim_moh_only = [
 import_filenames = import_filenames_all
 
 # OCL Settings - JetStream Staging user=datim-admin
-ocl_api_url_root = settings.oclenv
-ocl_api_token = settings.oclapitoken
+ocl_api_url_root = settings.ocl_api_url_qa
+ocl_api_token = settings.api_token_qa_root
 
-# Recommend running with test mode set to True before running for real
-test_mode = False
-limit = 0
-
+# Build a combined resource list
+resource_list = ocldev.oclresourcelist.OclJsonResourceList()
 for import_filename in import_filenames:
-    ocl_importer = OclFlexImporter(
-        file_path=import_filename, limit=limit, api_url_root=ocl_api_url_root, api_token=ocl_api_token,
-        test_mode=test_mode, do_update_if_exists=False)
-    ocl_importer.process()
+    resource_list = resource_list + ocldev.oclresourcelist.OclJsonResourceList.load_from_file(filename=import_filename)
+
+# Process as bulk import
+if resource_list:
+    bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
+        input_list=resource_list, api_token=ocl_api_token, api_url_root=ocl_api_url_root)
+    task_id = bulk_import_response.json()['task']
+    print 'BULK IMPORT TASK ID: %s' % task_id
+    import_results = ocldev.oclfleximporter.OclBulkImporter.get_bulk_import_results(
+        task_id=task_id, api_url_root=ocl_api_url_root, api_token=ocl_api_token,
+        delay_seconds=5, max_wait_seconds=800)
+    if import_results:
+        print import_results.display_report()

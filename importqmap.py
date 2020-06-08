@@ -59,7 +59,8 @@ parser.add_argument('--testmode', action="store_true", help='Enable test mode', 
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
 parser.add_argument('--version', action='version', version='%(prog)s v' + APP_VERSION)
-parser.add_argument('--qmap-api-root', help="API root for PLM QMAP mediators")
+parser.add_argument(
+    '--qmap-api-root', help="API root for PLM QMAP mediators, eg https://test.ohie.datim.org:5000/")
 parser.add_argument(
     '--fhir-url', required=True,
     help="URL for FHIR server API root, eg https://test.ohie.datim.org/hapi-fhir-jpaserver/fhir/")

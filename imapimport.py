@@ -16,10 +16,10 @@ Example Usage:
         -t="your-token-here" --test_mode csv/BI-FY19.csv
 
 """
-import time
+import json
+import argparse
 import datim.datimimap
 import datim.datimimapimport
-import argparse
 
 
 # Script constants
@@ -56,6 +56,8 @@ parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
 parser.add_argument('--public_access', help="Level of public access: View, None", default='View')
 parser.add_argument('--version', action='version', version='%(prog)s v' + APP_VERSION)
+parser.add_argument(
+    '--imap-api-root', help="API root for IMAP mediators, eg https://test.ohie.datim.org:5000/")
 parser.add_argument('--delete_existing_org', action="store_true",
                     help="Delete existing org if it exists", default=True)
 parser.add_argument(
@@ -113,13 +115,11 @@ if args.delete_existing_org:
     if args.verbosity:
         print('INFO: "delete_existing_org" is set to True:')
     if not args.test_mode:
-        # if args.verbosity:
-            # print('Deleting org "%s" if it exists in 5 seconds...' % country_org)
-        # Pause briefly to allow user to cancel in case deleting org on accident...
-        # time.sleep(5)
         result = datim.datimimap.DatimImapFactory.delete_org_if_exists(
             org_id=country_org, oclenv=ocl_env_url, ocl_root_api_token=args.admin_token,
             verbose=args.verbosity)
+        if result:
+            print('INFO: Organization "%s" successfully dropped' % country_org)
     elif args.verbosity:
         print('TEST-MODE: Skipping "delete_existing_org" step because "test_mode" is enabled')
 
@@ -134,8 +134,35 @@ elif not imap_input:
     exit(1)
 
 # Process the IMAP import
-imap_import = datim.datimimapimport.DatimImapImport(
-    oclenv=ocl_env_url, oclapitoken=args.token, verbosity=args.verbosity,
-    run_ocl_offline=False, test_mode=args.test_mode,
-    country_public_access=args.public_access)
-imap_import.import_imap(imap_input=imap_input)
+output_json = None
+try:
+    imap_import = datim.datimimapimport.DatimImapImport(
+        oclenv=ocl_env_url, oclapitoken=args.token, verbosity=args.verbosity,
+        run_ocl_offline=False, test_mode=args.test_mode,
+        country_public_access=args.public_access)
+    bulk_import_task_id = imap_import.import_imap(imap_input=imap_input)
+except Exception as e:
+    output_json = {
+        "status": "Error",
+        "message": str(e)
+    }
+else:
+    if bulk_import_task_id:
+        output_json = {
+            "status": "Success",
+            "message": ("IMAP successfully queued for bulk import into OCL. Request IMAP export "
+                        "after bulk import is processed or request import status."),
+            "ocl_bulk_import_task_id": bulk_import_task_id,
+            "ocl_bulk_import_status_url": "%s/manage/bulkimport?task=%s" % (
+                ocl_env_url, bulk_import_task_id),
+        }
+        if args.imap_api_root:
+            # https://test.ohie.datim.org:5000/ocl-imap/:countryCode/:period/[?format=:format]
+            output_json["imap_export_url"] = '%socl-imap/%s/%s/' % (
+                args.imap_api_root, args.country_code, args.period)
+            # https://test.ohie.datim.org:5000/ocl-imap/:countryCode/?importId=:importTaskId
+            output_json["imap_import_status_url"] = '%socl-imap/%s?importId=%s' % (
+                args.imap_api_root, args.country_code, bulk_import_task_id)
+
+if output_json:
+    print json.dumps(output_json)

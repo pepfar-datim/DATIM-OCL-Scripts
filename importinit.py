@@ -23,9 +23,6 @@ import_filenames_all = [
     'init/datim_moh_fy18.json',
     'init/datim_moh_fy19.json',
 ]
-import_filenames_datim_moh_only = [
-    'datim_init_only_moh.json',
-]
 import_filenames = import_filenames_all
 
 # OCL Settings - JetStream Staging user=datim-admin

@@ -52,10 +52,19 @@ def getQMAPDomainDetails(ocl_env_url='', domain=''):
     response.raise_for_status()
     return response.text
 
-# get QMAP domain details
+# get MOH Codelist details
 def getMOHCodeLists(ocl_env_url=''):
     ocl_api_headers = {'Content-Type': 'application/json'}
     mohCodelistsDetailsURL = '%s/orgs/PEPFAR-Test7/collections/?collectionType="Code+List"' % (
+        ocl_env_url)
+    response = requests.get(mohCodelistsDetailsURL, headers=ocl_api_headers)
+    response.raise_for_status()
+    return response.text
+
+# get MOH Sources details
+def getMOHSources(ocl_env_url=''):
+    ocl_api_headers = {'Content-Type': 'application/json'}
+    mohCodelistsDetailsURL = '%s/orgs/PEPFAR-Test7/sources/?extras__datim_moh_codelist=true&verbose=true' % (
         ocl_env_url)
     response = requests.get(mohCodelistsDetailsURL, headers=ocl_api_headers)
     response.raise_for_status()
@@ -95,6 +104,8 @@ try:
         response = getQMAPDomainDetails(ocl_env_url=ocl_env_url, domain=args.domain)
     if (args.requestType=="mohCodeLists"):
         response = getMOHCodeLists(ocl_env_url=ocl_env_url)
+    if (args.requestType=="mohSources"):
+        response = getMOHSources(ocl_env_url=ocl_env_url)
 except Exception as e:
     output_json = {
         "status": "Error",

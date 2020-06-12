@@ -105,4 +105,4 @@ else:
     output_json = response
 
 if output_json:
-    print json.dumps(output_json)
+    print output_json

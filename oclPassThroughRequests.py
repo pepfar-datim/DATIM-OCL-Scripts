@@ -52,6 +52,15 @@ def getQMAPDomainDetails(ocl_env_url='', domain=''):
     response.raise_for_status()
     return response.text
 
+# get QMAP domain details
+def getMOHCodeLists(ocl_env_url='', domain=''):
+    ocl_api_headers = {'Content-Type': 'application/json'}
+    mohCodelistsDetailsURL = '%s/orgs/%s/collections/?collectionType="Code+List"' % (
+        ocl_env_url, domain)
+    response = requests.get(mohCodelistsDetailsURL, headers=ocl_api_headers)
+    response.raise_for_status()
+    return response.text
+
 
 # Configure
 parser = argparse.ArgumentParser("bulkImportStatus", description="Get Bulk Import Status from OCL")
@@ -84,6 +93,8 @@ try:
             ocl_api_token=args.token, import_result_format=args.format)
     if (args.requestType=="qmapDetails"):
         response = getQMAPDomainDetails(ocl_env_url=ocl_env_url, domain=args.domain)
+    if (args.requestType=="mohCodeLists"):
+        response = getMOHCodeLists(ocl_env_url=ocl_env_url, domain=args.domain)
 except Exception as e:
     output_json = {
         "status": "Error",

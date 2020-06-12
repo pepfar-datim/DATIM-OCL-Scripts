@@ -64,7 +64,7 @@ def getMOHCodeLists(ocl_env_url=''):
 # get MOH Sources details
 def getMOHSources(ocl_env_url=''):
     ocl_api_headers = {'Content-Type': 'application/json'}
-    mohCodelistsDetailsURL = '%s/orgs/PEPFAR-Test7/sources/?extras_datim_moh_codelist=true&verbose=true' % (
+    mohCodelistsDetailsURL = '%s/orgs/PEPFAR/sources/?extras_datim_moh_codelist=true&verbose=true' % (
         ocl_env_url)
     response = requests.get(mohCodelistsDetailsURL, headers=ocl_api_headers)
     response.raise_for_status()

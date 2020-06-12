@@ -102,11 +102,7 @@ except Exception as e:
         "message": response
     }
 else:
-    output_json = {
-        "status": "",
-        "status_code": 0,
-        "message": response
-    }
+    output_json = response
 
 if output_json:
     print json.dumps(output_json)

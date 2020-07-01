@@ -14,6 +14,7 @@ The import script creates OCL-formatted JSON consisting of:
 
 TODO: Exclude "null-disag" update from the import scripts -- this does not have any effect, its just an unnecessary step
 """
+import json
 import datimbase
 import datimimap
 import ocldev.oclfleximporter
@@ -98,8 +99,24 @@ class DatimImapImport(datimbase.DatimBase):
 
         # STEP 3 of 4: Generate IMAP import script
         self.vlog(1, '**** STEP 3 of 4: Generate IMAP import script')
-        import_list = datimimap.DatimImapFactory.generate_resource_list_from_imap(
-            imap_input=imap_input)
+        import_list = ocldev.oclresourcelist.OclJsonResourceList()
+        does_imap_org_exist = datimimap.DatimImapFactory.check_if_imap_org(
+            org_id=imap_input.country_org, ocl_env_url=self.oclenv,
+            ocl_api_token=self.oclapitoken, verbose=True)
+        if does_imap_org_exist:
+            self.vlog(1, 'Org "%s" already exists.' % imap_input.country_org)
+            import_list.append({
+                '__action': 'DELETE',
+                'type': 'Organization',
+                'id': imap_input.country_org
+            })
+        else:
+            self.vlog(1, 'Org "%s" not found.' % imap_input.country_org)
+        import_list.append(datimimap.DatimImapFactory.generate_resource_list_from_imap(
+            imap_input=imap_input))
+        if self.verbosity >= 2:
+            for resource in import_list:
+                print json.dumps(resource)
         imap_timer.lap(label='STEP 3: Generate IMAP import script')
 
         # STEP 4 of 4: Bulk import into OCL

@@ -600,8 +600,7 @@ class DatimImap(object):
         country_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(
             datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE)
         row[DatimImap.IMAP_EXTRA_FIELD_DATIM_DISAG_NAME_CLEAN] = '_'.join(
-            row[DatimImap.IMAP_FIELD_DATIM_DISAG_NAME].replace('>', ' gt ').replace('<', ' lt ').
-                replace('|', ' ').replace('+', ' plus ').split())
+            row[DatimImap.IMAP_FIELD_DATIM_DISAG_NAME].replace('>', ' gt ').replace('<', ' lt ').replace('|', ' ').replace('+', ' plus ').split())
         row[DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_NAME] = row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID] + ': ' + row[
             DatimImap.IMAP_FIELD_DATIM_DISAG_NAME]
 
@@ -613,19 +612,21 @@ class DatimImap(object):
             row[DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_ID] = (
                 row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID] + '_' + row[DatimImap.IMAP_EXTRA_FIELD_DATIM_DISAG_NAME_CLEAN]).replace('_', '-')
 
-        # DATIM mapping
+        # DATIM HAS OPTION mapping
         row[DatimImap.IMAP_EXTRA_FIELD_DATIM_FROM_CONCEPT_URI] = '/%s/%s/sources/%s/concepts/%s/' % (
             datim_owner_type_url_part, datimbase.DatimBase.DATIM_MOH_OWNER_ID,
             datim_moh_source_id, row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID])
         row[DatimImap.IMAP_EXTRA_FIELD_DATIM_TO_CONCEPT_URI] = '/%s/%s/sources/%s/concepts/%s/' % (
             datim_owner_type_url_part, datimbase.DatimBase.DATIM_MOH_OWNER_ID,
             datim_moh_source_id, row[DatimImap.IMAP_FIELD_DATIM_DISAG_ID])
-        row[DatimImap.IMAP_EXTRA_FIELD_DATIM_MAP_TYPE] = datimbase.DatimBase.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION
+        row[DatimImap.IMAP_EXTRA_FIELD_DATIM_MAP_TYPE] = (
+            datimbase.DatimBase.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION)
         row[DatimImap.IMAP_EXTRA_FIELD_DATIM_HAS_OPTION_MAPPING_ID] = 'MAP-DATIM-HAS-OPTION-%s-%s' % (
             row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID], row[DatimImap.IMAP_FIELD_DATIM_DISAG_ID])
         row[DatimImap.IMAP_EXTRA_FIELD_DATIM_HAS_OPTION_MAPPING_URI] = '/%s/%s/sources/%s/mappings/%s/' % (
-            datim_owner_type_url_part, datimbase.DatimBase.DATIM_MOH_OWNER_ID,
-            datim_moh_source_id, row[DatimImap.IMAP_EXTRA_FIELD_DATIM_HAS_OPTION_MAPPING_ID])
+            country_data_element_owner_type_url_part, self.country_org,
+            datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID,
+            row[DatimImap.IMAP_EXTRA_FIELD_DATIM_HAS_OPTION_MAPPING_ID])
 
         # Country mapping
         row[DatimImap.IMAP_EXTRA_FIELD_MOH_MAP_TYPE] = '%s%s' % (
@@ -846,6 +847,36 @@ class DatimImapFactory(object):
         return False
 
     @staticmethod
+    def check_if_imap_org(org_id='', ocl_env_url='', ocl_api_token='', verbose=False):
+        """
+        Return true if the org exists and has the correct custom attribute set;
+        otherwise return False.
+        """
+        ocl_api_headers = {'Content-Type': 'application/json'}
+        if ocl_api_token:
+            ocl_api_headers['Authorization'] = 'Token %s' % str(ocl_api_token)
+        org_url = "%s/orgs/%s/" % (ocl_env_url, org_id)
+        if verbose:
+            print('INFO: Checking if org "%s" exists...' % org_url)
+        r = requests.get(org_url, headers=ocl_api_headers)
+        if r.status_code == 404:
+            if verbose:
+                print('Org "%s" not found or not authorized.' % org_id)
+            return False
+        r.raise_for_status()
+        if r.status_code != 200:
+            if verbose:
+                print('Unrecognized response code: "%s".' % r.status_code)
+            return False
+        imap_org = r.json()
+        if ('extras' in imap_org and 'datim_moh_object' in imap_org['extras'] and
+                imap_org['extras']['datim_moh_object']):
+            return True
+        elif verbose:
+            print('WARNING: Org "%s" exixts but is not an IMAP org.' % org_id)
+        return False
+
+    @staticmethod
     def delete_org_if_exists(org_id, oclenv='', ocl_root_api_token='', verbose=False):
         """
         Delete the org if it exists. Requires a root API token.
@@ -862,7 +893,6 @@ class DatimImapFactory(object):
         }
         if ocl_root_api_token:
             oclapiheaders['Authorization'] = 'Token %s' % str(ocl_root_api_token)
-        print oclapiheaders
         org_url = "%s/orgs/%s/" % (oclenv, org_id)
         if verbose:
             print('INFO: Checking if org "%s" exists...' % org_url)
@@ -1336,7 +1366,6 @@ class DatimImapFactory(object):
             import_list.pop(index_disag_null_disag)
 
         # Generate new country source version
-        # TODO: Verify that these are the correct values!
         next_country_version_id = '%s.v0' % imap_input.period
         import_list.append(DatimImapFactory.get_new_repo_version_json(
             owner_type=datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE,
@@ -1411,12 +1440,12 @@ class DatimImapFactory(object):
         import_list = []
         for collection_id in refs_by_collection:
             import_list.append({
-                    'type': 'Reference',
-                    'owner': imap_input.country_org,
-                    'owner_type': ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION,
-                    'collection': collection_id,
-                    'data': {'expressions': refs_by_collection[collection_id]}
-                })
+                'type': 'Reference',
+                'owner': imap_input.country_org,
+                'owner_type': ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION,
+                'collection': collection_id,
+                'data': {'expressions': refs_by_collection[collection_id]}
+            })
         return import_list
 
     @staticmethod

@@ -25,7 +25,7 @@ import_filenames_all = [
 ]
 import_filenames = import_filenames_all
 
-# OCL Settings - JetStream Staging user=datim-admin
+# OCL Settings
 ocl_api_url_root = settings.ocl_api_url_qa
 ocl_api_token = settings.api_token_qa_root
 

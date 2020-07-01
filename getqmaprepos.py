@@ -67,32 +67,29 @@ if args.verbosity > 1:
     print args
 
 
-def get_qmap_domains(ocl_env_url, ocl_api_token):
+def get_qmap_domains(ocl_env_url, ocl_api_token, verbose=False):
     # Retreive list of all orgs from OCL
     # TODO: Implement OCL's custom attribute API filter when supported
     ocl_api_headers = {'Content-Type': 'application/json'}
     if ocl_api_token:
         ocl_api_headers['Authorization'] = 'Token ' + ocl_api_token
-    url_all_orgs = '%s/orgs/?limit=0&verbose=true' % ocl_env_url
+    url_all_orgs = '%s/orgs/?limit=0&verbose=true&extras__qmap_org=true' % ocl_env_url
     response = requests.get(url_all_orgs, headers=ocl_api_headers)
+    if verbose:
+        print response.url
     response.raise_for_status()
-    ocl_all_orgs = response.json()
-
-    # Filter orgs based on custom attributes and specified filters
-    filtered_orgs = []
-    for ocl_org in ocl_all_orgs:
-        if 'extras' in ocl_org and ocl_org['extras'] and 'qmap_org' in ocl_org['extras'] and ocl_org['extras']['qmap_org']:
-            filtered_orgs.append(ocl_org)
-    return filtered_orgs
+    return response.json()
 
 
-def get_qmap_sources(ocl_env_url, ocl_api_token, qmap_domain):
+def get_qmap_sources(ocl_env_url, ocl_api_token, qmap_domain, verbose=False):
     # Verify that org is a qmap domain
     ocl_api_headers = {'Content-Type': 'application/json'}
     if ocl_api_token:
         ocl_api_headers['Authorization'] = 'Token ' + ocl_api_token
     url_qmap_domain = '%s/orgs/%s/' % (ocl_env_url, qmap_domain)
     response = requests.get(url_qmap_domain, headers=ocl_api_headers)
+    if verbose:
+        print response.url
     response.raise_for_status()
     ocl_org_qmap_domain = response.json()
     if ('extras' in ocl_org_qmap_domain and ocl_org_qmap_domain['extras'] and
@@ -105,25 +102,31 @@ def get_qmap_sources(ocl_env_url, ocl_api_token, qmap_domain):
     # TODO: Implement OCL's custom attribute API filter when supported
     url_qmap_sources = '%s/orgs/%s/sources/?limit=0&verbose=true' % (ocl_env_url, qmap_domain)
     response = requests.get(url_qmap_sources, headers=ocl_api_headers)
+    if verbose:
+        print response.url
     response.raise_for_status()
     ocl_qmap_sources = response.json()
 
-    # Filter orgs based on custom attributes and specified filters
+    # Filter sources based on custom attributes and specified filters
     filtered_qmap_sources = []
     for ocl_source in ocl_qmap_sources:
         if 'extras' in ocl_source and ocl_source['extras'] and 'qmap_version' in ocl_source['extras'] and ocl_source['extras']['qmap_version']:
             filtered_qmap_sources.append(ocl_source)
     return filtered_qmap_sources
 
+
 output_format = args.format.lower()
 
 # Get the QMAP orgs or sources based on settings
 if ocl_env_url and args.domain:
     result_type = 'Source'
-    filtered_results = get_qmap_sources(ocl_env_url=ocl_env_url, ocl_api_token=args.token, qmap_domain=args.domain)
+    filtered_results = get_qmap_sources(
+        ocl_env_url=ocl_env_url, ocl_api_token=args.token, qmap_domain=args.domain,
+        verbose=bool(args.verbosity))
 else:
     result_type = 'Organization'
-    filtered_results = get_qmap_domains(ocl_env_url=ocl_env_url, ocl_api_token=args.token)
+    filtered_results = get_qmap_domains(
+        ocl_env_url=ocl_env_url, ocl_api_token=args.token, verbose=bool(args.verbosity))
 
 # Display the results
 if result_type == 'Organization':

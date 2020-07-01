@@ -79,7 +79,8 @@ if args.verbosity > 1:
     print args
 
 
-def get_imap_orgs(ocl_env_url, ocl_api_token, period_filter='', country_code_filter=''):
+def get_imap_orgs(ocl_env_url, ocl_api_token, period_filter='', country_code_filter='',
+                  verbose=False):
     """
     Returns list of country Indicator Mapping organizations available in the specified OCL
     environment. This is determined by the 'datim_moh_object' == True custom attribute of
@@ -103,31 +104,24 @@ def get_imap_orgs(ocl_env_url, ocl_api_token, period_filter='', country_code_fil
     # Retrieve list of all orgs from OCL
     # TODO: Implement OCL's custom attribute API filter when supported
     ocl_api_headers = {'Content-Type': 'application/json'}
+    request_params = {
+        'limit': '0',
+        'verbose': 'true',
+        'extras__datim_moh_object': 'true'
+    }
+    if period_filter:
+        request_params['extras__datim_moh_period'] = ','.join(period_filter)
+    if country_code_filter:
+        request_params['extras__datim_moh_country_code'] = ','.join(country_code_filter)
     if ocl_api_token:
         ocl_api_headers['Authorization'] = 'Token ' + ocl_api_token
-    url_all_orgs = '%s/orgs/?limit=0&verbose=true' % ocl_env_url
-    response = requests.get(url_all_orgs, headers=ocl_api_headers)
+    url_all_orgs = '%s/orgs/' % ocl_env_url
+    response = requests.get(url_all_orgs, headers=ocl_api_headers, params=request_params)
+    if verbose:
+        print response.url
     response.raise_for_status()
     ocl_all_orgs = response.json()
-
-    # Filter orgs based on custom attributes and specified filters
-    ocl_moh_orgs = []
-    for ocl_org in ocl_all_orgs:
-        if 'extras' in ocl_org and ocl_org['extras'] and 'datim_moh_object' in ocl_org['extras'] and ocl_org['extras']['datim_moh_object']:
-            is_match = True
-            if period_filter:
-                if 'datim_moh_period' in ocl_org['extras'] and ocl_org['extras']['datim_moh_period'] in period_filter:
-                    pass
-                else:
-                    is_match = False
-            if is_match and country_code_filter:
-                if 'datim_moh_country_code' in ocl_org['extras'] and ocl_org['extras']['datim_moh_country_code'] in country_code_filter:
-                    pass
-                else:
-                    is_match = False
-            if is_match:
-                ocl_moh_orgs.append(ocl_org)
-    return ocl_moh_orgs
+    return ocl_all_orgs
 
 
 # Prepare filters
@@ -140,7 +134,7 @@ if args.country_code:
 
 # Get the orgs
 ocl_imap_orgs = get_imap_orgs(
-    ocl_env_url=ocl_env_url, ocl_api_token=args.token,
+    ocl_env_url=ocl_env_url, ocl_api_token=args.token, verbose=bool(args.verbosity),
     period_filter=period_filter, country_code_filter=country_code_filter)
 
 # Display the results
@@ -154,7 +148,7 @@ if isinstance(ocl_imap_orgs, list):
         for ocl_org in ocl_imap_orgs:
             print '%s: %s %s %s' % (
                 ocl_org['id'],
-                ocl_org['location'],
+                ocl_org.get('location', ''),
                 ocl_org['extras'].get('datim_moh_country_code'),
                 ocl_org['extras'].get('datim_moh_period'))
     else:

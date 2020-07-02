@@ -87,6 +87,8 @@ parser.add_argument(
     '--domain', help='Domain of bulk import results to return from OCL', required=False)
 parser.add_argument(
     '--requestType', help='Type of Passthrough Request', required=True)
+parser.add_argument(
+    '--country_code', help='Country Code', required=False)
 args = parser.parse_args()
 ocl_env_url = args.env if args.env else args.env_url
 

@@ -1,0 +1,129 @@
+DATIM_Indicator_Category,DATIM_Indicator_ID,DATIM_Disag_Name,DATIM_Disag_ID,Operation,MOH_Indicator_Name,MOH_Indicator_ID,MOH_Disag_Name,MOH_Disag_ID,Disaggregation Type
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | <1 | Female,pCFCaOLScdv,ADD,Vlad_test,VST,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 1-4 | Female,xzoIG0AwsNB,ADD,Jason_test,JBK,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 5-9 | Female,UggtNScQMVl,ADD,Vlad_test2,VST2,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 10-14 | Female,hXgqQX95TVa,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 15-19 | Female,wJCVvM7o6xm,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 20-24 | Female,tvOcOPhIdRH,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 25-29 | Female,BLWV93S2HJ0,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 30-34 | Female,bxqrio2gHOj,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 35-39 | Female,MuaoVfC9rYL,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 40-44 | Female,d3rKRkxJP1v,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 45-49 | Female,ERDcFrmlT0J,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 50+ | Female,GlfLlD3wSQj,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | <1 | Male,cXdSJvbabBT,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 1-4 | Male,tBoWuTd0ERY,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 5-9 | Male,wLMOUM9mfTV,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 10-14 | Male,KRoQaA91sv5,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 15-19 | Male,wpck6pSRDer,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 20-24 | Male,BitB2nKfWBK,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 25-29 | Male,NRZfd73Ypo8,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 30-34 | Male,kLd3OnUYTr5,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 35-39 | Male,wnsHEWFSqzG,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 40-44 | Male,HTcrEM69sst,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 45-49 | Male,OOCHuTdTJEQ,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Positive | 50+ | Male,WDpiIZ8UjB8,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | <1 | Female,Gvo9takmOXx,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 1-4 | Female,xTNM0wWDzo0,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 5-9 | Female,EFah6yBFc3J,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 10-14 | Female,tIhxMfmPrU5,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 15-19 | Female,NJclydByUvA,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 20-24 | Female,fysQ3RXzbzW,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 25-29 | Female,TCwxcGgIeqE,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 30-34 | Female,oKgx2Sw4qUL,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 35-39 | Female,Sf6GWp5gNx2,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 40-44 | Female,fsnxvho9fiG,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 45-49 | Female,i0RFyIDccSm,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 50+ | Female,i4lSbrUVcpe,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | <1 | Male,iomLts0rFcj,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 1-4 | Male,uPpiUkMhH6j,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 5-9 | Male,NpsmKYKl0mt,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 10-14 | Male,Kjn4IWLfG2G,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 15-19 | Male,eyTROtsEW5a,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 20-24 | Male,QS3vNL5WySH,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 25-29 | Male,lGNNK7ZYDGP,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 30-34 | Male,kZ5sEz94kJE,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 35-39 | Male,wO7RB8C1sal,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 40-44 | Male,RLLUx3DHJan,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 45-49 | Male,z1V5tDuMQt7,,,,,,Fine
+HTS_TST,HTS_TST_N_MOH_Age_Sex_Result,Negative | 50+ | Male,ip5uMUT73Qu,,,,,,Fine
+PMTCT_ART,PMTCT_ART_N_MOH,Total,HllvX50cXC0,,,,,,Coarse
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex_KnownNewPosNewNegRecNeg,Known Positive | Female,D3erNSl5dd2,ADD,,,,,Coarse
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex_KnownNewPosNewNegRecNeg,Newly Tested Positive | Female,brmDl6cMjft,ADD,,,,,Coarse
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex_KnownNewPosNewNegRecNeg,Recent Negative | Female,Ecflr8Ycqul,,,,,,Coarse
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex_KnownNewPosNewNegRecNeg,New Negative | Female,Wc6ItXYBs0s,ADD,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Newly Enrolled | <15 | Female,Q732w6Hev9u,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Newly Enrolled | <15 | Male,lq6iUq7YcZ1,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Newly Enrolled | <15 | Unknown Sex,nL6agczDQaW,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Newly Enrolled | 15+ | Female,ngI4uyiCOSj,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Newly Enrolled | 15+ | Male,ZuWjYTw4lpZ,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Newly Enrolled | 15+ | Unknown Sex,YbXei7Scpdk,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Newly Enrolled | Unknown Age | Female,OcHhTmUvRZE,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Newly Enrolled | Unknown Age | Male,m5ozu5OI1sc,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Newly Enrolled | Unknown Age | Unknown Sex,m95zIASJcjD,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Previously Enrolled | <15 | Female,ynzujzJwhjK,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Previously Enrolled | <15 | Male,z98a1NoV4mp,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Previously Enrolled | <15 | Unknown Sex,wHIObfcQeca,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Previously Enrolled | 15+ | Female,rccYwUJXYAA,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Previously Enrolled | 15+ | Male,UxkEEfHjlWb,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Previously Enrolled | 15+ | Unknown Sex,H23TL40CahD,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Previously Enrolled | Unknown Age | Female,x0rXsInb65X,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Previously Enrolled | Unknown Age | Male,QKn9JHx79JO,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Previously Enrolled | Unknown Age | Unknown Sex,wgdcoRFUkZP,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Unknown | <15 | Female,kRRN7PW2x2B,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Unknown | <15 | Male,r1YTNuDHWxc,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Unknown | <15 | Unknown Sex,eKKOcOxQOuS,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Unknown | 15+ | Female,SQG2P9rOIg4,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Unknown | 15+ | Male,ty2xR5ZaTSy,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Unknown | 15+ | Unknown Sex,wpIXXDYcvyd,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Unknown | Unknown Age | Female,UE64UWNZs1R,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Unknown | Unknown Age | Male,fgHq8eTmo7e,,,,,,Coarse
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,Unknown | Unknown Age | Unknown Sex,GwUc7g13Hg9,,,,,,Coarse
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,<1 | Female,y3VqNEK9n95,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,1-4 | Female,PPoL5AnEAQf,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,5-9 | Female,hiUhhVpgUMg,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,10-14 | Female,dFjZira5vTX,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,15-19 | Female,wW6G5NC8Wd1,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,20-24 | Female,Xn5oUNVSMWA,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,25-29 | Female,RMA75iIp8Wd,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,30-34 | Female,j0yodS3zbnW,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,35-39 | Female,OBbZvcHg2HL,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,40-44 | Female,eOn9JgfkB4F,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,45-49 | Female,POkbpo4D13c,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,50+ | Female,kGlGj9LDonu,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,<1 | Male,SeijxYK8F4b,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,1-4 | Male,jbrs9Qk6f9b,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,5-9 | Male,IxSwaxNCt1n,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,10-14 | Male,ljBmGJpAsZh,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,15-19 | Male,x1r1vfZQLFj,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,20-24 | Male,VdA970UlzlX,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,25-29 | Male,R9wcT5vQ7tR,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,30-34 | Male,B8JEL3qeQiw,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,35-39 | Male,ytvrDZdNAhc,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,40-44 | Male,qdYU6NoIpY1,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,45-49 | Male,WjX1mRJp9NV,ADD,,,,,Fine
+TX_CURR,TX_CURR_N_MOH_Age_Sex_HIVStatus,50+ | Male,FgwkSYUXq8x,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,<1 | Female,y3VqNEK9n95,ADD,TX_NEW,TX_NEW,female_u1,female_u1,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,1-4 | Female,PPoL5AnEAQf,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,5-9 | Female,hiUhhVpgUMg,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,10-14 | Female,dFjZira5vTX,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,15-19 | Female,wW6G5NC8Wd1,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,20-24 | Female,Xn5oUNVSMWA,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,25-29 | Female,RMA75iIp8Wd,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,30-34 | Female,j0yodS3zbnW,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,35-39 | Female,OBbZvcHg2HL,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,40-44 | Female,eOn9JgfkB4F,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,45-49 | Female,POkbpo4D13c,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,50+ | Female,kGlGj9LDonu,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,<1 | Male,SeijxYK8F4b,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,1-4 | Male,jbrs9Qk6f9b,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,5-9 | Male,IxSwaxNCt1n,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,10-14 | Male,ljBmGJpAsZh,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,15-19 | Male,x1r1vfZQLFj,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,20-24 | Male,VdA970UlzlX,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,25-29 | Male,R9wcT5vQ7tR,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,30-34 | Male,B8JEL3qeQiw,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,35-39 | Male,ytvrDZdNAhc,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,40-44 | Male,qdYU6NoIpY1,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,45-49 | Male,WjX1mRJp9NV,ADD,,,,,Fine
+TX_NEW,TX_NEW_N_MOH_Age_Sex_HIVStatus,50+ | Male,FgwkSYUXq8x,ADD,,,,,Fine

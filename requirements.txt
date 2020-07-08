@@ -33,7 +33,7 @@ pylint==1.9.2
 pyrsistent==0.15.7
 pytz==2018.9
 redis==3.2.1
-requests==2.19.1
+requests==2.24.0
 scandir==1.10.0
 singledispatch==3.4.0.3
 six==1.11.0

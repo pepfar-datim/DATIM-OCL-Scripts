@@ -22,6 +22,8 @@ class DatimSyncMohHelper(object):
             return DatimSyncMohHelper.get_disag_classification_fy18(de_code=de_code, de_uid=de_uid, coc_name=coc_name)
         elif period == 'FY19':
             return DatimSyncMohHelper.get_disag_classification_fy18(de_code=de_code, de_uid=de_uid, coc_name=coc_name)
+        elif period == 'FY20':
+            return DatimSyncMohHelper.get_disag_classification_fy20(de_code=de_code, de_uid=de_uid, coc_name=coc_name)
         return ''
 
     @staticmethod
@@ -85,3 +87,36 @@ class DatimSyncMohHelper(object):
         elif '_Age_' in de_code:
             return datimconstants.DatimConstants.DISAG_CLASSIFICATION_FINE
         return datimconstants.DatimConstants.DISAG_CLASSIFICATION_NA
+
+    @staticmethod
+    def get_disag_classification_fy20(de_code='', de_uid='', coc_name=''):
+        """
+        Python implementation of the classification logic embedded in the DHIS2 SqlView
+        (refer to https://vshioshvili.datim.org/api/sqlViews/ioG5uxOYnZe).
+        Here's the SQL version:
+            select * from (
+                select ds.name as dataSet, de.name as dataElement, de.shortname, de.code, de.uid as dataelementuid,
+                de.description as dataelementDesc, coc.name as categoryoptioncombo, coc.code as categoryoptioncombocode,
+                coc.uid as categoryoptioncombouid,
+                case
+                    when de.code like '%_Age_Agg%' then 'coarse'
+                    when coc.name = 'default' then 'n/a'
+                    else 'fine'
+                    end as classification
+            from dataset ds join datasetelement dsm on dsm.datasetid = ds.datasetid
+            join dataelement de on de.dataelementid = dsm.dataelementid
+            join categorycombos_optioncombos co on co.categorycomboid = de.categorycomboid
+            join categoryoptioncombo coc on coc.categoryoptioncomboid = co.categoryoptioncomboid
+            where ds.uid IN ('${dataSets}') ) meta
+            where classification != 'INVALID'
+            order by dataElement, categoryoptioncombo
+        :param de_code: DataElement code
+        :param de_uid: DataElement UID
+        :param coc_name: CategoryOptionCombo name
+        :return: <string> A member of DatimConstants.DISAG_CLASSIFICATIONS
+        """
+        if '_Age_Agg' in de_code:
+            return datimconstants.DatimConstants.DISAG_CLASSIFICATION_COARSE
+        elif coc_name == 'default':
+            return datimconstants.DatimConstants.DISAG_CLASSIFICATION_NA
+        return datimconstants.DatimConstants.DISAG_CLASSIFICATION_FINE

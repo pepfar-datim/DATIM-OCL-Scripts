@@ -89,12 +89,12 @@ class DatimImapImport(datimbase.DatimBase):
         self.vlog(1, '**** STEP 2 of 4: Validate country IMAP input file')
         if self.verbosity:
             imap_input.display(exclude_empty_maps=True, auto_fix_null_disag=True)
-        is_valid = imap_input.is_valid()
+        is_valid = imap_input.is_valid(datim_moh_source_export=datim_moh_source_export)
         if type(is_valid) == str:
-            self.vlog(1, 'WARNING: The following warnings were found in the provided IMAP CSV:\n',
+            self.vlog(1, 'WARNING: The following warnings were found in the provided IMAP:\n',
                       is_valid)
         else:
-            self.vlog(1, 'The provided IMAP CSV passed validation')
+            self.vlog(1, 'The provided IMAP passed validation')
         imap_timer.lap(label='STEP 2: Validate country IMAP input file')
 
         # STEP 3 of 4: Generate IMAP import script

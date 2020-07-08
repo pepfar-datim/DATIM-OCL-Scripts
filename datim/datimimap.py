@@ -21,7 +21,7 @@ class DatimImap(object):
     Object representing a set of country indicator mappings
     """
 
-    # Required IMAP field names
+    # Core IMAP field names
     IMAP_FIELD_DATIM_INDICATOR_CATEGORY = 'DATIM_Indicator_Category'
     IMAP_FIELD_DATIM_INDICATOR_ID = 'DATIM_Indicator_ID'
     IMAP_FIELD_DATIM_DISAG_ID = 'DATIM_Disag_ID'
@@ -33,7 +33,7 @@ class DatimImap(object):
     IMAP_FIELD_MOH_DISAG_NAME = 'MOH_Disag_Name'
     IMAP_FIELD_MOH_CLASSIFICATION = 'Classification'
 
-    # The list of required IMAP import fields (all other fields ignored during import)
+    # The list of core IMAP import fields (all other fields ignored during import)
     IMAP_IMPORT_FIELD_NAMES = [
         IMAP_FIELD_DATIM_INDICATOR_CATEGORY,
         IMAP_FIELD_DATIM_INDICATOR_ID,
@@ -44,6 +44,13 @@ class DatimImap(object):
         IMAP_FIELD_MOH_INDICATOR_NAME,
         IMAP_FIELD_MOH_DISAG_ID,
         IMAP_FIELD_MOH_DISAG_NAME,
+    ]
+
+    # List of required non-empty fields for IMAP validation
+    IMAP_REQUIRED_FIELD_NAMES = [
+        IMAP_FIELD_DATIM_INDICATOR_CATEGORY,
+        IMAP_FIELD_DATIM_INDICATOR_ID,
+        IMAP_FIELD_DATIM_DISAG_ID,
     ]
 
     # The list of required IMAP export fields (other fields discarded during export unless
@@ -109,7 +116,7 @@ class DatimImap(object):
     DATIM_IMAP_FORMAT_CSV = 'CSV'
     DATIM_IMAP_FORMAT_JSON = 'JSON'
     DATIM_IMAP_FORMAT_HTML = 'HTML'
-    # DATIM_IMAP_FORMAT_XML = 'XML'
+    DATIM_IMAP_FORMAT_XML = 'XML'
     DATIM_IMAP_FORMATS = [
         DATIM_IMAP_FORMAT_CSV,
         DATIM_IMAP_FORMAT_JSON,
@@ -410,14 +417,13 @@ class DatimImap(object):
         except:
             return object
 
-    def is_valid(self, throw_exception_on_error=True):
+    def is_valid(self, datim_moh_source_export=None, throw_exception_on_error=True):
         """
         Return whether the DatimImap mappings are valid. Checks that required fields are defined
         and that names match when an ID is reused.
         :param throw_exception_on_error:
         :return:
         """
-        # TODO: Update DatimImap.is_valid to work with new get_row model
 
         warnings = []
         errors = []
@@ -428,10 +434,38 @@ class DatimImap(object):
         line_number = 0
         for row in self.__imap_data:
             line_number += 1
-            for field_name in self.IMAP_IMPORT_FIELD_NAMES:
-                if field_name not in row:
-                    errors.append("ERROR: Missing field '%s' on row %s of input file" % (
-                        field_name, line_number))
+            for field_name in self.IMAP_REQUIRED_FIELD_NAMES:
+                if field_name not in row or not row[field_name]:
+                    err_msg = "ERROR: Missing or empty required field '%s' on row %s of IMAP" % (
+                        field_name, line_number)
+                    errors.append(err_msg)
+
+        # Verify DATIM Data Element/Disag IDs are valid (if datim_moh_source_export provided)
+        if datim_moh_source_export:
+            datim_moh_resource_list = datim_moh_source_export.to_resource_list()
+            line_number = 0
+            for row in self.__imap_data:
+                line_number += 1
+                if DatimImap.is_empty_map(row):
+                    continue
+                datim_moh_data_element = datim_moh_resource_list.get_resource(
+                    core_attrs={'type': 'Concept', 'id': row[self.IMAP_FIELD_DATIM_INDICATOR_ID]})
+                if not datim_moh_data_element:
+                    err_msg = 'ERROR: No matching %s found in DATIM MOH Codelist for "%s" on row %s' % (
+                        self.IMAP_FIELD_DATIM_INDICATOR_ID,
+                        row[self.IMAP_FIELD_DATIM_INDICATOR_ID],
+                        line_number
+                    )
+                    errors.append(err_msg)
+                datim_moh_disag = datim_moh_resource_list.get_resource(
+                    core_attrs={'type': 'Concept', 'id': row[self.IMAP_FIELD_DATIM_DISAG_ID]})
+                if not datim_moh_disag:
+                    err_msg = 'ERROR: No matching %s found in DATIM MOH Codelist for "%s" on row %s' % (
+                        self.IMAP_FIELD_DATIM_DISAG_ID,
+                        row[self.IMAP_FIELD_DATIM_DISAG_ID],
+                        line_number
+                    )
+                    errors.append(err_msg)
 
         # Check for reused IDs with different names in MOH indicator or disag columns
         disag_id = {}
@@ -976,8 +1010,15 @@ class DatimImapFactory(object):
         """
         with open(json_filename, 'rb') as input_file:
             imap_data = json.load(input_file)
-            return DatimImap(imap_data=imap_data, country_code=country_code,
-                             country_name=country_name, country_org=country_org, period=period)
+
+        # Validate
+        if not isinstance(imap_data, list):
+            err_msg = "ERROR: Expected JSON list in '%s'. '%s' found. Could not load IMAP." % (
+                json_filename, type(imap_data))
+            raise TypeError(err_msg)
+
+        return DatimImap(imap_data=imap_data, country_code=country_code,
+                         country_name=country_name, country_org=country_org, period=period)
 
     @staticmethod
     def load_imap_from_csv(csv_filename='', country_code='', country_org='',

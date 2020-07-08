@@ -329,8 +329,11 @@ class DatimSync(datimbase.DatimBase):
 
         # Execute the query
         self.vlog(1, 'Request URL:', url_dhis2_query)
+        auth_info = None
+        if self.dhis2uid and self.dhis2pwd:
+            auth_info = HTTPBasicAuth(self.dhis2uid, self.dhis2pwd)
         r = requests.get(
-            url_dhis2_query, auth=HTTPBasicAuth(self.dhis2uid, self.dhis2pwd), verify=False)
+            url_dhis2_query, auth=auth_info, verify=False)
         r.raise_for_status()
         content_length = 0
         with open(self.attach_absolute_data_path(outputfilename), 'wb') as handle:

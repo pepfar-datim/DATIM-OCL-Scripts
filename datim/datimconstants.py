@@ -39,6 +39,7 @@ class DatimConstants(object):
     IMPORT_BATCH_MOH_FY17 = 'MOH-FY17'
     IMPORT_BATCH_MOH_FY18 = 'MOH-FY18'
     IMPORT_BATCH_MOH_FY19 = 'MOH-FY19'
+    IMPORT_BATCH_MOH_FY20 = 'MOH-FY20'
     IMPORT_BATCH_MER = 'MER'
     IMPORT_BATCH_MER_MSP = 'MER-MSP'
     IMPORT_BATCH_SIMS = 'SIMS'
@@ -51,6 +52,7 @@ class DatimConstants(object):
         IMPORT_BATCH_MOH_FY17,
         IMPORT_BATCH_MOH_FY18,
         IMPORT_BATCH_MOH_FY19,
+        IMPORT_BATCH_MOH_FY20,
         IMPORT_BATCH_MER,
         IMPORT_BATCH_MER_MSP,
         IMPORT_BATCH_SIMS,
@@ -63,6 +65,7 @@ class DatimConstants(object):
     OPENHIM_ENDPOINT_MOH_FY17 = 'datim-moh'
     OPENHIM_ENDPOINT_MOH_FY18 = 'datim-moh'
     OPENHIM_ENDPOINT_MOH_FY19 = 'datim-moh'
+    OPENHIM_ENDPOINT_MOH_FY20 = 'datim-moh'
     OPENHIM_ENDPOINT_MER = 'datim-mer'
     OPENHIM_ENDPOINT_MER_MSP = 'datim-mer'
     OPENHIM_ENDPOINT_SIMS = 'datim-sims'
@@ -84,10 +87,12 @@ class DatimConstants(object):
     REPO_ACTIVE_ATTR_MOH_FY17 = 'datim_sync_moh_fy17'
     REPO_ACTIVE_ATTR_MOH_FY18 = 'datim_sync_moh_fy18'
     REPO_ACTIVE_ATTR_MOH_FY19 = 'datim_sync_moh_fy19'
+    REPO_ACTIVE_ATTR_MOH_FY20 = 'datim_sync_moh_fy20'
 
     # DHIS2 Presentation URLs
     DHIS2_PRESENTATION_URL_MOH_FY18 = 'https://test.geoalign.datim.org/api/sqlViews/jxuvedhz3S3/data.{{format}}?var=dataSets:sfk9cyQSUyi'
-    DHIS2_PRESENTATION_URL_MOH_FY19 = 'https://vshioshvili.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:OBhi1PUW3OL'
+    DHIS2_PRESENTATION_URL_MOH_FY19 = 'https://vshioshvili.datim.org/api/sqlViews/ioG5uxOYnZe/data.{{format}}?var=dataSets:OBhi1PUW3OL'
+    DHIS2_PRESENTATION_URL_MOH_FY20 = 'https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.{{format}}?var=dataSets:QSodwF4YG9a'
     DHIS2_PRESENTATION_URL_MOH = 'https://www.datim.org/api/sqlViews/DotdxKrNZxG/data.{{format}}?var=dataSets:{{dataset}}'
     DHIS2_PRESENTATION_URL_MER = 'https://www.datim.org/api/sqlViews/DotdxKrNZxG/data.{{format}}?var=dataSets:{{dataset}}'
     DHIS2_PRESENTATION_URL_MER_MSP = ''
@@ -97,6 +102,7 @@ class DatimConstants(object):
     MOH_PRESENTATION_SORT_COLUMN = 4
     MOH_FY18_PRESENTATION_SORT_COLUMN = 4
     MOH_FY19_PRESENTATION_SORT_COLUMN = 4
+    MOH_FY20_PRESENTATION_SORT_COLUMN = 4
     MER_PRESENTATION_SORT_COLUMN = 4
     MER_MSP_PRESENTATION_SORT_COLUMN = 4
     SIMS_PRESENTATION_SORT_COLUMN = 2
@@ -153,7 +159,9 @@ class DatimConstants(object):
     MER_MSP_DHIS2_QUERIES = {
         'MER-MSP': {
             'id': 'MER-MSP',
-            'name': 'DATIM-DHIS2 MER-MSP Indicators',
+            'name': 'DATIM-DHIS2 MER-MSP Data Elements',
+            'fy20': ['BRalYZhcHpi', 'V6hxDYUZFBq', 'yEQ5FoXJWAx', 'iDf461nJDJr', 'qFWmLNueTPF', 'oFFlA4vaSWD',
+                     'sdarqD1J8fb', 'GxUQu72i38n', 'Mon8vQgC9qg', 'l697bKzFRSv'],
             'fy19': ['zUoy5hk8r0q', 'PyD4x9oFwxJ', 'KWRj80vEfHU', 'fi9yMqWLWVy', 'IZ71Y2mEBJF', 'ndp6aR3e1X3',
                      'pnlFw2gDGHD', 'gc4KOv8kGlI', 'FsYxodZiXyH', 'iJ4d5HdGiqG', 'GiqB9vjbdwb', 'EbZrNIkuPtc',
                      'nIHNMxuPUOR', 'C2G7IyPPrvD', 'sBv1dj90IX6', 'HiJieecLXxN', 'dNGGlQyiq9b', 'tTK9BhvS5t3',
@@ -207,8 +215,7 @@ class DatimConstants(object):
     }
 
     # MOH-FY19 DHIS2 Queries - these are the FY19 PEPFAR gold standard data elements & disags that countries map to
-    # TODO: Verify that MOH-FY19 DHIS2 Queries works
-    # NOTE: https://vshioshvili.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:OBhi1PUW3OL
+    # https://vshioshvili.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:OBhi1PUW3OL
     # https://vshioshvili.datim.org/api/dataElements.json?fields=id,code,name,shortName,lastUpdated,description,categoryCombo[id,code,name,lastUpdated,created,categoryOptionCombos[id,code,name,lastUpdated,created]],dataSetElements[*,dataSet[id,name,shortName]]&paging=false&filter=dataSetElements.dataSet.id:in:[OBhi1PUW3OL]
     MOH_FY19_DHIS2_QUERIES = {
         'MOH-FY19': {
@@ -219,6 +226,22 @@ class DatimConstants(object):
                      'categoryOptionCombos[id,code,name,lastUpdated,created]],'
                      'dataSetElements[*,dataSet[id,name,shortName]]&'
                      'paging=false&filter=dataSetElements.dataSet.id:in:[OBhi1PUW3OL]',
+            'conversion_method': 'dhis2diff_moh'
+        }
+    }
+
+    # MOH-FY20 DHIS2 Queries - these are the FY20 PEPFAR gold standard data elements & disags that countries map to
+    # https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:QSodwF4YG9a
+    # https://test.geoalign.datim.org/api/dataElements.json?fields=id,code,name,shortName,lastUpdated,description,categoryCombo[id,code,name,lastUpdated,created,categoryOptionCombos[id,code,name,lastUpdated,created]],dataSetElements[*,dataSet[id,name,shortName]]&paging=false&filter=dataSetElements.dataSet.id:in:[QSodwF4YG9a]
+    MOH_FY20_DHIS2_QUERIES = {
+        'MOH-FY20': {
+            'id': 'MOH-FY20',
+            'name': 'DATIM MOH FY20 Indicators',
+            'query': '/api/dataElements.json?fields=id,code,name,shortName,lastUpdated,description,'
+                     'categoryCombo[id,code,name,lastUpdated,created,'
+                     'categoryOptionCombos[id,code,name,lastUpdated,created]],'
+                     'dataSetElements[*,dataSet[id,name,shortName]]&'
+                     'paging=false&filter=dataSetElements.dataSet.id:in:[QSodwF4YG9a]',
             'conversion_method': 'dhis2diff_moh'
         }
     }
@@ -256,14 +279,13 @@ class DatimConstants(object):
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-FY19/'},
+        'FY20': {
+            'title': 'MER Results: MOH Facility Based FY20',
+            'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-FY20/'},
     }
-    #JP: Removed 2019-05-23 until this is imported
-    # 'FY17': {
-    #   'title': 'MER Results: MOH Facility Based FY17',
-    #   'import_batch': IMPORT_BATCH_MOH_FY17,
-    #    'show_build_row_method': 'build_moh_indicator_output_fy17',
-    #    'show_headers_key': 'moh-fy17',
-    #    'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-FY17/'},
 
     # MOH FY18 OCL Export Definitions
     # TODO: Verify that this is not used and remove
@@ -283,6 +305,16 @@ class DatimConstants(object):
             'show_build_row_method': 'build_moh_fy19_indicator_output',
             'show_headers_key': 'moh_fy19',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-FY19/'},
+        }
+
+    # MOH FY20 OCL Export Definitions
+    # TODO: Verify that this is not used and remove
+    MOH_FY20_OCL_EXPORT_DEFS = {
+        'MOH-FY20': {
+            'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_fy20_indicator_output',
+            'show_headers_key': 'moh_fy20',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-FY20/'},
         }
 
     # MER-MSP OCL Export Definitions

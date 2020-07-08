@@ -16,25 +16,7 @@ import json
 import argparse
 import datim.datimimap
 import datim.datimimapimport
-
-
-# Script constants
-APP_VERSION = '0.1.0'
-OCL_ENVIRONMENTS = {
-    'qa': 'https://api.qa.openconceptlab.org',
-    'staging': 'https://api.staging.openconceptlab.org',
-    'production': 'https://api.openconceptlab.org',
-    'demo': 'https://api.demo.openconceptlab.org',
-}
-
-
-# Argument parser validation functions
-def ocl_environment(string):
-    """ Return OCL environment URL for the specified enviroment key"""
-    if string not in OCL_ENVIRONMENTS:
-        raise argparse.ArgumentTypeError('Argument "env" must be %s' % (
-            ', '.join(OCL_ENVIRONMENTS.keys())))
-    return OCL_ENVIRONMENTS[string]
+import common
 
 
 # Script argument parser
@@ -43,14 +25,14 @@ parser.add_argument('-c', '--country_code', help='Country code, eg "BI" or "UG"'
 parser.add_argument('--country_name', help='Country name, eg Burundi', required=False, default='')
 parser.add_argument('-p', '--period', help='Period, eg "FY19" or "FY20"', required=True)
 group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('--env', help='Name of the OCL API environment', type=ocl_environment)
+group.add_argument('--env', help='Name of the OCL API environment', type=common.ocl_environment)
 group.add_argument('--envurl', help='URL of the OCL API environment')
 parser.add_argument('-t', '--token', help='OCL API token', required=True)
 parser.add_argument('--test_mode', action="store_true", help='Enable test mode', default=False)
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
 parser.add_argument('--public_access', help="Level of public access: View, None", default='View')
-parser.add_argument('--version', action='version', version='%(prog)s v' + APP_VERSION)
+parser.add_argument('--version', action='version', version='%(prog)s v' + common.APP_VERSION)
 parser.add_argument(
     '--imap-api-root', help="API root for IMAP mediators, eg https://test.ohie.datim.org:5000/")
 parser.add_argument(
@@ -105,9 +87,9 @@ imap_input = datim.datimimap.DatimImapFactory.load_imap_from_file(
     imap_filename=imap_import_filename, period=args.period,
     country_org=country_org, country_name=country_name, country_code=args.country_code)
 if args.verbosity and imap_input:
-    print('INFO: IMAP import file "%s" loaded successfully' % imap_import_filename)
+    print 'INFO: IMAP import file "%s" loaded successfully' % imap_import_filename
 elif not imap_input:
-    print('ERROR: Unable to load IMAP import file "%s"' % imap_import_filename)
+    print 'ERROR: Unable to load IMAP import file "%s"' % imap_import_filename
     exit(1)
 
 # Process the IMAP import
@@ -118,10 +100,10 @@ try:
         run_ocl_offline=False, test_mode=args.test_mode,
         country_public_access=args.public_access)
     bulk_import_task_id = imap_import.import_imap(imap_input=imap_input)
-except Exception as e:
+except Exception as err:
     output_json = {
         "status": "Error",
-        "message": str(e)
+        "message": str(err)
     }
 else:
     if bulk_import_task_id:
@@ -137,8 +119,8 @@ else:
             # https://test.ohie.datim.org:5000/ocl-imap/:countryCode/:period/[?format=:format]
             output_json["imap_export_url"] = '%socl-imap/%s/%s/' % (
                 args.imap_api_root, args.country_code, args.period)
-            # https://test.ohie.datim.org:5000/ocl-imap/:countryCode/?importId=:importTaskId
-            output_json["imap_import_status_url"] = '%socl-imap/%s?importId=%s' % (
+            # https://test.ohie.datim.org:5000/ocl-imap/:countryCode/status/:importTaskId
+            output_json["imap_import_status_url"] = '%socl-imap/%s/status/%s/' % (
                 args.imap_api_root, args.country_code, bulk_import_task_id)
 
 if output_json:

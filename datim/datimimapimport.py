@@ -123,7 +123,7 @@ class DatimImapImport(datimbase.DatimBase):
         # NOTE: Everything is non-destructive up to this point. Changes are committed to OCL here.
         self.vlog(1, '**** STEP 4 of 4: Bulk import into OCL')
         if import_list and not self.test_mode:
-            self.vlog(1, 'Bulk importing %s changes to OCL...' % len(import_list))
+            self.vlog(1, 'Bulk importing %s resources to OCL...' % len(import_list))
             # TODO: Implement better OclBulkImporter response -- a new class OclBulkImportResponse?
             bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
                 input_list=import_list, api_token=self.oclapitoken, api_url_root=self.oclenv)

@@ -594,7 +594,8 @@ class DatimImap(object):
         # NOTE: These are modified so that an MOH indicator and disag may reuse the same ID
         if row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID]:
             row[DatimImap.IMAP_EXTRA_FIELD_MODIFIED_MOH_INDICATOR_ID] = '%s%s' % (
-                DatimImap.IMAP_MOH_DATA_ELEMENT_ID_PREFIX, row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID])
+                DatimImap.IMAP_MOH_DATA_ELEMENT_ID_PREFIX,
+                row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID])
         if row[DatimImap.IMAP_FIELD_MOH_DISAG_ID]:
             row[DatimImap.IMAP_EXTRA_FIELD_MODIFIED_MOH_DISAG_ID] = '%s%s' % (
                 DatimImap.IMAP_MOH_DISAG_ID_PREFIX, row[DatimImap.IMAP_FIELD_MOH_DISAG_ID])
@@ -604,83 +605,109 @@ class DatimImap(object):
         row[DatimImap.IMAP_EXTRA_FIELD_DATIM_OWNER_TYPE] = datimbase.DatimBase.DATIM_MOH_OWNER_TYPE
         row[DatimImap.IMAP_EXTRA_FIELD_DATIM_OWNER_ID] = datimbase.DatimBase.DATIM_MOH_OWNER_ID
         row[DatimImap.IMAP_EXTRA_FIELD_DATIM_SOURCE_ID] = datim_moh_source_id
-        datim_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(row[DatimImap.IMAP_EXTRA_FIELD_DATIM_OWNER_TYPE])
+        datim_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(
+            row[DatimImap.IMAP_EXTRA_FIELD_DATIM_OWNER_TYPE])
 
         # Set country data element attributes
-        row[DatimImap.IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_OWNER_TYPE] = datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE
+        row[DatimImap.IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_OWNER_TYPE] = (
+            datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE)
         row[DatimImap.IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_OWNER_ID] = self.country_org
-        row[DatimImap.IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_SOURCE_ID] = datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID
+        row[DatimImap.IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_SOURCE_ID] = (
+            datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID)
         country_data_element_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(
             row[DatimImap.IMAP_EXTRA_FIELD_MOH_DATA_ELEMENT_OWNER_TYPE])
 
         # Set country disag attributes, handling the null disag case
         if DatimImap.is_null_disag_row(row):
-            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_TYPE] = datimbase.DatimBase.DATIM_MOH_OWNER_TYPE
-            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_ID] = datimbase.DatimBase.DATIM_MOH_OWNER_ID
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_TYPE] = (
+                datimbase.DatimBase.DATIM_MOH_OWNER_TYPE)
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_ID] = (
+                datimbase.DatimBase.DATIM_MOH_OWNER_ID)
             row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_SOURCE_ID] = datim_moh_source_id
             moh_disag_id = datimbase.DatimBase.NULL_DISAG_ID
             moh_disag_name = datimbase.DatimBase.NULL_DISAG_NAME
         else:
-            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_TYPE] = datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_TYPE] = (
+                datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE)
             row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_ID] = self.country_org
-            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_SOURCE_ID] = datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_SOURCE_ID] = (
+                datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID)
             moh_disag_id = row[DatimImap.IMAP_EXTRA_FIELD_MODIFIED_MOH_DISAG_ID]
             moh_disag_name = row[DatimImap.IMAP_FIELD_MOH_DISAG_NAME]
         country_disaggregate_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(
             row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_TYPE])
 
-        # Build the collection name
-        # TODO: The country collection name should only be used if a collection has not already been defined
-        country_owner_type_url_part = datimbase.DatimBase.owner_type_to_stem(
-            datimbase.DatimBase.DATIM_MOH_COUNTRY_OWNER_TYPE)
-        row[DatimImap.IMAP_EXTRA_FIELD_DATIM_DISAG_NAME_CLEAN] = '_'.join(
-            row[DatimImap.IMAP_FIELD_DATIM_DISAG_NAME].replace('>', ' gt ').replace('<', ' lt ').replace('|', ' ').replace('+', ' plus ').split())
-        row[DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_NAME] = row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID] + ': ' + row[
-            DatimImap.IMAP_FIELD_DATIM_DISAG_NAME]
-
-        # Build the collection ID, replacing the default disag ID from DHIS2 with plain English (i.e. Total)
-        if row[DatimImap.IMAP_FIELD_DATIM_DISAG_ID] == datimbase.DatimBase.DATIM_DEFAULT_DISAG_ID:
-            row[DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_ID] = (
-                row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID] + '_' + datimbase.DatimBase.DATIM_DEFAULT_DISAG_REPLACEMENT_NAME).replace('_', '-')
-        else:
-            row[DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_ID] = (
-                row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID] + '_' + row[DatimImap.IMAP_EXTRA_FIELD_DATIM_DISAG_NAME_CLEAN]).replace('_', '-')
+        # Build the collection name and ID
+        row[DatimImap.IMAP_EXTRA_FIELD_DATIM_DISAG_NAME_CLEAN] = DatimImap.clean_country_disag_name(
+            disag_name_raw=row[DatimImap.IMAP_FIELD_DATIM_DISAG_NAME])
+        row[DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_NAME] = '%s: %s' % (
+            row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID],
+            row[DatimImap.IMAP_FIELD_DATIM_DISAG_NAME])
+        moh_collection_id = '%s_%s' % (
+            row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID],
+            row[DatimImap.IMAP_FIELD_DATIM_DISAG_ID])
+        row[DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_ID] = moh_collection_id.replace('_', '-')
 
         # DATIM HAS OPTION mapping
         row[DatimImap.IMAP_EXTRA_FIELD_DATIM_FROM_CONCEPT_URI] = '/%s/%s/sources/%s/concepts/%s/' % (
-            datim_owner_type_url_part, datimbase.DatimBase.DATIM_MOH_OWNER_ID,
-            datim_moh_source_id, row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID])
+            datim_owner_type_url_part,
+            datimbase.DatimBase.DATIM_MOH_OWNER_ID,
+            datim_moh_source_id,
+            row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID])
         row[DatimImap.IMAP_EXTRA_FIELD_DATIM_TO_CONCEPT_URI] = '/%s/%s/sources/%s/concepts/%s/' % (
-            datim_owner_type_url_part, datimbase.DatimBase.DATIM_MOH_OWNER_ID,
-            datim_moh_source_id, row[DatimImap.IMAP_FIELD_DATIM_DISAG_ID])
+            datim_owner_type_url_part,
+            datimbase.DatimBase.DATIM_MOH_OWNER_ID,
+            datim_moh_source_id,
+            row[DatimImap.IMAP_FIELD_DATIM_DISAG_ID])
         row[DatimImap.IMAP_EXTRA_FIELD_DATIM_MAP_TYPE] = (
             datimbase.DatimBase.DATIM_MOH_MAP_TYPE_COUNTRY_OPTION)
         row[DatimImap.IMAP_EXTRA_FIELD_DATIM_HAS_OPTION_MAPPING_ID] = 'MAP-DATIM-HAS-OPTION-%s-%s' % (
-            row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID], row[DatimImap.IMAP_FIELD_DATIM_DISAG_ID])
+            row[DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID],
+            row[DatimImap.IMAP_FIELD_DATIM_DISAG_ID])
         row[DatimImap.IMAP_EXTRA_FIELD_DATIM_HAS_OPTION_MAPPING_URI] = '/%s/%s/sources/%s/mappings/%s/' % (
-            country_data_element_owner_type_url_part, self.country_org,
+            country_data_element_owner_type_url_part,
+            self.country_org,
             datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID,
             row[DatimImap.IMAP_EXTRA_FIELD_DATIM_HAS_OPTION_MAPPING_ID])
 
         # Country mapping
         row[DatimImap.IMAP_EXTRA_FIELD_MOH_MAP_TYPE] = '%s%s' % (
-            row[DatimImap.IMAP_FIELD_OPERATION], DatimImap.IMAP_MOH_MAP_TYPE_OPERATION_POSTFIX)
+            row[DatimImap.IMAP_FIELD_OPERATION],
+            DatimImap.IMAP_MOH_MAP_TYPE_OPERATION_POSTFIX)
         row[DatimImap.IMAP_EXTRA_FIELD_MOH_FROM_CONCEPT_URI] = '/%s/%s/sources/%s/concepts/%s/' % (
-            country_data_element_owner_type_url_part, self.country_org,
+            country_data_element_owner_type_url_part,
+            self.country_org,
             datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID,
             row[DatimImap.IMAP_EXTRA_FIELD_MODIFIED_MOH_INDICATOR_ID])
         row[DatimImap.IMAP_EXTRA_FIELD_MOH_TO_CONCEPT_URI] = '/%s/%s/sources/%s/concepts/%s/' % (
             country_disaggregate_owner_type_url_part,
             row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_ID],
-            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_SOURCE_ID], moh_disag_id)
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_SOURCE_ID],
+            moh_disag_id)
         row[DatimImap.IMAP_EXTRA_FIELD_MOH_MAPPING_ID] = 'MAP-MOH-OPERATION-%s-%s' % (
-            row[DatimImap.IMAP_EXTRA_FIELD_MODIFIED_MOH_INDICATOR_ID], moh_disag_id)
+            row[DatimImap.IMAP_EXTRA_FIELD_MODIFIED_MOH_INDICATOR_ID],
+            moh_disag_id)
         row[DatimImap.IMAP_EXTRA_FIELD_MOH_MAPPING_URI] = '/%s/%s/sources/%s/mappings/%s/' % (
-            country_data_element_owner_type_url_part, self.country_org,
+            country_data_element_owner_type_url_part,
+            self.country_org,
             datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID,
             row[DatimImap.IMAP_EXTRA_FIELD_MOH_MAPPING_ID])
 
         return row
+
+    @staticmethod
+    def clean_country_disag_name(disag_name_raw):
+        replacements = {
+            '>': ' gt ',
+            '<': ' lt ',
+            '|': ' ',
+            ',': ' ',
+            '+': ' plus ',
+        }
+        new_disag_name = disag_name_raw
+        for needle in replacements:
+            new_disag_name = new_disag_name.replace(needle, replacements[needle])
+        return '_'.join(new_disag_name.split())
 
     def has_country_indicator(self, indicator_id='', indicator_name=''):
         """
@@ -720,11 +747,11 @@ class DatimImap(object):
         """
         # TODO: This method perpetuates the problem! Need to check the actual mappings, not the collection name
         full_csv_row_needle = self.add_columns_to_row(csv_row_needle.copy())
-        needle_collection_id = full_csv_row_needle['Country Collection ID']
+        needle_collection_id = full_csv_row_needle[DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_ID]
         if not needle_collection_id:
             return False
         for row in self.get_imap_data(exclude_empty_maps=True, include_extra_info=True):
-            if row['Country Collection ID'] == needle_collection_id:
+            if row[DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_ID] == needle_collection_id:
                 return True
         return False
 
@@ -1081,54 +1108,6 @@ class DatimImapFactory(object):
         }
         return new_version_data
 
-    # @staticmethod
-    # def create_repo_version(oclenv='', oclapitoken='', repo_endpoint='', repo_version_id='',
-    #                         delay_until_processed=False, delay_interval_seconds=10, verbose=0):
-    #     """
-    #     Create a new repository version
-    #     TODO: Determine whether this is used and potentially delete
-    #     :param oclenv:
-    #     :param oclapitoken:
-    #     :param repo_endpoint:
-    #     :param repo_version_id:
-    #     :param delay_until_processed:
-    #     :param delay_interval_seconds:
-    #     :param verbose:
-    #     :return:
-    #     """
-    #     oclapiheaders = {
-    #         'Authorization': 'Token ' + oclapitoken,
-    #         'Content-Type': 'application/json'
-    #     }
-    #     new_version_data = {
-    #         'id': repo_version_id,
-    #         'description': 'Automatically generated version',
-    #         'released': True
-    #     }
-    #     repo_version_url = '%s%sversions/' % (oclenv, repo_endpoint)
-    #     r = requests.post(
-    #         repo_version_url, data=json.dumps(new_version_data), headers=oclapiheaders)
-    #     r.raise_for_status()
-    #
-    #     if delay_until_processed:
-    #         is_repo_version_processing = True
-    #         country_version_processing_url = '%s%s%s/processing/' % (oclenv, repo_endpoint, repo_version_id)
-    #         while is_repo_version_processing:
-    #             if verbose:
-    #                 print 'INFO: Delaying %s seconds while source version is processing' % delay_interval_seconds
-    #             time.sleep(delay_interval_seconds)
-    #             r = requests.get(country_version_processing_url, headers=oclapiheaders)
-    #             if verbose:
-    #                 print 'INFO: Source version processing status for "%s": %s, Processing Status = %s' % (
-    #                     country_version_processing_url, r.status_code, r.text)
-    #             r.raise_for_status()
-    #             if r.text == 'False':
-    #                 is_repo_version_processing = False
-    #                 if verbose:
-    #                     print 'INFO: Source version processing is complete'
-    #
-    #     return True
-
     @staticmethod
     def generate_import_script_from_diff(imap_diff, verbose=True):
         """
@@ -1192,7 +1171,7 @@ class DatimImapFactory(object):
                 if not imap_diff.imap_a.has_country_collection(csv_row):
                     full_csv_row = imap_diff.imap_b.add_columns_to_row(csv_row.copy())
                     import_list_narrative.append('Create country collection: %s' % (
-                        full_csv_row['Country Collection ID']))
+                        full_csv_row[DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_ID]))
                     import_list += imap_diff.imap_b.get_country_collection_create_json(csv_row)
 
                 # country DATIM mapping
@@ -1387,18 +1366,20 @@ class DatimImapFactory(object):
         # Generate country org and source resources
         if include_country_org_and_source:
             country_org = DatimImapFactory.get_country_org_dict(
-                country_org=imap_input.country_org, country_code=imap_input.country_code,
+                country_org=imap_input.country_org,
+                country_code=imap_input.country_code,
                 country_name=imap_input.country_name,
                 country_public_access=country_public_access,
                 period=imap_input.period)
             country_source = DatimImapFactory.get_country_source_dict(
-                country_org=imap_input.country_org, country_code=imap_input.country_code,
+                country_org=imap_input.country_org,
+                country_code=imap_input.country_code,
                 country_name=imap_input.country_name,
                 country_public_access=country_public_access,
                 period=imap_input.period)
             import_list += [country_org, country_source]
 
-        # Generate import resources for the country source from the IMAP CSV file
+        # Generate import resources for the country source from the CSV-formatted IMAP
         import_list += DatimImapFactory.generate_import_script_from_csv(imap_input, verbose=False)
 
         # Remove unused "disag-null-disag" from resource list, if present
@@ -1448,9 +1429,10 @@ class DatimImapFactory(object):
         refs_by_collection = {}
         for csv_row in imap_input:
             # Skip if no collection is associated with this row
-            if 'Country Collection ID' not in csv_row or not csv_row['Country Collection ID']:
+            if (DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_ID not in csv_row or
+                    not csv_row[DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_ID]):
                 continue
-            collection_id = csv_row['Country Collection ID']
+            collection_id = csv_row[DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_ID]
 
             # Add references to DATIM-MOH-FY?? concepts/mappings, if first use of this collection
             if collection_id not in refs_by_collection:
@@ -1467,7 +1449,8 @@ class DatimImapFactory(object):
             moh_operation_from_concept_uri = csv_row[
                 DatimImap.IMAP_EXTRA_FIELD_MOH_FROM_CONCEPT_URI]
             if csv_row[DatimImap.IMAP_FIELD_MOH_DISAG_ID] == datimbase.DatimBase.NULL_DISAG_ID:
-                moh_operation_to_concept_url = datimbase.DatimBase.get_datim_moh_null_disag_endpoint(imap_input.period)
+                moh_operation_to_concept_url = (
+                    datimbase.DatimBase.get_datim_moh_null_disag_endpoint(imap_input.period))
             else:
                 moh_operation_to_concept_url = csv_row[
                     DatimImap.IMAP_EXTRA_FIELD_MOH_TO_CONCEPT_URI]
@@ -1481,7 +1464,7 @@ class DatimImapFactory(object):
         import_list = []
         for collection_id in refs_by_collection:
             import_list.append({
-                'type': 'Reference',
+                'type': ocldev.oclconstants.OclConstants.RESOURCE_TYPE_REFERENCE,
                 'owner': imap_input.country_org,
                 'owner_type': ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION,
                 'collection': collection_id,
@@ -1524,7 +1507,7 @@ class DatimImapFactory(object):
         source = {
             "type": ocldev.oclconstants.OclConstants.RESOURCE_TYPE_SOURCE,
             "id": datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID,
-            "owner_type": "Organization",
+            "owner_type": ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION,
             "owner": country_org,
             "short_code": datimbase.DatimBase.DATIM_MOH_COUNTRY_SOURCE_ID,
             "name": source_name,
@@ -1763,8 +1746,8 @@ class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConver
                 'definition_name': DatimMohCsvToJsonConverter.CSV_RESOURCE_DEF_MOH_COLLECTION,
                 'is_active': True,
                 'resource_type': 'Collection',
-                'id_column': 'Country Collection ID',
-                'skip_if_empty_column': 'Country Collection ID',
+                'id_column': DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_ID,
+                'skip_if_empty_column': DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_ID,
                 ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter.DEF_CORE_FIELDS: [
                     {'resource_field': 'full_name',
                      'column': DatimImap.IMAP_EXTRA_FIELD_MOH_COLLECTION_NAME},

@@ -40,13 +40,20 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
     import_status_url = "%s/manage/bulkimport/?task=%s&result=%s" % (
         ocl_env_url, bulkImportId, import_result_format)
     response = requests.get(import_status_url, headers=ocl_api_headers)
-    response.raise_for_status()
+    #response.raise_for_status()
     if import_result_format == 'summary':
-        output_json = {
+        if response.status_code==200:
+            output_json = {
             "status": "Success",
             "status_code": response.status_code,
             "message": response.text
-        }
+            }
+        else:
+            output_json = {
+                "status": "Failure",
+                "status_code": response.status_code,
+                "message": response.text
+            }
     return output_json
 
 # get QMAP domain details
@@ -119,8 +126,8 @@ try:
 except Exception as e:
     output_json = {
         "status": "Error",
-        "status_code": response.status_code,
-        "message": response.text
+        "status_code": 500,
+        "message": "Internal Server Error"
     }
 else:
     output_json = response

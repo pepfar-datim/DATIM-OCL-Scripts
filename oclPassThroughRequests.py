@@ -45,7 +45,7 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
         output_json = {
             "status": "Success",
             "status_code": 200,
-            "message": response
+            "message": response.text
         }
     return output_json
 

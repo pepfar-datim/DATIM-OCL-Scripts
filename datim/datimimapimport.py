@@ -100,9 +100,12 @@ class DatimImapImport(datimbase.DatimBase):
         # STEP 3 of 4: Generate IMAP import script
         self.vlog(1, '**** STEP 3 of 4: Generate IMAP import script')
         import_list = ocldev.oclresourcelist.OclJsonResourceList()
+        bool verbose=False;
+        if self.verbosity:
+            verbose=True;
         does_imap_org_exist = datimimap.DatimImapFactory.check_if_imap_org(
             org_id=imap_input.country_org, ocl_env_url=self.oclenv,
-            ocl_api_token=self.oclapitoken, verbose=True)
+            ocl_api_token=self.oclapitoken, verbose=verbose)
         if does_imap_org_exist:
             self.vlog(1, 'Org "%s" already exists.' % imap_input.country_org)
             import_list.append({

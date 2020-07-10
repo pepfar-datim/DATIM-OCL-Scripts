@@ -113,7 +113,7 @@ try:
 except Exception as e:
     output_json = {
         "status": "Error",
-        "status_code": 0,
+        "status_code": 500,
         "message": response
     }
 else:

@@ -113,7 +113,7 @@ class DatimImapImport(datimbase.DatimBase):
         else:
             self.vlog(1, 'Org "%s" not found.' % imap_input.country_org)
         import_list.append(datimimap.DatimImapFactory.generate_resource_list_from_imap(
-            imap_input=imap_input))
+            imap_input=imap_input, verbose=bool(self.verbosity)))
         if self.verbosity >= 2:
             for resource in import_list:
                 print json.dumps(resource)

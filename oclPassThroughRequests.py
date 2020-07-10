@@ -54,7 +54,7 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
                 "status_code": response.status_code,
                 "message": response.text
             }
-    return output_json
+    return json.dumps(output_json)
 
 # get QMAP domain details
 def getQMAPDomainDetails(ocl_env_url='', domain=''):

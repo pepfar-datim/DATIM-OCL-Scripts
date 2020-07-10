@@ -116,7 +116,7 @@ try:
             args.format="json"
         response = check_bulk_import_status(
             bulkImportId=args.bulkImportId, ocl_env_url=ocl_env_url,
-            ocl_api_token=args.token, import_result_format=args.format)
+            ocl_api_token=args.token, import_result_format=args.format.upper())
     if (args.requestType=="qmapDetails"):
         response = getQMAPDomainDetails(ocl_env_url=ocl_env_url, domain=args.domain)
     if (args.requestType=="mohCodeLists"):

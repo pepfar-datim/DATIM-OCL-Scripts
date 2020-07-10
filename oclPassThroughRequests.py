@@ -44,7 +44,7 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
     if import_result_format == 'summary':
         output_json = {
             "status": "Success",
-            "status_code": 200,
+            "status_code": response.status_code,
             "message": response.text
         }
     return output_json
@@ -119,8 +119,8 @@ try:
 except Exception as e:
     output_json = {
         "status": "Error",
-        "status_code": 500,
-        "message": response
+        "status_code": response.status_code,
+        "message": response.text
     }
 else:
     output_json = response

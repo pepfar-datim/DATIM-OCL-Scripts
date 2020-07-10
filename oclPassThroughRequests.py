@@ -41,7 +41,13 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
         ocl_env_url, bulkImportId, import_result_format)
     response = requests.get(import_status_url, headers=ocl_api_headers)
     response.raise_for_status()
-    return response.text
+    if import_result_format == 'summary':
+        output_json = {
+            "status": "Success",
+            "status_code": 200,
+            "message": response
+        }
+    return output_json
 
 # get QMAP domain details
 def getQMAPDomainDetails(ocl_env_url='', domain=''):

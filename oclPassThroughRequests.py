@@ -40,8 +40,21 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
     import_status_url = "%s/manage/bulkimport/?task=%s&result=%s" % (
         ocl_env_url, bulkImportId, import_result_format)
     response = requests.get(import_status_url, headers=ocl_api_headers)
-    response.raise_for_status()
-    return response.text
+    #response.raise_for_status()
+    if import_result_format == 'summary':
+        if response.status_code==200:
+            output_json = {
+            "status": "Success",
+            "status_code": response.status_code,
+            "message": response.text
+            }
+        else:
+            output_json = {
+                "status": "Failure",
+                "status_code": response.status_code,
+                "message": response.text
+            }
+    return json.dumps(output_json)
 
 # get QMAP domain details
 def getQMAPDomainDetails(ocl_env_url='', domain=''):
@@ -64,7 +77,7 @@ def getMOHCodeLists(ocl_env_url=''):
 # get MOH Sources details
 def getMOHSources(ocl_env_url=''):
     ocl_api_headers = {'Content-Type': 'application/json'}
-    mohCodelistsDetailsURL = '%s/orgs/PEPFAR/sources/?extras_datim_moh_codelist=true&verbose=true' % (
+    mohCodelistsDetailsURL = '%s/orgs/PEPFAR/sources/?extras__datim_moh_codelist=true&verbose=true' % (
         ocl_env_url)
     response = requests.get(mohCodelistsDetailsURL, headers=ocl_api_headers)
     response.raise_for_status()
@@ -103,7 +116,7 @@ try:
             args.format="json"
         response = check_bulk_import_status(
             bulkImportId=args.bulkImportId, ocl_env_url=ocl_env_url,
-            ocl_api_token=args.token, import_result_format=args.format)
+            ocl_api_token=args.token, import_result_format=args.format.upper())
     if (args.requestType=="qmapDetails"):
         response = getQMAPDomainDetails(ocl_env_url=ocl_env_url, domain=args.domain)
     if (args.requestType=="mohCodeLists"):
@@ -113,8 +126,8 @@ try:
 except Exception as e:
     output_json = {
         "status": "Error",
-        "status_code": 0,
-        "message": response
+        "status_code": 500,
+        "message": "Internal Server Error"
     }
 else:
     output_json = response

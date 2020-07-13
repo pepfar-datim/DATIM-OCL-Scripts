@@ -102,7 +102,7 @@ class DatimImapImport(datimbase.DatimBase):
         import_list = ocldev.oclresourcelist.OclJsonResourceList()
         does_imap_org_exist = datimimap.DatimImapFactory.check_if_imap_org(
             org_id=imap_input.country_org, ocl_env_url=self.oclenv,
-            ocl_api_token=self.oclapitoken, verbose=True)
+            ocl_api_token=self.oclapitoken, verbose=bool(self.verbosity))
         if does_imap_org_exist:
             self.vlog(1, 'Org "%s" already exists.' % imap_input.country_org)
             import_list.append({
@@ -113,7 +113,7 @@ class DatimImapImport(datimbase.DatimBase):
         else:
             self.vlog(1, 'Org "%s" not found.' % imap_input.country_org)
         import_list.append(datimimap.DatimImapFactory.generate_resource_list_from_imap(
-            imap_input=imap_input))
+            imap_input=imap_input, verbose=bool(self.verbosity)))
         if self.verbosity >= 2:
             for resource in import_list:
                 print json.dumps(resource)

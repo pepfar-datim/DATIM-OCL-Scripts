@@ -1,0 +1,21 @@
+DATIM_Indicator_Category,DATIM_Indicator_ID,DATIM_Disag_ID,DATIM_Disag_Name,Operation,MOH_Indicator_ID,MOH_Indicator_Name,MOH_Disag_ID,MOH_Disag_Name,Classification
+HTS_TST,HTS_TST_N_MOH,HllvX50cXC0,default,ADD,ATS_TOTAL,ATS - Total de ATS,,,n/a
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,EyJRtSgSChq,"Unknown Age, Unknown Sex, Positive",ADD,ATS_POS,ATS - Total de Testados Positivos,,,coarse
+HTS_TST,HTS_TST_N_MOH_Age_Agg_Sex_Result,mV483q7SboN,"Unknown Age, Unknown Sex, Negative",ADD,ATS_NEG,ATS - Total de Testados Negativos,,,coarse
+PMTCT_ART,PMTCT_ART_N_MOH,HllvX50cXC0,default,ADD,XX1hAvZFRx7,SMI-CPN - Mulheres gr�vidas em TARV a entrada,,,n/a
+PMTCT_ART,PMTCT_ART_N_MOH,HllvX50cXC0,default,ADD,u1LvFqIlF9J,SMI-CPN - Mulheres gr�vidas que iniciaram TARV durante a gravidez,default,default,n/a
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex,Jwb1SWomgpk,Female,ADD,GRT7kTCktpn,SMI-CPN - Mulheres gr�vidas,CM0h636cX5P,15-19 anos,"fine, semi-fine"
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex,Jwb1SWomgpk,Female,ADD,GRT7kTCktpn,SMI-CPN - Mulheres gr�vidas,dla2Wo2VyU0,20-24 anos,"fine, semi-fine"
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex,Jwb1SWomgpk,Female,ADD,GRT7kTCktpn,SMI-CPN - Mulheres gr�vidas,exNx1cGzXEc,>=25 anos,"fine, semi-fine"
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex,Jwb1SWomgpk,Female,ADD,GRT7kTCktpn,SMI-CPN - Mulheres gr�vidas,qxQx8cylMsO,10-14 anos,"fine, semi-fine"
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex_KnownNewPosNewNeg,PCasMOWl24Y,"Female, Newly Identified Negative",ADD,f3uGI9FiZ9t,SMI-CPN - Mulheres gr�vidas testadas HIV negativas durante a CPN,default,default,coarse
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex_KnownNewPosNewNeg,o0gcwyuh7mU,"Female, Known at Entry Positive",ADD,MgCxldQo2SW,SMI-CPN - Mulheres gr�vidas HIV positiva a entrada,default,default,coarse
+PMTCT_STAT,PMTCT_STAT_N_MOH_Sex_KnownNewPosNewNeg,pc4W2rmWK4q,"Female, Newly Identified Positive",ADD,PzkMawRB4dt,SMI-CPN - Mulheres gr�vidas testadas HIV positivas durante a CPN,default,default,coarse
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex_HIVStatus,XX7hDj6iz0D,"15+, Male, Positive",ADD,s9hvF8AlvF1,HIV (J ) - N� activos em TARV 15+ MASCULINO,,,coarse
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex_HIVStatus,Yf1BiWq71NE,"15+, Female, Positive",ADD,D6IKO5pKiFd,HIV (J) - N� activos em TARV 15+ FEMENINO,,,coarse
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex_HIVStatus,chrwpNxHlQQ,"<15, Female, Positive",ADD,Q3KGFAUJ5cL,HIV (J) - N� activos em TARV <15 FEMENINO,,,coarse
+TX_CURR,TX_CURR_N_MOH_Age_Agg_Sex_HIVStatus,zHSL7ATXJib,"<15, Male, Positive",ADD,VAArEvPULVG,HIV (J) - N� activos em TARV <15 MASCULINO,,,coarse
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex_HIVStatus,XX7hDj6iz0D,"15+, Male, Positive",ADD,UnsBkHQU3jw,HIV-PreTARV - Novos inscritos,mUmvPcx5OHn,"15+ anos, MASCULINO",coarse
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex_HIVStatus,Yf1BiWq71NE,"15+, Female, Positive",ADD,UnsBkHQU3jw,HIV-PreTARV - Novos inscritos,YeUsrCI6AMf,"15+ anos, FEMININO",coarse
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex_HIVStatus,chrwpNxHlQQ,"<15, Female, Positive",ADD,UnsBkHQU3jw,HIV-PreTARV - Novos inscritos,m53prKZBrbh,"<15, FEMININO",coarse
+TX_NEW,TX_NEW_N_MOH_Age_Agg_Sex_HIVStatus,zHSL7ATXJib,"<15, Male, Positive",ADD,UnsBkHQU3jw,HIV-PreTARV - Novos inscritos,bcrJhFuAlnS,"<15, MASCULINO",coarse

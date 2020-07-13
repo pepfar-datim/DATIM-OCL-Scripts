@@ -36,7 +36,7 @@ parser.add_argument('--version', action='version', version='%(prog)s v' + common
 parser.add_argument(
     '--imap-api-root', help="API root for IMAP mediators, eg https://test.ohie.datim.org:5000/")
 parser.add_argument(
-    'file', type=argparse.FileType('r'), help='IMAP JSON document, eg "BI-FY20.csv"')
+    'file', type=argparse.FileType('r'), help='IMAP file (JSON or CSV), eg "BI-FY20.csv"')
 args = parser.parse_args()
 
 # Pre-process input parameters

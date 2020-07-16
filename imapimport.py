@@ -44,6 +44,30 @@ ocl_env_url = args.env if args.env else args.envurl
 imap_import_filename = args.file.name
 country_org = 'DATIM-MOH-%s-%s' % (args.country_code, args.period)
 country_names = {
+    "BWA": "Botswana", # "BW"
+    "BDI": "Burundi",  # BI
+    "CMR": "Cameroon",  # CM
+    "CIV": "Cote d'Ivoire",  # CI
+    "DEMO": "demo_country",  # DEMO
+    "COD": "Democratic Republic of the Congo",  # CD
+    "SWZ": "Eswatini",  # SZ
+    "ETH": "Ethiopia",  # ET
+    "HTI": "Haiti",  # HT
+    "KEN": "Kenya",  # KE
+    "LSO": "Lesotho",  # LS
+    "MWI": "Malawi",  # MW
+    "MOZ": "Mozambique",  # MZ
+    "NAM": "Namibia",  # NA
+    "NGA": "Nigeria",  # NG
+    "RWA": "Rwanda",  # RW
+    "ZAF": "South Africa",  # ZA
+    "SSD": "South Sudan",  # SS
+    "TZA": "Tanzania",  # TZ
+    "UGA": "Uganda",  # UG
+    "UKR": "Ukraine",  # UA
+    "VNM": "Vietnam",  # VN
+    "ZMB": "Zambia",  # ZM
+    "ZWE": "Zimbabwe",  # ZW
     "BW": "Botswana",
     "BI": "Burundi",
     "CM": "Cameroon",

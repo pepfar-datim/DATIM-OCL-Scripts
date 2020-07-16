@@ -53,7 +53,7 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
             "status_code": response.status_code,
             "message": response.content
             }
-        elif response.status_code==200 and is_json==True:
+        elif (response.status_code==200 or response.status_code==202) and is_json==True:
             output_json = {
                 "status": "Pending",
                 "status_code": 202

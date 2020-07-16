@@ -40,13 +40,24 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
     import_status_url = "%s/manage/bulkimport/?task=%s&result=%s" % (
         ocl_env_url, bulkImportId, import_result_format)
     response = requests.get(import_status_url, headers=ocl_api_headers)
-    #response.raise_for_status()
+    response.raise_for_status() #- see if raise for status can be implemented without conflict
+    # check for if it is JSON or Text - if can't check test if it can be converted to json
+    try:
+        json_object = json.loads(response.content())
+        is_json=True
+    except ValueError as e:
+        is_json=False
     if import_result_format == 'summary':
-        if response.status_code==200:
+        if response.status_code==200 and is_json:
             output_json = {
-            "status": "Success",
+            "status": "Completed",
             "status_code": response.status_code,
-            "message": response.text
+            "message": json_object
+            }
+        elif response.status_code==200 and is_json==False:
+            output_json = {
+                "status": "Pending",
+                "status_code": 202
             }
         else:
             output_json = {

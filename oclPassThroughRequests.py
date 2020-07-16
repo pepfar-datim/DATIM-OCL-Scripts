@@ -33,20 +33,30 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
     import_result_formats = ['report', 'json', 'summary']
     if import_result_format not in import_result_formats:
         import_result_format = 'summary'
-
     ocl_api_headers = {'Content-Type': 'application/json'}
     if ocl_api_token:
         ocl_api_headers['Authorization'] = 'Token ' + ocl_api_token
     import_status_url = "%s/manage/bulkimport/?task=%s&result=%s" % (
         ocl_env_url, bulkImportId, import_result_format)
     response = requests.get(import_status_url, headers=ocl_api_headers)
-    #response.raise_for_status()
+    response.raise_for_status() #- see if raise for status can be implemented without conflict
+    # check for if it is JSON or Text - if can't check test if it can be converted to json
+    is_json = True
+    try:
+        json_object = json.loads(response.content)
+    except ValueError as e:
+        is_json=False
     if import_result_format == 'summary':
-        if response.status_code==200:
+        if response.status_code==200 and is_json==False:
             output_json = {
-            "status": "Success",
+            "status": "Completed",
             "status_code": response.status_code,
-            "message": response.text
+            "message": response.content
+            }
+        elif response.status_code==200 and is_json==True:
+            output_json = {
+                "status": "Pending",
+                "status_code": 202
             }
         else:
             output_json = {
@@ -127,7 +137,7 @@ except Exception as e:
     output_json = {
         "status": "Error",
         "status_code": 500,
-        "message": "Internal Server Error"
+        "message": str(e)
     }
 else:
     output_json = response

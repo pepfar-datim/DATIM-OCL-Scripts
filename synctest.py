@@ -13,5 +13,5 @@ oclapitoken = settings.oclapitoken
 
 # Perform the test and display results
 datim_test = datim.datimsynctest.DatimSyncTest(
-	oclenv=oclenv, oclapitoken=oclapitoken,formats=[datim.datimshow.DatimShow.DATIM_FORMAT_JSON])
+    oclenv=oclenv, oclapitoken=oclapitoken, formats=[datim.datimshow.DatimShow.DATIM_FORMAT_JSON])
 datim_test.test_all()

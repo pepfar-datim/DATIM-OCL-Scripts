@@ -42,7 +42,8 @@ class ImportInProgressError(StandardError):
 @__celery.task(name='import_task')
 def __import_task(script_filename, country_code, period, csv, country_name, test_mode):
     # Calls the specified python import script along with the rest of the args
-    return subprocess.check_output(['pipenv','run', 'python', script_filename, country_code, period, csv, country_name, test_mode])
+    return subprocess.check_output(
+        ['pipenv', 'run', 'python', script_filename, country_code, period, csv, country_name, test_mode])
 
 
 def import_csv(script_filename, country_code, period, csv, country_name, test_mode):

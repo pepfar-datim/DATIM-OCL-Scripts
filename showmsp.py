@@ -29,25 +29,7 @@ Example Usage:
 import argparse
 import datim.datimshow
 import datim.datimshowmsp
-
-
-# Script constants
-SCRIPT_VERSION = '0.1.0'
-OCL_ENVIRONMENTS = {
-    'qa': 'https://api.qa.openconceptlab.org',
-    'staging': 'https://api.staging.openconceptlab.org',
-    'production': 'https://api.openconceptlab.org',
-    'demo': 'https://api.demo.openconceptlab.org',
-}
-
-
-# Argument parser validation functions
-def arg_parser_ocl_environment(string):
-    """ Arg parser function for processing OCL enviroment setting """
-    if string not in OCL_ENVIRONMENTS:
-        raise argparse.ArgumentTypeError(
-            'Argument "env" must be %s' % ', '.join(OCL_ENVIRONMENTS.keys()))
-    return OCL_ENVIRONMENTS[string]
+import common
 
 
 def arg_parser_data_element_ids(string):
@@ -70,7 +52,7 @@ parser = argparse.ArgumentParser(
     description="Export MSP Data Elements from OCL")
 group_env = parser.add_mutually_exclusive_group(required=True)
 group_env.add_argument('--env', help='Name of the OCL API environment',
-                       type=arg_parser_ocl_environment)
+                       type=common.ocl_environment)
 group_env.add_argument('--envurl', help='URL of the OCL API environment')
 parser.add_argument('--msp-org', help='MSP Organization ID in OCL (default=PEPFAR)', default='PEPFAR')
 parser.add_argument('--msp-source', help='MSP Organization ID in OCL (default=MER)', default='MER')

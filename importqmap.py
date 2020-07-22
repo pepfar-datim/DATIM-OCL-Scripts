@@ -21,36 +21,19 @@ Example Output:
 """
 import json
 import argparse
-import datim.qmap
 import urllib3
+import common
+import datim.qmap
 
 
 # Suppress urllib error due to invalid SSL certificate
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# Script constants
-APP_VERSION = '0.1.0'
-OCL_ENVIRONMENTS = {
-    'qa': 'https://api.qa.openconceptlab.org',
-    'staging': 'https://api.staging.openconceptlab.org',
-    'production': 'https://api.openconceptlab.org',
-    'demo': 'https://api.demo.openconceptlab.org',
-}
-
-
-# Argument parser validation functions
-def ocl_environment(string):
-    if string not in OCL_ENVIRONMENTS:
-        raise argparse.ArgumentTypeError('Argument "env" must be %s' % (
-            ', '.join(OCL_ENVIRONMENTS.keys())))
-    return OCL_ENVIRONMENTS[string]
-
-
 # Script argument parser
 parser = argparse.ArgumentParser("qmap", description="Import a QMAP into OCL")
 parser.add_argument('-d', '--domain', help='ID of the QMAP domain', required=True)
 group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('--env', help='Name of the OCL API environment', type=ocl_environment)
+group.add_argument('--env', help='Name of the OCL API environment', type=common.ocl_environment)
 group.add_argument('--envurl', help='URL of the OCL API environment')
 parser.add_argument('-t', '--token', help='OCL API token', required=True)
 parser.add_argument(
@@ -58,7 +41,7 @@ parser.add_argument(
 parser.add_argument('--testmode', action="store_true", help='Enable test mode', default=False)
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
-parser.add_argument('--version', action='version', version='%(prog)s v' + APP_VERSION)
+parser.add_argument('--version', action='version', version='%(prog)s v' + common.APP_VERSION)
 parser.add_argument(
     '--qmap-api-root', help="API root for PLM QMAP mediators, eg https://test.ohie.datim.org:5000/")
 parser.add_argument(

@@ -2,34 +2,19 @@
 Script to retrieve BulkImport status from OCL and return as JSON.
 Designed to work with PEPFAR IMAP and QMAP resources.
 
-python bulkImportStatus.py --env=staging -t="my-api-token-here"
-    --bulkImportId=d6ac3dd2-e565-455c-b29a-f7d859fd1fe8-datim-admin
+python bulkImportStatus.py --env=staging -t=[my-ocl-api-token]
+    --bulkImportId=[bulk-import-task-id]
 """
-import requests
-import json
 import argparse
-
-# Script constants
-APP_VERSION = '0.1.0'
-OCL_ENVIRONMENTS = {
-    'qa': 'https://api.qa.openconceptlab.org',
-    'staging': 'https://api.staging.openconceptlab.org',
-    'production': 'https://api.openconceptlab.org',
-    'demo': 'https://api.demo.openconceptlab.org',
-}
-
-
-# Argument parser validation functions
-def ocl_environment(string):
-    if string not in OCL_ENVIRONMENTS:
-        raise argparse.ArgumentTypeError(
-            'Argument "env" must be %s' % ', '.join(OCL_ENVIRONMENTS.keys()))
-    return OCL_ENVIRONMENTS[string]
+import json
+import requests
+import common
 
 
 # Checks OCL bulk import status
 def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
                              import_result_format=''):
+    """ Retrieves bulk import status from OCL """
     import_result_formats = ['report', 'json', 'summary']
     if import_result_format not in import_result_formats:
         import_result_format = 'summary'
@@ -47,13 +32,13 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
 # Configure
 parser = argparse.ArgumentParser("bulkImportStatus", description="Get Bulk Import Status from OCL")
 group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('--env', help='Name of the OCL API environment', type=ocl_environment)
+group.add_argument('--env', help='Name of the OCL API environment', type=common.ocl_environment)
 group.add_argument('--envurl', help='URL of the OCL API environment')
 parser.add_argument('--bulkImportId', help='Bulk Import Status ID', required=True)
 parser.add_argument('-t', '--token', help='OCL API token', required=True)
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
-parser.add_argument('--version', action='version', version='%(prog)s v' + APP_VERSION)
+parser.add_argument('--version', action='version', version='%(prog)s v' + common.APP_VERSION)
 parser.add_argument(
     '--format', help='Format of bulk import results to return from OCL', default="summary")
 parser.add_argument(

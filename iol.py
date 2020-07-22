@@ -3,6 +3,7 @@ Shared methods for performing ETL on DATIM metadata
 """
 
 def get_as_csv(rows, start_columns=None, exclude_columns=None, include_extras=True):
+    """ Returm as CSV """
     if not rows:
         return ''
     csv_columns = rows[0].keys()

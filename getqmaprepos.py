@@ -24,41 +24,26 @@ Arguments:
   --version             show program's version number and exit
 """
 import json
-import requests
 import argparse
+import requests
 import iol
-
-
-# Script constants
-APP_VERSION = '0.1.0'
-OCL_ENVIRONMENTS = {
-    'qa': 'https://api.qa.openconceptlab.org',
-    'staging': 'https://api.staging.openconceptlab.org',
-    'production': 'https://api.openconceptlab.org',
-    'demo': 'https://api.demo.openconceptlab.org',
-}
-
-
-# Argument parser validation functions
-def ocl_environment(string):
-    if string not in OCL_ENVIRONMENTS:
-        raise argparse.ArgumentTypeError(
-            'Argument "env" must be %s' % ', '.join(OCL_ENVIRONMENTS.keys()))
-    return OCL_ENVIRONMENTS[string]
+import common
 
 
 # Script argument parser
 parser = argparse.ArgumentParser("qmap-repos", description="Get QMAP domains and repos from OCL")
 parser.add_argument('-d', '--domain', help='QMAP domain ID, eg "mAtches"', required=False)
 group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('--env', help='Name of the OCL API environment: production, staging, demo, qa', type=ocl_environment)
+group.add_argument(
+    '--env', help='Name of the OCL API environment: production, staging, demo, qa',
+    type=common.ocl_environment)
 group.add_argument('--envurl', help='URL of the OCL API environment')
 parser.add_argument('-t', '--token', help='OCL API token', required=False)
 parser.add_argument(
     '--format', help='Format of bulk import results to return from OCL', default="text")
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
-parser.add_argument('--version', action='version', version='%(prog)s v' + APP_VERSION)
+parser.add_argument('--version', action='version', version='%(prog)s v' + common.APP_VERSION)
 args = parser.parse_args()
 ocl_env_url = args.env if args.env else args.env_url
 
@@ -68,8 +53,7 @@ if args.verbosity > 1:
 
 
 def get_qmap_domains(ocl_env_url, ocl_api_token, verbose=False):
-    # Retreive list of all orgs from OCL
-    # TODO: Implement OCL's custom attribute API filter when supported
+    """ Retreive list of all orgs from OCL """
     ocl_api_headers = {'Content-Type': 'application/json'}
     if ocl_api_token:
         ocl_api_headers['Authorization'] = 'Token ' + ocl_api_token
@@ -82,7 +66,7 @@ def get_qmap_domains(ocl_env_url, ocl_api_token, verbose=False):
 
 
 def get_qmap_sources(ocl_env_url, ocl_api_token, qmap_domain, verbose=False):
-    # Verify that org is a qmap domain
+    """ Verify that org is a qmap domain """
     ocl_api_headers = {'Content-Type': 'application/json'}
     if ocl_api_token:
         ocl_api_headers['Authorization'] = 'Token ' + ocl_api_token
@@ -93,13 +77,14 @@ def get_qmap_sources(ocl_env_url, ocl_api_token, qmap_domain, verbose=False):
     response.raise_for_status()
     ocl_org_qmap_domain = response.json()
     if ('extras' in ocl_org_qmap_domain and ocl_org_qmap_domain['extras'] and
-            'qmap_org' in ocl_org_qmap_domain['extras'] and ocl_org_qmap_domain['extras']['qmap_org']):
+            'qmap_org' in ocl_org_qmap_domain['extras'] and
+            ocl_org_qmap_domain['extras']['qmap_org']):
         pass
     else:
         raise Exception('OCL organization "%s" is not a QMAP domain' % qmap_domain)
 
     # Retreive list of sources for the specified org
-    # TODO: Implement OCL's custom attribute API filter when supported
+    # NOTE: Assumes all sources in a QMAP org are valid
     url_qmap_sources = '%s/orgs/%s/sources/?limit=0&verbose=true' % (ocl_env_url, qmap_domain)
     response = requests.get(url_qmap_sources, headers=ocl_api_headers)
     if verbose:
@@ -110,7 +95,9 @@ def get_qmap_sources(ocl_env_url, ocl_api_token, qmap_domain, verbose=False):
     # Filter sources based on custom attributes and specified filters
     filtered_qmap_sources = []
     for ocl_source in ocl_qmap_sources:
-        if 'extras' in ocl_source and ocl_source['extras'] and 'qmap_version' in ocl_source['extras'] and ocl_source['extras']['qmap_version']:
+        if ('extras' in ocl_source and ocl_source['extras'] and
+                'qmap_version' in ocl_source['extras'] and
+                ocl_source['extras']['qmap_version']):
             filtered_qmap_sources.append(ocl_source)
     return filtered_qmap_sources
 
@@ -135,17 +122,26 @@ if result_type == 'Organization':
             print '%s' % (ocl_org['id'])
     elif output_format == 'csv':
         print iol.get_as_csv(
-            filtered_results, start_columns=['id','name'],
+            filtered_results, start_columns=['id', 'name'],
             exclude_columns=['members_url', 'collections_url', 'sources_url', 'uuid', 'members'])
     else:
         print json.dumps(filtered_results)
 elif result_type == 'Source':
     if output_format == 'text':
         for ocl_source in filtered_results:
-            print '%s: %s %s (%s)' % (ocl_source['id'], ocl_source['name'], ocl_source['extras']['questionnaireuid'], ocl_source['extras']['qmap_version'])
+            print '%s: %s %s (%s)' % (ocl_source['id'], ocl_source['name'],
+                                      ocl_source['extras']['questionnaireuid'],
+                                      ocl_source['extras']['qmap_version'])
     elif output_format == 'csv':
+        exclude_columns = [
+            'versions_url',
+            'uuid',
+            'mappings_url',
+            'concepts_url',
+            'custom_validation_schema',
+            'owner_type']
         print iol.get_as_csv(
             filtered_results, start_columns=['id', 'owner', 'full_name'],
-            exclude_columns=['versions_url', 'uuid', 'mappings_url', 'concepts_url', 'custom_validation_schema', 'owne_type'])
+            exclude_columns=exclude_columns)
     else:
         print json.dumps(filtered_results)

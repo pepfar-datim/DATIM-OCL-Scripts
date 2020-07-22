@@ -1,3 +1,5 @@
+""" ocl_datim constants for celery """
+
 ENV_CELERY_CONFIG = 'celery_config'
 
 TASK_ID_KEY = 'id'
@@ -14,4 +16,3 @@ STATUS_CODE_BAD_REQUEST = 400
 STATUS_CODE_CONFLICT = 409
 STATUS_CODE_ERROR = 500
 STATUS_CODE_NOT_FOUND = 404
-

@@ -5,31 +5,16 @@ Designed to work with PEPFAR IMAP and QMAP resources.
 python bulkImportStatus.py --env=staging -t="my-api-token-here"
     --bulkImportId=d6ac3dd2-e565-455c-b29a-f7d859fd1fe8-datim-admin
 """
-import requests
 import json
 import argparse
-
-# Script constants
-APP_VERSION = '0.1.0'
-OCL_ENVIRONMENTS = {
-    'qa': 'https://api.qa.openconceptlab.org',
-    'staging': 'https://api.staging.openconceptlab.org',
-    'production': 'https://api.openconceptlab.org',
-    'demo': 'https://api.demo.openconceptlab.org',
-}
-
-
-# Argument parser validation functions
-def ocl_environment(string):
-    if string not in OCL_ENVIRONMENTS:
-        raise argparse.ArgumentTypeError(
-            'Argument "env" must be %s' % ', '.join(OCL_ENVIRONMENTS.keys()))
-    return OCL_ENVIRONMENTS[string]
+import requests
+import common
 
 
 # Checks OCL bulk import status
 def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
                              import_result_format=''):
+    """ Return bulk import status ID """
     import_result_formats = ['report', 'json', 'summary']
     if import_result_format not in import_result_formats:
         import_result_format = 'summary'
@@ -45,29 +30,27 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
     try:
         json_object = json.loads(response.content)
     except ValueError as e:
-        is_json=False
+        is_json = False
     if import_result_format == 'summary':
-        if response.status_code==200 and is_json==False:
+        if response.status_code == 200 and is_json == False:
             output_json = {
-            "status": "Completed",
-            "status_code": response.status_code,
-            "message": response.content
-            }
-        elif (response.status_code==200 or response.status_code==202) and is_json==True:
+                "status": "Completed",
+                "status_code": response.status_code,
+                "message": response.content}
+        elif (response.status_code == 200 or response.status_code == 202) and is_json == True:
             output_json = {
                 "status": "Pending",
-                "status_code": 202
-            }
+                "status_code": 202}
         else:
             output_json = {
                 "status": "Failure",
                 "status_code": response.status_code,
-                "message": response.text
-            }
+                "message": response.text}
     return json.dumps(output_json)
 
-# get QMAP domain details
+
 def getQMAPDomainDetails(ocl_env_url='', domain=''):
+    """ get QMAP domain details """
     ocl_api_headers = {'Content-Type': 'application/json'}
     qmapDetailsURL = "%s/orgs/%s" % (
         ocl_env_url, domain)
@@ -75,8 +58,9 @@ def getQMAPDomainDetails(ocl_env_url='', domain=''):
     response.raise_for_status()
     return response.text
 
-# get MOH Codelist details
+
 def getMOHCodeLists(ocl_env_url=''):
+    """ get MOH Codelist details """
     ocl_api_headers = {'Content-Type': 'application/json'}
     mohCodelistsDetailsURL = '%s/orgs/PEPFAR-Test7/collections/?collectionType="Code+List"' % (
         ocl_env_url)
@@ -84,8 +68,9 @@ def getMOHCodeLists(ocl_env_url=''):
     response.raise_for_status()
     return response.text
 
-# get MOH Sources details
+
 def getMOHSources(ocl_env_url=''):
+    """ get MOH Sources details """
     ocl_api_headers = {'Content-Type': 'application/json'}
     mohCodelistsDetailsURL = '%s/orgs/PEPFAR/sources/?extras__datim_moh_codelist=true&verbose=true' % (
         ocl_env_url)
@@ -97,13 +82,13 @@ def getMOHSources(ocl_env_url=''):
 # Configure
 parser = argparse.ArgumentParser("bulkImportStatus", description="Get Bulk Import Status from OCL")
 group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('--env', help='Name of the OCL API environment', type=ocl_environment)
+group.add_argument('--env', help='Name of the OCL API environment', type=common.ocl_environment)
 group.add_argument('--envurl', help='URL of the OCL API environment')
 parser.add_argument('--bulkImportId', help='Bulk Import Status ID', required=False)
 parser.add_argument('-t', '--token', help='OCL API token', required=False)
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
-parser.add_argument('--version', action='version', version='%(prog)s v' + APP_VERSION)
+parser.add_argument('--version', action='version', version='%(prog)s v' + common.APP_VERSION)
 parser.add_argument(
     '--format', help='Format of bulk import results to return from OCL', default="summary")
 parser.add_argument(
@@ -121,24 +106,23 @@ if args.verbosity > 1:
 
 response = ''
 try:
-    if (args.requestType=="bulkImportStatus"):
+    if args.requestType == "bulkImportStatus":
         if not args.format:
-            args.format="json"
+            args.format = "json"
         response = check_bulk_import_status(
             bulkImportId=args.bulkImportId, ocl_env_url=ocl_env_url,
             ocl_api_token=args.token, import_result_format=args.format.upper())
-    if (args.requestType=="qmapDetails"):
+    if args.requestType == "qmapDetails":
         response = getQMAPDomainDetails(ocl_env_url=ocl_env_url, domain=args.domain)
-    if (args.requestType=="mohCodeLists"):
+    if args.requestType == "mohCodeLists":
         response = getMOHCodeLists(ocl_env_url=ocl_env_url)
-    if (args.requestType=="mohSources"):
+    if args.requestType == "mohSources":
         response = getMOHSources(ocl_env_url=ocl_env_url)
 except Exception as e:
     output_json = {
         "status": "Error",
         "status_code": 500,
-        "message": str(e)
-    }
+        "message": str(e)}
 else:
     output_json = response
 

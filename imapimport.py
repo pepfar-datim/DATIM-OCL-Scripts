@@ -21,7 +21,7 @@ import common
 
 # Script argument parser
 parser = argparse.ArgumentParser("imap-import", description="Import IMAP into OCL")
-parser.add_argument('-c', '--country_code', help='Country code, eg "BI" or "UG"', required=True)
+parser.add_argument('-c', '--country_code', help='Country code, eg "ETH", "KEN"', required=True)
 parser.add_argument('--country_name', help='Country name, eg Burundi', required=False, default='')
 parser.add_argument('-p', '--period', help='Period, eg "FY19" or "FY20"', required=True)
 group = parser.add_mutually_exclusive_group(required=True)

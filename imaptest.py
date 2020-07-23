@@ -1,3 +1,4 @@
+""" Script to run a set of tests """
 import requests
 import settings
 import datim.datimimap

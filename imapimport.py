@@ -41,7 +41,6 @@ args = parser.parse_args()
 
 # Pre-process input parameters
 ocl_env_url = args.env if args.env else args.envurl
-imap_import_filename = args.file.name
 country_org = 'DATIM-MOH-%s-%s' % (args.country_code, args.period)
 country_names = {
     "BWA": "Botswana", # "BW"
@@ -104,16 +103,16 @@ if args.verbosity:
     print 'INFO: Pre-processed arguments:'
     print '  country_name =', country_name
     print '  country_org =', country_org
-    print '  import_filename =', imap_import_filename
+    print '  import_filename =', args.file.name
 
 # Load IMAP from import file
 imap_input = datim.datimimap.DatimImapFactory.load_imap_from_file(
-    imap_filename=imap_import_filename, period=args.period,
+    imap_filename=args.file.name, period=args.period,
     country_org=country_org, country_name=country_name, country_code=args.country_code)
 if args.verbosity and imap_input:
-    print 'INFO: IMAP import file "%s" loaded successfully' % imap_import_filename
+    print 'INFO: IMAP import file "%s" loaded successfully' % args.file.name
 elif not imap_input:
-    print 'ERROR: Unable to load IMAP import file "%s"' % imap_import_filename
+    print 'ERROR: Unable to load IMAP import file "%s"' % args.file.name
     exit(1)
 
 # Process the IMAP import

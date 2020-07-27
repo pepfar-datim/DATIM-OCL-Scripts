@@ -186,7 +186,25 @@ class DatimConstants(object):
         }
     }
 
-    # MOH DHIS2 Queries
+    # MOH Alignment Codelist Queries
+    # test.geoalign.datim.org defines one dataset per MOH Alignment codelist:
+    #   FY18: sfk9cyQSUyi
+    #   FY19: OBhi1PUW3OL
+    #   FY20: QSodwF4YG9a
+    # These can be retrieved by querying an SqlView:
+    #
+    #   https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?
+    #       var=dataSets:{{dataSetId}}
+    #
+    # You can also retrieve the list of data elements and their disags:
+    #
+    #   https://test.geoalign.datim.org/api/dataElements.json?fields=id,code,name,shortName,
+    #       lastUpdated,description,categoryCombo[id,code,name,lastUpdated,created,
+    #       categoryOptionCombos[id,code,name,lastUpdated,created]],
+    #       dataSetElements[*,dataSet[id,name,shortName]]&paging=false&
+    #       filter=dataSetElements.dataSet.id:in:[{{dataSetId}}]
+
+    # MOH-FY17 DHIS2 Queries
     MOH_DHIS2_QUERIES = {
         'MOH': {
             'id': 'MOH',
@@ -200,7 +218,7 @@ class DatimConstants(object):
         }
     }
 
-    # MOH-FY18 DHIS2 Queries - these are the FY18 PEPFAR gold standard data elements & disags that countries map to
+    # MOH-FY18 DHIS2 Queries
     MOH_FY18_DHIS2_QUERIES = {
         'MOH-FY18': {
             'id': 'MOH-FY18',
@@ -214,9 +232,7 @@ class DatimConstants(object):
         }
     }
 
-    # MOH-FY19 DHIS2 Queries - these are the FY19 PEPFAR gold standard data elements & disags that countries map to
-    # https://vshioshvili.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:OBhi1PUW3OL
-    # https://vshioshvili.datim.org/api/dataElements.json?fields=id,code,name,shortName,lastUpdated,description,categoryCombo[id,code,name,lastUpdated,created,categoryOptionCombos[id,code,name,lastUpdated,created]],dataSetElements[*,dataSet[id,name,shortName]]&paging=false&filter=dataSetElements.dataSet.id:in:[OBhi1PUW3OL]
+    # MOH-FY19 DHIS2 Queries
     MOH_FY19_DHIS2_QUERIES = {
         'MOH-FY19': {
             'id': 'MOH-FY19',
@@ -230,9 +246,7 @@ class DatimConstants(object):
         }
     }
 
-    # MOH-FY20 DHIS2 Queries - these are the FY20 PEPFAR gold standard data elements & disags that countries map to
-    # https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:QSodwF4YG9a
-    # https://test.geoalign.datim.org/api/dataElements.json?fields=id,code,name,shortName,lastUpdated,description,categoryCombo[id,code,name,lastUpdated,created,categoryOptionCombos[id,code,name,lastUpdated,created]],dataSetElements[*,dataSet[id,name,shortName]]&paging=false&filter=dataSetElements.dataSet.id:in:[QSodwF4YG9a]
+    # MOH-FY20 DHIS2 Queries
     MOH_FY20_DHIS2_QUERIES = {
         'MOH-FY20': {
             'id': 'MOH-FY20',

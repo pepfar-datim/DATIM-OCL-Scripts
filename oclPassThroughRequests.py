@@ -59,18 +59,18 @@ def getQMAPDomainDetails(ocl_env_url='', domain=''):
     return response.text
 
 
-def getMOHCodeLists(ocl_env_url=''):
-    """ get MOH Codelist details """
+def getDATIMCodeLists(ocl_env_url=''):
+    """ get DATIM Codelist details """
     ocl_api_headers = {'Content-Type': 'application/json'}
-    mohCodelistsDetailsURL = '%s/orgs/PEPFAR-Test7/collections/?collectionType="Code+List"' % (
+    datimCodelistsDetailsURL = '%s/orgs/PEPFAR-Test7/collections/?collectionType="Code+List"' % (
         ocl_env_url)
-    response = requests.get(mohCodelistsDetailsURL, headers=ocl_api_headers)
+    response = requests.get(datimCodelistsDetailsURL, headers=ocl_api_headers)
     response.raise_for_status()
     return response.text
 
 
-def getMOHSources(ocl_env_url=''):
-    """ get MOH Sources details """
+def getMOHCodelists(ocl_env_url=''):
+    """ get MOH Codelists details """
     ocl_api_headers = {'Content-Type': 'application/json'}
     mohCodelistsDetailsURL = '%s/orgs/PEPFAR/sources/?extras__datim_moh_codelist=true&verbose=true' % (
         ocl_env_url)
@@ -114,10 +114,10 @@ try:
             ocl_api_token=args.token, import_result_format=args.format.upper())
     if args.requestType == "qmapDetails":
         response = getQMAPDomainDetails(ocl_env_url=ocl_env_url, domain=args.domain)
-    if args.requestType == "mohCodeLists":
-        response = getMOHCodeLists(ocl_env_url=ocl_env_url)
-    if args.requestType == "mohSources":
-        response = getMOHSources(ocl_env_url=ocl_env_url)
+    if args.requestType == "datimCodeLists":
+        response = getDATIMCodeLists(ocl_env_url=ocl_env_url)
+    if args.requestType == "mohCodelists":
+        response = getMOHCodelists(ocl_env_url=ocl_env_url)
 except Exception as e:
     output_json = {
         "status": "Error",

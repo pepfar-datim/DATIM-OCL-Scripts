@@ -114,7 +114,7 @@ try:
             ocl_api_token=args.token, import_result_format=args.format.upper())
     if args.requestType == "qmapDetails":
         response = getQMAPDomainDetails(ocl_env_url=ocl_env_url, domain=args.domain)
-    if args.requestType == "datimCodeLists":
+    if args.requestType == "datimCodelists":
         response = getDATIMCodeLists(ocl_env_url=ocl_env_url)
     if args.requestType == "mohCodelists":
         response = getMOHCodelists(ocl_env_url=ocl_env_url)

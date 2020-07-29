@@ -116,7 +116,12 @@ elif not imap_input:
     exit(1)
 
 # Process the IMAP import
-output_json = None
+output_json = {
+    "country_org": country_org,
+    "country_code": args.country_code,
+    "country_name": country_name,
+    "period": args.period
+}
 try:
     imap_import = datim.datimimapimport.DatimImapImport(
         oclenv=ocl_env_url, oclapitoken=args.token, verbosity=args.verbosity,
@@ -124,20 +129,19 @@ try:
         country_public_access=args.public_access)
     bulk_import_task_id = imap_import.import_imap(imap_input=imap_input)
 except Exception as err:
-    output_json = {
-        "status": "Error",
-        "message": str(err)
-    }
+    output_json["status"] = "Error"
+    output_json["message"] = str(err)
 else:
+    if args.test_mode:
+        output_json["status"] = "Test"
     if bulk_import_task_id:
-        output_json = {
-            "status": "Success",
-            "message": ("IMAP successfully queued for bulk import into OCL. Request IMAP export "
-                        "after bulk import is processed or request import status."),
-            "ocl_bulk_import_task_id": bulk_import_task_id,
-            "ocl_bulk_import_status_url": "%s/manage/bulkimport?task=%s" % (
-                ocl_env_url, bulk_import_task_id),
-        }
+        output_json["status"] = "Success"
+        output_json["message"] = ("IMAP successfully queued for bulk import into OCL. "
+                                  "Request IMAP export after bulk import is processed "
+                                  "or request import status.")
+        output_json["ocl_bulk_import_task_id"] = bulk_import_task_id
+        output_json["ocl_bulk_import_status_url"] = "%s/manage/bulkimport?task=%s" % (
+            ocl_env_url, bulk_import_task_id)
         if args.imap_api_root:
             # https://test.ohie.datim.org:5000/ocl-imap/:countryCode/:period/[?format=:format]
             output_json["imap_export_url"] = '%socl-imap/%s/%s/' % (

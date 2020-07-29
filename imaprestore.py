@@ -81,7 +81,9 @@ for imap_backup in imap_backups:
         output_json["status"] = "Error"
         output_json["message"] = str(err)
     else:
-        if bulk_import_task_id:
+        if args.test_mode:
+            output_json["status"] = "Test"
+        elif bulk_import_task_id:
             output_json["status"] = "Success"
             output_json["message"] = ("IMAP successfully queued for bulk import into OCL. "
                                       "Request IMAP export after bulk import is processed "

@@ -1,5 +1,33 @@
 """
-Script to retrieve a backup of all matching IMAPs
+Script to retrieve a backup of all matching IMAPs in an OCL environment.
+
+This command will return a JSON backup of all IMAPs in OCL staging:
+
+    python imapbackup.py --env=staging
+
+It can be filtered in the same way that getimaporgs.py can, so these will get a filtered backup:
+
+python imapbackup.py --env=staging -pFY19
+python imapbackup.py --env=staging -cDEMO
+
+`format` is ignored if verbosity is turned off, so these are all identical:
+
+    python imapbackup.py --env=staging
+    python imapbackup.py --env=staging -fjson
+    python imapbackup.py --env=staging -fcsv
+
+However, if verbosity is turned on, then you can output the IMAPs in any available format all in one go:
+# Displays all IMAPs in default format (CSV), including a header for each one
+
+    python imapbackup.py --env=staging -v1
+
+# Displays all IMAPs as JSON, including a header for each one
+
+    python imapbackup.py --env=staging -v1 -fjson
+
+# Displays all IMAPs as CSV, including a header and ALL DEBUG OUTPUT for each one
+
+    python imapbackup.py --env=staging -v2 -fcsv
 """
 import sys
 import json
@@ -10,7 +38,7 @@ import datim.datimimapexport
 
 
 # Script argument parser
-parser = argparse.ArgumentParser("imap-orgs", description="Backup IMAPs in OCL environment")
+parser = argparse.ArgumentParser("imap-backup", description="Backup IMAPs in OCL environment")
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument(
     '--env', help='Name of the OCL API environment: production, staging, demo, qa',
@@ -55,7 +83,7 @@ imap_backups = []
 imap_export = datim.datimimapexport.DatimImapExport(
     oclenv=ocl_env_url, oclapitoken=args.token, verbosity=imap_export_verbosity)
 for org in ocl_imap_orgs:
-    # Print debug info
+    # Print debug info for the current IMAP org
     if args.verbosity:
         print '\n\n' + '*' * 100
         print '** [EXPORT] Org: %s, Country Code: %s, Country Name: %s, Format: %s, Period: %s, Exclude Empty Maps: %s, Verbosity: %s' % (
@@ -69,12 +97,18 @@ for org in ocl_imap_orgs:
             period=org['extras']['datim_moh_period'], country_org=org['id'],
             country_code=org['extras']['datim_moh_country_code'])
     except (requests.exceptions.HTTPError, Exception) as e:
-        output = {
+        imap_error = {
+            'country_org': org['id'],
+            'country_code': org['extras'].get('datim_moh_country_code'),
+            'country_name': org.get('location'),
+            'period': org['extras'].get('datim_moh_period'),
             'status': 'Error',
-            'message': str(e)
+            'message': str(e),
+            'imap': None
         }
-        print json.dumps(output)
-        sys.exit(1)
+        if args.verbosity:
+            print json.dumps(imap_error)
+        imap_backups.append(imap_error)
     else:
         if args.verbosity:
             imap.display(fmt=args.format, sort=True, exclude_empty_maps=args.exclude_empty_maps,
@@ -84,6 +118,7 @@ for org in ocl_imap_orgs:
             'country_code': org['extras'].get('datim_moh_country_code'),
             'country_name': org.get('location'),
             'period': org['extras'].get('datim_moh_period'),
+            'status': 'Success',
             'imap': imap.get_imap_data(
                 sort=True,
                 exclude_empty_maps=args.exclude_empty_maps,

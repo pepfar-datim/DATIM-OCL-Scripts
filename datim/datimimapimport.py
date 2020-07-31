@@ -126,7 +126,8 @@ class DatimImapImport(datimbase.DatimBase):
             self.vlog(1, 'Bulk importing %s resources to OCL...' % len(import_list))
             # TODO: Implement better OclBulkImporter response -- a new class OclBulkImportResponse?
             bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
-                input_list=import_list, api_token=self.oclapitoken, api_url_root=self.oclenv)
+                input_list=import_list, api_token=self.oclapitoken, api_url_root=self.oclenv,
+                queue=imap_input.country_org)
             bulk_import_response.raise_for_status()
             task_id = bulk_import_response.json()['task']
             self.vlog(1, 'BULK IMPORT TASK ID: %s' % task_id)

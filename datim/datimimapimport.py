@@ -24,6 +24,11 @@ import ocldev.oclresourcelist
 import utils.timer
 
 
+class ImapCountryLockedForPeriodError(Exception):
+    """ ImapCountryLockedForPeriodError """
+    pass
+
+
 class DatimImapImport(datimbase.DatimBase):
     """
     Class to import DATIM country indicator mapping metadata into OCL.
@@ -62,10 +67,22 @@ class DatimImapImport(datimbase.DatimBase):
             self.vlog(1, msg)
             raise Exception(msg)
 
-        # STEP 1 of 4: Download PEPFAR/DATIM-MOH-FY## export for specified period from OCL
+        # STEP 1 of 5: Make sure an import for same country+period is not underway
         imap_timer = utils.timer.Timer()
         imap_timer.start()
-        self.vlog(1, '**** STEP 1 of 4: Download PEPFAR/DATIM-MOH-FY## export for specified period')
+        self.vlog(1, '**** STEP 1 of 5: Make sure an import for same country+period is not underway')
+        status_filter = ['PENDING', 'STARTED']
+        queued_imports = ocldev.oclfleximporter.OclBulkImporter.get_queued_imports(
+            api_url_root=self.oclenv, api_token=self.oclapitoken, queue=imap_input.country_org,
+            status_filter=status_filter)
+        if queued_imports:
+            err_msg = 'IMAP import is already underway for same country and period: %s' % (
+                imap_input.country_org)
+            raise ImapCountryLockedForPeriodError(err_msg)
+        imap_timer.lap(label='STEP 1: Make sure an import for same country+period is not underway')
+
+        # STEP 2 of 5: Download PEPFAR/DATIM-MOH-FY## export for specified period from OCL
+        self.vlog(1, '**** STEP 2 of 5: Download PEPFAR/DATIM-MOH-FY## export for specified period')
         self.datim_moh_source_id = datimbase.DatimBase.get_datim_moh_source_id(imap_input.period)
         datim_source_endpoint = datimbase.DatimBase.get_datim_moh_source_endpoint(imap_input.period)
         datim_source_version = self.get_latest_version_for_period(
@@ -81,12 +98,12 @@ class DatimImapImport(datimbase.DatimBase):
             repo_version_url='%s%s/%s/' % (
                 self.oclenv, datim_source_endpoint, datim_source_version),
             oclapitoken=self.oclapitoken)
-        imap_timer.lap(label='STEP 1: Download DATIM-MOH-FYxx Export')
+        imap_timer.lap(label='STEP 3: Download DATIM-MOH-FYxx Export')
 
-        # STEP 2 of 4: Validate input country mapping CSV file
+        # STEP 3 of 5: Validate input country mapping CSV file
         # NOTE: This currently just verifies that the correct columns exist (order agnostic)
         # TODO: Validate that DATIM indicator/disag IDs in the provided IMAP are valid
-        self.vlog(1, '**** STEP 2 of 4: Validate country IMAP input file')
+        self.vlog(1, '**** STEP 3 of 5: Validate country IMAP input file')
         if self.verbosity:
             imap_input.display(exclude_empty_maps=True, auto_fix_null_disag=True)
         is_valid = imap_input.is_valid(datim_moh_source_export=datim_moh_source_export)
@@ -95,10 +112,10 @@ class DatimImapImport(datimbase.DatimBase):
                       is_valid)
         else:
             self.vlog(1, 'The provided IMAP passed validation')
-        imap_timer.lap(label='STEP 2: Validate country IMAP input file')
+        imap_timer.lap(label='STEP 3: Validate country IMAP input file')
 
-        # STEP 3 of 4: Generate IMAP import script
-        self.vlog(1, '**** STEP 3 of 4: Generate IMAP import script')
+        # STEP 4 of 5: Generate IMAP import script
+        self.vlog(1, '**** STEP 4 of 5: Generate IMAP import script')
         import_list = ocldev.oclresourcelist.OclJsonResourceList()
         does_imap_org_exist = datimimap.DatimImapFactory.check_if_imap_org(
             org_id=imap_input.country_org, ocl_env_url=self.oclenv,
@@ -117,11 +134,11 @@ class DatimImapImport(datimbase.DatimBase):
         if self.verbosity >= 2:
             for resource in import_list:
                 print json.dumps(resource)
-        imap_timer.lap(label='STEP 3: Generate IMAP import script')
+        imap_timer.lap(label='STEP 4: Generate IMAP import script')
 
-        # STEP 4 of 4: Bulk import into OCL
+        # STEP 5 of 5: Bulk import into OCL
         # NOTE: Everything is non-destructive up to this point. Changes are committed to OCL here.
-        self.vlog(1, '**** STEP 4 of 4: Bulk import into OCL')
+        self.vlog(1, '**** STEP 5 of 5: Bulk import into OCL')
         if import_list and not self.test_mode:
             self.vlog(1, 'Bulk importing %s resources to OCL...' % len(import_list))
             # TODO: Implement better OclBulkImporter response -- a new class OclBulkImportResponse?

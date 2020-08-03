@@ -14,10 +14,8 @@ Example Usage:
 import sys
 import json
 import argparse
-import requests
 import datim.datimimap
 import datim.datimimapexport
-from import_manager import has_existing_import
 import common
 
 
@@ -48,31 +46,17 @@ parser.add_argument(
 parser.add_argument('--version', action='version', version='%(prog)s v' + common.APP_VERSION)
 args = parser.parse_args()
 ocl_env_url = args.env if args.env else args.env_url
-
-# Display debug output
-if args.verbosity > 1:
-    print args
-
-# Exit if import is already in process
-# TODO: Fix this so that it is automatically skipped if not run in an async environment
-# if has_existing_import(args.country_code):
-#     response = {
-#             'status_code': 409,
-#             'result': 'There is an import already in progress for this country code'
-#         }
-#     print json.dumps(response)
-#     sys.exit(1)
-
-# Pre-process input parameters
 country_org = 'DATIM-MOH-%s-%s' % (args.country_code, args.period)
 
-# Debug output
+# Display debug output
 if args.verbosity:
-    print('\n\n' + '*' * 100)
-    print('** [EXPORT] Country Code: %s, Org: %s, Format: %s, Period: %s, Version: %s, Exclude Empty Maps: %s, Verbosity: %s, OCL Env: %s' % (
+    if args.verbosity > 1:
+        print args
+    print '\n\n' + '*' * 100
+    print '** [EXPORT] Country Code: %s, Org: %s, Format: %s, Period: %s, Version: %s, Exclude Empty Maps: %s, Verbosity: %s, OCL Env: %s' % (
         args.country_code, country_org, args.format, args.period, args.country_version,
-        str(args.exclude_empty_maps), str(args.verbosity)), ocl_env_url)
-    print('*' * 100)
+        str(args.exclude_empty_maps), str(args.verbosity), ocl_env_url)
+    print '*' * 100
 
 # Generate the IMAP export
 datim_imap_export = datim.datimimapexport.DatimImapExport(
@@ -82,10 +66,11 @@ try:
     imap = datim_imap_export.get_imap(
         period=args.period, version=args.country_version, country_org=country_org,
         country_code=args.country_code)
-except (requests.exceptions.HTTPError, Exception) as e:
+except Exception as err:
     output = {
         'status': 'Error',
-        'message': str(e)
+        'type': err.__class__.__name__,
+        'message': str(err)
     }
     print json.dumps(output)
     sys.exit(1)

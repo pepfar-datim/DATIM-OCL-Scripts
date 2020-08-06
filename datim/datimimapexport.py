@@ -20,17 +20,21 @@ period (e.g. FY17). Export follows the format of the country mapping CSV templat
 import json
 import datimbase
 import datimimap
+import datimimapimport
 import datimsyncmohhelper
 import utils.timer
+import ocldev.oclfleximporter
 
 
 class DatimUnknownCountryPeriodError(Exception):
+    """ DatimUnknownCountryPeriodError """
     def __init___(self, message):
         Exception.__init__(self, message)
         self.message = message
 
 
 class DatimUnknownDatimPeriodError(Exception):
+    """ DatimUnknownDatimPeriodError """
     def __init___(self, message):
         Exception.__init__(self, message)
         self.message = message
@@ -44,7 +48,8 @@ class DatimImapExport(datimbase.DatimBase):
     def __init__(self, oclenv='', oclapitoken='', verbosity=0, run_ocl_offline=False):
         """
         Initialize an DatimImapExport object
-        :param oclenv: Base URL for the OCL environment with hanging slash omitted, e.g. https://api.openconceptlab.org
+        :param oclenv: Base URL for the OCL environment with hanging slash omitted,
+            e.g. https://api.openconceptlab.org
         :param oclapitoken: API token of the OCL user account making the export request
         :param verbosity: Verbosity level (0=none, 1=some, 2=tons)
         :param run_ocl_offline:
@@ -110,10 +115,22 @@ class DatimImapExport(datimbase.DatimBase):
             self.vlog(1, msg)
             raise Exception(msg)
 
-        # STEP 1 of 7: Determine the country period, minor version, and repo version ID (e.g. FY18.v0)
+        # STEP 1 of 8: Make sure an import for same country+period is not underway
         imap_timer = utils.timer.Timer()
         imap_timer.start()
-        self.vlog(1, '**** STEP 1 of 7: Determine the country period, minor version, and repo version ID')
+        self.vlog(1, '**** STEP 1 of 8: Make sure an import for same country+period is not underway')
+        status_filter = ['PENDING', 'STARTED']
+        queued_imports = ocldev.oclfleximporter.OclBulkImporter.get_queued_imports(
+            api_url_root=self.oclenv, api_token=self.oclapitoken, queue=country_org,
+            status_filter=status_filter)
+        if queued_imports:
+            err_msg = 'Cannot export IMAP because an import is being processed for this country and period: %s' % (
+                country_org)
+            raise datimimapimport.ImapCountryLockedForPeriodError(err_msg)
+        imap_timer.lap(label='STEP 1: Make sure an import for same country+period is not underway')
+
+        # STEP 2 of 8: Determine the country period, minor version, and repo version ID (e.g. FY18.v0)
+        self.vlog(1, '**** STEP 2 of 8: Determine the country period, minor version, and repo version ID')
         country_owner_endpoint = '/orgs/%s/' % country_org  # e.g. /orgs/DATIM-MOH-RW-FY18/
         country_source_endpoint = '%ssources/%s/' % (
             country_owner_endpoint, self.DATIM_MOH_COUNTRY_SOURCE_ID)
@@ -131,16 +148,17 @@ class DatimImapExport(datimbase.DatimBase):
                 raise DatimUnknownCountryPeriodError(msg)
             country_version_id = country_version['id']
             period = datimimap.DatimImapFactory.get_period_from_version_id(country_version_id)
-            country_minor_version = datimimap.DatimImapFactory.get_minor_version_from_version_id(country_version_id)
+            country_minor_version = datimimap.DatimImapFactory.get_minor_version_from_version_id(
+                country_version_id)
         if not period or not country_version_id:
             msg = 'ERROR: No valid and released version found for country org "%s"' % country_org
             self.vlog(1, msg)
             raise DatimUnknownCountryPeriodError(msg)
         self.vlog(1, 'Using version "%s" for country "%s"' % (country_version_id, country_org))
+        imap_timer.lap(label='STEP 2: Parse IMAP export parameters')
 
-        # STEP 2 of 7: Download DATIM-MOH-xx source for specified period (e.g. DATIM-MOH-FY18)
-        imap_timer.lap(label='Step 1')
-        self.vlog(1, '**** STEP 2 of 7: Download DATIM-MOH source for specified period (e.g. DATIM-MOH-FY18)')
+        # STEP 3 of 8: Download DATIM-MOH-xx source for specified period (e.g. DATIM-MOH-FY18)
+        self.vlog(1, '**** STEP 3 of 8: Download DATIM-MOH source for specified period (e.g. DATIM-MOH-FY18)')
         datim_moh_source_id = datimbase.DatimBase.get_datim_moh_source_id(period)
         datim_source_endpoint = datimbase.DatimBase.get_datim_moh_source_endpoint(period)
         datim_source_url = '%s%s' % (self.oclenv, datim_source_endpoint)
@@ -160,10 +178,10 @@ class DatimImapExport(datimbase.DatimBase):
                 zipfilename=datim_source_zip_filename, jsonfilename=datim_source_json_filename)
         else:
             self.does_offline_data_file_exist(datim_source_json_filename, exit_if_missing=True)
+        imap_timer.lap(label='STEP 3: Download DATIM-MOH-xx source')
 
-        # STEP 3 of 7: Pre-process DATIM-MOH indicator+disag structure (before loading country source)
-        imap_timer.lap(label='Step 2')
-        self.vlog(1, '**** STEP 3 of 7: Pre-process DATIM-MOH indicator+disag structure')
+        # STEP 4 of 8: Pre-process DATIM-MOH indicator+disag structure (before loading country source)
+        self.vlog(1, '**** STEP 4 of 8: Pre-process DATIM-MOH indicator+disag structure')
         indicators = {}
         disaggregates = {}
         with open(self.attach_absolute_data_path(datim_source_json_filename), 'rb') as handle_datim_source:
@@ -188,11 +206,11 @@ class DatimImapExport(datimbase.DatimBase):
                 else:
                     self.vlog(1, 'SKIPPING: Unrecognized map type "%s" for mapping: %s' % (
                         mapping['map_type'], str(mapping)))
+        imap_timer.lap(label='STEP 4: Pre-process DATIM-MOH indicator+disag structure')
 
-        # STEP 4 of 7: Download and process country source
+        # STEP 5 of 8: Download and process country source
         # NOTE: This returns the individual country concepts and mappings
-        imap_timer.lap(label='Step 3')
-        self.vlog(1, '**** STEP 4 of 7: Download and process country source')
+        self.vlog(1, '**** STEP 5 of 8: Download and process country source')
         country_source_zip_filename = self.endpoint2filename_ocl_export_zip(country_source_endpoint)
         country_source_json_filename = self.endpoint2filename_ocl_export_json(country_source_endpoint)
         if not self.run_ocl_offline:
@@ -210,21 +228,21 @@ class DatimImapExport(datimbase.DatimBase):
                     country_disaggregates[concept['url']] = concept.copy()
                 elif concept['concept_class'] == self.DATIM_MOH_CONCEPT_CLASS_DE:
                     country_indicators[concept['url']] = concept.copy()
+        imap_timer.lap(label='STEP 5: Download and process country source')
 
-        # STEP 5 of 7: Async download of country indicator+disag collections
+        # STEP 6 of 8: Async download of country indicator+disag collections
         # NOTE: This returns the collections that define how individual concepts/mappings from the country source
         # combine to map country indicator+disag pairs to DATIM indicator+disag pairs
-        imap_timer.lap(label='Step 4')
-        self.vlog(1, '**** STEP 5 of 7: Async download of country indicator+disag mappings')
+        self.vlog(1, '**** STEP 6 of 8: Async download of country indicator+disag mappings')
         country_collections_endpoint = '%scollections/' % country_owner_endpoint
         if self.run_ocl_offline:
             self.vlog(1, 'WARNING: Offline not supported here yet. Taking this ship online!')
         country_collections = self.get_ocl_exports_async(
             endpoint=country_collections_endpoint, period=period, version=country_minor_version)
+        imap_timer.lap(label='STEP 5: Async download of country indicator+disag mappings')
 
-        # STEP 6 of 7: Process one country collection at a time
-        imap_timer.lap(label='Step 5')
-        self.vlog(1, '**** STEP 6 of 7: Process one country collection at a time')
+        # STEP 7 of 8: Process one country collection at a time
+        self.vlog(1, '**** STEP 7 of 8: Process one country collection at a time')
         datim_moh_null_disag_endpoint = datimbase.DatimBase.get_datim_moh_null_disag_endpoint(period)
         for collection_version_export_url, collection_version in country_collections.items():
             collection_id = collection_version['collection']['id']
@@ -281,10 +299,10 @@ class DatimImapExport(datimbase.DatimBase):
                     if (datim_indicator_mapping['from_concept_url'] == datim_indicator_url and
                             datim_indicator_mapping['to_concept_url'] == datim_disaggregate_url):
                         datim_indicator_mapping['operations'] = operations
+        imap_timer.lap(label='STEP 7: Process one country collection at a time')
 
-        # STEP 7 of 7: Convert to tabular format
-        imap_timer.lap(label='Step 6')
-        self.vlog(1, '**** STEP 7 of 7: Convert to tabular format')
+        # STEP 8 of 8: Convert to tabular format
+        self.vlog(1, '**** STEP 8 of 8: Convert to tabular format')
         rows = []
         for indicator_id, indicator in indicators.items():
             for mapping in indicator['mappings']:
@@ -327,30 +345,40 @@ class DatimImapExport(datimbase.DatimBase):
                     rows.append(row_base.copy())
 
         # Stop the timer
-        imap_timer.stop(label='Step 7')
+        imap_timer.stop(label='STEP 8')
 
         # Display debug information
         self.vlog(2, '**** IMAP EXPORT SUMMARY')
         self.vlog(2, '** IMAP export time breakdown:\n', imap_timer)
 
         # Generate and return the IMAP object
-        return datimimap.DatimImap(imap_data=rows, country_code=country_code, country_org=country_org,
-                                   period=period, version=country_version_id)
+        return datimimap.DatimImap(imap_data=rows, country_code=country_code,
+                                   country_org=country_org, period=period,
+                                   version=country_version_id)
 
     @staticmethod
     def get_clean_disag_id(disag_id):
-        return DatimImapExport.remove_prefix_if_exists(disag_id, datimimap.DatimImap.IMAP_MOH_DISAG_ID_PREFIX)
+        """ Cleans a disag ID by removing the "disag-" prefix """
+        return DatimImapExport.remove_prefix_if_exists(
+            disag_id, datimimap.DatimImap.IMAP_MOH_DISAG_ID_PREFIX)
 
     @staticmethod
     def get_clean_indicator_id(disag_id):
-        return DatimImapExport.remove_prefix_if_exists(disag_id, datimimap.DatimImap.IMAP_MOH_DATA_ELEMENT_ID_PREFIX)
+        """ Cleans an indicator ID by removing the "de-" prefix """
+        return DatimImapExport.remove_prefix_if_exists(
+            disag_id, datimimap.DatimImap.IMAP_MOH_DATA_ELEMENT_ID_PREFIX)
 
     @staticmethod
     def remove_prefix_if_exists(original_string, prefix):
+        """ Removes a prefix from a string if present """
         if original_string[:len(prefix)] == prefix:
             return original_string[len(prefix):]
         return original_string
 
     @staticmethod
     def map_type_to_operator(map_type):
+        """
+        Convert OCL Map Type to an IMAP operator
+        If map_type == "ADD OPERATOR" then operator = 'ADD'
+        """
         return map_type.replace(datimimap.DatimImap.IMAP_MOH_MAP_TYPE_OPERATION_POSTFIX, '')

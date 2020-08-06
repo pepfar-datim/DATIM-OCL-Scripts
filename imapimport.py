@@ -131,6 +131,7 @@ try:
 except Exception as err:
     output_json["status"] = "Error"
     output_json["message"] = str(err)
+    output_json['type'] = err.__class__.__name__
 else:
     if args.test_mode:
         output_json["status"] = "Test"

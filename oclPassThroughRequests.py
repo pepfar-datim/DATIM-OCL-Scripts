@@ -62,7 +62,7 @@ def getQMAPDomainDetails(ocl_env_url='', domain=''):
 def getDATIMCodeLists(ocl_env_url=''):
     """ get DATIM Codelist details """
     ocl_api_headers = {'Content-Type': 'application/json'}
-    datimCodelistsDetailsURL = '%s/orgs/PEPFAR-Test7/collections/?collectionType="Code+List"' % (
+    datimCodelistsDetailsURL = '%s/orgs/PEPFAR-Test8/collections/?collectionType="Code+List"&limit=0' % (
         ocl_env_url)
     response = requests.get(datimCodelistsDetailsURL, headers=ocl_api_headers)
     response.raise_for_status()

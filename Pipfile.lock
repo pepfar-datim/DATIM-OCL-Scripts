@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ddd8a8f9f43303335c8288b5963ac9bef6f2688bd4bd1f9891e4d2da2d9f0129"
+            "sha256": "764a190bbb67bc966386f95dbb96e55d8a72f884f69ee3f3f9a00101b511f05a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -323,10 +323,6 @@
             ],
             "index": "pypi",
             "version": "==2.3.5"
-        },
-        "pprint": {
-            "index": "pypi",
-            "version": "==0.1"
         },
         "pylint": {
             "hashes": [

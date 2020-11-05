@@ -684,7 +684,8 @@ class DatimImap(object):
             row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_OWNER_ID],
             row[DatimImap.IMAP_EXTRA_FIELD_MOH_DISAG_SOURCE_ID],
             moh_disag_id)
-        row[DatimImap.IMAP_EXTRA_FIELD_MOH_MAPPING_ID] = 'MAP-MOH-OPERATION-%s-%s' % (
+        row[DatimImap.IMAP_EXTRA_FIELD_MOH_MAPPING_ID] = 'MAP-MOH-%s-%s-%s' % (
+            row[DatimImap.IMAP_EXTRA_FIELD_MOH_MAP_TYPE].replace(' ', '-'),
             row[DatimImap.IMAP_EXTRA_FIELD_MODIFIED_MOH_INDICATOR_ID],
             moh_disag_id)
         row[DatimImap.IMAP_EXTRA_FIELD_MOH_MAPPING_URI] = '/%s/%s/sources/%s/mappings/%s/' % (

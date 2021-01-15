@@ -11,8 +11,6 @@ The import script creates OCL-formatted JSON consisting of:
     One mapping for each PEPFAR indicator+disag pair represented with a "DATIM HAS OPTION" map type
     Country Collections, one per mapping to DATIM indicator+disag pair
     References for each concept and mapping added to each collection
-
-TODO: Exclude "null-disag" update from the import scripts -- this does not have any effect, its just an unnecessary step
 """
 import json
 import datimbase

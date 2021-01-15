@@ -14,13 +14,17 @@ api_token_qa_root = ''
 api_token_qa_datim_admin = ''
 api_token_staging_root = ''
 api_token_staging_datim_admin = ''
+api_token_staging_aws_datim_admin = ''
 api_token_production_root = ''
 api_token_production_datim_admin = ''
 
 # OCL API URL root - no slash at the end
 ocl_api_url_production = 'https://api.openconceptlab.org'
+ocl_api_url_production_aws = 'https://api.aws.openconceptlab.org'
 ocl_api_url_staging = 'https://api.staging.openconceptlab.org'
+ocl_api_url_staging_aws = 'https://api.staging.aws.openconceptlab.org'
 ocl_api_url_qa = 'https://api.qa.openconceptlab.org'
+ocl_api_url_qa_aws = 'https://api.qa.aws.openconceptlab.org'
 
 # IMAP Mediator URL roots - no slash at the end
 imap_mediator_url_test = 'https://test.ohie.datim.org:5000'
@@ -31,19 +35,19 @@ import_file_path = ''
 
 # DATIM DHIS2 Credentials for different environments
 dhis2env_devde = 'https://dev-de.datim.org'
-dhis2uid_devde = 'system_ocl_metadata_sync'
+dhis2uid_devde = ''
 dhis2pwd_devde = ''
 dhis2env_triage = 'https://triage.datim.org'
 dhis2uid_triage = ''
 dhis2pwd_triage = ''
 dhis2env_data = 'https://data.datim.org'
-dhis2uid_data = 'system_ocl_metadata_sync'
+dhis2uid_data = ''
 dhis2pwd_data = ''
 dhis2env_testgeoalign = 'https://test.geoalign.datim.org'
-dhis2uid_testgeoalign = 'system_ocl_metadata_sync'
+dhis2uid_testgeoalign = ''
 dhis2pwd_testgeoalign = ''
 dhis2env_geoalign = 'https://geoalign.datim.org'
-dhis2uid_geoalign = 'system_ocl_metadata_sync'
+dhis2uid_geoalign = ''
 dhis2pwd_geoalign = ''
 
 # DATIM DHIS2 Settings

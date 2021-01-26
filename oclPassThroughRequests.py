@@ -59,21 +59,21 @@ def getQMAPDomainDetails(ocl_env_url='', domain=''):
     return response.text
 
 
-def getDATIMCodeLists(ocl_env_url=''):
+def getDATIMCodeLists(ocl_env_url='',owner=''):
     """ get DATIM Codelist details """
     ocl_api_headers = {'Content-Type': 'application/json'}
-    datimCodelistsDetailsURL = '%s/orgs/PEPFAR-Test8/collections/?collectionType="Code+List"&limit=0' % (
-        ocl_env_url)
+    datimCodelistsDetailsURL = '%s/orgs/%s/collections/?collectionType=Code%20List&q=&limit=400' % (
+        ocl_env_url,owner)
     response = requests.get(datimCodelistsDetailsURL, headers=ocl_api_headers)
     response.raise_for_status()
     return response.text
 
 
-def getMOHCodelists(ocl_env_url=''):
+def getMOHCodelists(ocl_env_url='',owner=''):
     """ get MOH Codelists details """
     ocl_api_headers = {'Content-Type': 'application/json'}
-    mohCodelistsDetailsURL = '%s/orgs/PEPFAR/sources/?extras__datim_moh_codelist=true&verbose=true' % (
-        ocl_env_url)
+    mohCodelistsDetailsURL = '%s/orgs/%s/sources/?extras.datim_moh_codelist=true&verbose=true' % (
+        ocl_env_url,owner)
     response = requests.get(mohCodelistsDetailsURL, headers=ocl_api_headers)
     response.raise_for_status()
     return response.text

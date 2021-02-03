@@ -532,7 +532,10 @@ class DatimImap(object):
                 # throw out columns we don't need
                 row_to_output = {}
                 for field_name in fieldnames:
-                    row_to_output[field_name] = row[field_name].encode('utf8')
+                    if row[field_name] is None:
+                        row_to_output[field_name] = None
+                    else:
+                        row_to_output[field_name] = row[field_name].encode('utf8')
                 # output the row
                 writer.writerow(row_to_output)
         elif fmt == self.DATIM_IMAP_FORMAT_JSON:

@@ -325,7 +325,7 @@ class DatimImapExport(datimbase.DatimBase):
                 row_base[datimimap.DatimImap.IMAP_FIELD_MOH_CLASSIFICATION] = (
                     datimsyncmohhelper.DatimSyncMohHelper.get_disag_classification(
                         period=period, de_code=indicator['id'], de_uid=indicator['external_id'],
-                        coc_name=mapping['to_concept_name']))
+                        coc_name=mapping['to_concept_name_resolved']))
                 if 'operations' in mapping and mapping['operations']:
                     # Country has mapped content to this datim indicator+disag pair
                     for operation in mapping['operations']:

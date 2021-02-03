@@ -53,12 +53,12 @@ def get_imap_orgs(ocl_env_url, ocl_api_token, period_filter='', country_code_fil
     request_params = {
         'limit': '0',
         'verbose': 'true',
-        'extras__datim_moh_object': 'true'
+        'extras.datim_moh_object': 'true'
     }
     if period_filter:
-        request_params['extras__datim_moh_period'] = ','.join(period_filter)
+        request_params['extras.datim_moh_period'] = ','.join(period_filter)
     if country_code_filter:
-        request_params['extras__datim_moh_country_code'] = ','.join(country_code_filter)
+        request_params['extras.datim_moh_country_code'] = ','.join(country_code_filter)
     if ocl_api_token:
         ocl_api_headers['Authorization'] = 'Token ' + ocl_api_token
     url_all_orgs = '%s/orgs/' % ocl_env_url

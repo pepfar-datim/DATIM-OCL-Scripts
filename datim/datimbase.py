@@ -420,6 +420,11 @@ class DatimBase(object):
                 self.vlog(1, '[%s MISSING EXPORT] %s -- Export not yet cached. Generating...' % (
                     export_response.status_code, export_response.url))
                 export_response = self.generate_repository_version_export(original_export_url)
+            elif export_response.status_code == 208:
+                # Export is already being generated for this export, so just hang tight
+                self.vlog(1, '[%s EXPORT IS BEING GENERAT4ED] %s -- Export is already being cached. Waiting...' % (
+                    export_response.status_code, export_response.url))
+                export_response = self.wait_for_repository_version_export(original_export_url)
             else:
                 export_response.raise_for_status()
 
@@ -503,6 +508,45 @@ class DatimBase(object):
 
         return True
 
+    def wait_for_repository_version_export(self, repo_export_url, delay_seconds=10,
+                                           max_wait_seconds=120):
+        """
+        Wait until the specified repository export has finished processing and return the
+        response object. Otherwise, fail with an exception.
+        :param repo_export_url:
+        :param delay_seconds:
+        :param max_wait_seconds:
+        :return: <Response>
+        """
+        is_first_loop = True
+        start_time = time.time()
+        while (time.time() - start_time + delay_seconds) < max_wait_seconds:
+            # Delay
+            if not is_first_loop:
+                self.vlog(1, 'INFO: Delaying %s seconds while export is being generated...' % str(
+                    delay_seconds))
+                time.sleep(delay_seconds)
+            else:
+                is_first_loop = False
+
+            # Request the export
+            r = requests.get(repo_export_url, headers=self.oclapiheaders)
+            r.raise_for_status()
+            if r.status_code == 200:
+                return r
+            elif r.status_code > 200 and r.status_code < 300:
+                continue
+            else:
+                msg = 'ERROR: %s error generating export for "%s"' % (
+                    r.status_code, repo_export_url)
+                self.vlog(1, msg)
+                raise Exception(msg)
+
+        # If it gets to here, that means the export is still not available
+        msg = 'ERROR: Export taking too long to process for "%s". Exiting...' % repo_export_url
+        self.vlog(1, msg)
+        raise Exception(msg)
+
     def generate_repository_version_export(self, repo_export_url, do_wait_until_cached=True,
                                            delay_seconds=10, max_wait_seconds=120):
         """
@@ -516,23 +560,20 @@ class DatimBase(object):
         :param max_wait_seconds:
         :return: <Response>
         """
-        # Make the initial request
+        # Make the initial request to generate the export
         request_create_export = requests.post(
             repo_export_url, headers=self.oclapiheaders, allow_redirects=True)
-        do_delay_on_first_loop = True
         if request_create_export.status_code == 409:
             # 409 conflict means that repo export is already being processed, so go ahead
             if not do_wait_until_cached:
                 self.vlog(1, 'INFO: Unable to generate export: 409 conflict: %s.' % repo_export_url)
                 return None
             else:
-                self.vlog(1, 'INFO: Repository export already processing: %s.' % repo_export_url)
+                self.vlog(1, 'INFO: Repository export already processing, so just wait: %s.' % repo_export_url)
         elif request_create_export.status_code == 202:
             self.vlog(1, 'INFO: Generating repository export: %s.' % repo_export_url)
-            do_delay_on_first_loop = False
         elif request_create_export.status_code == 303:
             self.vlog(1, 'INFO: Repository export already exists: %s.' % repo_export_url)
-            do_delay_on_first_loop = False
         else:
             msg = 'ERROR: %s error generating export for "%s"' % (
                 request_create_export.status_code, repo_export_url)
@@ -541,27 +582,9 @@ class DatimBase(object):
 
         # Optionally wait for export to be processed and then retrieve it
         if do_wait_until_cached:
-            start_time = time.time()
-            while time.time() - start_time + delay_seconds < max_wait_seconds:
-                self.vlog(1, 'INFO: Delaying %s seconds while export is being generated...' % str(
-                    delay_seconds))
-                if do_delay_on_first_loop:
-                    time.sleep(delay_seconds)
-                    do_delay_on_first_loop = False
-                r = requests.get(repo_export_url, headers=self.oclapiheaders)
-                r.raise_for_status()
-                if r.status_code == 200:
-                    return r
-                elif r.status_code == 204:
-                    continue
-                else:
-                    msg = 'ERROR: %s error generating export for "%s"' % (
-                        request_create_export.status_code, repo_export_url)
-                    self.vlog(1, msg)
-                    raise Exception(msg)
-            msg = 'ERROR: Export taking too long to process. Exiting...'
-            self.vlog(1, msg)
-            raise Exception(msg)
+            return self.wait_for_repository_version_export(
+                repo_export_url=repo_export_url, delay_seconds=delay_seconds,
+                max_wait_seconds=max_wait_seconds)
         else:
             # Otherwise just return True that the request was successfully submitted
             return True

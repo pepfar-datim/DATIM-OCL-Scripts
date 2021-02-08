@@ -361,7 +361,8 @@ class DatimBase(object):
                               data=json.dumps(new_repo_version_data),
                               headers=self.oclapiheaders)
             r.raise_for_status()
-            repo_version_endpoint = str(ocl_export_def['endpoint']) + str(new_repo_version_data['id']) + '/'
+            repo_version_endpoint = str(
+                ocl_export_def['endpoint']) + str(new_repo_version_data['id']) + '/'
             self.vlog(1, '[OCL Export %s of %s] %s: Created new repository version "%s"' % (
                 cnt, len(self.OCL_EXPORT_DEFS), ocl_export_key, repo_version_endpoint))
 
@@ -382,7 +383,8 @@ class DatimBase(object):
             len(country_collections), endpoint))
         export_urls = []
         for collection_id, collection in country_collections.items():
-            url_ocl_export = '%s%s%s/export/' % (self.oclenv, collection['url'], country_version_id)
+            url_ocl_export = '%s%s%s/export/' % (
+                self.oclenv, collection['url'], country_version_id)
             self.vlog(1, 'Export URL:', url_ocl_export)
             export_urls.append(url_ocl_export)
 
@@ -412,6 +414,7 @@ class DatimBase(object):
                 original_export_url = export_response.history[0].url
             if export_response.status_code == 404:
                 # Repository version does not exist, so we can safely skip this one
+                # This happens when there is no country mapping for this
                 self.vlog(1, '[%s NOT FOUND] %s -- Current IMAP %s has no mapping for this data element, so we can safely skip' % (
                     export_response.status_code, export_response.url, country_version_id))
                 continue
@@ -422,7 +425,7 @@ class DatimBase(object):
                 export_response = self.generate_repository_version_export(original_export_url)
             elif export_response.status_code == 208:
                 # Export is already being generated for this export, so just hang tight
-                self.vlog(1, '[%s EXPORT IS BEING GENERAT4ED] %s -- Export is already being cached. Waiting...' % (
+                self.vlog(1, '[%s EXPORT IS BEING GENERATED] %s -- Export is already being cached. Waiting...' % (
                     export_response.status_code, export_response.url))
                 export_response = self.wait_for_repository_version_export(original_export_url)
             else:
@@ -509,7 +512,7 @@ class DatimBase(object):
         return True
 
     def wait_for_repository_version_export(self, repo_export_url, delay_seconds=10,
-                                           max_wait_seconds=120):
+                                           max_wait_seconds=120, do_wait_on_first_loop=False):
         """
         Wait until the specified repository export has finished processing and return the
         response object. Otherwise, fail with an exception.
@@ -522,12 +525,11 @@ class DatimBase(object):
         start_time = time.time()
         while (time.time() - start_time + delay_seconds) < max_wait_seconds:
             # Delay
-            if not is_first_loop:
+            if (is_first_loop and do_wait_on_first_loop) or not is_first_loop:
                 self.vlog(1, 'INFO: Delaying %s seconds while export is being generated...' % str(
                     delay_seconds))
                 time.sleep(delay_seconds)
-            else:
-                is_first_loop = False
+            is_first_loop = False
 
             # Request the export
             r = requests.get(repo_export_url, headers=self.oclapiheaders)

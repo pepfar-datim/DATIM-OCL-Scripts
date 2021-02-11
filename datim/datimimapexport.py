@@ -180,8 +180,8 @@ class DatimImapExport(datimbase.DatimBase):
             self.does_offline_data_file_exist(datim_source_json_filename, exit_if_missing=True)
         imap_timer.lap(label='STEP 3: Download DATIM-MOH-xx source')
 
-        # STEP 4 of 8: Preprocess DATIM-MOH indicator+disag structure
-        self.vlog(1, '**** STEP 4 of 8: Preprocess DATIM-MOH indicator+disag structure')
+        # STEP 4 of 8: Pre-process DATIM-MOH indicator+disag structure
+        self.vlog(1, '**** STEP 4 of 8: Pre-process DATIM-MOH indicator+disag structure')
         indicators = {}
         disaggregates = {}
         with open(self.attach_absolute_data_path(datim_source_json_filename), 'rb') as handle_datim_source:

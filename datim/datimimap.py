@@ -995,13 +995,13 @@ class DatimImapFactory(object):
             'Content-Type': 'application/json'
         }
         repo_versions_url = '%sversions/?limit=100' % repo_url
+        if released:
+            repo_versions_url += '&released=true'
         r = requests.get(repo_versions_url, headers=oclapiheaders)
         r.raise_for_status()
         repo_versions = r.json()
         if repo_versions:
             for repo_version in repo_versions:
-                if released and not repo_version['released']:
-                    continue
                 if not DatimImapFactory.is_valid_period_version_id(repo_version['id']):
                     continue
                 if not period:

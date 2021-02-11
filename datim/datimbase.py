@@ -155,34 +155,42 @@ class DatimBase(object):
 
     @staticmethod
     def endpoint2filename_ocl_export_zip(endpoint):
+        """ Helper method to convert API endpoint to filename """
         return 'ocl-%s.zip' % DatimBase._convert_endpoint_to_filename_fmt(endpoint)
 
     @staticmethod
     def endpoint2filename_ocl_export_json(endpoint):
+        """ Helper method to convert API endpoint to filename """
         return 'ocl-%s-raw.json' % DatimBase._convert_endpoint_to_filename_fmt(endpoint)
 
     @staticmethod
     def endpoint2filename_ocl_export_intermediate_json(endpoint):
+        """ Helper method to convert API endpoint to filename """
         return 'ocl-%s-intermediate.json' % DatimBase._convert_endpoint_to_filename_fmt(endpoint)
 
     @staticmethod
     def endpoint2filename_ocl_export_cleaned(endpoint):
+        """ Helper method to convert API endpoint to filename """
         return 'ocl-%s-cleaned.json' % DatimBase._convert_endpoint_to_filename_fmt(endpoint)
 
     @staticmethod
     def dhis2filename_export_new(dhis2_query_id):
+        """ Helper method to convert API endpoint to filename """
         return 'dhis2-%s-export-new-raw.json' % dhis2_query_id
 
     @staticmethod
     def dhis2filename_export_old(dhis2_query_id):
+        """ Helper method to convert API endpoint to filename """
         return 'dhis2-%s-export-old-raw.json' % dhis2_query_id
 
     @staticmethod
     def dhis2filename_export_converted(dhis2_query_id):
+        """ Helper method to convert API endpoint to filename """
         return 'dhis2-%s-export-converted.json' % dhis2_query_id
 
     @staticmethod
     def filename_diff_result(import_batch_name):
+        """ Helper method to convert API endpoint to filename """
         return '%s-diff-results-%s.json' % (
             import_batch_name, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 
@@ -260,7 +268,8 @@ class DatimBase(object):
                             'extras'][active_attr_name])):
                     filtered_repos[repo[key_field]] = repo
             next_url = ''
-            if 'next' in response.headers and response.headers['next'] and response.headers['next'] != 'None':
+            if ('next' in response.headers and response.headers['next'] and
+                    response.headers['next'] != 'None'):
                 next_url = response.headers['next']
         return filtered_repos
 
@@ -410,7 +419,8 @@ class DatimBase(object):
                 self.vlog(1, 'WARNING: Export value is None')
                 continue
             original_export_url = export_response.url
-            if export_response.history and export_response.history[0] and export_response.history[0].url:
+            if (export_response.history and export_response.history[0] and
+                    export_response.history[0].url):
                 original_export_url = export_response.history[0].url
             if export_response.status_code == 404:
                 # Repository version does not exist, so we can safely skip this one
@@ -450,7 +460,7 @@ class DatimBase(object):
         return collection_results
 
     def get_ocl_export(self, endpoint='', version='', zipfilename='', jsonfilename='',
-                       delay_seconds=10, max_wait_seconds=120):
+                       delay_seconds=5, max_wait_seconds=120):
         """
         Fetches an export of the specified repository version and saves to file.
         Use version="latest" to fetch the most recent released repo version.
@@ -511,7 +521,7 @@ class DatimBase(object):
 
         return True
 
-    def wait_for_repository_version_export(self, repo_export_url, delay_seconds=10,
+    def wait_for_repository_version_export(self, repo_export_url, delay_seconds=5,
                                            max_wait_seconds=120, do_wait_on_first_loop=False):
         """
         Wait until the specified repository export has finished processing and return the
@@ -550,7 +560,7 @@ class DatimBase(object):
         raise Exception(msg)
 
     def generate_repository_version_export(self, repo_export_url, do_wait_until_cached=True,
-                                           delay_seconds=10, max_wait_seconds=120):
+                                           delay_seconds=5, max_wait_seconds=120):
         """
         Generate a cached repository version export in OCL and optionally wait until processing
         of the export is completed. Returns True if the request is submitted successfully and
@@ -562,6 +572,13 @@ class DatimBase(object):
         :param max_wait_seconds:
         :return: <Response>
         """
+
+        # Confirm that the export is still not available
+        r = requests.get(repo_export_url, headers=self.oclapiheaders)
+        r.raise_for_status()
+        if r.status_code == 200:
+            return r
+
         # Make the initial request to generate the export
         request_create_export = requests.post(
             repo_export_url, headers=self.oclapiheaders, allow_redirects=True)
@@ -571,7 +588,8 @@ class DatimBase(object):
                 self.vlog(1, 'INFO: Unable to generate export: 409 conflict: %s.' % repo_export_url)
                 return None
             else:
-                self.vlog(1, 'INFO: Repository export already processing, so just wait: %s.' % repo_export_url)
+                self.vlog(1, 'INFO: Repository export already processing, so just wait: %s.' % (
+                    repo_export_url))
         elif request_create_export.status_code == 202:
             self.vlog(1, 'INFO: Generating repository export: %s.' % repo_export_url)
         elif request_create_export.status_code == 303:

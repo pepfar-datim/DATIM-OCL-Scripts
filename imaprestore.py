@@ -122,7 +122,7 @@ for imap_backup in imap_backups:
                                       "Request IMAP export after bulk import is processed "
                                       "or request import status.")
             output_json["ocl_bulk_import_task_id"] = bulk_import_task_id
-            output_json["ocl_bulk_import_status_url"] = "%s/manage/bulkimport?task=%s" % (
+            output_json["ocl_bulk_import_status_url"] = "%s/manage/bulkimport/?task=%s" % (
                 ocl_env_url, bulk_import_task_id)
     if output_json and not args.test_mode:
         print json.dumps(output_json)

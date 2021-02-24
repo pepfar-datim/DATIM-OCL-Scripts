@@ -58,7 +58,7 @@ class Qmap(object):
         if verbosity:
             print 'Requesting export from: %s ' % qmap_repo_url
         qmap_export = ocldev.oclexport.OclExportFactory.load_latest_export(
-            qmap_repo_url, oclapitoken=ocl_api_token)
+            qmap_repo_url, oclapitoken=ocl_api_token, do_wait_for_export=True)
         if not qmap_export:
             err_msg = "Unable to load QMAP export from OCL for domain '%s' and qmap_id '%s'" % (
                 domain, qmap_id)

@@ -57,7 +57,7 @@ def get_qmap_domains(ocl_env_url, ocl_api_token, verbose=False):
     ocl_api_headers = {'Content-Type': 'application/json'}
     if ocl_api_token:
         ocl_api_headers['Authorization'] = 'Token ' + ocl_api_token
-    url_all_orgs = '%s/orgs/?limit=0&verbose=true&extras__qmap_org=true' % ocl_env_url
+    url_all_orgs = '%s/orgs/?limit=0&verbose=true&extras.qmap_org=true' % ocl_env_url
     response = requests.get(url_all_orgs, headers=ocl_api_headers)
     if verbose:
         print response.url

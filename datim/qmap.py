@@ -138,7 +138,7 @@ class Qmap(object):
         # Process headers
         for _header_concept in qmap_export.get_concepts(
                 core_attrs={"concept_class": Qmap.QMAP_CONCEPT_CLASS_POS_HEADER}):
-            _qmap_contents["map"]["headers"][_header_concept["id"]] = {
+            _qmap_contents["map"]["headers"][_header_concept["names"][0]['name']] = {
                 "path": _header_concept["extras"]["path"],
                 "valueType": _header_concept["datatype"]
             }
@@ -153,8 +153,10 @@ class Qmap(object):
             elif "choiceMap" not in _qmap_contents["map"]["headers"][_linked_header_concept_id]:
                 _qmap_contents["map"]["headers"][_linked_header_concept_id]["choiceMap"] = {}
             _qmap_contents["map"]["headers"][_linked_header_concept_id]["choiceMap"][
-                _choice_concept['display_name']] = (
-                    _choice_concept["extras"]["questionnaire_choice_value"])
+                _choice_concept['display_name']] = {
+                        "code": _choice_concept["extras"]["questionnaire_choice_code"],
+                        "valueType": _choice_concept["extras"]["questionnaire_choice_valueType"]
+                    }
 
         # Process constants
         for _constant_concept in qmap_export.get_concepts(
@@ -217,6 +219,16 @@ class Qmap(object):
             qmap_questionnaire=qmap_questionnaire)
         qmap_json_resources = qmap_csv_resources.convert_to_ocl_formatted_json()
 
+        # Optionally delete the source (add this to the front of the JSON resource list)
+        if does_source_exist:
+            delete_resource_list = ocldev.oclresourcelist.OclJsonResourceList({
+                '__action': 'DELETE',
+                'type': ocldev.oclconstants.OclConstants.RESOURCE_TYPE_SOURCE,
+                'owner': domain,
+                'owner_type': ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION,
+                'id': self.uid})
+            qmap_json_resources = delete_resource_list + qmap_json_resources
+
         # Display debug output
         if verbosity:
             print '\n**** QMAP Org and sources in OCL:'
@@ -248,25 +260,16 @@ class Qmap(object):
                 print json.dumps(resource)
             print ''
 
+        # JP 2021-03-10: Validation is no longer up-to-date; does not support source delete
         # Validate
-        qmap_csv_resources.validate()
-        qmap_json_resources.validate()
+        # qmap_csv_resources.validate()
+        # qmap_json_resources.validate()
 
         # Exit now if in test mode
         if test_mode:
             if verbosity:
                 print "\nTEST MODE: Skipping import"
             return None
-
-        # Delete QMAP source if it already exists
-        # TODO: Shift to updating source in place in the future
-        if does_source_exist:
-            if verbosity:
-                if not ocl_api_admin_token:
-                    ocl_api_admin_token = ocl_api_token
-                print '\nDeleting existing source "%s" for domain "%s"...' % (self.uid, domain)
-            Qmap.delete_source(domain=domain, qmap_id=self.uid,
-                               ocl_env_url=ocl_env_url, ocl_api_token=ocl_api_admin_token)
 
         # Submit the bulk import
         import_response = ocldev.oclfleximporter.OclBulkImporter.post(
@@ -276,21 +279,6 @@ class Qmap(object):
         import_response_json = import_response.json()
         task_id = import_response_json['task']
         return task_id
-
-    @staticmethod
-    def delete_source(domain='', qmap_id='', ocl_env_url='', ocl_api_token=''):
-        qmap_repo_url = '%s%s' % (ocl_env_url, ocldev.oclconstants.OclConstants.get_repository_url(
-            owner_id=domain, repository_id=qmap_id, include_trailing_slash=True))
-        ocl_api_headers = {'Content-Type': 'application/json'}
-        if ocl_api_token:
-            ocl_api_headers['Authorization'] = 'Token ' + ocl_api_token
-        response = requests.delete(qmap_repo_url, headers=ocl_api_headers)
-        response.raise_for_status()
-        if response.status_code == 204:
-            # Successfully deleted
-            return True
-        raise Exception("Unexpected response code when deleting source '%s': %s" % (
-            qmap_repo_url, response.status_code))
 
     def generate_import_script(self, domain='', do_create_org=True, do_create_qmap_source=True,
                                do_create_questionnaire_source=True, qmap_questionnaire=None):
@@ -323,6 +311,11 @@ class Qmap(object):
 
         # Build the Qmap CSV concepts with their mappings for Qmap headers
         for qmap_key, qmap_item in self.headers.items():
+            if 'path' not in qmap_item or 'valueType' not in qmap_item:
+                # For now, skipping unmapped elements that look like this:
+                #   "patient.person.names[0].type": {
+                #     "headerPath": ["patient", "person", "names", 0, "type"]}
+                continue
             pos_header_concept = self._generate_pos_header_concept_and_mapping(
                 qmap_key=qmap_key, qmap_item=qmap_item, owner=domain, source=self.uid,
                 qmap_questionnaire=qmap_questionnaire,
@@ -466,12 +459,13 @@ class Qmap(object):
             choice_concept['id'] = Qmap._convert_to_pos_choice_concept_id(
                 qmap_key, choice_pos_value)
             choice_concept['name'] = choice_pos_value
-            choice_concept['attr:questionnaire_choice_value'] = choice_questionnaire_value
+            choice_concept['attr:questionnaire_choice_valueType'] = choice_questionnaire_value['valueType']
+            choice_concept['attr:questionnaire_choice_code'] = choice_questionnaire_value['code']
             choice_concept['extmap_to_source_url[01]'] = ocldev.oclconstants.OclConstants.get_repository_url(
                 owner_id=qmap_questionnaire.owner, repository_id=qmap_questionnaire.source,
                 include_trailing_slash=True)
             choice_concept['extmap_to_concept_id[01]'] = self._get_questionnaire_choice_concept_id(
-                qmap_item, choice_questionnaire_value)
+                qmap_item, choice_questionnaire_value['code'])
             choice_concepts.append(choice_concept)
         return choice_concepts
 

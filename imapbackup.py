@@ -1,14 +1,14 @@
 """
 Script to retrieve a backup of all matching IMAPs in an OCL environment.
 
-This command will return a JSON backup of all IMAPs in OCL staging:
+This command will return a JSON backup of all public IMAPs in OCL staging:
 
     python imapbackup.py --env=staging
 
 It can be filtered in the same way that getimaporgs.py can, so these will get a filtered backup:
 
-python imapbackup.py --env=staging -pFY19
-python imapbackup.py --env=staging -cDEMO
+    python imapbackup.py --env=staging -pFY19
+    python imapbackup.py --env=staging -cDEMO
 
 `format` is ignored if verbosity is turned off, so these are all identical:
 

@@ -127,21 +127,28 @@ class Qmap(object):
             "created": _qmap_export_json["source"]["created_on"],
             "updated": _qmap_export_json["source"]["updated_on"],
             "uid": _qmap_export_json["source"]["external_id"],
-            "questionnaireuid": _qmap_export_json["source"]["extras"]["questionnaireuid"],
             "complete": True,
             "map": {
                 "headers": {},
                 "constants": {},
             }
         }
+        if 'extras' in _qmap_export_json["source"]:
+            _qmap_contents["questionnaireuid"] = (
+                _qmap_export_json["source"]["extras"]["questionnaireuid"])
 
         # Process headers
         for _header_concept in qmap_export.get_concepts(
                 core_attrs={"concept_class": Qmap.QMAP_CONCEPT_CLASS_POS_HEADER}):
-            _qmap_contents["map"]["headers"][_header_concept["names"][0]['name']] = {
-                "path": _header_concept["extras"]["path"],
-                "valueType": _header_concept["datatype"]
-            }
+            _new_header = {}
+            if 'extras' in _header_concept and 'path' in _header_concept["extras"]:
+                _new_header['path'] = _header_concept["extras"]["path"]
+            if 'extras' in _header_concept and 'headerPath' in _header_concept["extras"]:
+                _new_header['headerPath'] = _header_concept["extras"]["headerPath"]
+            if "datatype" in _header_concept and _header_concept['datatype'] != 'None':
+                _new_header['valueType'] = _header_concept["datatype"]
+            if _new_header:
+                _qmap_contents["map"]["headers"][_header_concept["names"][0]['name']] = _new_header
 
         # Process choices
         for _choice_concept in qmap_export.get_concepts(
@@ -260,11 +267,6 @@ class Qmap(object):
                 print json.dumps(resource)
             print ''
 
-        # JP 2021-03-10: Validation is no longer up-to-date; does not support source delete
-        # Validate
-        # qmap_csv_resources.validate()
-        # qmap_json_resources.validate()
-
         # Exit now if in test mode
         if test_mode:
             if verbosity:
@@ -284,7 +286,7 @@ class Qmap(object):
                                do_create_questionnaire_source=True, qmap_questionnaire=None):
         """ Generate OCL-formatted CSV import script """
 
-        # Instantiate the resource list and add org and source resources
+        # Add org and source to resource list
         qmap_csv_resources = ocldev.oclresourcelist.OclCsvResourceList()
         if do_create_org:
             qmap_csv_resources.append(self._get_csv_resource_organization(
@@ -311,15 +313,12 @@ class Qmap(object):
 
         # Build the Qmap CSV concepts with their mappings for Qmap headers
         for qmap_key, qmap_item in self.headers.items():
-            if 'path' not in qmap_item or 'valueType' not in qmap_item:
-                # For now, skipping unmapped elements that look like this:
-                #   "patient.person.names[0].type": {
-                #     "headerPath": ["patient", "person", "names", 0, "type"]}
-                continue
             pos_header_concept = self._generate_pos_header_concept_and_mapping(
                 qmap_key=qmap_key, qmap_item=qmap_item, owner=domain, source=self.uid,
                 qmap_questionnaire=qmap_questionnaire,
                 owner_type=ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION)
+            if not pos_header_concept:
+                continue
             qmap_csv_resources.append(pos_header_concept)
             if 'choiceMap' in qmap_item:
                 pos_header_choices = self._generate_pos_choice_concepts_and_mappings(
@@ -402,6 +401,9 @@ class Qmap(object):
     def _generate_pos_header_concept_and_mapping(self, qmap_key='', qmap_item=None,
                                                  source='', qmap_questionnaire=None, owner='',
                                                  owner_type=ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION):
+        if 'path' not in qmap_item and 'valueType' not in qmap_item and 'headerPath' not in qmap_item:
+            # Skip if it doesn't have at least one of these
+            return None
         concept = {
             'resource_type': ocldev.oclconstants.OclConstants.RESOURCE_TYPE_CONCEPT,
             'id': Qmap._convert_to_pos_header_concept_id(qmap_key),
@@ -410,14 +412,19 @@ class Qmap(object):
             'source': source,
             'name': qmap_key,
             'concept_class': self.QMAP_CONCEPT_CLASS_POS_HEADER,
-            'datatype': qmap_item['valueType'],
-            'attr:path': qmap_item['path'],
-            'extmap_type[01]': 'Same As',
-            'extmap_to_source_url[01]': ocldev.oclconstants.OclConstants.get_repository_url(
-                owner_id=qmap_questionnaire.owner, repository_id=qmap_questionnaire.source,
-                include_trailing_slash=True),
-            'extmap_to_concept_id[01]': Qmap._convert_to_questionnaire_concept_id(qmap_item),
+            'datatype': qmap_item.get('valueType', 'None'),
         }
+        if 'headerPath': 
+            concept['attr:headerPath'] = qmap_item['headerPath']
+        if 'path' in qmap_item:
+            # Generate a mapping between the POS and Questionnaire items
+            concept['extmap_type[01]'] = 'Same As'
+            concept['extmap_to_source_url[01]'] = ocldev.oclconstants.OclConstants.get_repository_url(
+                owner_id=qmap_questionnaire.owner, repository_id=qmap_questionnaire.source,
+                include_trailing_slash=True)
+            concept['extmap_to_concept_id[01]'] = Qmap._convert_to_questionnaire_concept_id(
+                qmap_item)
+            concept['attr:path'] = qmap_item['path']
         return concept
 
     def _generate_pos_constant_concept_and_mapping(self, qmap_key='', qmap_item=None,
@@ -429,13 +436,13 @@ class Qmap(object):
             'owner_id': owner,
             'owner_type': owner_type,
             'source': source,
-            'name': qmap_item["display"],
+            'name': qmap_item.get('display', ''),
             'name_type': 'display',
-            'name[2]': qmap_item["code"],
+            'name[2]': qmap_item.get('code', ''),
             'name_type[2]': 'code',
             'concept_class': self.QMAP_CONCEPT_CLASS_POS_CONSTANT,
-            'datatype': qmap_item['valueType'],
-            'attr:path': qmap_item['path'],
+            'datatype': qmap_item.get('valueType', ''),
+            'attr:path': qmap_item.get('path', ''),
         }
         return pos_constant_concept
 
@@ -450,7 +457,7 @@ class Qmap(object):
             'source': source,
             'concept_class': self.QMAP_CONCEPT_CLASS_POS_CHOICE,
             'datatype': 'None',
-            'attr:path': qmap_item['path'],
+            'attr:path': qmap_item.get('path', ''),
             'attr:header_concept_id': Qmap._convert_to_pos_header_concept_id(qmap_key),
             'extmap_type[01]': 'Same As',
         }

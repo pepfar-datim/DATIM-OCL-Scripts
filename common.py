@@ -11,7 +11,7 @@ OCL_ENVIRONMENTS = {
     'staging': 'https://api.staging.openconceptlab.org',
     'staging-aws': 'https://api.staging.aws.openconceptlab.org',
     'production': 'https://api.openconceptlab.org',
-    'production-aws': 'https://api.openconceptlab.org',
+    'production-aws': 'https://api.aws.openconceptlab.org',
     'demo': 'https://api.demo.openconceptlab.org',
     'demo-aws': 'https://api.demo.aws.openconceptlab.org',
 }
@@ -27,7 +27,7 @@ def ocl_environment(string):
 
 
 def get_imap_orgs(ocl_env_url, ocl_api_token, period_filter='', country_code_filter='',
-                  verbose=False):
+                  verbose=False, ocl_api_version='v2'):
     """
     Returns list of country Indicator Mapping organizations available in the specified OCL
     environment. This is determined by the 'datim_moh_object' == True custom attribute of
@@ -49,16 +49,17 @@ def get_imap_orgs(ocl_env_url, ocl_api_token, period_filter='', country_code_fil
             country_code_filter = [country_code_filter]
 
     # Retrieve list of all orgs from OCL
+    extras_separator = '__' if ocl_api_version == 'v1' else '.'
     ocl_api_headers = {'Content-Type': 'application/json'}
     request_params = {
         'limit': '0',
         'verbose': 'true',
-        'extras.datim_moh_object': 'true'
     }
+    request_params['extras%sdatim_moh_object' % extras_separator] = 'true'
     if period_filter:
-        request_params['extras.datim_moh_period'] = ','.join(period_filter)
+        request_params['extras%sdatim_moh_period' % extras_separator] = ','.join(period_filter)
     if country_code_filter:
-        request_params['extras.datim_moh_country_code'] = ','.join(country_code_filter)
+        request_params['extras%sdatim_moh_country_code' % extras_separator] = ','.join(country_code_filter)
     if ocl_api_token:
         ocl_api_headers['Authorization'] = 'Token ' + ocl_api_token
     url_all_orgs = '%s/orgs/' % ocl_env_url

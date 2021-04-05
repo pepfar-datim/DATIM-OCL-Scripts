@@ -89,7 +89,7 @@ class DatimImapExport(datimbase.DatimBase):
                 return fmt
         return default_fmt
 
-    def get_imap(self, period='', version='', country_org='', country_code=''):
+    def get_imap(self, period='', version='', country_org='', country_code='', ocl_api_version='v2'):
         """
         Fetch JSON exports from OCL and build the IMAP export
         If version is not specified, then the latest released version for the given period will be used.
@@ -102,6 +102,7 @@ class DatimImapExport(datimbase.DatimBase):
             (or simply leave blank) to automatically retrieve the latest version for the specified period.
         :param country_org: DATIM-MOH-UA-FY19
         :param country_code: UA
+        :param ocl_api_version: v1 or v2
         :return:
         """
 
@@ -305,6 +306,12 @@ class DatimImapExport(datimbase.DatimBase):
 
         # STEP 8 of 8: Convert to tabular format
         self.vlog(1, '**** STEP 8 of 8: Convert to tabular format')
+        if ocl_api_version == 'v1':
+            from_concept_name_field = 'from_concept_name'
+            to_concept_name_field = 'to_concept_name'
+        else: 
+            from_concept_name_field = 'from_concept_name_resolved'
+            to_concept_name_field = 'to_concept_name_resolved'
         rows = []
         for indicator_id, indicator in indicators.items():
             for mapping in indicator['mappings']:
@@ -312,7 +319,7 @@ class DatimImapExport(datimbase.DatimBase):
                     datimimap.DatimImap.IMAP_FIELD_DATIM_INDICATOR_CATEGORY: '',
                     datimimap.DatimImap.IMAP_FIELD_DATIM_INDICATOR_ID: indicator['id'],
                     datimimap.DatimImap.IMAP_FIELD_DATIM_DISAG_ID: mapping['to_concept_code'],
-                    datimimap.DatimImap.IMAP_FIELD_DATIM_DISAG_NAME: mapping['to_concept_name_resolved'],
+                    datimimap.DatimImap.IMAP_FIELD_DATIM_DISAG_NAME: mapping[to_concept_name_field],
                     datimimap.DatimImap.IMAP_FIELD_OPERATION: '',
                     datimimap.DatimImap.IMAP_FIELD_MOH_INDICATOR_ID: '',
                     datimimap.DatimImap.IMAP_FIELD_MOH_INDICATOR_NAME: '',
@@ -327,7 +334,7 @@ class DatimImapExport(datimbase.DatimBase):
                 row_base[datimimap.DatimImap.IMAP_FIELD_MOH_CLASSIFICATION] = (
                     datimsyncmohhelper.DatimSyncMohHelper.get_disag_classification(
                         period=period, de_code=indicator['id'], de_uid=indicator['external_id'],
-                        coc_name=mapping['to_concept_name_resolved']))
+                        coc_name=mapping[to_concept_name_field]))
                 if 'operations' in mapping and mapping['operations']:
                     # Country has mapped content to this datim indicator+disag pair
                     for operation in mapping['operations']:
@@ -337,10 +344,10 @@ class DatimImapExport(datimbase.DatimBase):
                                 operation['map_type'])
                             row[datimimap.DatimImap.IMAP_FIELD_MOH_INDICATOR_ID] = DatimImapExport.get_clean_indicator_id(
                                 operation['from_concept_code'])
-                            row[datimimap.DatimImap.IMAP_FIELD_MOH_INDICATOR_NAME] = operation['from_concept_name_resolved']
+                            row[datimimap.DatimImap.IMAP_FIELD_MOH_INDICATOR_NAME] = operation[from_concept_name_field]
                             row[datimimap.DatimImap.IMAP_FIELD_MOH_DISAG_ID] = DatimImapExport.get_clean_disag_id(
                                 operation['to_concept_code'])
-                            row[datimimap.DatimImap.IMAP_FIELD_MOH_DISAG_NAME] = operation['to_concept_name_resolved']
+                            row[datimimap.DatimImap.IMAP_FIELD_MOH_DISAG_NAME] = operation[to_concept_name_field]
                         rows.append(row)
                 else:
                     # Country has not mapped to this indicator+disag pair, so just add the blank row

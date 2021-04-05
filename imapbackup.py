@@ -58,6 +58,7 @@ parser.add_argument(
 parser.add_argument(
     '--include_extra_info', help='Includes extra IMAP columns', default=False, required=False)
 parser.add_argument('--version', action='version', version='%(prog)s v' + common.APP_VERSION)
+parser.add_argument('--apiversion', help='OCL API version (eg v1 or v2)', required=False, default="v2")
 args = parser.parse_args()
 ocl_env_url = args.env if args.env else args.env_url
 if args.verbosity > 1:
@@ -76,7 +77,8 @@ imap_export_verbosity = 1 if args.verbosity > 1 else 0
 # Get the list of IMAP orgs
 ocl_imap_orgs = common.get_imap_orgs(
     ocl_env_url=ocl_env_url, ocl_api_token=args.token, verbose=bool(args.verbosity),
-    period_filter=period_filter, country_code_filter=country_code_filter)
+    period_filter=period_filter, country_code_filter=country_code_filter,
+    ocl_api_version=args.apiversion)
 
 # Export each one
 imap_backups = []
@@ -86,26 +88,30 @@ for org in ocl_imap_orgs:
     # Print debug info for the current IMAP org
     if args.verbosity:
         print '\n\n' + '*' * 100
+        if 'extras' not in org or not org['extras']:
+            org['extras'] = {}
         print '** [EXPORT] Org: %s, Country Code: %s, Country Name: %s, Format: %s, Period: %s, Exclude Empty Maps: %s, Verbosity: %s' % (
-            org['id'], org['extras']['datim_moh_country_code'], org['name'], args.format,
-            org['extras']['datim_moh_period'], str(args.exclude_empty_maps), str(args.verbosity))
+            org['id'], org['extras'].get('datim_moh_country_code'), org['name'], args.format,
+            org['extras'].get('datim_moh_period'), str(args.exclude_empty_maps), str(args.verbosity))
         print '*' * 100
 
     # Generate the IMAP export
     try:
         imap = imap_export.get_imap(
             period=org['extras']['datim_moh_period'], country_org=org['id'],
-            country_code=org['extras']['datim_moh_country_code'])
+            country_code=org['extras']['datim_moh_country_code'],
+            ocl_api_version=args.apiversion)
     except (requests.exceptions.HTTPError, Exception) as e:
         imap_error = {
             'country_org': org['id'],
-            'country_code': org['extras'].get('datim_moh_country_code'),
             'country_name': org.get('location'),
-            'period': org['extras'].get('datim_moh_period'),
             'status': 'Error',
             'message': str(e),
             'imap': None
         }
+        if 'extras' in org and org['extras']:
+            imap_error['country_code'] = org['extras'].get('datim_moh_country_code', '')
+            imap_error['period'] = org['extras'].get('datim_moh_period')
         if args.verbosity:
             print json.dumps(imap_error)
         imap_backups.append(imap_error)
@@ -128,4 +134,4 @@ for org in ocl_imap_orgs:
 if args.verbosity:
     print '\n%s IMAPs exported successfully' % len(imap_backups)
 else:
-    print json.dumps(imap_backups)
+    print json.dumps(imap_backups, indent=4)

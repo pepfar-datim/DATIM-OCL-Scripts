@@ -7,12 +7,16 @@ import requests
 APP_VERSION = '0.1.0'
 OCL_ENVIRONMENTS = {
     'qa': 'https://api.qa.openconceptlab.org',
+    'qa-v1': 'https://api.qa.v1.openconceptlab.org',
     'qa-aws': 'https://api.qa.aws.openconceptlab.org',
     'staging': 'https://api.staging.openconceptlab.org',
+    'staging-v1': 'https://api.staging.v1.openconceptlab.org',
     'staging-aws': 'https://api.staging.aws.openconceptlab.org',
     'production': 'https://api.openconceptlab.org',
+    'production-v1': 'https://api.v1.openconceptlab.org',
     'production-aws': 'https://api.aws.openconceptlab.org',
     'demo': 'https://api.demo.openconceptlab.org',
+    'demo-v1': 'https://api.demo.v1.openconceptlab.org',
     'demo-aws': 'https://api.demo.aws.openconceptlab.org',
 }
 
@@ -52,7 +56,7 @@ def get_imap_orgs(ocl_env_url, ocl_api_token, period_filter='', country_code_fil
     extras_separator = '__' if ocl_api_version == 'v1' else '.'
     ocl_api_headers = {'Content-Type': 'application/json'}
     request_params = {
-        'limit': '0',
+        'limit': '200',
         'verbose': 'true',
     }
     request_params['extras%sdatim_moh_object' % extras_separator] = 'true'

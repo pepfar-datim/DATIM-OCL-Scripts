@@ -141,7 +141,7 @@ else:
                                   "Request IMAP export after bulk import is processed "
                                   "or request import status.")
         output_json["ocl_bulk_import_task_id"] = bulk_import_task_id
-        output_json["ocl_bulk_import_status_url"] = "%s/manage/bulkimport?task=%s" % (
+        output_json["ocl_bulk_import_status_url"] = "%s/manage/bulkimport/?task=%s" % (
             ocl_env_url, bulk_import_task_id)
         if args.imap_api_root:
             # https://test.ohie.datim.org:5000/ocl-imap/:countryCode/:period/[?format=:format]

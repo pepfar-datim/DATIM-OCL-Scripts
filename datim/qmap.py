@@ -58,7 +58,7 @@ class Qmap(object):
         if verbosity:
             print 'Requesting export from: %s ' % qmap_repo_url
         qmap_export = ocldev.oclexport.OclExportFactory.load_latest_export(
-            qmap_repo_url, oclapitoken=ocl_api_token)
+            qmap_repo_url, oclapitoken=ocl_api_token, do_wait_for_export=True)
         if not qmap_export:
             err_msg = "Unable to load QMAP export from OCL for domain '%s' and qmap_id '%s'" % (
                 domain, qmap_id)
@@ -127,21 +127,28 @@ class Qmap(object):
             "created": _qmap_export_json["source"]["created_on"],
             "updated": _qmap_export_json["source"]["updated_on"],
             "uid": _qmap_export_json["source"]["external_id"],
-            "questionnaireuid": _qmap_export_json["source"]["extras"]["questionnaireuid"],
             "complete": True,
             "map": {
                 "headers": {},
                 "constants": {},
             }
         }
+        if 'extras' in _qmap_export_json["source"]:
+            _qmap_contents["questionnaireuid"] = (
+                _qmap_export_json["source"]["extras"]["questionnaireuid"])
 
         # Process headers
         for _header_concept in qmap_export.get_concepts(
                 core_attrs={"concept_class": Qmap.QMAP_CONCEPT_CLASS_POS_HEADER}):
-            _qmap_contents["map"]["headers"][_header_concept["id"]] = {
-                "path": _header_concept["extras"]["path"],
-                "valueType": _header_concept["datatype"]
-            }
+            _new_header = {}
+            if 'extras' in _header_concept and 'path' in _header_concept["extras"]:
+                _new_header['path'] = _header_concept["extras"]["path"]
+            if 'extras' in _header_concept and 'headerPath' in _header_concept["extras"]:
+                _new_header['headerPath'] = _header_concept["extras"]["headerPath"]
+            if "datatype" in _header_concept and _header_concept['datatype'] != 'None':
+                _new_header['valueType'] = _header_concept["datatype"]
+            if _new_header:
+                _qmap_contents["map"]["headers"][_header_concept["names"][0]['name']] = _new_header
 
         # Process choices
         for _choice_concept in qmap_export.get_concepts(
@@ -153,8 +160,10 @@ class Qmap(object):
             elif "choiceMap" not in _qmap_contents["map"]["headers"][_linked_header_concept_id]:
                 _qmap_contents["map"]["headers"][_linked_header_concept_id]["choiceMap"] = {}
             _qmap_contents["map"]["headers"][_linked_header_concept_id]["choiceMap"][
-                _choice_concept['display_name']] = (
-                    _choice_concept["extras"]["questionnaire_choice_value"])
+                _choice_concept['display_name']] = {
+                        "code": _choice_concept["extras"]["questionnaire_choice_code"],
+                        "valueType": _choice_concept["extras"]["questionnaire_choice_valueType"]
+                    }
 
         # Process constants
         for _constant_concept in qmap_export.get_concepts(
@@ -217,6 +226,16 @@ class Qmap(object):
             qmap_questionnaire=qmap_questionnaire)
         qmap_json_resources = qmap_csv_resources.convert_to_ocl_formatted_json()
 
+        # Optionally delete the source (add this to the front of the JSON resource list)
+        if does_source_exist:
+            delete_resource_list = ocldev.oclresourcelist.OclJsonResourceList({
+                '__action': 'DELETE',
+                'type': ocldev.oclconstants.OclConstants.RESOURCE_TYPE_SOURCE,
+                'owner': domain,
+                'owner_type': ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION,
+                'id': self.uid})
+            qmap_json_resources = delete_resource_list + qmap_json_resources
+
         # Display debug output
         if verbosity:
             print '\n**** QMAP Org and sources in OCL:'
@@ -248,25 +267,11 @@ class Qmap(object):
                 print json.dumps(resource)
             print ''
 
-        # Validate
-        qmap_csv_resources.validate()
-        qmap_json_resources.validate()
-
         # Exit now if in test mode
         if test_mode:
             if verbosity:
                 print "\nTEST MODE: Skipping import"
             return None
-
-        # Delete QMAP source if it already exists
-        # TODO: Shift to updating source in place in the future
-        if does_source_exist:
-            if verbosity:
-                if not ocl_api_admin_token:
-                    ocl_api_admin_token = ocl_api_token
-                print '\nDeleting existing source "%s" for domain "%s"...' % (self.uid, domain)
-            Qmap.delete_source(domain=domain, qmap_id=self.uid,
-                               ocl_env_url=ocl_env_url, ocl_api_token=ocl_api_admin_token)
 
         # Submit the bulk import
         import_response = ocldev.oclfleximporter.OclBulkImporter.post(
@@ -277,26 +282,11 @@ class Qmap(object):
         task_id = import_response_json['task']
         return task_id
 
-    @staticmethod
-    def delete_source(domain='', qmap_id='', ocl_env_url='', ocl_api_token=''):
-        qmap_repo_url = '%s%s' % (ocl_env_url, ocldev.oclconstants.OclConstants.get_repository_url(
-            owner_id=domain, repository_id=qmap_id, include_trailing_slash=True))
-        ocl_api_headers = {'Content-Type': 'application/json'}
-        if ocl_api_token:
-            ocl_api_headers['Authorization'] = 'Token ' + ocl_api_token
-        response = requests.delete(qmap_repo_url, headers=ocl_api_headers)
-        response.raise_for_status()
-        if response.status_code == 204:
-            # Successfully deleted
-            return True
-        raise Exception("Unexpected response code when deleting source '%s': %s" % (
-            qmap_repo_url, response.status_code))
-
     def generate_import_script(self, domain='', do_create_org=True, do_create_qmap_source=True,
                                do_create_questionnaire_source=True, qmap_questionnaire=None):
         """ Generate OCL-formatted CSV import script """
 
-        # Instantiate the resource list and add org and source resources
+        # Add org and source to resource list
         qmap_csv_resources = ocldev.oclresourcelist.OclCsvResourceList()
         if do_create_org:
             qmap_csv_resources.append(self._get_csv_resource_organization(
@@ -327,6 +317,8 @@ class Qmap(object):
                 qmap_key=qmap_key, qmap_item=qmap_item, owner=domain, source=self.uid,
                 qmap_questionnaire=qmap_questionnaire,
                 owner_type=ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION)
+            if not pos_header_concept:
+                continue
             qmap_csv_resources.append(pos_header_concept)
             if 'choiceMap' in qmap_item:
                 pos_header_choices = self._generate_pos_choice_concepts_and_mappings(
@@ -409,6 +401,9 @@ class Qmap(object):
     def _generate_pos_header_concept_and_mapping(self, qmap_key='', qmap_item=None,
                                                  source='', qmap_questionnaire=None, owner='',
                                                  owner_type=ocldev.oclconstants.OclConstants.RESOURCE_TYPE_ORGANIZATION):
+        if 'path' not in qmap_item and 'valueType' not in qmap_item and 'headerPath' not in qmap_item:
+            # Skip if it doesn't have at least one of these
+            return None
         concept = {
             'resource_type': ocldev.oclconstants.OclConstants.RESOURCE_TYPE_CONCEPT,
             'id': Qmap._convert_to_pos_header_concept_id(qmap_key),
@@ -417,14 +412,19 @@ class Qmap(object):
             'source': source,
             'name': qmap_key,
             'concept_class': self.QMAP_CONCEPT_CLASS_POS_HEADER,
-            'datatype': qmap_item['valueType'],
-            'attr:path': qmap_item['path'],
-            'extmap_type[01]': 'Same As',
-            'extmap_to_source_url[01]': ocldev.oclconstants.OclConstants.get_repository_url(
-                owner_id=qmap_questionnaire.owner, repository_id=qmap_questionnaire.source,
-                include_trailing_slash=True),
-            'extmap_to_concept_id[01]': Qmap._convert_to_questionnaire_concept_id(qmap_item),
+            'datatype': qmap_item.get('valueType', 'None'),
         }
+        if 'headerPath': 
+            concept['attr:headerPath'] = qmap_item['headerPath']
+        if 'path' in qmap_item:
+            # Generate a mapping between the POS and Questionnaire items
+            concept['extmap_type[01]'] = 'Same As'
+            concept['extmap_to_source_url[01]'] = ocldev.oclconstants.OclConstants.get_repository_url(
+                owner_id=qmap_questionnaire.owner, repository_id=qmap_questionnaire.source,
+                include_trailing_slash=True)
+            concept['extmap_to_concept_id[01]'] = Qmap._convert_to_questionnaire_concept_id(
+                qmap_item)
+            concept['attr:path'] = qmap_item['path']
         return concept
 
     def _generate_pos_constant_concept_and_mapping(self, qmap_key='', qmap_item=None,
@@ -436,13 +436,13 @@ class Qmap(object):
             'owner_id': owner,
             'owner_type': owner_type,
             'source': source,
-            'name': qmap_item["display"],
+            'name': qmap_item.get('display', ''),
             'name_type': 'display',
-            'name[2]': qmap_item["code"],
+            'name[2]': qmap_item.get('code', ''),
             'name_type[2]': 'code',
             'concept_class': self.QMAP_CONCEPT_CLASS_POS_CONSTANT,
-            'datatype': qmap_item['valueType'],
-            'attr:path': qmap_item['path'],
+            'datatype': qmap_item.get('valueType', ''),
+            'attr:path': qmap_item.get('path', ''),
         }
         return pos_constant_concept
 
@@ -457,7 +457,7 @@ class Qmap(object):
             'source': source,
             'concept_class': self.QMAP_CONCEPT_CLASS_POS_CHOICE,
             'datatype': 'None',
-            'attr:path': qmap_item['path'],
+            'attr:path': qmap_item.get('path', ''),
             'attr:header_concept_id': Qmap._convert_to_pos_header_concept_id(qmap_key),
             'extmap_type[01]': 'Same As',
         }
@@ -466,12 +466,13 @@ class Qmap(object):
             choice_concept['id'] = Qmap._convert_to_pos_choice_concept_id(
                 qmap_key, choice_pos_value)
             choice_concept['name'] = choice_pos_value
-            choice_concept['attr:questionnaire_choice_value'] = choice_questionnaire_value
+            choice_concept['attr:questionnaire_choice_valueType'] = choice_questionnaire_value['valueType']
+            choice_concept['attr:questionnaire_choice_code'] = choice_questionnaire_value['code']
             choice_concept['extmap_to_source_url[01]'] = ocldev.oclconstants.OclConstants.get_repository_url(
                 owner_id=qmap_questionnaire.owner, repository_id=qmap_questionnaire.source,
                 include_trailing_slash=True)
             choice_concept['extmap_to_concept_id[01]'] = self._get_questionnaire_choice_concept_id(
-                qmap_item, choice_questionnaire_value)
+                qmap_item, choice_questionnaire_value['code'])
             choice_concepts.append(choice_concept)
         return choice_concepts
 

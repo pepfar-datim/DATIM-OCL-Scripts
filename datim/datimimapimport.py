@@ -11,8 +11,6 @@ The import script creates OCL-formatted JSON consisting of:
     One mapping for each PEPFAR indicator+disag pair represented with a "DATIM HAS OPTION" map type
     Country Collections, one per mapping to DATIM indicator+disag pair
     References for each concept and mapping added to each collection
-
-TODO: Exclude "null-disag" update from the import scripts -- this does not have any effect, its just an unnecessary step
 """
 import json
 import datimbase
@@ -94,10 +92,14 @@ class DatimImapImport(datimbase.DatimBase):
             raise Exception(msg)
         self.vlog(1, 'Latest version found for period "%s" for source "%s": "%s"' % (
             imap_input.period, datim_source_endpoint, datim_source_version))
+        repo_version_url = '%s%s/%s/' % (
+                self.oclenv, datim_source_endpoint, datim_source_version)
+        repo_version_url = '%s%s' % (self.oclenv, datim_source_endpoint)
+        if datim_source_endpoint[-1] != "/":
+            repo_version_url += "/"
+        repo_version_url += '%s/' % (datim_source_version)
         datim_moh_source_export = ocldev.oclexport.OclExportFactory.load_export(
-            repo_version_url='%s%s/%s/' % (
-                self.oclenv, datim_source_endpoint, datim_source_version),
-            oclapitoken=self.oclapitoken)
+            repo_version_url=repo_version_url, oclapitoken=self.oclapitoken)
         imap_timer.lap(label='STEP 3: Download DATIM-MOH-FYxx Export')
 
         # STEP 3 of 5: Validate input country mapping CSV file

@@ -21,7 +21,7 @@ class DatimShowMsp(datimshow.DatimShow):
     REQUIRE_OCL_EXPORT_DEFINITION = False
 
     # Default endpoint to use if unspecified OCL export
-    DEFAULT_REPO_LIST_ENDPOINT = '/orgs/PEPFAR-Test6/collections/'
+    DEFAULT_REPO_LIST_ENDPOINT = '/orgs/PEPFAR-Test10/collections/'
 
     DEFAULT_SHOW_BUILD_ROW_METHOD = 'build_mer_data_element_output'
 
@@ -96,6 +96,7 @@ class DatimShowMsp(datimshow.DatimShow):
                 show_build_row_method='build_mer_data_element_output')
             self.transform_to_format(intermediate, export_format)
         elif repo_id:
+            self.DEFAULT_REPO_LIST_ENDPOINT = '/orgs/%s/collections/' % owner
             datimshow.DatimShow.get(self, repo_id=repo_id, export_format=export_format)
         else:
             raise Exception('Must provide either data_element_ids or repo_id.')

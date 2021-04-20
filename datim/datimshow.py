@@ -141,7 +141,10 @@ class DatimShow(datimbase.DatimBase):
         for row in content['rows']:
             sys.stdout.write('\n<tr>')
             for header in content['headers']:
-                sys.stdout.write('<td>%s</td>' % str(row[header['name']].encode('utf-8')))
+                try:
+                    sys.stdout.write('<td>%s</td>' % str(row[header['name']].encode('utf-8')))
+                except:
+                    sys.stdout.write('<td>%s</td>' % str(row[header['name']]))
         sys.stdout.write('</tr>')
         sys.stdout.write('\n</tbody></table></div>')
         sys.stdout.flush()
@@ -202,7 +205,10 @@ class DatimShow(datimbase.DatimBase):
             # convert to utf-8 encoded strings
             row_utf8 = {}
             for key in row:
-                row_utf8[key] = row[key].encode('utf-8')
+                try:
+                    row_utf8[key] = row[key].encode('utf-8')
+                except:
+                    row_utf8[key] = row[key]
             writer.writerow(row_utf8)
         sys.stdout.flush()
 

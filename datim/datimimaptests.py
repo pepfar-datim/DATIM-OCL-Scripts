@@ -28,6 +28,7 @@ class DatimImapTests:
     IMAP_COMPARE_TYPE_FILE = 'file'
     IMAP_COMPARE_TYPE_OCL = 'ocl'
     IMAP_COMPARE_TYPE_RESULT = 'result'
+    IMAP_COMPARE_TYPE_VARIABLE = 'variable'
 
     def __init__(self):
         self.results = {}
@@ -108,6 +109,7 @@ class DatimImapTests:
             args['imap_a_type'],
             imap_result_id=args.get('imap_a_result_id'),
             imap_filename=args.get('imap_a_filename'),
+            imap_object=args.get('imap_a_object'),
             period=args.get('imap_a_period'),
             version=args.get('imap_a_version'),
             country_org=args.get('imap_a_country_org'),
@@ -123,6 +125,7 @@ class DatimImapTests:
             args['imap_b_type'],
             imap_result_id=args.get('imap_b_result_id'),
             imap_filename=args.get('imap_b_filename'),
+            imap_object=args.get('imap_b_object'),
             period=args.get('imap_b_period'),
             version=args.get('imap_b_version'),
             country_org=args.get('imap_b_country_org'),
@@ -140,7 +143,7 @@ class DatimImapTests:
             return imap_diff
         return None
 
-    def get_imap(self, imap_type, imap_result_id='', imap_filename='',
+    def get_imap(self, imap_type, imap_result_id='', imap_filename='', imap_object=None,
                  period='', version='', country_org='', country_code='', country_name='',
                  oclenv='', oclapitoken=''):
         if imap_type == DatimImapTests.IMAP_COMPARE_TYPE_RESULT:
@@ -161,6 +164,8 @@ class DatimImapTests:
                 oclenv=oclenv, oclapitoken=oclapitoken, verbosity=1, run_ocl_offline=False)
             return datim_imap_export.get_imap(
                 period=period, version=version, country_org=country_org, country_code=country_code)
+        elif imap_type == DatimImapTests.IMAP_COMPARE_TYPE_VARIABLE:
+            return imap_object
         else:
             raise Exception('Unrecognized imap_type "%s". Must be one of the DatimImapTests.IMAP_COMPARE_TYPE_RESULT contants' % imap_type)
 

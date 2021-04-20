@@ -1,38 +1,32 @@
 """
-Script to restore a backup of IMAPs into an OCL environment
+Perform diff on an IMAP stored in OCL and one stored in a JSON or CSV file
 
-This command will import an IMAP backup into OCL staging:
-
-    python imaprestore.py --env=staging -t=[my-token] imap_backup_filename.json
-
+EXAMPLE:
+python imapdiffbackup.py --env=production-aws -t=2925899a86b7601de02b7b0f22cafda494ad2a5e -v1 imap-samples/production-v1-imap-backup-20210405.json
 """
 import json
 import argparse
 import datim.datimimap
-import datim.datimimapimport
+import datim.datimimaptests
 import common
 
 
 # Script argument parser
 parser = argparse.ArgumentParser(
-    "imap-restore", description="Restore IMAP backup file to OCL environment")
-group = parser.add_mutually_exclusive_group()
-group.add_argument(
-    '--env', help='Name of the OCL API environment: production, staging, demo, qa',
-    type=common.ocl_environment)
+    "imap-diff-backup", description="Diff IMAP backup with OCL environment")
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument('--env', help='Name of the OCL API environment', type=common.ocl_environment)
 group.add_argument('--envurl', help='URL of the OCL API environment')
-parser.add_argument('-t', '--token', help='OCL API token')
-parser.add_argument('--test_mode', action="store_true", help='Enable test mode', default=False)
+parser.add_argument('-t', '--token', help='OCL API token', required=True)
+parser.add_argument(
+    '-c', '--country_code', help='Filter backup by country code, eg "BI" or "UG"', default='')
+parser.add_argument(
+    '-p', '--period', help='Filter backup by period, eg "FY19" or "FY20"', default='')
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
-parser.add_argument(
-    '-c', '--country_code', help='Filter by country code, eg "ETH", "KEN"', required=False, default='')
-parser.add_argument(
-    '-p', '--period', help='Filter by period, eg "FY18", "FY19"', required=False, default='')
-parser.add_argument('--public_access', help="Level of public access: View, None", default='View')
 parser.add_argument('--version', action='version', version='%(prog)s v' + common.APP_VERSION)
 parser.add_argument(
-    'file', type=argparse.FileType('r'), help='IMAP file (JSON or CSV), eg "BI-FY20.csv"')
+    'file', type=argparse.FileType('r'), help='IMAP backup file #1')
 args = parser.parse_args()
 
 # Prepare filters
@@ -95,34 +89,29 @@ for imap_backup in imap_backups:
         print 'ERROR: Unable to load IMAP import file "%s"' % args.file.name
         exit(1)
 
-    # Import IMAP
-    output_json = {
-        "country_org": imap_backup['country_org'],
-        "country_code": imap_backup['country_code'],
-        "country_name": imap_backup['country_name'],
-        "period": imap_backup['period']
-    }
-    try:
-        bulk_import_task_id = ''
-        if not args.test_mode:
-            imap_import = datim.datimimapimport.DatimImapImport(
-                oclenv=ocl_env_url, oclapitoken=args.token, verbosity=args.verbosity,
-                run_ocl_offline=False, test_mode=args.test_mode,
-                country_public_access=args.public_access)
-            bulk_import_task_id = imap_import.import_imap(imap_input=imap_input)
-    except Exception as err:
-        output_json["status"] = "Error"
-        output_json["message"] = str(err)
-    else:
-        if args.test_mode:
-            output_json["status"] = "Test"
-        elif bulk_import_task_id:
-            output_json["status"] = "Success"
-            output_json["message"] = ("IMAP successfully queued for bulk import into OCL. "
-                                      "Request IMAP export after bulk import is processed "
-                                      "or request import status.")
-            output_json["ocl_bulk_import_task_id"] = bulk_import_task_id
-            output_json["ocl_bulk_import_status_url"] = "%s/manage/bulkimport/?task=%s" % (
-                ocl_env_url, bulk_import_task_id)
-    if output_json and not args.test_mode:
-        print json.dumps(output_json)
+    # Run the diff
+    imap_test_batch = [
+        {
+            "test_id": "imap-diff",
+            "is_active": True,
+            "test_description": "Compare IMAP from backup to an IMAP in OCL",
+            "test_type": datim.datimimaptests.DatimImapTests.DATIM_OCL_TEST_TYPE_COMPARE,
+            "imap_a_type": datim.datimimaptests.DatimImapTests.IMAP_COMPARE_TYPE_VARIABLE,
+            "imap_a_object": imap_input,
+            "imap_b_type": datim.datimimaptests.DatimImapTests.IMAP_COMPARE_TYPE_OCL,
+            "imap_b_ocl_api_env": ocl_env_url,
+            "imap_b_ocl_api_token": args.token,
+            "imap_b_period": imap_backup['period'],
+            "imap_b_country_org": imap_backup['country_org'],
+            "imap_b_country_name": imap_backup['country_name'],
+            "imap_b_country_code": imap_backup['country_code'],
+            "assert_result_type": datim.datimimap.DatimImapDiff,
+            "assert_num_diff": 0,
+        }
+    ]
+
+    # Run the diff and display the results
+    datim.datimimaptests.DatimImapTests.display_test_summary(imap_test_batch)
+    imap_tester = datim.datimimaptests.DatimImapTests()
+    imap_tester.run_tests(imap_test_batch)
+    imap_tester.display_test_results()

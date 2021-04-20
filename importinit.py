@@ -24,16 +24,16 @@ import settings
 # Edit this list to import the files that you need
 import_filenames_all = [
     'init/pepfar_org.json',
-    'init/datim_moh_fy18.json',
+    # 'init/datim_moh_fy18.json',
     'init/datim_moh_fy19.json',
     'init/datim_moh_fy20.json',
 ]
 import_filenames = import_filenames_all
 
 # OCL Settings
-do_wait_until_import_complete = False
-ocl_api_url_root = settings.ocl_api_url_staging
-ocl_api_token = settings.api_token_staging_datim_admin
+do_wait_until_import_complete = True
+ocl_api_url_root = settings.ocl_api_url_staging_aws
+ocl_api_token = settings.api_token_staging_aws_datim_admin
 
 # Build a combined resource list
 resource_list = ocldev.oclresourcelist.OclJsonResourceList()

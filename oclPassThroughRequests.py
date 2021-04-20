@@ -27,8 +27,12 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
     response.raise_for_status() #- see if raise for status can be implemented without conflict
     # check for if it is JSON or Text - if can't check test if it can be converted to json
     is_json = True
+    content=response.content
     try:
-        json_object = json.loads(response.content)
+        content=response.content
+        if content.startswith('"') and content.endswith('"'): # trimming first and last quotes
+            content = content[1:-1]
+        json_object = json.loads(content)
     except ValueError as e:
         is_json = False
     if import_result_format == 'summary':
@@ -36,7 +40,7 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
             output_json = {
                 "status": "Completed",
                 "status_code": response.status_code,
-                "message": response.content}
+                "message": content}
         elif (response.status_code == 200 or response.status_code == 202) and is_json == True:
             output_json = {
                 "status": "Pending",
@@ -62,7 +66,7 @@ def getQMAPDomainDetails(ocl_env_url='', domain=''):
 def getDATIMCodeLists(ocl_env_url='',owner=''):
     """ get DATIM Codelist details """
     ocl_api_headers = {'Content-Type': 'application/json'}
-    datimCodelistsDetailsURL = '%s/orgs/%s/collections/?collectionType="Code+List"&limit=0' % (
+    datimCodelistsDetailsURL = '%s/orgs/%s/collections/?collectionType=Code List&q=&limit=400' % (
         ocl_env_url,owner)
     response = requests.get(datimCodelistsDetailsURL, headers=ocl_api_headers)
     response.raise_for_status()
@@ -72,7 +76,7 @@ def getDATIMCodeLists(ocl_env_url='',owner=''):
 def getMOHCodelists(ocl_env_url='',owner=''):
     """ get MOH Codelists details """
     ocl_api_headers = {'Content-Type': 'application/json'}
-    mohCodelistsDetailsURL = '%s/orgs/%s/sources/?extras__datim_moh_codelist=true&verbose=true' % (
+    mohCodelistsDetailsURL = '%s/orgs/%s/sources/?extras.datim_moh_codelist=true&verbose=true' % (
         ocl_env_url,owner)
     response = requests.get(mohCodelistsDetailsURL, headers=ocl_api_headers)
     response.raise_for_status()
@@ -80,7 +84,7 @@ def getMOHCodelists(ocl_env_url='',owner=''):
 
 
 # Configure
-parser = argparse.ArgumentParser("bulkImportStatus", description="Get Bulk Import Status from OCL")
+parser = argparse.ArgumentParser("OCL Passthrough", description="Set of passthrough requests to direct ocl api endpoints")
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('--env', help='Name of the OCL API environment', type=common.ocl_environment)
 group.add_argument('--envurl', help='URL of the OCL API environment')
@@ -97,6 +101,8 @@ parser.add_argument(
     '--requestType', help='Type of Passthrough Request', required=True)
 parser.add_argument(
     '--country_code', help='Country Code', required=False)
+parser.add_argument(
+    '--owner', help='owner', required=False)
 args = parser.parse_args()
 ocl_env_url = args.env if args.env else args.env_url
 
@@ -115,9 +121,9 @@ try:
     if args.requestType == "qmapDetails":
         response = getQMAPDomainDetails(ocl_env_url=ocl_env_url, domain=args.domain)
     if args.requestType == "datimCodelists":
-        response = getDATIMCodeLists(ocl_env_url=ocl_env_url)
+        response = getDATIMCodeLists(ocl_env_url=ocl_env_url, owner=args.owner)
     if args.requestType == "mohCodelists":
-        response = getMOHCodelists(ocl_env_url=ocl_env_url)
+        response = getMOHCodelists(ocl_env_url=ocl_env_url, owner=args.owner)
 except Exception as e:
     output_json = {
         "status": "Error",

@@ -84,10 +84,15 @@ if isinstance(ocl_imap_orgs, list):
             exclude_columns=['members_url', 'collections_url', 'sources_url', 'uuid', 'members'])
     elif output_format == 'text':
         for ocl_org in ocl_imap_orgs:
+            datim_moh_country_code = None
+            datim_moh_period = None
+            if 'extras' in ocl_org and ocl_org['extras']:
+                datim_moh_country_code = ocl_org['extras'].get('datim_moh_country_code')
+                datim_moh_period = ocl_org['extras'].get('datim_moh_period')
             print '%s: %s %s %s' % (
                 ocl_org['id'],
                 ocl_org.get('location', ''),
-                ocl_org['extras'].get('datim_moh_country_code'),
-                ocl_org['extras'].get('datim_moh_period'))
+                datim_moh_country_code,
+                datim_moh_period)
     else:
         print json.dumps(ocl_imap_orgs)

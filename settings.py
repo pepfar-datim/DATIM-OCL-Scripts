@@ -27,9 +27,6 @@ ocl_api_url_staging_aws = 'https://api.staging.aws.openconceptlab.org'
 ocl_api_url_qa = 'https://api.qa.openconceptlab.org'
 ocl_api_url_qa_v1 = 'https://api.qa.v1.openconceptlab.org'
 ocl_api_url_qa_aws = 'https://api.qa.aws.openconceptlab.org'
-ocl_api_url_qa = 'https://api.qa.openconceptlab.org'
-ocl_api_url_qa_v1 = 'https://api.qa.v1.openconceptlab.org'
-ocl_api_url_qa_aws = 'https://api.qa.aws.openconceptlab.org'
 
 # IMAP Mediator URL roots - no slash at the end
 imap_mediator_url_test = 'https://test.ohie.datim.org:5000'

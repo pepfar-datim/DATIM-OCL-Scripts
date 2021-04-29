@@ -17,7 +17,7 @@ import json
 import requests
 import os
 import sys
-import pprint
+#import pprint
 import time
 from requests.auth import HTTPBasicAuth
 from shutil import copyfile
@@ -745,7 +745,7 @@ class DatimSync(datimbase.DatimBase):
                 ocl_diff=local_ocl_diff, dhis2_diff=local_dhis2_diff)
 
         # TODO: Remove the diff_result display after final testing of content
-        pprint.pprint(self.diff_result)
+        #.pprint(self.diff_result)
 
         # STEP 8 of 12: Determine action based on diff result
         # NOTE: This step occurs regardless of sync mode -- processing terminates here if DIFF mode

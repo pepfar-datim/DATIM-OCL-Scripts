@@ -5,7 +5,7 @@ import requests
 import sys
 import json
 import simplejson
-from pprint import pprint
+#from pprint import pprint
 import tarfile
 from deepdiff import DeepDiff
 from requests.auth import HTTPBasicAuth

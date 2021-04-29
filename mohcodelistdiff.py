@@ -1,5 +1,5 @@
 import csv
-import pprint
+#import pprint
 from deepdiff import DeepDiff
 
 # FY18: sfk9cyQSUyi
@@ -36,7 +36,7 @@ for period in periods:
 
     ddiff = DeepDiff(dhis2_codelist, ocl_codelist)
     print '%s:' % period
-    pprint.pprint(ddiff)
+    #pprint.pprint(ddiff)
     print '\n\n'
 
     # print period, len(ocl_codelist), len(dhis2_codelist)

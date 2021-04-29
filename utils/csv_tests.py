@@ -3,7 +3,7 @@ Use this script to test one or multiple IMAP CSV files for validity and
 that the DatimImap object is interpreting the values correctly.
 """
 import datim.datimimap
-import pprint
+#import pprint
 
 verbosity = 1
 country_codes = {

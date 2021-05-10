@@ -123,9 +123,9 @@ except ocldev.oclexport.OclExportNotAvailableError as export_error:
     print json.dumps({
         "status": "Not Available",
         "message": "QMAP export not available. Try requesting again later."
-    })
+    }, indent=4)
 except Exception as e:
     print json.dumps({
         "status": "Error",
         "message": str(e)
-    })
+    }, indent=4)

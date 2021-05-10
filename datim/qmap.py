@@ -30,7 +30,7 @@ class Qmap(object):
 
     def __str__(self):
         """ Get string representation of Qmap object """
-        return json.dumps(self._qmap)
+        return json.dumps(self._qmap, indent=4)
 
     @staticmethod
     def export_qmap(domain='', qmap_id='', ocl_env_url='', ocl_api_token='', verbosity=0):
@@ -141,10 +141,13 @@ class Qmap(object):
         for _header_concept in qmap_export.get_concepts(
                 core_attrs={"concept_class": Qmap.QMAP_CONCEPT_CLASS_POS_HEADER}):
             _new_header = {}
-            if 'extras' in _header_concept and 'path' in _header_concept["extras"]:
-                _new_header['path'] = _header_concept["extras"]["path"]
-            if 'extras' in _header_concept and 'headerPath' in _header_concept["extras"]:
-                _new_header['headerPath'] = _header_concept["extras"]["headerPath"]
+            if 'extras' in _header_concept:
+                if 'path' in _header_concept["extras"]:
+                    _new_header['path'] = _header_concept["extras"]["path"]
+                if 'headerPath' in _header_concept["extras"]:
+                    _new_header['headerPath'] = _header_concept["extras"]["headerPath"]
+                if 'logic' in _header_concept["extras"]:
+                    _new_header['logic'] = _header_concept["extras"]["logic"]
             if "datatype" in _header_concept and _header_concept['datatype'] != 'None':
                 _new_header['valueType'] = _header_concept["datatype"]
             if _new_header:
@@ -414,7 +417,7 @@ class Qmap(object):
             'concept_class': self.QMAP_CONCEPT_CLASS_POS_HEADER,
             'datatype': qmap_item.get('valueType', 'None'),
         }
-        if 'headerPath': 
+        if 'headerPath' in qmap_item:
             concept['attr:headerPath'] = qmap_item['headerPath']
         if 'path' in qmap_item:
             # Generate a mapping between the POS and Questionnaire items
@@ -425,6 +428,8 @@ class Qmap(object):
             concept['extmap_to_concept_id[01]'] = Qmap._convert_to_questionnaire_concept_id(
                 qmap_item)
             concept['attr:path'] = qmap_item['path']
+        if 'logic' in qmap_item:
+            concept['attr:logic'] = qmap_item['logic']
         return concept
 
     def _generate_pos_constant_concept_and_mapping(self, qmap_key='', qmap_item=None,

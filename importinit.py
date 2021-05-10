@@ -15,7 +15,7 @@ Files: (THIS LIST NEEDS TO BE UPDATED!)
     Tiered Site Support. Note that no repo versions and no collection references are created for
     Tiered Site Support
 """
-import pprint
+#import pprint
 import ocldev.oclfleximporter
 import ocldev.oclresourcelist
 import settings
@@ -41,7 +41,7 @@ for import_filename in import_filenames:
     resource_list += ocldev.oclresourcelist.OclJsonResourceList.load_from_file(
         filename=import_filename)
 print '%s resources will be imported:' % len(resource_list)
-pprint.pprint(resource_list.summarize(core_attr_key='type'))
+#pprint.pprint(resource_list.summarize(core_attr_key='type'))
 
 # Process as bulk import
 if resource_list:

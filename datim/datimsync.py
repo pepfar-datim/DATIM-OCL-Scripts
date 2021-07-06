@@ -778,7 +778,7 @@ class DatimSync(datimbase.DatimBase):
         if sync_mode in [DatimSync.SYNC_MODE_FULL_IMPORT]:
             bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
                 file_path=self.attach_absolute_data_path(self.NEW_IMPORT_SCRIPT_FILENAME),
-                api_token=self.oclapitoken, api_url_root=self.oclenv)
+                api_token=self.oclapitoken, api_url_root=self.oclenv, parallel=True)
             task_id = bulk_import_response.json()['task']
             import_results = ocldev.oclfleximporter.OclBulkImporter.get_bulk_import_results(
                 task_id=task_id, api_url_root=self.oclenv, api_token=self.oclapitoken,

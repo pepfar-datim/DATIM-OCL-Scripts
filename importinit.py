@@ -47,7 +47,8 @@ print '%s resources will be imported:' % len(resource_list)
 if resource_list:
     print 'Submitting bulk import to: %s' % ocl_api_url_root
     bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
-        input_list=resource_list, api_token=ocl_api_token, api_url_root=ocl_api_url_root)
+        input_list=resource_list, api_token=ocl_api_token,
+        api_url_root=ocl_api_url_root, parallel=True)
     task_id = bulk_import_response.json()['task']
     print 'BULK IMPORT TASK ID: %s' % task_id
     if do_wait_until_import_complete:

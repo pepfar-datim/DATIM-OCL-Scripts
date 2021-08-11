@@ -24,7 +24,11 @@ class DatimSyncMohHelper(object):
             return DatimSyncMohHelper.get_disag_classification_fy18(de_code=de_code, de_uid=de_uid, coc_name=coc_name)
         elif period == 'FY20':
             return DatimSyncMohHelper.get_disag_classification_fy20(de_code=de_code, de_uid=de_uid, coc_name=coc_name)
-        return ''
+        else:
+            # return DatimSyncMohHelper.get_disag_classification_from_custom_attribute(
+            #     de_code=de_code, de_uid=de_uid, coc_name=coc_name
+            # )
+            return ''
 
     @staticmethod
     def get_disag_classification_fy18(de_code='', de_uid='', coc_name=''):

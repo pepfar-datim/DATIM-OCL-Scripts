@@ -40,7 +40,7 @@ group.add_argument(
 group.add_argument('--envurl', help='URL of the OCL API environment')
 parser.add_argument('-t', '--token', help='OCL API token', required=False)
 parser.add_argument(
-    '--format', help='Format of bulk import results to return from OCL', default="text")
+    '-f', '--format', help='Format of bulk import results to return from OCL', default="text")
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
 parser.add_argument('--version', action='version', version='%(prog)s v' + common.APP_VERSION)
@@ -123,7 +123,7 @@ if result_type == 'Organization':
     elif output_format == 'csv':
         print iol.get_as_csv(
             filtered_results, start_columns=['id', 'name'],
-            exclude_columns=['members_url', 'collections_url', 'sources_url', 'uuid', 'members'])
+            include_columns=['id', 'name'])
     else:
         print json.dumps(filtered_results)
 elif result_type == 'Source':
@@ -133,15 +133,8 @@ elif result_type == 'Source':
                                       ocl_source['extras']['questionnaireuid'],
                                       ocl_source['extras']['qmap_version'])
     elif output_format == 'csv':
-        exclude_columns = [
-            'versions_url',
-            'uuid',
-            'mappings_url',
-            'concepts_url',
-            'custom_validation_schema',
-            'owner_type']
         print iol.get_as_csv(
             filtered_results, start_columns=['id', 'owner', 'full_name'],
-            exclude_columns=exclude_columns)
+            include_columns=['id', 'owner', 'full_name', 'attr:questionnaireuid', 'attr:qmap_version'])
     else:
         print json.dumps(filtered_results)

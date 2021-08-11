@@ -1,18 +1,26 @@
+"""
+Converts a DSHI2 formatted CSV codelist to an OCL-formatted JSON bulk import script.
+This has been tested and used for DAA-FY21 and CS-FY21. This would likely work for other
+periods (eg FY20) as well with minimal modification.
+
+CS-FY21: https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:u069j8gVYTA
+"""
 import unicodecsv as csv
 import json
 import ocldev.oclresourcelist
 
 
+# Configure script
 fy_only = 'FY21'
 period = "CS-FY21"
 csv_filename = 'dhis2_moh_fy21_cs.csv'
+FILENAME_MAP_DE_CODE_TO_INDICATOR_CATEGORY = 'cs_fy21_indicator_maps.csv'
 owner = 'PEPFAR'
 owner_type = 'Organization'
+debug = True
 
-de_concepts = {}
-coc_concepts = {}
-de_coc_mappings = []
 
+# Source, null disag, and source version configuration
 datim_moh_source = {
     "type": "Source",
     "id": "DATIM-MOH-%s" % period,
@@ -86,7 +94,15 @@ def row_to_coc_concept(row, datim_moh_source):
     return concept
 
 
-def row_to_de_concept(row, datim_moh_source):
+def row_to_de_concept(row, datim_moh_source, map_de_code_to_indicator_category, debug=False):
+    if row['code'] in map_de_code_to_indicator_category:
+        indicator_category_code = map_de_code_to_indicator_category[row['code']]
+        if debug:
+            print row['code'], indicator_category_code
+    else:
+        indicator_category_code = row['code'][:find_nth(row['code'], '_', 2)]
+        if debug:
+            print '***', row['code'], indicator_category_code
     concept = {
         "type": "Concept",
         "id": row['code'],
@@ -96,7 +112,7 @@ def row_to_de_concept(row, datim_moh_source):
         "concept_class": "Data Element",
         "source": datim_moh_source["id"],
         "extras": {
-            "indicator_category_code": row['code'][:find_nth(row['code'], '_', 2)]
+            "indicator_category_code": indicator_category_code
         },
         "descriptions": [
             {
@@ -144,13 +160,33 @@ def row_to_mapping(row, datim_moh_source):
     return mapping
 
 
+# Load mapping between indicator categories and data element codes
+de_concepts = {}
+coc_concepts = {}
+de_coc_mappings = []
+map_de_code_to_indicator_category = {}
+with open(FILENAME_MAP_DE_CODE_TO_INDICATOR_CATEGORY) as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        map_de_code_to_indicator_category[row['de_code']] = row['indicator_category_code']
+
 # Build the individual concepts and mappings
+de_codes = {}
+missing = []
+found = []
+if debug:
+    print 'LIST OF UNIQUE DATA ELEMENT CODES MAPPED TO INDICATOR CODES:'
+    print 'de_name,indicator_code'
 with open(csv_filename) as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
-        # print json.dumps(row, indent=4)
+        de_code = row['code']
+        if de_code not in de_codes:
+            de_codes[de_code] = True
+            found.append(de_code)
         if row["code"] not in de_concepts:
-            de_concepts[row["code"]] = row_to_de_concept(row, datim_moh_source)
+            de_concepts[row["code"]] = row_to_de_concept(
+                row, datim_moh_source, map_de_code_to_indicator_category, debug)
         if row["categoryoptioncombouid"] not in coc_concepts:
             coc_concepts[row["categoryoptioncombouid"]] = row_to_coc_concept(row, datim_moh_source)
         de_coc_mappings.append(row_to_mapping(row, datim_moh_source))
@@ -165,6 +201,9 @@ for coc_concept_id in coc_concepts:
     moh_resources += coc_concepts[coc_concept_id]
 moh_resources += de_coc_mappings
 moh_resources += source_version
+
+if debug:
+    print '\n\nCODELIST AS OCL-FORMATTED JSON:'
 
 # Output
 for resource in moh_resources:

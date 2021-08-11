@@ -79,9 +79,10 @@ ocl_imap_orgs = common.get_imap_orgs(
 if isinstance(ocl_imap_orgs, list):
     output_format = args.format.lower()
     if output_format == 'csv':
+        # DATIM-MOH-TESTER2-FY20: TESTER2 TESTER2 FY20
         print iol.get_as_csv(
             ocl_imap_orgs, start_columns=['id', 'name'],
-            exclude_columns=['members_url', 'collections_url', 'sources_url', 'uuid', 'members'])
+            include_columns=['id', 'name', 'attr:datim_moh_period', 'attr:datim_moh_country_code', 'url'])
     elif output_format == 'text':
         for ocl_org in ocl_imap_orgs:
             datim_moh_country_code = None
@@ -95,4 +96,4 @@ if isinstance(ocl_imap_orgs, list):
                 datim_moh_country_code,
                 datim_moh_period)
     else:
-        print json.dumps(ocl_imap_orgs)
+        print json.dumps(ocl_imap_orgs, indent=4)

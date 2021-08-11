@@ -137,11 +137,11 @@ else:
         output_json["status"] = "Test"
     if bulk_import_task_id:
         output_json["status"] = "Success"
-        output_json["message"] = ("IMAP successfully queued for bulk import into OCL. "
-                                  "Request IMAP export after bulk import is processed "
-                                  "or request import status.")
+        output_json["message"] = ("IMAP successfully queued for loading into OCL. "
+                                  "IMAP export will be available after bulk import processing "
+                                  "has completed.")
         output_json["ocl_bulk_import_task_id"] = bulk_import_task_id
-        output_json["ocl_bulk_import_status_url"] = "%s/manage/bulkimport/?task=%s" % (
+        output_json["ocl_bulk_import_status_url"] = "%s/importers/bulk-import/?task=%s" % (
             ocl_env_url, bulk_import_task_id)
         if args.imap_api_root:
             # https://test.ohie.datim.org:5000/ocl-imap/:countryCode/:period/[?format=:format]

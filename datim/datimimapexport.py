@@ -309,7 +309,7 @@ class DatimImapExport(datimbase.DatimBase):
         if ocl_api_version == 'v1':
             from_concept_name_field = 'from_concept_name'
             to_concept_name_field = 'to_concept_name'
-        else: 
+        else:
             from_concept_name_field = 'from_concept_name_resolved'
             to_concept_name_field = 'to_concept_name_resolved'
         rows = []
@@ -331,10 +331,20 @@ class DatimImapExport(datimbase.DatimBase):
                     if datimimap.DatimImap.IMAP_INDICATOR_CATEGORY_CUSTOM_ATTRIBUTE in indicator['extras']:
                         row_base[datimimap.DatimImap.IMAP_FIELD_DATIM_INDICATOR_CATEGORY] = indicator['extras'][
                             datimimap.DatimImap.IMAP_INDICATOR_CATEGORY_CUSTOM_ATTRIBUTE]
-                row_base[datimimap.DatimImap.IMAP_FIELD_MOH_CLASSIFICATION] = (
-                    datimsyncmohhelper.DatimSyncMohHelper.get_disag_classification(
+
+                # Set the classification attribute for this data element+disag pair
+                if mapping['to_concept_url'] in disaggregates and 'extras' in disaggregates[mapping['to_concept_url']]:
+                    # Classification for FY21 and forward is set by a disag custom attribute
+                    classification =  disaggregates[mapping['to_concept_url']]['extras'].get('classification')
+                if not classification:
+                    # If we can't get classification from a disag custom attribute, try to evaluate
+                    # it from the data element code. This method was needed for FY18-FY20.
+                    classification = datimsyncmohhelper.DatimSyncMohHelper.get_disag_classification(
                         period=period, de_code=indicator['id'], de_uid=indicator['external_id'],
-                        coc_name=mapping[to_concept_name_field]))
+                        coc_name=mapping[to_concept_name_field])
+                row_base[datimimap.DatimImap.IMAP_FIELD_MOH_CLASSIFICATION] = classification
+
+                moh_disag = mapping['from_concept_url']
                 if 'operations' in mapping and mapping['operations']:
                     # Country has mapped content to this datim indicator+disag pair
                     for operation in mapping['operations']:

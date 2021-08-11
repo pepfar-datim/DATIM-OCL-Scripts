@@ -299,6 +299,18 @@ class DatimConstants(object):
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-FY20/'},
+        'CS-FY21': {
+            'title': 'MER Results: CS Facility Based FY21',
+            'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-CS-FY21/'},
+        'DAA-FY21': {
+            'title': 'MER Results: MOH Facility Based FY21',
+            'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY21/'},
     }
 
     # MOH FY18 OCL Export Definitions

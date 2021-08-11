@@ -1,6 +1,6 @@
 """
 Use to import starter content into OCL to initialize the PEPFAR DATIM environment.
-Before running, edit import_filenames variable with the list of files you wish to import.
+Before running, edit IMPORT_FILENAMES variable with the list of files you wish to import.
 
 Files: (THIS LIST NEEDS TO BE UPDATED!)
 * datim_init_all.json - Do this first - imports PEPFAR Org and sources for MER,SIMS,Mechanisms,
@@ -15,29 +15,29 @@ Files: (THIS LIST NEEDS TO BE UPDATED!)
     Tiered Site Support. Note that no repo versions and no collection references are created for
     Tiered Site Support
 """
-#import pprint
 import ocldev.oclfleximporter
 import ocldev.oclresourcelist
 import settings
 
 
 # Edit this list to import the files that you need
-import_filenames_all = [
+IMPORT_FILENAMES_ALL = [
     'init/pepfar_org.json',
-    # 'init/datim_moh_fy18.json',
     'init/datim_moh_fy19.json',
     'init/datim_moh_fy20.json',
+    'init/datim_moh_fy21_cs.json',
+    'init/datim_moh_fy21_daa.json',
 ]
-import_filenames = import_filenames_all
+IMPORT_FILENAMES = IMPORT_FILENAMES_ALL
 
 # OCL Settings
-do_wait_until_import_complete = True
-ocl_api_url_root = settings.ocl_api_url_staging_aws
-ocl_api_token = settings.api_token_staging_aws_datim_admin
+DO_WAIT_UNTIL_IMPORT_COMPLETE = True
+OCL_API_URL_ROOT = settings.ocl_api_url_staging
+OCL_API_TOKEN = settings.api_token_staging_datim_admin
 
 # Build a combined resource list
 resource_list = ocldev.oclresourcelist.OclJsonResourceList()
-for import_filename in import_filenames:
+for import_filename in IMPORT_FILENAMES:
     resource_list += ocldev.oclresourcelist.OclJsonResourceList.load_from_file(
         filename=import_filename)
 print '%s resources will be imported:' % len(resource_list)
@@ -45,15 +45,16 @@ print '%s resources will be imported:' % len(resource_list)
 
 # Process as bulk import
 if resource_list:
-    print 'Submitting bulk import to: %s' % ocl_api_url_root
+    print 'Submitting bulk import to: %s' % OCL_API_URL_ROOT
     bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
-        input_list=resource_list, api_token=ocl_api_token, api_url_root=ocl_api_url_root)
+        input_list=resource_list, api_token=OCL_API_TOKEN,
+        api_url_root=OCL_API_URL_ROOT, parallel=True)
     task_id = bulk_import_response.json()['task']
     print 'BULK IMPORT TASK ID: %s' % task_id
-    if do_wait_until_import_complete:
+    if DO_WAIT_UNTIL_IMPORT_COMPLETE:
         print 'INFO: Waiting until import is complete...'
         import_results = ocldev.oclfleximporter.OclBulkImporter.get_bulk_import_results(
-            task_id=task_id, api_url_root=ocl_api_url_root, api_token=ocl_api_token,
+            task_id=task_id, api_url_root=OCL_API_URL_ROOT, api_token=OCL_API_TOKEN,
             delay_seconds=5, max_wait_seconds=800)
         if import_results:
             print import_results.display_report()

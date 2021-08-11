@@ -279,7 +279,7 @@ class Qmap(object):
         # Submit the bulk import
         import_response = ocldev.oclfleximporter.OclBulkImporter.post(
             input_list=qmap_json_resources, api_url_root=ocl_env_url,
-            api_token=ocl_api_token, test_mode=test_mode)
+            api_token=ocl_api_token, test_mode=test_mode, parallel=True)
         import_response.raise_for_status()
         import_response_json = import_response.json()
         task_id = import_response_json['task']

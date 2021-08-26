@@ -28,7 +28,6 @@ mccabe==0.6.1
 monotonic==1.5
 ocldev==0.1.88
 pathlib2==2.3.5
-pprint==0.1
 pylint==1.9.2
 pyrsistent==0.15.7
 pytz==2018.9

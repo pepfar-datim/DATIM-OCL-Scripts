@@ -5,7 +5,6 @@ import requests
 from ocldev.oclfleximporter import OclFlexImporter
 import time
 import settings
-# import pprint
 
 
 # JetStream staging
@@ -31,7 +30,7 @@ for c in collections:
     r = requests.delete(url, headers=oclapiheaders)
     print 'STATUS CODE: %d, %s' % (r.status_code, r.text)
     #c_version = r.json()
-    #pprint(c_version)
+    print(c_version)
 
 # Create new version for each collection
 for c in collections:

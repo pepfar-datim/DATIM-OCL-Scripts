@@ -3,7 +3,6 @@ Script to compare two IMAPs. Each IMAP may be stored in a file or in any of the 
 """
 import datim.datimimap
 import settings
-#import pprint
 
 # Constants - DO NOT EDIT
 IMAP_TYPE_LOAD_FROM_FILE = 'file'

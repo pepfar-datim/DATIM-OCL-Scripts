@@ -5,7 +5,6 @@ import requests
 import sys
 import json
 import simplejson
-#from pprint import pprint
 import tarfile
 from deepdiff import DeepDiff
 from requests.auth import HTTPBasicAuth
@@ -277,8 +276,8 @@ if verbosity:
     print '\n**** STEP 7 of 12: Prepare OCL exports for diff'
 with open(attachAbsolutePath(ocl_export_defs['mechanisms_source']['jsonfilename']), 'rb') as ifile, open(attachAbsolutePath(ocl_export_defs['mechanisms_source']['jsoncleanfilename']), 'wb') as ofile:
     ocl_mechanisms_export = json.load(ifile)
-    #if verbosity >= 2:
-    #    pprint(ocl_mechanisms_export)
+    if verbosity >= 2:
+        print(ocl_mechanisms_export)
     ocl_mechanisims_export_clean = []
     for c in ocl_mechanisms_export['concepts']:
         # clean the concept and write it

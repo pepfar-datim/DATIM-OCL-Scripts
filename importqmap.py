@@ -56,9 +56,8 @@ ocl_env_url = args.env if args.env else args.envurl
 
 # Display debug output
 if args.verbosity > 1:
-    #import pprint
     print args
-    #pprint.pprint(json.loads(str(qmap)))
+    print qmap
 
 # Process the qmap import
 output_json = None

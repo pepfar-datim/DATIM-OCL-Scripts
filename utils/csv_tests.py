@@ -3,7 +3,6 @@ Use this script to test one or multiple IMAP CSV files for validity and
 that the DatimImap object is interpreting the values correctly.
 """
 import datim.datimimap
-#import pprint
 
 verbosity = 1
 country_codes = {
@@ -129,7 +128,7 @@ for country_code in sorted(country_codes.iterkeys()):
             num_replaced_indicator_names += len(tracker_moh_indicator[resource_id]) - 1
             if verbosity >= 2:
                 print resource_id, tracker_moh_indicator[resource_id]
-    #pprint.pprint(tracker_moh_indicator)
+    print(tracker_moh_indicator)
     if verbosity >= 2:
         print '** MOH Disag Name Counts'
     num_replaced_disag_names = 0
@@ -138,7 +137,7 @@ for country_code in sorted(country_codes.iterkeys()):
             num_replaced_disag_names += len(tracker_moh_disag[resource_id]) - 1
             if verbosity >= 2:
                 print resource_id, tracker_moh_disag[resource_id]
-    #pprint.pprint(tracker_moh_disag)
+    print(tracker_moh_disag)
     if verbosity >= 1:
         print '%s (%s): %s replaced Indicator Names; %s replaced Disag Names' % (
             country_code, country_name, num_replaced_indicator_names, num_replaced_disag_names)

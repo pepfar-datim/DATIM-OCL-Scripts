@@ -7,7 +7,6 @@ import requests
 import warnings
 import difflib
 import deepdiff
-#import pprint
 from operator import itemgetter
 import datimconstants
 import datimbase
@@ -128,7 +127,7 @@ class DatimSyncTest(datimbase.DatimBase):
             diff = self.test_csv(request_dhis2, request_ocl)
         if diff:
             print('Diff Results:')
-           # pprint.pprint(diff)
+            print(diff)
         else:
             print('No diff!')
         sys.stdout.flush()

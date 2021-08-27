@@ -22,9 +22,9 @@ import settings
 
 # Edit this list to import the files that you need
 IMPORT_FILENAMES_ALL = [
-    'init/pepfar_org.json',
-    'init/datim_moh_fy19.json',
-    'init/datim_moh_fy20.json',
+    # 'init/pepfar_org.json',
+    # 'init/datim_moh_fy19.json',
+    # 'init/datim_moh_fy20.json',
     'init/datim_moh_fy21_cs.json',
     'init/datim_moh_fy21_daa.json',
 ]
@@ -32,8 +32,10 @@ IMPORT_FILENAMES = IMPORT_FILENAMES_ALL
 
 # OCL Settings
 DO_WAIT_UNTIL_IMPORT_COMPLETE = True
-OCL_API_URL_ROOT = settings.ocl_api_url_staging
-OCL_API_TOKEN = settings.api_token_staging_datim_admin
+# OCL_API_URL_ROOT = settings.ocl_api_url_staging
+# OCL_API_TOKEN = settings.api_token_staging_datim_admin
+OCL_API_URL_ROOT = settings.ocl_api_url_production
+OCL_API_TOKEN = settings.api_token_production_datim_admin
 
 # Build a combined resource list
 resource_list = ocldev.oclresourcelist.OclJsonResourceList()
@@ -41,7 +43,7 @@ for import_filename in IMPORT_FILENAMES:
     resource_list += ocldev.oclresourcelist.OclJsonResourceList.load_from_file(
         filename=import_filename)
 print '%s resources will be imported:' % len(resource_list)
-#pprint.pprint(resource_list.summarize(core_attr_key='type'))
+print(resource_list.summarize(core_attr_key='type'))
 
 # Process as bulk import
 if resource_list:

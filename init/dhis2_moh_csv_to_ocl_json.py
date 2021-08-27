@@ -3,21 +3,31 @@ Converts a DSHI2 formatted CSV codelist to an OCL-formatted JSON bulk import scr
 This has been tested and used for DAA-FY21 and CS-FY21. This would likely work for other
 periods (eg FY20) as well with minimal modification.
 
-CS-FY21: https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:u069j8gVYTA
+
+1. Save DHIS2 codelist to CSV file (eg dhis2_moh_fy21_daa.csv)
+    CS-FY21: https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:u069j8gVYTA
+    DAA-FY21: https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:U7qYX49krHK
+2. Update script settings
+3. Run the script and save the outputted OCL bulk import script to a json file:
+    python dhis2_moh_csv_to_ocl_json.py > datim_moh_fy21_daa.json
+4. Update importinit.py and run it to load the codelist into the target OCL environment
+    python importinit.py
 """
 import unicodecsv as csv
 import json
 import ocldev.oclresourcelist
 
 
-# Configure script
+# Script settings
+modality = 'DAA'  # Central Support or DAA
 fy_only = 'FY21'
-period = "CS-FY21"
-csv_filename = 'dhis2_moh_fy21_cs.csv'
-FILENAME_MAP_DE_CODE_TO_INDICATOR_CATEGORY = 'cs_fy21_indicator_maps.csv'
+period = "DAA-FY21"
+csv_filename = 'dhis2_moh_fy21_daa.csv'
+# FILENAME_MAP_DE_CODE_TO_INDICATOR_CATEGORY = 'cs_fy21_indicator_maps.csv'
+FILENAME_MAP_DE_CODE_TO_INDICATOR_CATEGORY = ''
 owner = 'PEPFAR'
 owner_type = 'Organization'
-debug = True
+debug = False
 
 
 # Source, null disag, and source version configuration
@@ -26,7 +36,7 @@ datim_moh_source = {
     "id": "DATIM-MOH-%s" % period,
     "short_code": "DATIM-MOH-%s" % period,
     "name": "DATIM-MOH-%s" % period,
-    "full_name": "DATIM MOH Central Support %s Country Alignment Code List" % fy_only,
+    "full_name": "DATIM MOH %s %s Country Alignment Code List" % (modality, fy_only),
     "owner_type": owner_type,
     "owner": owner,
     "description": "",
@@ -165,10 +175,11 @@ de_concepts = {}
 coc_concepts = {}
 de_coc_mappings = []
 map_de_code_to_indicator_category = {}
-with open(FILENAME_MAP_DE_CODE_TO_INDICATOR_CATEGORY) as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        map_de_code_to_indicator_category[row['de_code']] = row['indicator_category_code']
+if FILENAME_MAP_DE_CODE_TO_INDICATOR_CATEGORY:
+    with open(FILENAME_MAP_DE_CODE_TO_INDICATOR_CATEGORY) as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            map_de_code_to_indicator_category[row['de_code']] = row['indicator_category_code']
 
 # Build the individual concepts and mappings
 de_codes = {}

@@ -624,6 +624,11 @@ class DatimConstants(object):
             'show_build_row_method': 'build_mer_indicator_output',
             'show_headers_key': 'mer',
             'endpoint': '/orgs/PEPFAR/collections/MER-T-Narratives-IM-FY18/'},
+        'MER-T-PSNU': {
+            'import_batch': IMPORT_BATCH_MER,
+            'show_build_row_method': 'build_mer_indicator_output',
+            'show_headers_key': 'mer',
+            'endpoint': '/orgs/PEPFAR/collections/MER-T-PSNU/'},
         'MER-T-Operating-Unit-Level-IM-FY16': {
             'import_batch': IMPORT_BATCH_MER,
             'show_build_row_method': 'build_mer_indicator_output',

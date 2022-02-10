@@ -9,6 +9,7 @@ OCL_ENVIRONMENTS = {
     'qa': 'https://api.qa.openconceptlab.org',
     'qa-v1': 'https://api.qa.v1.openconceptlab.org',
     'qa-aws': 'https://api.qa.aws.openconceptlab.org',
+    'dev': 'https://api.dev.openconceptlab.org',
     'staging': 'https://api.staging.openconceptlab.org',
     'staging-v1': 'https://api.staging.v1.openconceptlab.org',
     'staging-aws': 'https://api.staging.aws.openconceptlab.org',

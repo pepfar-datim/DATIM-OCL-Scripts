@@ -15,27 +15,29 @@ Files: (THIS LIST NEEDS TO BE UPDATED!)
     Tiered Site Support. Note that no repo versions and no collection references are created for
     Tiered Site Support
 """
+import json
 import ocldev.oclfleximporter
 import ocldev.oclresourcelist
 import settings
 
 
 # Edit this list to import the files that you need
+
 IMPORT_FILENAMES_ALL = [
-    # 'init/pepfar_org.json',
-    # 'init/datim_moh_fy19.json',
-    # 'init/datim_moh_fy20.json',
+    'init/pepfar_org.json',
+    'init/datim_moh_fy19.json',
+    'init/datim_moh_fy20.json',
     'init/datim_moh_fy21_cs.json',
     'init/datim_moh_fy21_daa.json',
 ]
 IMPORT_FILENAMES = IMPORT_FILENAMES_ALL
 
 # OCL Settings
+VERBOSE = False
+DO_BULK_IMPORT = True
 DO_WAIT_UNTIL_IMPORT_COMPLETE = True
-# OCL_API_URL_ROOT = settings.ocl_api_url_staging
-# OCL_API_TOKEN = settings.api_token_staging_datim_admin
-OCL_API_URL_ROOT = settings.ocl_api_url_production
-OCL_API_TOKEN = settings.api_token_production_datim_admin
+OCL_API_URL_ROOT = settings.ocl_api_url_qa
+OCL_API_TOKEN = settings.api_token_qa_datim_admin
 
 # Build a combined resource list
 resource_list = ocldev.oclresourcelist.OclJsonResourceList()
@@ -45,8 +47,14 @@ for import_filename in IMPORT_FILENAMES:
 print '%s resources will be imported:' % len(resource_list)
 print(resource_list.summarize(core_attr_key='type'))
 
+# Display the full list of resources
+if VERBOSE:
+    import json
+    for resource in resource_list:
+        print json.dumps(resource)
+
 # Process as bulk import
-if resource_list:
+if DO_BULK_IMPORT and resource_list:
     print 'Submitting bulk import to: %s' % OCL_API_URL_ROOT
     bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
         input_list=resource_list, api_token=OCL_API_TOKEN,

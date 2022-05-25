@@ -1,7 +1,7 @@
-import settings
-import datim.datimimap
-import datim.datimimaptests
-import datim.datimimapimport
+from . import settings
+from . import datim.datimimap
+from . import datim.datimimaptests
+from . import datim.datimimapimport
 
 # Settings
 period = 'FY19'

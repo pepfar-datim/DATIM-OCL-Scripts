@@ -8,9 +8,9 @@ import warnings
 import difflib
 import deepdiff
 from operator import itemgetter
-import datimconstants
-import datimbase
-import datimshow
+from . import datimconstants
+from . import datimbase
+from . import datimshow
 
 class DatimSyncTest(datimbase.DatimBase):
     """
@@ -48,7 +48,7 @@ class DatimSyncTest(datimbase.DatimBase):
         elif resource_type == datimconstants.DatimConstants.IMPORT_BATCH_MER:
             self.test_mer()
         else:
-            print('ERROR: Unrecognized resource_type "%s"' % resource_type)
+            print(('ERROR: Unrecognized resource_type "%s"' % resource_type))
             sys.exit(1)
 
     def test_sims(self):
@@ -88,7 +88,7 @@ class DatimSyncTest(datimbase.DatimBase):
             url_ocl_repo = self.oclenv + datimconstants.DatimConstants.MER_OCL_EXPORT_DEFS[export_def_key]['endpoint']
             r = requests.get(url_ocl_repo, headers=self.oclapiheaders)
             repo = r.json()
-            print('\n**** %s (dataSet.id=%s) ****' % (datimconstants.DatimConstants.MER_OCL_EXPORT_DEFS[export_def_key]['endpoint'], repo['external_id']))
+            print(('\n**** %s (dataSet.id=%s) ****' % (datimconstants.DatimConstants.MER_OCL_EXPORT_DEFS[export_def_key]['endpoint'], repo['external_id'])))
             if not repo['external_id']:
                 print('Skipping because no external ID...')
                 continue
@@ -109,9 +109,9 @@ class DatimSyncTest(datimbase.DatimBase):
                 self.test_one(format, dhis2_presentation_url, ocl_presentation_url)
 
     def test_one(self, format, dhis2_presentation_url, ocl_presentation_url):
-        print ('Format = %s' % format)
-        print('DHIS2: %s' % dhis2_presentation_url)
-        print('OCL:   %s' % ocl_presentation_url)
+        print(('Format = %s' % format))
+        print(('DHIS2: %s' % dhis2_presentation_url))
+        print(('OCL:   %s' % ocl_presentation_url))
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             request_dhis2 = requests.get(dhis2_presentation_url)
@@ -144,7 +144,7 @@ class DatimSyncTest(datimbase.DatimBase):
             ocl_json['rows_dict']['%s-%s' % (row[4], row[7])] = row[1:]
         del(dhis2_json['rows'])
         del(ocl_json['rows'])
-        print('Rows: DHIS2(%s), OCL(%s)' % (len(dhis2_json['rows_dict']), len(ocl_json['rows_dict'])))
+        print(('Rows: DHIS2(%s), OCL(%s)' % (len(dhis2_json['rows_dict']), len(ocl_json['rows_dict']))))
 
         # Do the diff
         diff = deepdiff.DeepDiff(dhis2_json, ocl_json, ignore_order=False, verbose_level=2, exclude_paths={"root['title']", "root['subtitle']"})

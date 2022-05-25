@@ -14,9 +14,9 @@ Example Usage:
 import sys
 import json
 import argparse
-import datim.datimimap
-import datim.datimimapexport
-import common
+from . import datim.datimimap
+from . import datim.datimimapexport
+from . import common
 
 
 # Script argument parser
@@ -51,12 +51,12 @@ country_org = 'DATIM-MOH-%s-%s' % (args.country_code, args.period)
 # Display debug output
 if args.verbosity:
     if args.verbosity > 1:
-        print args
-    print '\n\n' + '*' * 100
-    print '** [EXPORT] Country Code: %s, Org: %s, Format: %s, Period: %s, Version: %s, Exclude Empty Maps: %s, Verbosity: %s, OCL Env: %s' % (
+        print(args)
+    print('\n\n' + '*' * 100)
+    print('** [EXPORT] Country Code: %s, Org: %s, Format: %s, Period: %s, Version: %s, Exclude Empty Maps: %s, Verbosity: %s, OCL Env: %s' % (
         args.country_code, country_org, args.format, args.period, args.country_version,
-        str(args.exclude_empty_maps), str(args.verbosity), ocl_env_url)
-    print '*' * 100
+        str(args.exclude_empty_maps), str(args.verbosity), ocl_env_url))
+    print('*' * 100)
 
 # Generate the IMAP export
 datim_imap_export = datim.datimimapexport.DatimImapExport(
@@ -72,7 +72,7 @@ except Exception as err:
         'type': err.__class__.__name__,
         'message': str(err)
     }
-    print json.dumps(output)
+    print(json.dumps(output))
     sys.exit(1)
 else:
     imap.display(fmt=args.format, sort=True, exclude_empty_maps=args.exclude_empty_maps,

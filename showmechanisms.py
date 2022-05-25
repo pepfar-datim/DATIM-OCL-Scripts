@@ -5,9 +5,9 @@ Supported Formats: html, xml, csv, json
 OpenHIM Endpoint Request Format: /datim-mechanisms?format=____
 """
 import sys
-import settings
-import datim.datimshow
-import datim.datimshowmechanisms
+from . import settings
+from . import datim.datimshow
+from . import datim.datimshowmechanisms
 
 
 # Default Script Settings

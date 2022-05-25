@@ -13,9 +13,9 @@ synchronized with repositories in OCL as described below.
 """
 import os
 import sys
-import settings
-import datim.datimsync
-import datim.datimsyncmer
+from . import settings
+from . import datim.datimsync
+from . import datim.datimsyncmer
 
 
 # DATIM DHIS2 Settings

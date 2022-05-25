@@ -5,9 +5,9 @@ Request Format: /datim-tiered-support?collection=____&format=____
 Supported Formats: html, xml, csv, json
 Supported Collections: datalements, options
 """
-from __future__ import with_statement
-import datimshow
-import datimconstants
+
+from . import datimshow
+from . import datimconstants
 
 
 class DatimShowTieredSupport(datimshow.DatimShow):

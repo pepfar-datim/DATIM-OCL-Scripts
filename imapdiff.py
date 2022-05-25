@@ -5,9 +5,9 @@ EXAMPLE:
 python imapdiff.py --env=staging -t=token -c=BI -pFY19 imap-samples/BI-FY19-baseline.csv
 """
 import argparse
-import datim.datimimap
-import datim.datimimaptests
-import common
+from . import datim.datimimap
+from . import datim.datimimaptests
+from . import common
 
 
 # Script argument parser

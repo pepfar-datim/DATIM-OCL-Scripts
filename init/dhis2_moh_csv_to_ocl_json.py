@@ -108,11 +108,11 @@ def row_to_de_concept(row, datim_moh_source, map_de_code_to_indicator_category, 
     if row['code'] in map_de_code_to_indicator_category:
         indicator_category_code = map_de_code_to_indicator_category[row['code']]
         if debug:
-            print row['code'], indicator_category_code
+            print(row['code'], indicator_category_code)
     else:
         indicator_category_code = row['code'][:find_nth(row['code'], '_', 2)]
         if debug:
-            print '***', row['code'], indicator_category_code
+            print('***', row['code'], indicator_category_code)
     concept = {
         "type": "Concept",
         "id": row['code'],
@@ -186,8 +186,8 @@ de_codes = {}
 missing = []
 found = []
 if debug:
-    print 'LIST OF UNIQUE DATA ELEMENT CODES MAPPED TO INDICATOR CODES:'
-    print 'de_name,indicator_code'
+    print('LIST OF UNIQUE DATA ELEMENT CODES MAPPED TO INDICATOR CODES:')
+    print('de_name,indicator_code')
 with open(csv_filename) as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
@@ -214,8 +214,8 @@ moh_resources += de_coc_mappings
 moh_resources += source_version
 
 if debug:
-    print '\n\nCODELIST AS OCL-FORMATTED JSON:'
+    print('\n\nCODELIST AS OCL-FORMATTED JSON:')
 
 # Output
 for resource in moh_resources:
-    print json.dumps(resource)
+    print(json.dumps(resource))

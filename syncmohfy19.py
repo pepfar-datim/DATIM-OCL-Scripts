@@ -14,9 +14,9 @@ test.geoalign.org and FY17 (syncmoh.py) runs against www.datim.org.
 """
 import sys
 import os
-import settings
-import datim.datimsync
-import datim.datimsyncmohfy19
+from . import settings
+from . import datim.datimsync
+from . import datim.datimsyncmohfy19
 
 
 # DATIM DHIS2 Settings

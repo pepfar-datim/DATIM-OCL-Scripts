@@ -12,10 +12,10 @@ collection. If it seems like you're looking at old data, check the collection ve
 import argparse
 import requests
 import json
-import iol
-import datim.datimshow
-import datim.datimshowmoh
-import common
+from . import iol
+from . import datim.datimshow
+from . import datim.datimshowmoh
+from . import common
 
 
 # Script argument parser
@@ -48,15 +48,15 @@ else:
     ocl_moh_sources = response.json()
     output_format = args.format.lower()
     if output_format == 'csv':
-        print iol.get_as_csv(
+        print(iol.get_as_csv(
             ocl_moh_sources, start_columns=['attr:Period', 'id'],
-            include_columns=['attr:Period', 'id', 'url'])
+            include_columns=['attr:Period', 'id', 'url']))
     elif output_format == 'text':
         for ocl_moh_source in ocl_moh_sources:
             datim_moh_period = None
             if 'extras' in ocl_moh_source and ocl_moh_source['extras']:
                 datim_moh_period = ocl_moh_source['extras'].get('Period')
-            print '%s: %s' % (
-                datim_moh_period, ocl_moh_source['id'])
+            print('%s: %s' % (
+                datim_moh_period, ocl_moh_source['id']))
     else:
-        print json.dumps(ocl_moh_sources, indent=4)
+        print(json.dumps(ocl_moh_sources, indent=4))

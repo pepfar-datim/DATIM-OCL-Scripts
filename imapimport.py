@@ -14,9 +14,9 @@ Example Usage:
 """
 import json
 import argparse
-import datim.datimimap
-import datim.datimimapimport
-import common
+from . import datim.datimimap
+from . import datim.datimimapimport
+from . import common
 
 
 # Script argument parser
@@ -99,20 +99,20 @@ if not country_name:
 
 # Display debug output
 if args.verbosity:
-    print args
-    print 'INFO: Pre-processed arguments:'
-    print '  country_name =', country_name
-    print '  country_org =', country_org
-    print '  import_filename =', args.file.name
+    print(args)
+    print('INFO: Pre-processed arguments:')
+    print('  country_name =', country_name)
+    print('  country_org =', country_org)
+    print('  import_filename =', args.file.name)
 
 # Load IMAP from import file
 imap_input = datim.datimimap.DatimImapFactory.load_imap_from_file(
     imap_filename=args.file.name, period=args.period,
     country_org=country_org, country_name=country_name, country_code=args.country_code)
 if args.verbosity and imap_input:
-    print 'INFO: IMAP import file "%s" loaded successfully' % args.file.name
+    print('INFO: IMAP import file "%s" loaded successfully' % args.file.name)
 elif not imap_input:
-    print 'ERROR: Unable to load IMAP import file "%s"' % args.file.name
+    print('ERROR: Unable to load IMAP import file "%s"' % args.file.name)
     exit(1)
 
 # Process the IMAP import
@@ -152,4 +152,4 @@ else:
                 args.imap_api_root, args.country_code, bulk_import_task_id)
 
 if output_json:
-    print json.dumps(output_json)
+    print(json.dumps(output_json))

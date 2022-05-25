@@ -1,4 +1,4 @@
-from __future__ import with_statement
+
 import os
 import itertools, functools, operator
 import requests
@@ -181,7 +181,7 @@ class DatimSyncMERIndicators(DatimBase):
         # STEP 2: Extract list of DHIS2 dataset IDs from collection external_id
         if self.verbosity:
             self.log('**** STEP 2 of 13: Extract list of DHIS2 dataset IDs from collection external_id')
-        str_active_dataset_ids = ','.join(MERIndicators_collections.keys())
+        str_active_dataset_ids = ','.join(list(MERIndicators_collections.keys()))
         if self.verbosity:
             self.log('MERIndicators Assessment Type Dataset IDs:', str_active_dataset_ids)
 

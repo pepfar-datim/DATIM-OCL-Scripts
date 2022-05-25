@@ -22,8 +22,8 @@ Example Output:
 import json
 import argparse
 import urllib3
-import common
-import datim.qmap
+from . import common
+from . import datim.qmap
 
 
 # Suppress urllib error due to invalid SSL certificate
@@ -56,8 +56,8 @@ ocl_env_url = args.env if args.env else args.envurl
 
 # Display debug output
 if args.verbosity > 1:
-    print args
-    print qmap
+    print(args)
+    print(qmap)
 
 # Process the qmap import
 output_json = None
@@ -89,4 +89,4 @@ else:
                 args.qmap_api_root, args.domain, bulk_import_task_id)
 
 if output_json:
-    print json.dumps(output_json)
+    print(json.dumps(output_json))

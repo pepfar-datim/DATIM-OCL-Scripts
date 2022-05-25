@@ -44,7 +44,7 @@ class DatimImapTests:
         summary += '%s("%s"): %s\n' % (
             test_args.get("test_type"), test_args.get("test_id"), test_args.get("test_description"))
         is_first_val = True
-        for key, val in test_args.items():
+        for key, val in list(test_args.items()):
             if key in ["test_id", "test_type", "test_description"]:
                 continue
             if not is_first_val:
@@ -88,7 +88,7 @@ class DatimImapTests:
             country_code=args.get('country_code')
         )
         if imap_input:
-            print('INFO: IMAP import file "%s" loaded successfully' % args.get('imap_import_filename', ""))
+            print(('INFO: IMAP import file "%s" loaded successfully' % args.get('imap_import_filename', "")))
         elif not imap_input:
             errmsg = 'ERROR: Unable to load IMAP import file "%s"' % args.get('imap_import_filename', "")
             raise Exception(errmsg)
@@ -118,9 +118,9 @@ class DatimImapTests:
             oclenv=args.get('imap_a_ocl_api_env'),
             oclapitoken=args.get('imap_a_ocl_api_token'))
         if isinstance(imap_a, datim.datimimap.DatimImap):
-            print '** IMAP-A loaded successfully:'
+            print('** IMAP-A loaded successfully:')
             imap_a.display(sort=True, exclude_empty_maps=True)
-            print '\n'
+            print('\n')
         imap_b = self.get_imap(
             args['imap_b_type'],
             imap_result_id=args.get('imap_b_result_id'),
@@ -134,9 +134,9 @@ class DatimImapTests:
             oclenv=args.get('imap_b_ocl_api_env'),
             oclapitoken=args.get('imap_b_ocl_api_token'))
         if isinstance(imap_b, datim.datimimap.DatimImap):
-            print '** IMAP-B loaded successfully:'
+            print('** IMAP-B loaded successfully:')
             imap_b.display(sort=True, exclude_empty_maps=True)
-            print '\n'
+            print('\n')
         if isinstance(imap_a, datim.datimimap.DatimImap) and isinstance(imap_b, datim.datimimap.DatimImap):
             imap_diff = imap_a.diff(imap_b)
             imap_diff.display()
@@ -192,12 +192,12 @@ class DatimImapTests:
     @staticmethod
     def assert_result_type(result, result_type):
         assert_result = isinstance(result, result_type)
-        print "Assert Result Type: %s == %s -- %s" % (type(result), result_type, assert_result)
+        print("Assert Result Type: %s == %s -- %s" % (type(result), result_type, assert_result))
 
     @staticmethod
     def assert_result_value(result, result_value):
         assert_result = result == result_value
-        print "Assert Result Value: %s == %s -- %s" % (result, result_value, assert_result)
+        print("Assert Result Value: %s == %s -- %s" % (result, result_value, assert_result))
 
     @staticmethod
     def assert_num_diff(result, target_num_diff):
@@ -206,7 +206,7 @@ class DatimImapTests:
         if isinstance(result, datim.datimimap.DatimImapDiff):
             result_num_diff = result.get_num_diffs()
             assert_result = target_num_diff == result_num_diff
-        print "Assert Num Diff: %s == %s -- %s" % (result_num_diff, target_num_diff, assert_result)
+        print("Assert Num Diff: %s == %s -- %s" % (result_num_diff, target_num_diff, assert_result))
 
     @staticmethod
     def assert_http_response_code(result, http_response_code):
@@ -218,7 +218,7 @@ class DatimImapTests:
         elif isinstance(result, int):
             result_response_code = result
         assert_result = result_response_code == int(http_response_code)
-        print "Assert HTTP Response Code: %s == %s -- %s" % (result_response_code, http_response_code, assert_result)
+        print("Assert HTTP Response Code: %s == %s -- %s" % (result_response_code, http_response_code, assert_result))
 
     @staticmethod
     def process_assertions_for_test(result, test_args):
@@ -236,7 +236,7 @@ class DatimImapTests:
 
         # Skip if set to inactive
         if "is_active" in test_args and not test_args["is_active"]:
-            print 'SKIPPING: "is_active" set to False'
+            print('SKIPPING: "is_active" set to False')
             return
 
         # Pre-process args
@@ -245,7 +245,7 @@ class DatimImapTests:
             test_args['country_org'] = 'DATIM-MOH-%s-%s' % (test_args.get('country_code'), test_args.get('period'))
 
         # Make sure its a valid test type
-        print self.get_test_summary(test_args)
+        print(self.get_test_summary(test_args))
         if test_type not in DatimImapTests.DATIM_OCL_TEST_TYPES:
             raise Exception('Invalid test_type "%s" with args: %s' % (test_type, test_args))
 
@@ -272,7 +272,7 @@ class DatimImapTests:
 
         # Optionally display the result
         if "do_display_result" not in test_args or test_args["do_display_result"]:
-            print result
+            print(result)
 
         # Record the lap time
         if self.__timer and self.__timer.running:
@@ -284,15 +284,15 @@ class DatimImapTests:
         self.__current_test_num = 0
         for test in self.__tests:
             self.__current_test_num += 1
-            print self.get_test_summary(test)
+            print(self.get_test_summary(test))
             if test['test_id'] in self.results:
                 result = self.results[test['test_id']]
                 DatimImapTests.process_assertions_for_test(result, test)
             else:
-                print 'INFO: No result for test "%s"' % test['test_id']
+                print('INFO: No result for test "%s"' % test['test_id'])
         if self.__timer:
-            print '\n**** SUMMARY OF PROCESSING TIMES:'
-            print self.__timer
+            print('\n**** SUMMARY OF PROCESSING TIMES:')
+            print(self.__timer)
 
     def run_tests(self, tests):
         self.__timer = utils.timer.Timer()
@@ -310,6 +310,6 @@ class DatimImapTests:
         i = 0
         for test in tests:
             i += 1
-            print "[Test %s of %s] %s('%s'): %s" % (
-                i, len(tests), test["test_type"], test["test_id"], test["test_description"])
+            print("[Test %s of %s] %s('%s'): %s" % (
+                i, len(tests), test["test_type"], test["test_id"], test["test_description"]))
 

@@ -5,9 +5,9 @@ Request Format: /datim-mer?collection=____&format=____
 Supported Formats: html, xml, csv, json
 Supported Collections: Refer to DatimConstants.MER_OCL_EXPORT_DEFS (there are more than 60 options)
 """
-from __future__ import with_statement
-import datimshow
-import datimconstants
+
+from . import datimshow
+from . import datimconstants
 
 
 class DatimShowMer(datimshow.DatimShow):

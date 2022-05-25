@@ -14,9 +14,9 @@ runs against www.datim.org.
 """
 import sys
 import os
-import settings
-import datim.datimsync
-import datim.datimsyncmohfy18
+from . import settings
+from . import datim.datimsync
+from . import datim.datimsyncmohfy18
 
 
 # DATIM DHIS2 Settings

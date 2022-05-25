@@ -13,8 +13,8 @@ The import script creates OCL-formatted JSON consisting of:
     References for each concept and mapping added to each collection
 """
 import json
-import datimbase
-import datimimap
+from . import datimbase
+from . import datimimap
 import ocldev.oclfleximporter
 import ocldev.oclexport
 import ocldev.oclconstants
@@ -135,7 +135,7 @@ class DatimImapImport(datimbase.DatimBase):
             imap_input=imap_input, verbose=bool(self.verbosity)))
         if self.verbosity >= 2:
             for resource in import_list:
-                print json.dumps(resource)
+                print(json.dumps(resource))
         imap_timer.lap(label='STEP 4: Generate IMAP import script')
 
         # STEP 5 of 5: Bulk import into OCL

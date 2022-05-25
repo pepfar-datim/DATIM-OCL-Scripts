@@ -19,4 +19,4 @@ else:
 # Output as response -- note that output happens during processing if verbose is True
 if not verbose:
     for result in results:
-        print(json.dumps(result))
+        print((json.dumps(result)))

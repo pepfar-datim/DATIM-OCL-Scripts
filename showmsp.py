@@ -27,9 +27,9 @@ Example Usage:
 
 """
 import argparse
-import datim.datimshow
-import datim.datimshowmsp
-import common
+from . import datim.datimshow
+from . import datim.datimshowmsp
+from . import common
 
 
 def arg_parser_data_element_ids(string):
@@ -70,7 +70,7 @@ ocl_env_url = args.env if args.env else args.envurl
 
 # Display debug output
 if args.verbosity > 1:
-    print args, ocl_env_url
+    print(args, ocl_env_url)
 
 # Create DatimMspShow object and run
 datim_show = datim.datimshowmsp.DatimShowMsp(

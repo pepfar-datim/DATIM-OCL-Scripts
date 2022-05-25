@@ -32,10 +32,10 @@ try:
             RESPONSE_FIELD_STATUS: import_status.status,
             RESPONSE_FIELD_RESULT: result
         }
-except Exception, e:
+except Exception as e:
     response = {
         RESPONSE_FIELD_STATUS_CODE: STATUS_CODE_ERROR,
         RESPONSE_FIELD_RESULT: str(e)
     }
 
-print json.dumps(response)
+print(json.dumps(response))

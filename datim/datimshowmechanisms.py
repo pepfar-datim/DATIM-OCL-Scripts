@@ -4,9 +4,9 @@ Script to present DATIM Mechanisms metadata
 Request Format: /datim-mechanisms?format=____
 Supported Formats: html, xml, csv, json
 """
-from __future__ import with_statement
-import datimshow
-import datimconstants
+
+from . import datimshow
+from . import datimconstants
 
 
 class DatimShowMechanisms(datimshow.DatimShow):

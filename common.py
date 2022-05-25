@@ -27,7 +27,7 @@ def ocl_environment(string):
     """ Return OCL environment URL for the specified enviroment key"""
     if string not in OCL_ENVIRONMENTS:
         raise argparse.ArgumentTypeError('Argument "env" must be %s' % (
-            ', '.join(OCL_ENVIRONMENTS.keys())))
+            ', '.join(list(OCL_ENVIRONMENTS.keys()))))
     return OCL_ENVIRONMENTS[string]
 
 
@@ -70,7 +70,7 @@ def get_imap_orgs(ocl_env_url, ocl_api_token, period_filter='', country_code_fil
     url_all_orgs = '%s/orgs/' % ocl_env_url
     response = requests.get(url_all_orgs, headers=ocl_api_headers, params=request_params)
     if verbose:
-        print response.url
+        print(response.url)
     response.raise_for_status()
     ocl_all_orgs = response.json()
     return ocl_all_orgs

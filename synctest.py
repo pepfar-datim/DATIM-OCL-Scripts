@@ -2,9 +2,9 @@
 Script to test the synchronization by comparing the resulting metadata presentation
 formats from DHIS2 and OCL.
 """
-import settings
-import datim.datimshow
-import datim.datimsynctest
+from . import settings
+from . import datim.datimshow
+from . import datim.datimsynctest
 
 
 # OCL Settings - JetStream Staging user=datim-admin

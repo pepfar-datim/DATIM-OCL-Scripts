@@ -9,9 +9,9 @@ This script fetches an export from OCL for the latest released version of the sp
 If it seems like you're looking at old data, check the collection version first.
 """
 import sys
-import settings
-import datim.datimshow
-import datim.datimshowmer
+from . import settings
+from . import datim.datimshow
+from . import datim.datimshowmer
 
 
 # Default Script Settings

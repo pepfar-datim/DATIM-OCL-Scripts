@@ -16,10 +16,10 @@ synchronized with repositories in OCL as described below.
 """
 import os
 import sys
-import settings
+from . import settings
 # import datim.datimbase
-import datim.datimsync
-import datim.datimsyncmermsp
+from . import datim.datimsync
+from . import datim.datimsyncmermsp
 
 
 # DATIM DHIS2 Settings

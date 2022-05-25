@@ -4,9 +4,9 @@ Script to present DATIM MOH metadata
 Supported Formats: html, xml, csv, json
 OpenHIM Mediator Request Format: /datim-moh?period=____&format=____
 """
-from __future__ import with_statement
-import datimshow
-import datimconstants
+
+from . import datimshow
+from . import datimconstants
 
 
 class DatimShowMoh(datimshow.DatimShow):

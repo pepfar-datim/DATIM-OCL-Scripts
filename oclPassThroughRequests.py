@@ -8,7 +8,7 @@ python bulkImportStatus.py --env=staging -t="my-api-token-here"
 import json
 import argparse
 import requests
-import common
+from . import common
 
 
 # Checks OCL bulk import status
@@ -108,7 +108,7 @@ ocl_env_url = args.env if args.env else args.env_url
 
 # Display debug output
 if args.verbosity > 1:
-    print args
+    print(args)
 
 response = ''
 try:
@@ -133,4 +133,4 @@ else:
     output_json = response
 
 if output_json:
-    print output_json
+    print(output_json)

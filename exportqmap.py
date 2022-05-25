@@ -87,8 +87,8 @@ Example Output:
 import argparse
 import json
 import ocldev.oclexport
-import datim.qmap
-import common
+from . import datim.qmap
+from . import common
 
 
 # Script argument parser
@@ -108,7 +108,7 @@ ocl_env_url = args.env if args.env else args.env_url
 
 # Display debug output
 if args.verbosity > 1:
-    print args
+    print(args)
 
 # Process the qmap export
 try:
@@ -117,15 +117,15 @@ try:
         ocl_env_url=ocl_env_url, ocl_api_token=args.token,
         verbosity=args.verbosity)
     # Export successful -- Return 200 status code and print (as JSON)
-    print qmap
+    print(qmap)
 except ocldev.oclexport.OclExportNotAvailableError as export_error:
     # Export not yet ready -- Return 204 status code
-    print json.dumps({
+    print(json.dumps({
         "status": "Not Available",
         "message": "QMAP export not available. Try requesting again later."
-    }, indent=4)
+    }, indent=4))
 except Exception as e:
-    print json.dumps({
+    print(json.dumps({
         "status": "Error",
         "message": str(e)
-    }, indent=4)
+    }, indent=4))

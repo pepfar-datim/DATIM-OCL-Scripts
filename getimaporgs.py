@@ -36,8 +36,8 @@ Arguments:
 """
 import json
 import argparse
-import iol
-import common
+from . import iol
+from . import common
 
 
 # Script argument parser
@@ -60,7 +60,7 @@ parser.add_argument('--version', action='version', version='%(prog)s v' + common
 args = parser.parse_args()
 ocl_env_url = args.env if args.env else args.env_url
 if args.verbosity > 1:
-    print args
+    print(args)
 
 # Prepare filters
 period_filter = ''
@@ -80,9 +80,9 @@ if isinstance(ocl_imap_orgs, list):
     output_format = args.format.lower()
     if output_format == 'csv':
         # DATIM-MOH-TESTER2-FY20: TESTER2 TESTER2 FY20
-        print iol.get_as_csv(
+        print(iol.get_as_csv(
             ocl_imap_orgs, start_columns=['id', 'name'],
-            include_columns=['id', 'name', 'attr:datim_moh_period', 'attr:datim_moh_country_code', 'url'])
+            include_columns=['id', 'name', 'attr:datim_moh_period', 'attr:datim_moh_country_code', 'url']))
     elif output_format == 'text':
         for ocl_org in ocl_imap_orgs:
             datim_moh_country_code = None
@@ -90,10 +90,10 @@ if isinstance(ocl_imap_orgs, list):
             if 'extras' in ocl_org and ocl_org['extras']:
                 datim_moh_country_code = ocl_org['extras'].get('datim_moh_country_code')
                 datim_moh_period = ocl_org['extras'].get('datim_moh_period')
-            print '%s: %s %s %s' % (
+            print('%s: %s %s %s' % (
                 ocl_org['id'],
                 ocl_org.get('location', ''),
                 datim_moh_country_code,
-                datim_moh_period)
+                datim_moh_period))
     else:
-        print json.dumps(ocl_imap_orgs, indent=4)
+        print(json.dumps(ocl_imap_orgs, indent=4))

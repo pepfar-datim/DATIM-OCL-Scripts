@@ -33,14 +33,14 @@ country_codes = {
 
 # Iterate through IMAPs and test
 period = 'FY18'
-for country_code in sorted(country_codes.iterkeys()):
+for country_code in sorted(country_codes.keys()):
     csv_filename = 'csv/%s-%s.csv' % (country_code, period)
     country_name = country_codes[country_code]
     country_org = 'DATIM-MOH-%s' % country_code
     if verbosity >= 1:
-        print '\n\n*****************************************************************************'
-        print '**  %s, %s, %s' % (country_code, country_name, country_org)
-        print '*****************************************************************************'
+        print('\n\n*****************************************************************************')
+        print('**  %s, %s, %s' % (country_code, country_name, country_org))
+        print('*****************************************************************************')
 
     # Load the IMAP CSV
     imap = datim.datimimap.DatimImapFactory.load_imap_from_csv(
@@ -49,7 +49,7 @@ for country_code in sorted(country_codes.iterkeys()):
     imap.do_add_columns_to_csv = False
     if verbosity >= 2:
         imap.display(fmt='csv', sort=True, exclude_empty_maps=True, auto_fix_null_disag=True)
-        print ''
+        print('')
 
     # Having some fun
     """
@@ -84,9 +84,9 @@ for country_code in sorted(country_codes.iterkeys()):
         if row['MOH_Indicator_ID'] and row['MOH_Indicator_ID'] == row['MOH_Disag_ID']:
             count += 1
             if verbosity >= 2:
-                print('Matching IDs: %s == %s  %s' % (row['MOH_Indicator_ID'], row['MOH_Disag_ID'], row))
+                print(('Matching IDs: %s == %s  %s' % (row['MOH_Indicator_ID'], row['MOH_Disag_ID'], row)))
     if verbosity >= 1:
-        print('%s (%s): %s reused ID(s)' % (country_code, country_name, count))
+        print(('%s (%s): %s reused ID(s)' % (country_code, country_name, count)))
 
     # Test 2a: Blank Disag ID count
     count = 0
@@ -94,7 +94,7 @@ for country_code in sorted(country_codes.iterkeys()):
         if row['MOH_Indicator_ID'] and not row['MOH_Disag_ID']:
             count += 1
     if verbosity >= 1:
-        print('%s (%s): %s blank Disag ID(s)' % (country_code, country_name, count))
+        print(('%s (%s): %s blank Disag ID(s)' % (country_code, country_name, count)))
 
     # Test 2b: After applying the fix
     county = 0
@@ -102,7 +102,7 @@ for country_code in sorted(country_codes.iterkeys()):
         if row['MOH_Indicator_ID'] and not row['MOH_Disag_ID']:
             count += 1
     if verbosity >= 1:
-        print('%s (%s): %s blank Disag ID(s) ... AFTER FIXING' % (country_code, country_name, count))
+        print(('%s (%s): %s blank Disag ID(s) ... AFTER FIXING' % (country_code, country_name, count)))
 
     # Test 3: Reused IDs with different names
     tracker_moh_indicator = {}
@@ -127,17 +127,17 @@ for country_code in sorted(country_codes.iterkeys()):
         if len(tracker_moh_indicator[resource_id]) > 1:
             num_replaced_indicator_names += len(tracker_moh_indicator[resource_id]) - 1
             if verbosity >= 2:
-                print resource_id, tracker_moh_indicator[resource_id]
+                print(resource_id, tracker_moh_indicator[resource_id])
     print(tracker_moh_indicator)
     if verbosity >= 2:
-        print '** MOH Disag Name Counts'
+        print('** MOH Disag Name Counts')
     num_replaced_disag_names = 0
     for resource_id in tracker_moh_disag:
         if len(tracker_moh_disag[resource_id]) > 1:
             num_replaced_disag_names += len(tracker_moh_disag[resource_id]) - 1
             if verbosity >= 2:
-                print resource_id, tracker_moh_disag[resource_id]
+                print(resource_id, tracker_moh_disag[resource_id])
     print(tracker_moh_disag)
     if verbosity >= 1:
-        print '%s (%s): %s replaced Indicator Names; %s replaced Disag Names' % (
-            country_code, country_name, num_replaced_indicator_names, num_replaced_disag_names)
+        print('%s (%s): %s replaced Indicator Names; %s replaced Disag Names' % (
+            country_code, country_name, num_replaced_indicator_names, num_replaced_disag_names))

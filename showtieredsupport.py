@@ -6,9 +6,9 @@ Supported Collections: datalements, options
 OpenHIM Endpoint Request Format: /datim-tiered-support?collection=____&format=____
 """
 import sys
-import settings
-import datim.datimshow
-import datim.datimshowtieredsupport
+from . import settings
+from . import datim.datimshow
+from . import datim.datimshowtieredsupport
 
 
 # Default Script Settings

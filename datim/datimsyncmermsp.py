@@ -11,12 +11,12 @@ synchronized with repositories in OCL as described below.
 |             |         | /orgs/PEPFAR/collections/Planning-Attributes-*/ |
 |-------------|---------|-------------------------------------------------|
 """
-from __future__ import with_statement
+
 import json
-import datimsync
-import datimconstants
+from . import datimsync
+from . import datimconstants
 import ocldev.oclconstants
-import datimbase
+from . import datimbase
 
 
 class DatimSyncMerMsp(datimsync.DatimSync):

@@ -5,10 +5,10 @@ See showmsp.py for an example of usage.
 
 Supported Formats: html, xml, csv, json
 """
-from __future__ import with_statement
+
 import requests
-import datimshow
-import datimbase
+from . import datimshow
+from . import datimbase
 
 
 class DatimShowMsp(datimshow.DatimShow):

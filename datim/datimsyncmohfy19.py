@@ -15,11 +15,11 @@ and to import the required starter content.
 TODO: Implement new repo versioning model (e.g. FY19.v0)
 TODO: Add "indicator_category_code" attribute for each indicator (e.g. PMTCT_STAT)
 """
-from __future__ import with_statement
+
 import json
-import datimsync
-import datimconstants
-import datimsyncmohhelper
+from . import datimsync
+from . import datimconstants
+from . import datimsyncmohhelper
 
 
 class DatimSyncMohFy19(datimsync.DatimSync):

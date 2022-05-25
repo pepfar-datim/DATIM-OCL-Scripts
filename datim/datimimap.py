@@ -2,7 +2,7 @@
 DATIM IMAP object and its helper classes
 """
 import sys
-import StringIO
+import io
 import csv
 import json
 import re
@@ -10,8 +10,8 @@ import time
 from operator import itemgetter
 import requests
 import deepdiff
-import datimimapexport
-import datimbase
+from . import datimimapexport
+from . import datimbase
 import ocldev.oclconstants
 import ocldev.oclcsvtojsonconverter
 
@@ -151,7 +151,7 @@ class DatimImap(object):
         self._current_iter = 0
         return self
 
-    def next(self):
+    def __next__(self):
         """
         Iterator for the DatimImap class
         :return:
@@ -324,7 +324,7 @@ class DatimImap(object):
             row[DatimImap.IMAP_FIELD_MOH_INDICATOR_ID],
             disag_id
         ]
-        si = StringIO.StringIO()
+        si = io.StringIO()
         cw = csv.writer(si)
         cw.writerow(data)
         return si.getvalue().strip('\r\n')
@@ -357,7 +357,7 @@ class DatimImap(object):
 
     @staticmethod
     def parse_imap_row_key(row_key):
-        si = StringIO.StringIO(row_key)
+        si = io.StringIO(row_key)
         reader = csv.reader(si, delimiter=',')
         for row in reader:
             return {
@@ -410,10 +410,10 @@ class DatimImap(object):
             built-in function
         :return: <unicode>
         """
-        if isinstance(object, unicode):
+        if isinstance(object, str):
             return object
         try:
-            return unicode(object, encoding, errors)
+            return str(object, encoding, errors)
         except:
             return object
 
@@ -539,18 +539,18 @@ class DatimImap(object):
                 # output the row
                 writer.writerow(row_to_output)
         elif fmt == self.DATIM_IMAP_FORMAT_JSON:
-            print(json.dumps(data))
+            print((json.dumps(data)))
         elif fmt == self.DATIM_IMAP_FORMAT_HTML:
-            print('<h1>Country IMAP Export for Country Code "%s" and Period "%s"</h1>' % (
-                self.country_code, self.period))
+            print(('<h1>Country IMAP Export for Country Code "%s" and Period "%s"</h1>' % (
+                self.country_code, self.period)))
             print('<table border="1" cellspacing="0"><tr>')
             for field_name in self.IMAP_EXPORT_FIELD_NAMES:
-                print('<th>%s</th>' % field_name)
+                print(('<th>%s</th>' % field_name))
             print('</tr>')
             for row in data:
                 print('<tr>')
                 for field_name in self.IMAP_EXPORT_FIELD_NAMES:
-                    print('<td>%s</td>' % row[field_name])
+                    print(('<td>%s</td>' % row[field_name]))
                 print('</tr>')
             print('</table>')
 
@@ -922,23 +922,23 @@ class DatimImapFactory(object):
             ocl_api_headers['Authorization'] = 'Token %s' % str(ocl_api_token)
         org_url = "%s/orgs/%s/" % (ocl_env_url, org_id)
         if verbose:
-            print('INFO: Checking if org "%s" exists...' % org_url)
+            print(('INFO: Checking if org "%s" exists...' % org_url))
         r = requests.get(org_url, headers=ocl_api_headers)
         if r.status_code == 404:
             if verbose:
-                print('Org "%s" not found or not authorized.' % org_id)
+                print(('Org "%s" not found or not authorized.' % org_id))
             return False
         r.raise_for_status()
         if r.status_code != 200:
             if verbose:
-                print('Unrecognized response code: "%s".' % r.status_code)
+                print(('Unrecognized response code: "%s".' % r.status_code))
             return False
         imap_org = r.json()
         if ('extras' in imap_org and 'datim_moh_object' in imap_org['extras'] and
                 imap_org['extras']['datim_moh_object']):
             return True
         elif verbose:
-            print('WARNING: Org "%s" exixts but is not an IMAP org.' % org_id)
+            print(('WARNING: Org "%s" exixts but is not an IMAP org.' % org_id))
         return False
 
     @staticmethod
@@ -960,16 +960,16 @@ class DatimImapFactory(object):
             oclapiheaders['Authorization'] = 'Token %s' % str(ocl_root_api_token)
         org_url = "%s/orgs/%s/" % (oclenv, org_id)
         if verbose:
-            print('INFO: Checking if org "%s" exists...' % org_url)
+            print(('INFO: Checking if org "%s" exists...' % org_url))
         r = requests.get(org_url, headers=oclapiheaders)
         if r.status_code == 404:
             if verbose:
-                print('Org "%s" not found. Could not delete.' % org_id)
+                print(('Org "%s" not found. Could not delete.' % org_id))
             return False
         r.raise_for_status()
         if r.status_code != 200:
             if verbose:
-                print('Unrecognized response code: "%s". Could not delete.' % r.status_code)
+                print(('Unrecognized response code: "%s". Could not delete.' % r.status_code))
             return False
 
         # Delete the org
@@ -977,7 +977,7 @@ class DatimImapFactory(object):
         r.raise_for_status()
         if r.status_code == 204:
             if verbose:
-                print('Org "%s" successfully deleted. Continuing...' % org_id)
+                print(('Org "%s" successfully deleted. Continuing...' % org_id))
             return True
 
         return False
@@ -1127,7 +1127,7 @@ class DatimImapFactory(object):
 
         # Handle 'dictionary_item_added' - new country mapping
         if 'dictionary_item_added' in diff_data:
-            for diff_key in diff_data['dictionary_item_added'].keys():
+            for diff_key in list(diff_data['dictionary_item_added'].keys()):
                 row_key = diff_key.strip("root['").strip("']")
                 csv_row = diff_data['dictionary_item_added'][diff_key]
 
@@ -1202,7 +1202,7 @@ class DatimImapFactory(object):
 
         # Handle 'dictionary_item_removed' - removed country mapping
         if 'dictionary_item_removed' in diff_data:
-            for diff_key in diff_data['dictionary_item_removed'].keys():
+            for diff_key in list(diff_data['dictionary_item_removed'].keys()):
                 row_key = diff_key.strip("root['").strip("']")
                 csv_row = imap_diff.imap_a.get_imap_row_by_key(row_key)
 
@@ -1254,7 +1254,7 @@ class DatimImapFactory(object):
         # NOTE: Names changes to DATIM indicator/disags are ignored
         if 'values_changed' in diff_data:
             regex_pattern = r"^root\[\'([a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+)\'\]\[\'(MOH_Disag_Name|MOH_Indicator_Name)\'\]$"
-            for diff_key in diff_data['values_changed'].keys():
+            for diff_key in list(diff_data['values_changed'].keys()):
                 # Parse the diff resource key
                 regex_result = re.match(regex_pattern, diff_key)
                 if not regex_result:
@@ -1287,8 +1287,8 @@ class DatimImapFactory(object):
         # Display additional debug info
         if verbose:
             for i in range(0, len(import_list_dedup)):
-                print '[%s of %s] %s -- %s' % (
-                    i + 1, len(import_list_dedup), import_list_narrative_dedup[i], import_list_dedup[i])
+                print('[%s of %s] %s -- %s' % (
+                    i + 1, len(import_list_dedup), import_list_narrative_dedup[i], import_list_dedup[i]))
 
         return import_list_dedup
 
@@ -1321,7 +1321,7 @@ class DatimImapFactory(object):
         # Display additional debug info
         if verbose:
             for i in range(0, len(import_list_dedup)):
-                print '[%s of %s] %s' % (i + 1, len(import_list_dedup), import_list_dedup[i])
+                print('[%s of %s] %s' % (i + 1, len(import_list_dedup), import_list_dedup[i]))
 
         return import_list_dedup
 
@@ -1349,7 +1349,7 @@ class DatimImapFactory(object):
         # Display additional debug info
         if verbose:
             for i in range(0, len(import_list_dedup)):
-                print '[%s of %s] %s' % (i + 1, len(import_list_dedup), import_list_dedup[i])
+                print('[%s of %s] %s' % (i + 1, len(import_list_dedup), import_list_dedup[i]))
 
         return import_list_dedup
 
@@ -1409,7 +1409,7 @@ class DatimImapFactory(object):
         import_list += ref_import_list
 
         if verbose:
-            print 'INFO: %s resource(s) added to import list' % len(import_list)
+            print('INFO: %s resource(s) added to import list' % len(import_list))
 
         return import_list
 
@@ -1557,7 +1557,7 @@ class DatimImapDiff(object):
 
         # Post-processing Step 1: Remove the Total vs. default differences
         if 'values_changed' in self.__diff_data:
-            for diff_key in self.__diff_data['values_changed'].keys():
+            for diff_key in list(self.__diff_data['values_changed'].keys()):
                 if (self.__diff_data['values_changed'][diff_key]['new_value'] == 'Total' and
                         self.__diff_data['values_changed'][diff_key]['old_value'] == 'default'):
                     del(self.__diff_data['values_changed'][diff_key])
@@ -1565,7 +1565,7 @@ class DatimImapDiff(object):
         # Post-processing Step 2: Remove name discrepancies in the DATIM indicator and disag names
         if 'values_changed' in self.__diff_data:
             regex_pattern = r"^root\[\'([a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+,[a-zA-Z0-9.\-_]+)\'\]\[\'(DATIM_Disag_Name)\'\]$"
-            for diff_key in self.__diff_data['values_changed'].keys():
+            for diff_key in list(self.__diff_data['values_changed'].keys()):
                 # Parse the diff resource key
                 regex_result = re.match(regex_pattern, diff_key)
                 if regex_result is not None:
@@ -1580,19 +1580,19 @@ class DatimImapDiff(object):
 
     def get_num_diffs(self):
         num = 0
-        for diff_category in self.__diff_data.keys():
-            for resource_diff_key, resource_diff in self.__diff_data[diff_category].items():
+        for diff_category in list(self.__diff_data.keys()):
+            for resource_diff_key, resource_diff in list(self.__diff_data[diff_category].items()):
                 num += 1
         return num
 
     def display(self):
-        for diff_category in self.__diff_data.keys():
-            print '** DIFF CATEGORY: %s' % diff_category
+        for diff_category in list(self.__diff_data.keys()):
+            print('** DIFF CATEGORY: %s' % diff_category)
             i = 0
-            for resource_diff_key, resource_diff in self.__diff_data[diff_category].items():
+            for resource_diff_key, resource_diff in list(self.__diff_data[diff_category].items()):
                 i += 1
-                print '    [%s of %s] %s -- %s' % (
-                    i, len(self.__diff_data[diff_category]), resource_diff_key, resource_diff)
+                print('    [%s of %s] %s -- %s' % (
+                    i, len(self.__diff_data[diff_category]), resource_diff_key, resource_diff))
 
 
 class DatimMohCsvToJsonConverter(ocldev.oclcsvtojsonconverter.OclCsvToJsonConverter):

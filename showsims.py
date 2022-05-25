@@ -9,9 +9,9 @@ Supported Collections:
 OpenHIM Endpoint Request Format: /datim-sims?collection=____&format=____
 """
 import sys
-import settings
-import datim.datimshow
-import datim.datimshowsims
+from . import settings
+from . import datim.datimshow
+from . import datim.datimshowsims
 
 
 # Default Script Settings

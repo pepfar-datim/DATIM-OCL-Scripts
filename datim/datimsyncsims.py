@@ -17,10 +17,10 @@ synchronized with repositories in OCL as described below.
 |             |                         | /orgs/PEPFAR/collections/SIMS-Options/     |
 |-------------|-------------------------|--------------------------------------------|
 """
-from __future__ import with_statement
+
 import json
-import datimsync
-import datimconstants
+from . import datimsync
+from . import datimconstants
 
 
 class DatimSyncSims(datimsync.DatimSync):

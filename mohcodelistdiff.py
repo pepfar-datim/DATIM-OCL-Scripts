@@ -34,8 +34,8 @@ for period in periods:
     # ddiff = DeepDiff(dhis2_codelist_sorted, ocl_codelist_sorted)
 
     ddiff = DeepDiff(dhis2_codelist, ocl_codelist)
-    print '%s:' % period
-    print ddiff
-    print '\n\n'
+    print('%s:' % period)
+    print(ddiff)
+    print('\n\n')
 
     # print period, len(ocl_codelist), len(dhis2_codelist)

@@ -7,9 +7,9 @@ Supported Collections:
     sims2_facility, sims2_community, sims2_above_site
     sims_option_sets
 """
-from __future__ import with_statement
-import datimshow
-import datimconstants
+
+from . import datimshow
+from . import datimconstants
 
 
 class DatimShowSims(datimshow.DatimShow):

@@ -8,9 +8,9 @@ This command will import an IMAP backup into OCL staging:
 """
 import json
 import argparse
-import datim.datimimap
-import datim.datimimapimport
-import common
+from . import datim.datimimap
+from . import datim.datimimapimport
+from . import common
 
 
 # Script argument parser
@@ -56,12 +56,12 @@ for imap_backup in all_imap_backups:
 
 # Display debug info
 if args.verbosity:
-    print args
-    print 'ocl_env_url=%s' % ocl_env_url
-    print 'country_codes=%s' % country_code_filter
-    print 'periods=%s' % period_filter
-    print '%s IMAPs (after filter) of %s IMAP backups loaded' % (
-        len(imap_backups), len(all_imap_backups))
+    print(args)
+    print('ocl_env_url=%s' % ocl_env_url)
+    print('country_codes=%s' % country_code_filter)
+    print('periods=%s' % period_filter)
+    print('%s IMAPs (after filter) of %s IMAP backups loaded' % (
+        len(imap_backups), len(all_imap_backups)))
 
 # Loop through each and import
 current_num = 0
@@ -71,16 +71,16 @@ for imap_backup in imap_backups:
     # Display debug info for the current IMAP org
     if args.verbosity:
         if args.verbosity > 1:
-            print '\n\n' + '*' * 100
-        print '** [IMAP %s of %s] Org: %s, Country Code: %s, Country Name: %s, Period: %s' % (
+            print('\n\n' + '*' * 100)
+        print('** [IMAP %s of %s] Org: %s, Country Code: %s, Country Name: %s, Period: %s' % (
             current_num, len(imap_backups), imap_backup['country_org'],
-            imap_backup['country_code'], imap_backup['country_name'], imap_backup['period'])
+            imap_backup['country_code'], imap_backup['country_name'], imap_backup['period']))
         if args.verbosity > 1:
-            print '*' * 100
+            print('*' * 100)
 
     # Load into IMAP object
     if imap_backup['status'] != 'Success':
-        print 'WARNING: Invalid IMAP backup:', json.dumps(imap_backup)
+        print('WARNING: Invalid IMAP backup:', json.dumps(imap_backup))
         continue
     imap_input = datim.datimimap.DatimImap(
         imap_data=imap_backup['imap'],
@@ -92,7 +92,7 @@ for imap_backup in imap_backups:
         imap_input.display(sort=True, exclude_empty_maps=True)
         # print 'INFO: IMAP import file "%s" loaded successfully' % args.file.name
     elif not imap_input:
-        print 'ERROR: Unable to load IMAP import file "%s"' % args.file.name
+        print('ERROR: Unable to load IMAP import file "%s"' % args.file.name)
         exit(1)
 
     # Import IMAP
@@ -125,4 +125,4 @@ for imap_backup in imap_backups:
             output_json["ocl_bulk_import_status_url"] = "%s/manage/bulkimport/?task=%s" % (
                 ocl_env_url, bulk_import_task_id)
     if output_json and not args.test_mode:
-        print json.dumps(output_json)
+        print(json.dumps(output_json))

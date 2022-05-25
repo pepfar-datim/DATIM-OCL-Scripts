@@ -26,8 +26,8 @@ Arguments:
 import json
 import argparse
 import requests
-import iol
-import common
+from . import iol
+from . import common
 
 
 # Script argument parser
@@ -49,7 +49,7 @@ ocl_env_url = args.env if args.env else args.env_url
 
 # Display debug output
 if args.verbosity > 1:
-    print args
+    print(args)
 
 
 def get_qmap_domains(ocl_env_url, ocl_api_token, verbose=False):
@@ -60,7 +60,7 @@ def get_qmap_domains(ocl_env_url, ocl_api_token, verbose=False):
     url_all_orgs = '%s/orgs/?limit=0&verbose=true&extras.qmap_org=true' % ocl_env_url
     response = requests.get(url_all_orgs, headers=ocl_api_headers)
     if verbose:
-        print response.url
+        print(response.url)
     response.raise_for_status()
     return response.json()
 
@@ -73,7 +73,7 @@ def get_qmap_sources(ocl_env_url, ocl_api_token, qmap_domain, verbose=False):
     url_qmap_domain = '%s/orgs/%s/' % (ocl_env_url, qmap_domain)
     response = requests.get(url_qmap_domain, headers=ocl_api_headers)
     if verbose:
-        print response.url
+        print(response.url)
     response.raise_for_status()
     ocl_org_qmap_domain = response.json()
     if ('extras' in ocl_org_qmap_domain and ocl_org_qmap_domain['extras'] and
@@ -88,7 +88,7 @@ def get_qmap_sources(ocl_env_url, ocl_api_token, qmap_domain, verbose=False):
     url_qmap_sources = '%s/orgs/%s/sources/?limit=0&verbose=true' % (ocl_env_url, qmap_domain)
     response = requests.get(url_qmap_sources, headers=ocl_api_headers)
     if verbose:
-        print response.url
+        print(response.url)
     response.raise_for_status()
     ocl_qmap_sources = response.json()
 
@@ -119,22 +119,22 @@ else:
 if result_type == 'Organization':
     if output_format == 'text':
         for ocl_org in filtered_results:
-            print '%s' % (ocl_org['id'])
+            print('%s' % (ocl_org['id']))
     elif output_format == 'csv':
-        print iol.get_as_csv(
+        print(iol.get_as_csv(
             filtered_results, start_columns=['id', 'name'],
-            include_columns=['id', 'name'])
+            include_columns=['id', 'name']))
     else:
-        print json.dumps(filtered_results)
+        print(json.dumps(filtered_results))
 elif result_type == 'Source':
     if output_format == 'text':
         for ocl_source in filtered_results:
-            print '%s: %s %s (%s)' % (ocl_source['id'], ocl_source['name'],
+            print('%s: %s %s (%s)' % (ocl_source['id'], ocl_source['name'],
                                       ocl_source['extras']['questionnaireuid'],
-                                      ocl_source['extras']['qmap_version'])
+                                      ocl_source['extras']['qmap_version']))
     elif output_format == 'csv':
-        print iol.get_as_csv(
+        print(iol.get_as_csv(
             filtered_results, start_columns=['id', 'owner', 'full_name'],
-            include_columns=['id', 'owner', 'full_name', 'attr:questionnaireuid', 'attr:qmap_version'])
+            include_columns=['id', 'owner', 'full_name', 'attr:questionnaireuid', 'attr:qmap_version']))
     else:
-        print json.dumps(filtered_results)
+        print(json.dumps(filtered_results))

@@ -33,8 +33,8 @@ import sys
 import json
 import argparse
 import requests
-import common
-import datim.datimimapexport
+from . import common
+from . import datim.datimimapexport
 
 
 # Script argument parser
@@ -62,8 +62,8 @@ parser.add_argument('--apiversion', help='OCL API version (eg v1 or v2)', requir
 args = parser.parse_args()
 ocl_env_url = args.env if args.env else args.env_url
 if args.verbosity > 1:
-    print args
-    print 'ocl_env_url=%s' % ocl_env_url
+    print(args)
+    print('ocl_env_url=%s' % ocl_env_url)
 
 # Prepare filters
 period_filter = ''
@@ -87,13 +87,13 @@ imap_export = datim.datimimapexport.DatimImapExport(
 for org in ocl_imap_orgs:
     # Print debug info for the current IMAP org
     if args.verbosity:
-        print '\n\n' + '*' * 100
+        print('\n\n' + '*' * 100)
         if 'extras' not in org or not org['extras']:
             org['extras'] = {}
-        print '** [EXPORT] Org: %s, Country Code: %s, Country Name: %s, Format: %s, Period: %s, Exclude Empty Maps: %s, Verbosity: %s' % (
+        print('** [EXPORT] Org: %s, Country Code: %s, Country Name: %s, Format: %s, Period: %s, Exclude Empty Maps: %s, Verbosity: %s' % (
             org['id'], org['extras'].get('datim_moh_country_code'), org['name'], args.format,
-            org['extras'].get('datim_moh_period'), str(args.exclude_empty_maps), str(args.verbosity))
-        print '*' * 100
+            org['extras'].get('datim_moh_period'), str(args.exclude_empty_maps), str(args.verbosity)))
+        print('*' * 100)
 
     # Generate the IMAP export
     try:
@@ -113,7 +113,7 @@ for org in ocl_imap_orgs:
             imap_error['country_code'] = org['extras'].get('datim_moh_country_code', '')
             imap_error['period'] = org['extras'].get('datim_moh_period')
         if args.verbosity:
-            print json.dumps(imap_error)
+            print(json.dumps(imap_error))
         imap_backups.append(imap_error)
     else:
         if args.verbosity:
@@ -132,6 +132,6 @@ for org in ocl_imap_orgs:
         })
 
 if args.verbosity:
-    print '\n%s IMAPs exported successfully' % len(imap_backups)
+    print('\n%s IMAPs exported successfully' % len(imap_backups))
 else:
-    print json.dumps(imap_backups, indent=4)
+    print(json.dumps(imap_backups, indent=4))

@@ -14,7 +14,7 @@ def get_as_csv(rows, start_columns=None, include_columns=None, exclude_columns=N
     if include_columns:
         csv_columns = include_columns
     else:
-        csv_columns = rows[0].keys()
+        csv_columns = list(rows[0].keys())
         if 'extras' in csv_columns:
             csv_columns.remove('extras')
 

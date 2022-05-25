@@ -18,7 +18,7 @@ Files: (THIS LIST NEEDS TO BE UPDATED!)
 import json
 import ocldev.oclfleximporter
 import ocldev.oclresourcelist
-import settings
+from . import settings
 
 
 # Edit this list to import the files that you need
@@ -44,27 +44,27 @@ resource_list = ocldev.oclresourcelist.OclJsonResourceList()
 for import_filename in IMPORT_FILENAMES:
     resource_list += ocldev.oclresourcelist.OclJsonResourceList.load_from_file(
         filename=import_filename)
-print '%s resources will be imported:' % len(resource_list)
-print(resource_list.summarize(core_attr_key='type'))
+print('%s resources will be imported:' % len(resource_list))
+print((resource_list.summarize(core_attr_key='type')))
 
 # Display the full list of resources
 if VERBOSE:
     import json
     for resource in resource_list:
-        print json.dumps(resource)
+        print(json.dumps(resource))
 
 # Process as bulk import
 if DO_BULK_IMPORT and resource_list:
-    print 'Submitting bulk import to: %s' % OCL_API_URL_ROOT
+    print('Submitting bulk import to: %s' % OCL_API_URL_ROOT)
     bulk_import_response = ocldev.oclfleximporter.OclBulkImporter.post(
         input_list=resource_list, api_token=OCL_API_TOKEN,
         api_url_root=OCL_API_URL_ROOT, parallel=True)
     task_id = bulk_import_response.json()['task']
-    print 'BULK IMPORT TASK ID: %s' % task_id
+    print('BULK IMPORT TASK ID: %s' % task_id)
     if DO_WAIT_UNTIL_IMPORT_COMPLETE:
-        print 'INFO: Waiting until import is complete...'
+        print('INFO: Waiting until import is complete...')
         import_results = ocldev.oclfleximporter.OclBulkImporter.get_bulk_import_results(
             task_id=task_id, api_url_root=OCL_API_URL_ROOT, api_token=OCL_API_TOKEN,
             delay_seconds=5, max_wait_seconds=800)
         if import_results:
-            print import_results.display_report()
+            print(import_results.display_report())

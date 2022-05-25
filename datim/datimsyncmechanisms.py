@@ -8,12 +8,12 @@ synchronized with repositories in OCL as described below.
 | mechanisms  | MechanismsQuery | /orgs/PEPFAR/sources/Mechanisms/ |
 |-------------|-----------------|----------------------------------|
 """
-from __future__ import with_statement
+
 import os
 import sys
 import json
-import datimsync
-import datimconstants
+from . import datimsync
+from . import datimconstants
 
 
 class DatimSyncMechanisms(datimsync.DatimSync):

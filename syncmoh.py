@@ -14,9 +14,9 @@ Note: This script is set to run against `www.datim.org` while `syncmohfy18.py` r
 """
 import sys
 import os
-import settings
-import datim.datimsync
-import datim.datimsyncmoh
+from . import settings
+from . import datim.datimsync
+from . import datim.datimsyncmoh
 
 
 # DATIM DHIS2 Settings

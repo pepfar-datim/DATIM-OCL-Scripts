@@ -2,15 +2,15 @@
 Class to test the synchronization by comparing the resulting metadata presentation
 formats from DHIS2 and OCL.
 """
-import sys
-import requests
-import warnings
 import difflib
+import sys
+import warnings
+
 import deepdiff
-from operator import itemgetter
-from . import datimconstants
-from . import datimbase
-from . import datimshow
+import requests
+
+from. import datimbase, datimconstants, datimshow
+
 
 class DatimSyncTest(datimbase.DatimBase):
     """

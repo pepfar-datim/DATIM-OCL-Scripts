@@ -19,8 +19,8 @@ synchronized with repositories in OCL as described below.
 """
 
 import json
-from . import datimsync
-from . import datimconstants
+
+from . import datimconstants, datimsync
 
 
 class DatimSyncSims(datimsync.DatimSync):

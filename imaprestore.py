@@ -6,12 +6,11 @@ This command will import an IMAP backup into OCL staging:
     python imaprestore.py --env=staging -t=[my-token] imap_backup_filename.json
 
 """
-import json
 import argparse
-from . import datim.datimimap
-from . import datim.datimimapimport
-from . import common
+import json
 
+import common
+from datim import datimimap, datimimapimport
 
 # Script argument parser
 parser = argparse.ArgumentParser(
@@ -82,7 +81,7 @@ for imap_backup in imap_backups:
     if imap_backup['status'] != 'Success':
         print('WARNING: Invalid IMAP backup:', json.dumps(imap_backup))
         continue
-    imap_input = datim.datimimap.DatimImap(
+    imap_input = datimimap.DatimImap(
         imap_data=imap_backup['imap'],
         period=imap_backup['period'],
         country_org=imap_backup['country_org'],
@@ -105,7 +104,7 @@ for imap_backup in imap_backups:
     try:
         bulk_import_task_id = ''
         if not args.test_mode:
-            imap_import = datim.datimimapimport.DatimImapImport(
+            imap_import = datimimapimport.DatimImapImport(
                 oclenv=ocl_env_url, oclapitoken=args.token, verbosity=args.verbosity,
                 run_ocl_offline=False, test_mode=args.test_mode,
                 country_public_access=args.public_access)

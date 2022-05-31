@@ -12,12 +12,11 @@ Note: This script is set to run against `www.datim.org` while `syncmohfy18.py` r
 |             |        | /orgs/PEPFAR/collections/DATIM-MOH-*/           |
 |-------------|--------|-------------------------------------------------|
 """
-import sys
 import os
-from . import settings
-from . import datim.datimsync
-from . import datim.datimsyncmoh
+import sys
 
+import settings
+from datim import datimsync, datimsyncmoh
 
 # DATIM DHIS2 Settings
 dhis2env = settings.dhis2env
@@ -29,7 +28,7 @@ oclenv = settings.oclenv
 oclapitoken = settings.oclapitoken
 
 # Local development environment settings
-sync_mode = datim.datimsync.DatimSync.SYNC_MODE_BUILD_IMPORT_SCRIPT  # Set which operation is performed by the sync script
+sync_mode = datimsync.DatimSync.SYNC_MODE_BUILD_IMPORT_SCRIPT  # Set which operation is performed by the sync script
 verbosity = 2  # 0=none, 1=some, 2=all
 import_limit = 0  # Number of resources to import; 0=all
 import_delay = 0  # Number of seconds to delay between each import request
@@ -59,7 +58,7 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
         run_ocl_offline = os.environ['RUN_OCL_OFFLINE'] in ['true', 'True']
 
 # Create sync object and run
-datim_sync = datim.datimsyncmoh.DatimSyncMoh(
+datim_sync = datimsyncmoh.DatimSyncMoh(
     oclenv=oclenv, oclapitoken=oclapitoken, dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
     compare2previousexport=compare2previousexport, run_dhis2_offline=run_dhis2_offline,
     run_ocl_offline=run_ocl_offline, verbosity=verbosity, import_limit=import_limit)

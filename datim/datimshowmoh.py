@@ -5,8 +5,7 @@ Supported Formats: html, xml, csv, json
 OpenHIM Mediator Request Format: /datim-moh?period=____&format=____
 """
 
-from . import datimshow
-from . import datimconstants
+from . import datimconstants, datimshow
 
 
 class DatimShowMoh(datimshow.DatimShow):

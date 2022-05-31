@@ -3,11 +3,12 @@ Utility script to easily import CSV files for multiple countries in one go.
 Provides an option to delete one or multiple existing orgs in the case of a clean import.
 Be super careful with the org delete option!
 """
-import requests
-import settings
 import time
-import datim.datimimap
-import datim.datimimapimport
+
+import requests
+
+import settings
+from datim import datimimap, datimimapimport
 
 # Import Script Settings
 period = 'FY18'
@@ -90,7 +91,7 @@ for country_code in country_codes:
 
     # Load i-map from CSV file
     try:
-        imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(
+        imap_input = datimimap.DatimImapFactory.load_imap_from_csv(
             csv_filename=csv_filename, period=period,
             country_org=country_org, country_name=country_name, country_code=imap_country_code)
         imap_input.display(sort=True, exclude_empty_maps=True)
@@ -99,7 +100,7 @@ for country_code in country_codes:
         continue
 
     # Run the import
-    imap_import = datim.datimimapimport.DatimImapImport(
+    imap_import = datimimapimport.DatimImapImport(
         oclenv=ocl_env, oclapitoken=oclapitoken, verbosity=2, test_mode=test_mode)
     imap_import.import_imap(imap_input=imap_input)
     time.sleep(5) # short delay before the next one begins

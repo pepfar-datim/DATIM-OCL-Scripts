@@ -29,13 +29,13 @@ However, if verbosity is turned on, then you can output the IMAPs in any availab
 
     python imapbackup.py --env=staging -v2 -fcsv
 """
-import sys
-import json
 import argparse
-import requests
-from . import common
-from . import datim.datimimapexport
+import json
 
+import requests
+
+import common
+from datim import datimimapexport, datimimap
 
 # Script argument parser
 parser = argparse.ArgumentParser("imap-backup", description="Backup IMAPs in OCL environment")
@@ -50,7 +50,7 @@ parser.add_argument(
 parser.add_argument('-p', '--period', help='Period, eg "FY18", "FY19"', required=False, default='')
 parser.add_argument(
     '-f', '--format', help='Format of the export: CSV (default), JSON, XML, HTML',
-    default=datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV, required=False)
+    default=datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV, required=False)
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
 parser.add_argument(
@@ -82,7 +82,7 @@ ocl_imap_orgs = common.get_imap_orgs(
 
 # Export each one
 imap_backups = []
-imap_export = datim.datimimapexport.DatimImapExport(
+imap_export = datimimapexport.DatimImapExport(
     oclenv=ocl_env_url, oclapitoken=args.token, verbosity=imap_export_verbosity)
 for org in ocl_imap_orgs:
     # Print debug info for the current IMAP org

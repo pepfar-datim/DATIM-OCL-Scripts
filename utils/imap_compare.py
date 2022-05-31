@@ -1,15 +1,15 @@
 """
 Script to compare two IMAPs. Each IMAP may be stored in a file or in any of the OCL environments.
 """
-import datim.datimimap
 import settings
+from datim import datimimap
 
 # Constants - DO NOT EDIT
 IMAP_TYPE_LOAD_FROM_FILE = 'file'
 IMAP_TYPE_LOAD_FROM_OCL = 'ocl'
 
 # Shared settings - YOU CAN EDIT THESE
-export_format = datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV
+export_format = datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV
 exclude_empty_maps = True
 include_extra_info = False
 
@@ -39,12 +39,12 @@ imap_b_country_org = 'DATIM-MOH-%s-%s' % (imap_b_country_code, imap_b_period)
 print('**** STEP 1 OF 4: Load IMAP A...')
 if imap_a_type == IMAP_TYPE_LOAD_FROM_FILE:
     print('Loading IMAP A from file: %s' % imap_a_filename)
-    imap_a = datim.datimimap.DatimImapFactory.load_imap_from_csv(
+    imap_a = datimimap.DatimImapFactory.load_imap_from_csv(
         csv_filename=imap_a_filename, period=imap_a_period, country_org=imap_a_country_org,
         country_name=imap_a_country_name, country_code=imap_a_country_code)
 elif imap_a_type == IMAP_TYPE_LOAD_FROM_OCL:
     print('Loading IMAP A from OCL: %s' % imap_a_country_org)
-    imap_a = datim.datimimap.DatimImapFactory.load_imap_from_ocl(
+    imap_a = datimimap.DatimImapFactory.load_imap_from_ocl(
         oclenv=imap_a_ocl_env, oclapitoken=imap_a_ocl_api_token, run_ocl_offline=False,
         country_code=imap_a_country_code, country_org=imap_a_country_org, period=imap_a_period, verbosity=2)
 else:
@@ -59,12 +59,12 @@ if imap_a_is_valid != True:
 print('**** STEP 2 OF 4: Load IMAP B...')
 if imap_b_type == IMAP_TYPE_LOAD_FROM_FILE:
     print('Loading IMAP B from file: %s' % imap_b_filename)
-    imap_b = datim.datimimap.DatimImapFactory.load_imap_from_csv(
+    imap_b = datimimap.DatimImapFactory.load_imap_from_csv(
         csv_filename=imap_b_filename, period=imap_b_period, country_org=imap_b_country_org,
         country_name=imap_b_country_name, country_code=imap_b_country_code)
 elif imap_b_type == IMAP_TYPE_LOAD_FROM_OCL:
     print('Loading IMAP B from OCL: %s' % imap_b_country_org)
-    imap_b = datim.datimimap.DatimImapFactory.load_imap_from_ocl(
+    imap_b = datimimap.DatimImapFactory.load_imap_from_ocl(
         oclenv=imap_b_ocl_env, oclapitoken=imap_b_ocl_api_token, run_ocl_offline=False,
         country_code=imap_b_country_code, country_org=imap_b_country_org, period=imap_b_period, verbosity=2)
 else:
@@ -82,4 +82,4 @@ imap_diff.display()
 
 # STEP 4 OF 4: Generate patch import script (to update IMAP A to match IMAP B)
 print('**** STEP 4 OF 4: Generate patch import script (to update IMAP A to match IMAP B)...')
-import_list = datim.datimimap.DatimImapFactory.generate_import_script_from_diff(imap_diff)
+import_list = datimimap.DatimImapFactory.generate_import_script_from_diff(imap_diff)

@@ -12,8 +12,8 @@ TODO: This class (FY17) must be updated to the model used by FY18 and FY19 befor
 """
 
 import json
-from . import datimsync
-from . import datimconstants
+
+from . import datimconstants, datimsync
 
 
 class DatimSyncMoh(datimsync.DatimSync):

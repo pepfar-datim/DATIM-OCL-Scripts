@@ -34,11 +34,11 @@ Arguments:
                         Verbosity level: 0 (default), 1, or 2
   --version             show program's version number and exit
 """
-import json
 import argparse
-from . import iol
-from . import common
+import json
 
+import common
+import iol
 
 # Script argument parser
 parser = argparse.ArgumentParser("imap-orgs", description="Export IMAP country list from OCL")

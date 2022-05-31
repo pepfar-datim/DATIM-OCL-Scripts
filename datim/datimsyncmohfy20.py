@@ -17,9 +17,8 @@ TODO: Add "indicator_category_code" attribute for each indicator (e.g. PMTCT_STA
 """
 
 import json
-from . import datimsync
-from . import datimconstants
-from . import datimsyncmohhelper
+
+from . import datimconstants, datimsync, datimsyncmohhelper
 
 
 class DatimSyncMohFy20(datimsync.DatimSync):

@@ -7,8 +7,8 @@ Supported Formats: html, xml, csv, json
 """
 
 import requests
-from . import datimshow
-from . import datimbase
+
+from . import datimbase, datimshow
 
 
 class DatimShowMsp(datimshow.DatimShow):

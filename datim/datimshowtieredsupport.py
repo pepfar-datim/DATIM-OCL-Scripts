@@ -6,8 +6,7 @@ Supported Formats: html, xml, csv, json
 Supported Collections: datalements, options
 """
 
-from . import datimshow
-from . import datimconstants
+from . import datimconstants, datimshow
 
 
 class DatimShowTieredSupport(datimshow.DatimShow):

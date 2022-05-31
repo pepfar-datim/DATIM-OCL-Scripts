@@ -5,10 +5,9 @@ Supported Test Actions: IMPORT, EXPORT, COMPARE, DROP
 Supported Test Assertions:
 """
 import requests
-import datim.datimimap
-import datim.datimimapexport
-import datim.datimimapimport
-import utils.timer
+
+from . import datimimap, datimimapexport, datimimapimport
+from utils import timer
 
 
 class DatimImapTests:
@@ -55,7 +54,7 @@ class DatimImapTests:
         return summary
 
     def get_export(self, args):
-        datim_imap_export = datim.datimimapexport.DatimImapExport(
+        datim_imap_export = datimimapexport.DatimImapExport(
             oclenv=args['ocl_api_env'],
             oclapitoken=args['ocl_api_token'],
             verbosity=args.get('verbosity', 2),
@@ -80,7 +79,7 @@ class DatimImapTests:
 
     def process_import(self, args):
         # First load the import CSV
-        imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(
+        imap_input = datimimap.DatimImapFactory.load_imap_from_csv(
             csv_filename=args.get('imap_import_filename'),
             period=args.get('period', ''),
             country_org=args.get('country_org'),
@@ -94,7 +93,7 @@ class DatimImapTests:
             raise Exception(errmsg)
 
         # Now process the import
-        imap_import = datim.datimimapimport.DatimImapImport(
+        imap_import = datimimapimport.DatimImapImport(
             oclenv=args.get('ocl_api_env'),
             oclapitoken=args.get('ocl_api_token'),
             verbosity=args.get('verbosity', 2),
@@ -117,7 +116,7 @@ class DatimImapTests:
             country_name=args.get('imap_a_country_name'),
             oclenv=args.get('imap_a_ocl_api_env'),
             oclapitoken=args.get('imap_a_ocl_api_token'))
-        if isinstance(imap_a, datim.datimimap.DatimImap):
+        if isinstance(imap_a, datimimap.DatimImap):
             print('** IMAP-A loaded successfully:')
             imap_a.display(sort=True, exclude_empty_maps=True)
             print('\n')
@@ -133,11 +132,11 @@ class DatimImapTests:
             country_name=args.get('imap_b_country_name'),
             oclenv=args.get('imap_b_ocl_api_env'),
             oclapitoken=args.get('imap_b_ocl_api_token'))
-        if isinstance(imap_b, datim.datimimap.DatimImap):
+        if isinstance(imap_b, datimimap.DatimImap):
             print('** IMAP-B loaded successfully:')
             imap_b.display(sort=True, exclude_empty_maps=True)
             print('\n')
-        if isinstance(imap_a, datim.datimimap.DatimImap) and isinstance(imap_b, datim.datimimap.DatimImap):
+        if isinstance(imap_a, datimimap.DatimImap) and isinstance(imap_b, datimimap.DatimImap):
             imap_diff = imap_a.diff(imap_b)
             imap_diff.display()
             return imap_diff
@@ -148,7 +147,7 @@ class DatimImapTests:
                  oclenv='', oclapitoken=''):
         if imap_type == DatimImapTests.IMAP_COMPARE_TYPE_RESULT:
             if imap_result_id in self.results:
-                if isinstance(self.results[imap_result_id], datim.datimimap.DatimImap):
+                if isinstance(self.results[imap_result_id], datimimap.DatimImap):
                     return self.results[imap_result_id]
                 else:
                     raise Exception('ERROR: Result ID "%s" not a valid DatimImap: %s' % (
@@ -156,11 +155,11 @@ class DatimImapTests:
             else:
                 raise Exception('ERROR: No result ID "%s"' % imap_result_id)
         elif imap_type == DatimImapTests.IMAP_COMPARE_TYPE_FILE:
-            return datim.datimimap.DatimImapFactory.load_imap_from_file(
+            return datimimap.DatimImapFactory.load_imap_from_file(
                 imap_filename=imap_filename, period=period,
                 country_org=country_org, country_name=country_name, country_code=country_code)
         elif imap_type == DatimImapTests.IMAP_COMPARE_TYPE_OCL:
-            datim_imap_export = datim.datimimapexport.DatimImapExport(
+            datim_imap_export = datimimapexport.DatimImapExport(
                 oclenv=oclenv, oclapitoken=oclapitoken, verbosity=1, run_ocl_offline=False)
             return datim_imap_export.get_imap(
                 period=period, version=version, country_org=country_org, country_code=country_code)
@@ -170,7 +169,7 @@ class DatimImapTests:
             raise Exception('Unrecognized imap_type "%s". Must be one of the DatimImapTests.IMAP_COMPARE_TYPE_RESULT contants' % imap_type)
 
     def drop_org(self, args):
-        return datim.datimimap.DatimImapFactory.delete_org_if_exists(
+        return datimimap.DatimImapFactory.delete_org_if_exists(
             org_id=args.get('country_org'),
             oclenv=args.get('ocl_api_env'),
             ocl_root_api_token=args.get('ocl_api_token'),
@@ -203,7 +202,7 @@ class DatimImapTests:
     def assert_num_diff(result, target_num_diff):
         assert_result = False
         result_num_diff = 'N/A'
-        if isinstance(result, datim.datimimap.DatimImapDiff):
+        if isinstance(result, datimimap.DatimImapDiff):
             result_num_diff = result.get_num_diffs()
             assert_result = target_num_diff == result_num_diff
         print("Assert Num Diff: %s == %s -- %s" % (result_num_diff, target_num_diff, assert_result))
@@ -295,7 +294,7 @@ class DatimImapTests:
             print(self.__timer)
 
     def run_tests(self, tests):
-        self.__timer = utils.timer.Timer()
+        self.__timer = timer.Timer()
         self.__tests = list(tests)
         self.__current_test_num = 0
         self.__total_test_count = len(tests)

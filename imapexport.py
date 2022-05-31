@@ -11,13 +11,12 @@ Example Usage:
 * To see all options:
     python imapexport.py -h
 """
-import sys
-import json
 import argparse
-from . import datim.datimimap
-from . import datim.datimimapexport
-from . import common
+import json
+import sys
 
+import common
+from datim import datimimap, datimimapexport
 
 # Script argument parser
 parser = argparse.ArgumentParser("imap-export", description="Export IMAP from OCL")
@@ -31,7 +30,7 @@ parser.add_argument('-p', '--period', help='Period, eg "FY18"', required=True)
 parser.add_argument('-t', '--token', help='OCL API token', required=False, default='')
 parser.add_argument(
     '-f', '--format', help='Format of the export: CSV (default), JSON, XML, HTML',
-    default=datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV, required=False)
+    default=datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV, required=False)
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
 parser.add_argument(
@@ -59,7 +58,7 @@ if args.verbosity:
     print('*' * 100)
 
 # Generate the IMAP export
-datim_imap_export = datim.datimimapexport.DatimImapExport(
+datim_imap_export = datimimapexport.DatimImapExport(
     oclenv=ocl_env_url, oclapitoken=args.token, verbosity=args.verbosity,
     run_ocl_offline=args.run_ocl_offline)
 try:

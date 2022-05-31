@@ -16,11 +16,10 @@ synchronized with repositories in OCL as described below.
 """
 import os
 import sys
-from . import settings
-# import datim.datimbase
-from . import datim.datimsync
-from . import datim.datimsyncmermsp
 
+import settings
+# from datim import datimbase
+from datim import datimsync, datimsyncmermsp
 
 # DATIM DHIS2 Settings
 dhis2env = settings.dhis2env
@@ -32,7 +31,7 @@ oclenv = settings.oclenv
 oclapitoken = settings.oclapitoken
 
 # Local development environment settings
-sync_mode = datim.datimsync.DatimSync.SYNC_MODE_FULL_IMPORT  # Set which operation is performed by this script
+sync_mode = datimsync.DatimSync.SYNC_MODE_FULL_IMPORT  # Set which operation is performed by this script
 verbosity = 2  # 0=none, 1=some, 2=all
 import_limit = 0  # Number of resources to import; 0=all
 import_delay = 3  # Number of seconds to delay between each import request
@@ -62,7 +61,7 @@ if len(sys.argv) > 1 and sys.argv[1] in ['true', 'True']:
         run_ocl_offline = os.environ['RUN_OCL_OFFLINE'] in ['true', 'True']
 
 # Create sync object and run
-datim_sync = datim.datimsyncmermsp.DatimSyncMerMsp(
+datim_sync = datimsyncmermsp.DatimSyncMerMsp(
     oclenv=oclenv, oclapitoken=oclapitoken, dhis2env=dhis2env, dhis2uid=dhis2uid, dhis2pwd=dhis2pwd,
     compare2previousexport=compare2previousexport, run_dhis2_offline=run_dhis2_offline,
     run_ocl_offline=run_ocl_offline, verbosity=verbosity, import_limit=import_limit)

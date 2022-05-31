@@ -5,10 +5,12 @@ Designed to work with PEPFAR IMAP and QMAP resources.
 python bulkImportStatus.py --env=staging -t="my-api-token-here"
     --bulkImportId=d6ac3dd2-e565-455c-b29a-f7d859fd1fe8-datim-admin
 """
-import json
 import argparse
+import json
+
 import requests
-from . import common
+
+import common
 
 
 # Checks OCL bulk import status

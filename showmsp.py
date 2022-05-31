@@ -27,9 +27,9 @@ Example Usage:
 
 """
 import argparse
-from . import datim.datimshow
-from . import datim.datimshowmsp
-from . import common
+
+import common
+from datim import datimshow, datimshowmsp
 
 
 def arg_parser_data_element_ids(string):
@@ -43,7 +43,7 @@ def arg_parser_data_element_ids(string):
 
 def arg_parser_export_format(format_string):
     """ Arg parser function for determining export format """
-    return datim.datimshow.DatimShow.get_format_from_string(format_string, default_fmt='csv')
+    return datimshow.DatimShow.get_format_from_string(format_string, default_fmt='csv')
 
 
 # Script argument parser
@@ -73,7 +73,7 @@ if args.verbosity > 1:
     print(args, ocl_env_url)
 
 # Create DatimMspShow object and run
-datim_show = datim.datimshowmsp.DatimShowMsp(
+datim_show = datimshowmsp.DatimShowMsp(
     oclenv=ocl_env_url, oclapitoken=args.token,
     run_ocl_offline=False, verbosity=args.verbosity)
 datim_show.get(

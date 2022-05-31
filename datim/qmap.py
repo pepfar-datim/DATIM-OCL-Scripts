@@ -2,15 +2,17 @@
 Script to import a QMAP into OCL. A QMAP is a JSON representation of a mapping between
 a point of service system (POS) to a FHIR Questionnaire.
 """
-import re
 import json
-import requests
+import re
+
 import ocldev.oclconstants
 import ocldev.oclexport
-import ocldev.oclvalidator
-import ocldev.oclresourcelist
 import ocldev.oclfleximporter
-from . import fhir
+import ocldev.oclresourcelist
+import ocldev.oclvalidator
+import requests
+
+import fhir
 
 
 class Qmap(object):

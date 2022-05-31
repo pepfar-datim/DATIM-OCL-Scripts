@@ -18,12 +18,14 @@ period (e.g. FY17). Export follows the format of the country mapping CSV templat
 1. Implement long-term method for populating the indicator category column (currently manually set a custom attribute)
 """
 import json
+
+import ocldev.oclfleximporter
+
 from . import datimbase
 from . import datimimap
 from . import datimimapimport
 from . import datimsyncmohhelper
-import utils.timer
-import ocldev.oclfleximporter
+from utils import timer
 
 
 class DatimUnknownCountryPeriodError(Exception):
@@ -117,7 +119,7 @@ class DatimImapExport(datimbase.DatimBase):
             raise Exception(msg)
 
         # STEP 1 of 8: Make sure an import for same country+period is not underway
-        imap_timer = utils.timer.Timer()
+        imap_timer = timer.Timer()
         imap_timer.start()
         self.vlog(1, '**** STEP 1 of 8: Make sure an import for same country+period is not underway')
         status_filter = ['PENDING', 'STARTED']

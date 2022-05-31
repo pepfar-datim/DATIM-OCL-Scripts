@@ -86,10 +86,11 @@ Example Output:
 """
 import argparse
 import json
-import ocldev.oclexport
-from . import datim.qmap
-from . import common
 
+import ocldev.oclexport
+
+import common
+from datim import qmap
 
 # Script argument parser
 parser = argparse.ArgumentParser("qmap", description="Export a QMAP into OCL")
@@ -112,7 +113,7 @@ if args.verbosity > 1:
 
 # Process the qmap export
 try:
-    qmap = datim.qmap.Qmap.export_qmap(
+    qmap = qmap.Qmap.export_qmap(
         domain=args.domain, qmap_id=args.qmapid,
         ocl_env_url=ocl_env_url, ocl_api_token=args.token,
         verbosity=args.verbosity)

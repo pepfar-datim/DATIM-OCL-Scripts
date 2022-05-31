@@ -5,8 +5,7 @@ Request Format: /datim-mechanisms?format=____
 Supported Formats: html, xml, csv, json
 """
 
-from . import datimshow
-from . import datimconstants
+from . import datimconstants, datimshow
 
 
 class DatimShowMechanisms(datimshow.DatimShow):

@@ -10,13 +10,14 @@ NOTE:
 
 import csv
 import sys
-import datim.datimimap
+
+from datim import datimimap
 
 verbosity = 0
 csv_filename = "csv/KE-FY18-dirty.csv"
 
 # Load the IMAP CSV
-imap = datim.datimimap.DatimImapFactory.load_imap_from_csv(
+imap = datimimap.DatimImapFactory.load_imap_from_csv(
     csv_filename=csv_filename, period="",
     country_org="", country_name="", country_code="")
 if verbosity >= 2:
@@ -24,7 +25,7 @@ if verbosity >= 2:
 
 # Output a cleaned version
 count = 0
-writer = csv.DictWriter(sys.stdout, fieldnames=datim.datimimap.DatimImap.IMAP_EXPORT_FIELD_NAMES)
+writer = csv.DictWriter(sys.stdout, fieldnames=datimimap.DatimImap.IMAP_EXPORT_FIELD_NAMES)
 writer.writeheader()
 for row_number in range(imap.length()):
     row = imap.get_row(row_number)

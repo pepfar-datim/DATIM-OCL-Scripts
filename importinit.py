@@ -15,11 +15,9 @@ Files: (THIS LIST NEEDS TO BE UPDATED!)
     Tiered Site Support. Note that no repo versions and no collection references are created for
     Tiered Site Support
 """
-import json
-import ocldev.oclfleximporter
 import ocldev.oclresourcelist
-from . import settings
 
+import settings
 
 # Edit this list to import the files that you need
 

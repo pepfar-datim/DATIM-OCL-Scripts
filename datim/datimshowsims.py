@@ -8,8 +8,7 @@ Supported Collections:
     sims_option_sets
 """
 
-from . import datimshow
-from . import datimconstants
+from . import datimconstants, datimshow
 
 
 class DatimShowSims(datimshow.DatimShow):

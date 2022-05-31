@@ -23,12 +23,13 @@ Arguments:
                         Verbosity level: 0 (default), 1, or 2
   --version             show program's version number and exit
 """
-import json
 import argparse
-import requests
-from . import iol
-from . import common
+import json
 
+import requests
+
+import common
+import iol
 
 # Script argument parser
 parser = argparse.ArgumentParser("qmap-repos", description="Get QMAP domains and repos from OCL")

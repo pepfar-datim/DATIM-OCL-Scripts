@@ -12,12 +12,11 @@ Example Usage:
         -t="your-token-here" --test_mode csv/BI-FY19.csv
 
 """
-import json
 import argparse
-from . import datim.datimimap
-from . import datim.datimimapimport
-from . import common
+import json
 
+import common
+from datim import datimimap, datimimapimport
 
 # Script argument parser
 parser = argparse.ArgumentParser("imap-import", description="Import IMAP into OCL")
@@ -106,7 +105,7 @@ if args.verbosity:
     print('  import_filename =', args.file.name)
 
 # Load IMAP from import file
-imap_input = datim.datimimap.DatimImapFactory.load_imap_from_file(
+imap_input = datimimap.DatimImapFactory.load_imap_from_file(
     imap_filename=args.file.name, period=args.period,
     country_org=country_org, country_name=country_name, country_code=args.country_code)
 if args.verbosity and imap_input:
@@ -123,7 +122,7 @@ output_json = {
     "period": args.period
 }
 try:
-    imap_import = datim.datimimapimport.DatimImapImport(
+    imap_import = datimimapimport.DatimImapImport(
         oclenv=ocl_env_url, oclapitoken=args.token, verbosity=args.verbosity,
         run_ocl_offline=False, test_mode=args.test_mode,
         country_public_access=args.public_access)

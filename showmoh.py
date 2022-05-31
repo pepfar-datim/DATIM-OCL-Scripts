@@ -10,13 +10,13 @@ This script fetches an export from OCL for the latest released version of the sp
 collection. If it seems like you're looking at old data, check the collection version first.
 """
 import argparse
-import requests
 import json
-from . import iol
-from . import datim.datimshow
-from . import datim.datimshowmoh
-from . import common
 
+import requests
+
+import common
+import iol
+from datim import datimshowmoh
 
 # Script argument parser
 parser = argparse.ArgumentParser("moh", description="Export MOH data from OCL")
@@ -34,7 +34,7 @@ ocl_env_url = args.env if args.env else args.env_url
 
 if args.period:
     # Create Show object and run -- returns a single codelist
-    datim_show = datim.datimshowmoh.DatimShowMoh(
+    datim_show = datimshowmoh.DatimShowMoh(
         oclenv=ocl_env_url, oclapitoken=args.token, verbosity=args.verbosity)
     datim_show.get(period=args.period, export_format=args.format)
 else:

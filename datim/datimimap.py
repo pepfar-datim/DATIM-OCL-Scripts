@@ -1,19 +1,19 @@
 """
 DATIM IMAP object and its helper classes
 """
-import sys
-import io
 import csv
+import io
 import json
 import re
-import time
-from operator import itemgetter
-import requests
+import sys
+
 import deepdiff
-from . import datimimapexport
-from . import datimbase
 import ocldev.oclconstants
 import ocldev.oclcsvtojsonconverter
+import requests
+
+from . import datimbase
+from . import datimimapexport
 
 
 class DatimImap(object):

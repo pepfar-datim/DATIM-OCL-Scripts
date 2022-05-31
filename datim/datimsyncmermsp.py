@@ -13,10 +13,10 @@ synchronized with repositories in OCL as described below.
 """
 
 import json
-from . import datimsync
-from . import datimconstants
+
 import ocldev.oclconstants
-from . import datimbase
+
+from . import datimbase, datimconstants, datimsync
 
 
 class DatimSyncMerMsp(datimsync.DatimSync):

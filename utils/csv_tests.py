@@ -2,7 +2,7 @@
 Use this script to test one or multiple IMAP CSV files for validity and
 that the DatimImap object is interpreting the values correctly.
 """
-import datim.datimimap
+from datim import datimimap
 
 verbosity = 1
 country_codes = {
@@ -43,7 +43,7 @@ for country_code in sorted(country_codes.keys()):
         print('*****************************************************************************')
 
     # Load the IMAP CSV
-    imap = datim.datimimap.DatimImapFactory.load_imap_from_csv(
+    imap = datimimap.DatimImapFactory.load_imap_from_csv(
         csv_filename=csv_filename, period=period,
         country_org=country_org, country_name=country_name, country_code=country_code)
     imap.do_add_columns_to_csv = False

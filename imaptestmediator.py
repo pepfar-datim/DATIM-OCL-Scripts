@@ -1,7 +1,5 @@
-from . import settings
-from . import datim.datimimap
-from . import datim.datimimaptests
-from . import datim.datimimapimport
+import settings
+from datim import datimimap, datimimaptests
 
 # Settings
 ocl_api_env = settings.ocl_api_url_staging
@@ -23,19 +21,19 @@ imap_test_batch = [
         "test_id": "mediator-export:%s" % country_test_code,
         "is_active": True,
         "test_description": "Export '%s'" % country_test_code,
-        "test_type": datim.datimimaptests.DatimImapTests.DATIM_OCL_TEST_TYPE_MEDIATOR_EXPORT,
+        "test_type": datimimaptests.DatimImapTests.DATIM_OCL_TEST_TYPE_MEDIATOR_EXPORT,
         "imap_mediator_env": imap_mediator_env,
-        "export_format": datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_JSON,
+        "export_format": datimimap.DatimImap.DATIM_IMAP_FORMAT_JSON,
         "country_code": country_test_code,
         "country_name": country_test_name,
         "period": period,
-        "assert_result_type": datim.datimimap.DatimImap,
+        "assert_result_type": datimimap.DatimImap,
         "assert_http_response_code": 200,
     }
 ]
 
 # Run the tests and display the results
-datim.datimimaptests.DatimImapTests.display_test_summary(imap_test_batch)
-imap_tester = datim.datimimaptests.DatimImapTests()
+datimimaptests.DatimImapTests.display_test_summary(imap_test_batch)
+imap_tester = datimimaptests.DatimImapTests()
 imap_tester.run_tests(imap_test_batch)
 imap_tester.display_test_results()

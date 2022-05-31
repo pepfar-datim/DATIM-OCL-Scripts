@@ -4,12 +4,11 @@ Perform diff on an IMAP stored in OCL and one stored in a JSON or CSV file
 EXAMPLE:
 python imapdiffbackup.py --env=production-aws -t=2925899a86b7601de02b7b0f22cafda494ad2a5e -v1 imap-samples/production-v1-imap-backup-20210405.json
 """
-import json
 import argparse
-from . import datim.datimimap
-from . import datim.datimimaptests
-from . import common
+import json
 
+import common
+from datim import datimimap, datimimaptests
 
 # Script argument parser
 parser = argparse.ArgumentParser(
@@ -76,7 +75,7 @@ for imap_backup in imap_backups:
     if imap_backup['status'] != 'Success':
         print('WARNING: Invalid IMAP backup:', json.dumps(imap_backup))
         continue
-    imap_input = datim.datimimap.DatimImap(
+    imap_input = datimimap.DatimImap(
         imap_data=imap_backup['imap'],
         period=imap_backup['period'],
         country_org=imap_backup['country_org'],
@@ -95,23 +94,23 @@ for imap_backup in imap_backups:
             "test_id": "imap-diff",
             "is_active": True,
             "test_description": "Compare IMAP from backup to an IMAP in OCL",
-            "test_type": datim.datimimaptests.DatimImapTests.DATIM_OCL_TEST_TYPE_COMPARE,
-            "imap_a_type": datim.datimimaptests.DatimImapTests.IMAP_COMPARE_TYPE_VARIABLE,
+            "test_type": datimimaptests.DatimImapTests.DATIM_OCL_TEST_TYPE_COMPARE,
+            "imap_a_type": datimimaptests.DatimImapTests.IMAP_COMPARE_TYPE_VARIABLE,
             "imap_a_object": imap_input,
-            "imap_b_type": datim.datimimaptests.DatimImapTests.IMAP_COMPARE_TYPE_OCL,
+            "imap_b_type": datimimaptests.DatimImapTests.IMAP_COMPARE_TYPE_OCL,
             "imap_b_ocl_api_env": ocl_env_url,
             "imap_b_ocl_api_token": args.token,
             "imap_b_period": imap_backup['period'],
             "imap_b_country_org": imap_backup['country_org'],
             "imap_b_country_name": imap_backup['country_name'],
             "imap_b_country_code": imap_backup['country_code'],
-            "assert_result_type": datim.datimimap.DatimImapDiff,
+            "assert_result_type": datimimap.DatimImapDiff,
             "assert_num_diff": 0,
         }
     ]
 
     # Run the diff and display the results
-    datim.datimimaptests.DatimImapTests.display_test_summary(imap_test_batch)
-    imap_tester = datim.datimimaptests.DatimImapTests()
+    datimimaptests.DatimImapTests.display_test_summary(imap_test_batch)
+    imap_tester = datimimaptests.DatimImapTests()
     imap_tester.run_tests(imap_test_batch)
     imap_tester.display_test_results()

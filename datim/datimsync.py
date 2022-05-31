@@ -14,16 +14,17 @@ Import batches should be structured as follows:
 }
 """
 import json
-import requests
 import os
 import sys
-import time
-from requests.auth import HTTPBasicAuth
 from shutil import copyfile
+
 import deepdiff
-from . import datimbase
 import ocldev.oclconstants
 import ocldev.oclfleximporter
+import requests
+from requests.auth import HTTPBasicAuth
+
+from . import datimbase
 import utils.timer
 
 

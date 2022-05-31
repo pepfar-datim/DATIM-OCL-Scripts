@@ -2,11 +2,12 @@
 Shared class for custom presentations (i.e. shows) of DATIM metadata
 """
 import csv
-import sys
 import json
+import sys
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import SubElement
 from xml.etree.ElementTree import tostring
+
 from . import datimbase
 
 

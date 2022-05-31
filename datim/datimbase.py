@@ -13,8 +13,16 @@ import time
 import datetime
 import json
 from io import StringIO
-import requests
+
+# below is needed because of https://github.com/spyoungtech/grequests/issues/103
+from gevent import monkey
+def stub(*args, **kwargs):  # pylint: disable=unused-argument
+    pass
+monkey.patch_all = stub
+#########
+
 import grequests
+import requests
 import settings
 import ocldev.oclconstants
 from requests.adapters import HTTPAdapter

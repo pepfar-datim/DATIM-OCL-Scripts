@@ -13,7 +13,7 @@ enum34==1.1.6
 eventlet==0.25.1
 gevent==21.12.0
 greenlet==1.1.2
-grequests==0.4.0
+grequests==0.6.0
 idna==2.7
 importlib-metadata==1.5.0
 isort==4.3.4

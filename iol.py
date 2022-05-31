@@ -46,7 +46,7 @@ def get_as_csv(rows, start_columns=None, include_columns=None, exclude_columns=N
     # Generate the CSV output
     import csv
     import io
-    output_stream = io.BytesIO()
+    output_stream = io.StringIO()
     writer = csv.DictWriter(output_stream, fieldnames=csv_columns)
     writer.writeheader()
     for row in rows:

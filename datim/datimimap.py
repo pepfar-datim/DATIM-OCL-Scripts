@@ -6,6 +6,7 @@ import io
 import json
 import re
 import sys
+from functools import cmp_to_key
 
 import deepdiff
 import ocldev.oclconstants
@@ -568,6 +569,10 @@ class DatimImap(object):
         from operator import itemgetter
         comparers = [((itemgetter(col[1:].strip()), -1) if col.startswith('-') else
                       (itemgetter(col.strip()), 1)) for col in columns]
+
+        def cmp(a, b):
+            return (a > b) - (a < b)
+
         def comparer(left, right):
             for fn, mult in comparers:
                 result = cmp(fn(left), fn(right))
@@ -575,7 +580,7 @@ class DatimImap(object):
                     return mult * result
             else:
                 return 0
-        return sorted(items, cmp=comparer)
+        return sorted(items, key=cmp_to_key(comparer))
 
     def add_columns_to_row(self, row):
         """

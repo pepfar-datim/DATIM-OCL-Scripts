@@ -12,7 +12,7 @@ import zipfile
 import time
 import datetime
 import json
-from io import StringIO
+from io import BytesIO
 
 # below is needed because of https://github.com/spyoungtech/grequests/issues/103
 from gevent import monkey
@@ -452,7 +452,7 @@ class DatimBase(object):
             if export_response.status_code == 200:
                 # Cached export successfully retrieved for this repository version
                 self.vlog(2, '[%s FOUND] %s' % (export_response.status_code, original_export_url))
-                export_string_handle = StringIO(export_response.content)
+                export_string_handle = BytesIO(export_response.content)
                 zipref = zipfile.ZipFile(export_string_handle, "r")
                 if 'export.json' in zipref.namelist():
                     collection_results[original_export_url] = json.loads(zipref.read('export.json'))

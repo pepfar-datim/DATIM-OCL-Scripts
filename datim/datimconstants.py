@@ -311,6 +311,66 @@ class DatimConstants(object):
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY21/'},
+        'DAA-FY22': {
+            'title': 'MER Results: MOH Facility Based FY22',
+            'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY22/'},
+        'DAA-FY22Q1': {
+            'title': 'MER Results: MOH Facility Based FY22Q1',
+            'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY22Q1/'},
+        'DAA-FY22Q2': {
+            'title': 'MER Results: MOH Facility Based FY22Q2',
+            'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY22Q2/'},
+        'DAA-FY22Q3': {
+            'title': 'MER Results: MOH Facility Based FY22Q3',
+            'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY22Q3/'},
+        'DAA-FY22Q4': {
+            'title': 'MER Results: MOH Facility Based FY22Q4',
+            'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY22Q4/'},
+        'CS-FY22': {
+            'title': 'MER Results: CS Facility Based FY22',
+            'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-CS-FY22/'},
+        'CS-FY22Q1': {
+            'title': 'MER Results: CS Facility Based FY22Q1',
+            'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-CS-FY22Q1/'},
+        'CS-FY22Q2': {
+            'title': 'MER Results: CS Facility Based FY22Q2',
+            'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-CS-FY22Q2/'},
+        'CS-FY22Q3': {
+            'title': 'MER Results: CS Facility Based FY22Q3',
+            'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-CS-FY22Q3/'},
+        'CS-FY22Q4': {
+            'title': 'MER Results: CS Facility Based FY22Q4',
+            'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-CS-FY22Q4/'},
     }
 
     # MOH FY18 OCL Export Definitions

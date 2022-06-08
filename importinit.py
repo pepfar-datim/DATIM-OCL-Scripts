@@ -16,7 +16,7 @@ Files: (THIS LIST NEEDS TO BE UPDATED!)
     Tiered Site Support
 """
 import ocldev.oclresourcelist
-
+import ocldev.oclfleximporter
 import settings
 
 # Edit this list to import the files that you need
@@ -27,6 +27,8 @@ IMPORT_FILENAMES_ALL = [
     'init/datim_moh_fy20.json',
     'init/datim_moh_fy21_cs.json',
     'init/datim_moh_fy21_daa.json',
+    'init/datim_moh_fy22_daa.json',
+    'init/datim_moh_fy22q1_daa.json',
 ]
 IMPORT_FILENAMES = IMPORT_FILENAMES_ALL
 
@@ -34,8 +36,8 @@ IMPORT_FILENAMES = IMPORT_FILENAMES_ALL
 VERBOSE = False
 DO_BULK_IMPORT = True
 DO_WAIT_UNTIL_IMPORT_COMPLETE = True
-OCL_API_URL_ROOT = settings.ocl_api_url_qa
-OCL_API_TOKEN = settings.api_token_qa_datim_admin
+OCL_API_URL_ROOT = settings.ocl_api_url_staging
+OCL_API_TOKEN = settings.api_token_staging_datim_admin
 
 # Build a combined resource list
 resource_list = ocldev.oclresourcelist.OclJsonResourceList()

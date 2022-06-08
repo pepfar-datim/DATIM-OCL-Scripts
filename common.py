@@ -7,18 +7,10 @@ import requests
 APP_VERSION = '0.1.0'
 OCL_ENVIRONMENTS = {
     'qa': 'https://api.qa.openconceptlab.org',
-    'qa-v1': 'https://api.qa.v1.openconceptlab.org',
-    'qa-aws': 'https://api.qa.aws.openconceptlab.org',
     'dev': 'https://api.dev.openconceptlab.org',
     'staging': 'https://api.staging.openconceptlab.org',
-    'staging-v1': 'https://api.staging.v1.openconceptlab.org',
-    'staging-aws': 'https://api.staging.aws.openconceptlab.org',
     'production': 'https://api.openconceptlab.org',
-    'production-v1': 'https://api.v1.openconceptlab.org',
-    'production-aws': 'https://api.aws.openconceptlab.org',
     'demo': 'https://api.demo.openconceptlab.org',
-    'demo-v1': 'https://api.demo.v1.openconceptlab.org',
-    'demo-aws': 'https://api.demo.aws.openconceptlab.org',
 }
 
 

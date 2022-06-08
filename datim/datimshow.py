@@ -278,7 +278,7 @@ class DatimShow(datimbase.DatimBase):
         self.vlog(1, '**** STEP 3 of 4: Cache the intermediate output')
         if self.cache_intermediate:
             filename = self.endpoint2filename_ocl_export_intermediate_json(repo_endpoint)
-            with open(self.attach_absolute_data_path(filename), 'wb') as output_file:
+            with open(self.attach_absolute_data_path(filename), 'w') as output_file:
                 output_file.write(json.dumps(intermediate))
                 self.vlog(1, 'Processed OCL export saved to "%s"' % filename)
         else:

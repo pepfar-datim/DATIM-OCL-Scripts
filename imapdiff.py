@@ -27,7 +27,7 @@ args = parser.parse_args()
 # Pre-process input parameters
 ocl_env_url = args.env if args.env else args.envurl
 imap_filename = args.file.name
-country_org = 'DATIM-MOH-%s-%s' % (args.country_code, args.period)
+country_org = f'DATIM-MOH-{args.country_code}-{args.period}'
 
 # Test batch definition
 imap_test_batch = [

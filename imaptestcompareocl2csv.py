@@ -1,3 +1,4 @@
+""" Script to compare IMAP loaded in an OCL environment to an IMAP stored in a file """
 import settings
 from datim import datimimap, datimimaptests
 
@@ -9,7 +10,7 @@ ocl_api_root_token = settings.api_token_production_root
 imap_compare_csv_filename = 'csv/HT-FY19-v2.csv'
 imap_compare_country_code = 'TEST-HT2'
 imap_compare_country_name = 'TEST-HT2'
-imap_compare_country_org = 'DATIM-MOH-%s-%s' % (imap_compare_country_code, period)
+imap_compare_country_org = f'DATIM-MOH-{imap_compare_country_code}-{period}'
 
 # Test batch definition
 imap_test_batch = [

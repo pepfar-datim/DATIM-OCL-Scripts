@@ -23,8 +23,8 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
     ocl_api_headers = {'Content-Type': 'application/json'}
     if ocl_api_token:
         ocl_api_headers['Authorization'] = 'Token ' + ocl_api_token
-    import_status_url = "%s/manage/bulkimport/?task=%s&result=%s" % (
-        ocl_env_url, bulkImportId, import_result_format)
+    import_status_url = (f"{ocl_env_url}/manage/bulkimport/?task={bulkImportId}"
+                         f"&result={import_result_format}")
     response = requests.get(import_status_url, headers=ocl_api_headers)
     response.raise_for_status() #- see if raise for status can be implemented without conflict
     # check for if it is JSON or Text - if can't check test if it can be converted to json
@@ -38,12 +38,12 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
     except ValueError as e:
         is_json = False
     if import_result_format == 'summary':
-        if response.status_code == 200 and is_json == False:
+        if response.status_code == 200 and not is_json:
             output_json = {
                 "status": "Completed",
                 "status_code": response.status_code,
                 "message": content}
-        elif (response.status_code == 200 or response.status_code == 202) and is_json == True:
+        elif (response.status_code == 200 or response.status_code == 202) and is_json:
             output_json = {
                 "status": "Pending",
                 "status_code": 202}
@@ -58,8 +58,7 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
 def getQMAPDomainDetails(ocl_env_url='', domain=''):
     """ get QMAP domain details """
     ocl_api_headers = {'Content-Type': 'application/json'}
-    qmapDetailsURL = "%s/orgs/%s" % (
-        ocl_env_url, domain)
+    qmapDetailsURL = f"{ocl_env_url}/orgs/{domain}"
     response = requests.get(qmapDetailsURL, headers=ocl_api_headers)
     response.raise_for_status()
     return response.text
@@ -68,8 +67,8 @@ def getQMAPDomainDetails(ocl_env_url='', domain=''):
 def getDATIMCodeLists(ocl_env_url='',owner=''):
     """ get DATIM Codelist details """
     ocl_api_headers = {'Content-Type': 'application/json'}
-    datimCodelistsDetailsURL = '%s/orgs/%s/collections/?collectionType=Code List&q=&limit=400' % (
-        ocl_env_url,owner)
+    datimCodelistsDetailsURL = (f'{ocl_env_url}/orgs/{owner}/collections/?'
+                                f'collectionType=Code List&q=&limit=400')
     response = requests.get(datimCodelistsDetailsURL, headers=ocl_api_headers)
     response.raise_for_status()
     return response.text
@@ -78,15 +77,16 @@ def getDATIMCodeLists(ocl_env_url='',owner=''):
 def getMOHCodelists(ocl_env_url='',owner=''):
     """ get MOH Codelists details """
     ocl_api_headers = {'Content-Type': 'application/json'}
-    mohCodelistsDetailsURL = '%s/orgs/%s/sources/?extras.datim_moh_codelist=true&verbose=true' % (
-        ocl_env_url,owner)
+    mohCodelistsDetailsURL = (f'{ocl_env_url}/orgs/{owner}/sources/?'
+                              f'extras.datim_moh_codelist=true&verbose=true')
     response = requests.get(mohCodelistsDetailsURL, headers=ocl_api_headers)
     response.raise_for_status()
     return response.text
 
 
 # Configure
-parser = argparse.ArgumentParser("OCL Passthrough", description="Set of passthrough requests to direct ocl api endpoints")
+parser = argparse.ArgumentParser(
+    "OCL Passthrough", description="Set of passthrough requests to direct ocl api endpoints")
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('--env', help='Name of the OCL API environment', type=common.ocl_environment)
 group.add_argument('--envurl', help='URL of the OCL API environment')
@@ -106,6 +106,7 @@ parser.add_argument(
 parser.add_argument(
     '--owner', help='owner', required=False)
 args = parser.parse_args()
+
 ocl_env_url = args.env if args.env else args.env_url
 
 # Display debug output

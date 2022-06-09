@@ -26,9 +26,9 @@ collections = r.json()
 version_id = 'FY17'
 for c in collections:
     url = '%s%s%s/' % (oclenv, c['url'], version_id)
-    print '**** DELETE %s' % url
+    print('**** DELETE %s' % url)
     r = requests.delete(url, headers=oclapiheaders)
-    print 'STATUS CODE: %d, %s' % (r.status_code, r.text)
+    print('STATUS CODE: %d, %s' % (r.status_code, r.text))
     #c_version = r.json()
     print(c_version)
 
@@ -43,12 +43,12 @@ mappings = r.json()
 for m in mappings:
     mapping_url = oclenv + m['url']
     data = {'map_type': 'Has Organizational Unit'}
-    print mapping_url
-    print '\tFROM:%s' % m['from_concept_url']
-    print '\tMAPTYPE: %s' % m['map_type']
-    print '\tTO:  %s' % m['to_concept_url']
+    print(mapping_url)
+    print('\tFROM:%s' % m['from_concept_url'])
+    print('\tMAPTYPE: %s' % m['map_type'])
+    print('\tTO:  %s' % m['to_concept_url'])
     r = requests.put(mapping_url, data=json.dumps(data), headers=oclapiheaders)
-    print r.status_code, r.text
+    print(r.status_code, r.text)
 
 url_all_collections = oclenv + endpoint + '?limit=100'
 # url = oclenv + endpoint + '?q=MER+Results+Facility+dod&verbose=true&limit=100'
@@ -63,23 +63,23 @@ def set_extra_attr(repo, attr_name='', attr_value=''):
     repo_url = oclenv + repo['url']
     repo['extras'][attr_name] = attr_value
     new_attr_data = {'extras': repo['extras']}
-    print repo_url, '\n', json.dumps(new_attr_data)
+    print(repo_url, '\n', json.dumps(new_attr_data))
     r = requests.put(repo_url, data=json.dumps(new_attr_data), headers=oclapiheaders)
-    print r.status_code, r.text
+    print(r.status_code, r.text)
 
 def set_repo_field(repo_endpoint, field, value):
     repo_url = oclenv + repo_endpoint
     new_data = {field: value}
-    print repo_url, '\n', json.dumps(new_data)
+    print(repo_url, '\n', json.dumps(new_data))
     r = requests.put(repo_url, data=json.dumps(new_data), headers=oclapiheaders)
-    print r.status_code, r.text
+    print(r.status_code, r.text)
 
 # Delete matching repos
 for c in collections:
     if c['id'].find('SIMS') == 0 or c['id'].find('Tiered') == 0:
         continue
     delete_request = requests.delete(oclenv + c['url'], headers=oclapiheaders)
-    print 'DELETE', c['id'], 'STATUS CODE:', delete_request.status_code
+    print('DELETE', c['id'], 'STATUS CODE:', delete_request.status_code)
 
 def create_initial_repo_version(collections):
     missing_count = 0
@@ -88,11 +88,11 @@ def create_initial_repo_version(collections):
         latest_url = oclenv + c['url'] + 'latest/'
         r = requests.get(latest_url, headers=oclapiheaders)
         if r.status_code == 200:
-            print "ALL GOOD:", latest_url
+            print("ALL GOOD:", latest_url)
             all_good_count += 1
         elif r.status_code == 404:
             missing_count += 1
-            print "MISSING: need initial version for '%s'" % c['url']
+            print("MISSING: need initial version for '%s'" % c['url'])
             create_initial_repo_version(oclenv + c['url'], oclapiheaders=oclapiheaders)
 
 def create_missing_exports(collections):
@@ -100,17 +100,17 @@ def create_missing_exports(collections):
         latest_url = oclenv + c['url'] + 'latest/'
         latest_response = requests.get(latest_url, headers=oclapiheaders)
         if latest_response.status_code != 200:
-            print 'SKIPPING: No latest version defined for repo "%s"' % c['url']
+            print('SKIPPING: No latest version defined for repo "%s"' % c['url'])
             continue
         latest_repo_version = latest_response.json()
         # try to get the export
         export_url = oclenv + latest_repo_version['version_url'] + 'export/'
         get_export_response = requests.get(export_url, headers=oclapiheaders)
-        print 'GET %s: STATUS CODE %s' % (export_url, get_export_response.status_code)
+        print('GET %s: STATUS CODE %s' % (export_url, get_export_response.status_code))
         if get_export_response.status_code == 204:
             # create the export
             post_export_response = requests.post(export_url, headers=oclapiheaders)
-            print 'POST %s: STATUS CODE %s' % (export_url, post_export_response.status_code)
+            print('POST %s: STATUS CODE %s' % (export_url, post_export_response.status_code))
 
 
 def create_repo_version(repo_url='', oclapiheaders=None, version_desc='Automatically generated initial empty repository version', version_id='initial', released=True):
@@ -121,9 +121,9 @@ def create_repo_version(repo_url='', oclapiheaders=None, version_desc='Automatic
         'description': version_desc,
         'released': released,
     }
-    print 'POST %s: %s' % (new_version_url, str(new_repo_version_data))
+    print('POST %s: %s' % (new_version_url, str(new_repo_version_data)))
     r = requests.post(new_version_url, headers=oclapiheaders, data=json.dumps(new_repo_version_data))
-    print 'STATUS CODE:', r.status_code
+    print('STATUS CODE:', r.status_code)
     r.raise_for_status()
 
 
@@ -132,23 +132,23 @@ for c in collections:
     if c['id'].find('SIMS') == 0 or c['id'].find('Tiered') == 0:
         continue
     mer.append(c)
-    print c['id']
+    print(c['id'])
 
 for c in collections:
     add_attr(c, attr_name=attr_name, attr_value=attr_value)
 
 for c in collections:
     if 'extras' in c and 'datim_sync_mer' in c['extras']:
-        print c['id']
+        print(c['id'])
 
 for c in collections:
     if c['id'].find('SIMS') == 0:
         if c['id'] not in sims_external_ids:
             continue
-        print c['url'], 'external_id =', sims_external_ids[c['id']]
+        print(c['url'], 'external_id =', sims_external_ids[c['id']])
         set_repo_field(c['url'], 'external_id', sims_external_ids[c['id']])
 
-        print c['id'], '[', c['external_id'], ']:', c['extras']
+        print(c['id'], '[', c['external_id'], ']:', c['extras'])
         add_attr(c, attr_name='datim', attr_value=attr_value)
 
 sims_external_ids = {
@@ -171,12 +171,12 @@ for c in collections:
     latest_version_json = latest_version_request.json()
     if latest_version_json['id'] == 'initial':
         cnt += 1
-        print '[%s] Creating new version for "%s"' % (cnt, c['id'])
+        print('[%s] Creating new version for "%s"' % (cnt, c['id']))
         try:
             create_repo_version(repo_url=oclenv + c['url'], oclapiheaders=oclapiheaders, version_desc='Automatically generated repository version', version_id='v2017-10-02', released=True)
         except:
-            print "That one failed... but no way we're going to let that keep us down..."
-        print 'Sleeping for 10 seconds...'
+            print("That one failed... but no way we're going to let that keep us down...")
+        print('Sleeping for 10 seconds...')
         time.sleep(10)
 
 
@@ -186,6 +186,7 @@ for c in collections:
     latest_version_request = requests.get(oclenv + c['url'] + 'latest/', headers=oclapiheaders)
     latest_version_json = latest_version_request.json()
     if latest_version_json['id'] == 'initial':
+        pass
 
 import_filename = 'mer_dhis2ocl_import_script.json'
 importer_collections = OclFlexImporter(
@@ -223,9 +224,9 @@ for partial_map in mr:
     full_maps = datim_moh_export.get_mappings(from_concept_uri=partial_map['from_concept_url'], to_concept_uri=partial_map['to_concept_url'], map_type=partial_map['map_type'])
     if len(full_maps) == 1:
         mapping_url = oclenv + full_maps[0]['versioned_object_url']
-        print mapping_url
+        print(mapping_url)
         r = requests.put(mapping_url, json={'retired':True, "update_comment":"FY18 update"}, headers=oclapiheaders)
-        print r.status_code
+        print(r.status_code)
 
 
 # Delete all references in a collection
@@ -241,7 +242,7 @@ for ref in collection['references']:
 payload = { "references": refs }
 r = requests.delete(collection_ref_url, json=payload, headers=oclapiheaders)
 r.raise_for_status()
-print r.text
+print(r.text)
 
 
 # get list of orgs and delete those with IDs that match a certain string
@@ -259,10 +260,10 @@ orgs = orgs_response.json()
 for org in orgs:
     if org['id'][:10] == 'DATIM-MOH-':
         delete_url = oclenv + org['url']
-        print '**********', org['id']
-        print '  DELETE', delete_url
+        print('**********', org['id'])
+        print('  DELETE', delete_url)
         delete_response = requests.delete(delete_url, headers=oclapiheaders)
-        print delete_response.status_code
-        print ''        
+        print(delete_response.status_code)
+        print('')        
     else:
-        print org['id'], '\n'
+        print(org['id'], '\n')

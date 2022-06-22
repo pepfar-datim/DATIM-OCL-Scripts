@@ -295,7 +295,7 @@ class DatimBase(object):
                 endpoint=self.OCL_DATASET_ENDPOINT,
                 key_field='external_id',
                 active_attr_name=self.REPO_ACTIVE_ATTR)
-            with open(self.attach_absolute_data_path(self.DATASET_REPOSITORIES_FILENAME), 'wb') as output_file:
+            with open(self.attach_absolute_data_path(self.DATASET_REPOSITORIES_FILENAME), 'w') as output_file:
                 output_file.write(json.dumps(self.ocl_dataset_repos))
             self.vlog(1, 'Repositories retrieved from OCL matching key "%s": %s' % (
                 self.REPO_ACTIVE_ATTR, len(self.ocl_dataset_repos)))
@@ -305,7 +305,7 @@ class DatimBase(object):
             # Load the files offline (from a local cache) if they exist
             self.vlog(1, 'OCL-OFFLINE: Loading repositories from "%s"' % (
                 self.DATASET_REPOSITORIES_FILENAME))
-            with open(self.attach_absolute_data_path(self.DATASET_REPOSITORIES_FILENAME), 'rb') as handle:
+            with open(self.attach_absolute_data_path(self.DATASET_REPOSITORIES_FILENAME), 'r') as handle:
                 self.ocl_dataset_repos = json.load(handle)
             self.vlog(
                 1, 'OCL-OFFLINE: Repositories successfully loaded:', len(self.ocl_dataset_repos))

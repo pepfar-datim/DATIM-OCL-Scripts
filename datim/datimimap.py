@@ -1044,7 +1044,7 @@ class DatimImapFactory(object):
         :param period:
         :return:
         """
-        with open(json_filename, 'rb') as input_file:
+        with open(json_filename, 'r') as input_file:
             imap_data = json.load(input_file)
 
         # Validate
@@ -1068,7 +1068,7 @@ class DatimImapFactory(object):
         :param period:
         :return:
         """
-        with open(csv_filename, 'rb') as input_file:
+        with open(csv_filename, 'r') as input_file:
             imap_data = csv.DictReader(input_file)
             return DatimImap(imap_data=imap_data, country_code=country_code,
                              country_name=country_name, country_org=country_org, period=period)

@@ -25,7 +25,7 @@ import ocldev.oclresourcelist
 # Script settings
 modality = 'DAA'  # e.g. CS or DAA
 fy_only = 'FY22Q1'  # e.g. FY21 or FY22Q1
-period = "DAA-FY22Q1"  # e.g. DAA-FY22Q1, CS-FY21
+period = "DAA-FY22"  # e.g. DAA-FY22Q1, CS-FY21
 csv_filename = 'dhis2_moh_FY22_DAA.csv'  # e.g. dhis2_moh_FY22_DAA.csv
 FILENAME_MAP_DE_CODE_TO_INDICATOR_CATEGORY = ''  # e.g. cs_fy21_indicator_maps.csv
 owner = 'PEPFAR'  # e.g. PEPFAR

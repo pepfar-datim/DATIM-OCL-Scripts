@@ -26,23 +26,24 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
     import_status_url = (f"{ocl_env_url}/manage/bulkimport/?task={bulkImportId}"
                          f"&result={import_result_format}")
     response = requests.get(import_status_url, headers=ocl_api_headers)
-    response.raise_for_status() #- see if raise for status can be implemented without conflict
-    # check for if it is JSON or Text - if can't check test if it can be converted to json
+    response.raise_for_status()
     is_json = True
-    content=response.content
     try:
-        content=response.content
-        if content.startswith('"') and content.endswith('"'): # trimming first and last quotes
-            content = content[1:-1]
-        json_object = json.loads(content)
+        json_content = response.text
+        if json_content.startswith('"') and json_content.endswith('"'):
+            json_content = json_content[1:-1]
+        json_object = json.loads(json_content)
     except ValueError as e:
         is_json = False
     if import_result_format == 'summary':
         if response.status_code == 200 and not is_json:
+            message_text = response.text
+            if message_text.startswith('"') and message_text .endswith('"'):
+                message_text = message_text[1:-1]
             output_json = {
                 "status": "Completed",
                 "status_code": response.status_code,
-                "message": content}
+                "message": message_text}
         elif (response.status_code == 200 or response.status_code == 202) and is_json:
             output_json = {
                 "status": "Pending",
@@ -121,11 +122,11 @@ try:
         response = check_bulk_import_status(
             bulkImportId=args.bulkImportId, ocl_env_url=ocl_env_url,
             ocl_api_token=args.token, import_result_format=args.format.upper())
-    if args.requestType == "qmapDetails":
+    elif args.requestType == "qmapDetails":
         response = getQMAPDomainDetails(ocl_env_url=ocl_env_url, domain=args.domain)
-    if args.requestType == "datimCodelists":
+    elif args.requestType == "datimCodelists":
         response = getDATIMCodeLists(ocl_env_url=ocl_env_url, owner=args.owner)
-    if args.requestType == "mohCodelists":
+    elif args.requestType == "mohCodelists":
         response = getMOHCodelists(ocl_env_url=ocl_env_url, owner=args.owner)
 except Exception as e:
     output_json = {

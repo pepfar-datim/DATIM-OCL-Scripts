@@ -1,5 +1,5 @@
 """ Static helper class for DatimSyncMoh objects """
-import datimconstants
+from . import datimconstants
 
 class DatimSyncMohHelper(object):
     """ Static helper class for DatimSyncMoh objects """

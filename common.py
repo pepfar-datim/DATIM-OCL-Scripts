@@ -7,18 +7,10 @@ import requests
 APP_VERSION = '0.1.0'
 OCL_ENVIRONMENTS = {
     'qa': 'https://api.qa.openconceptlab.org',
-    'qa-v1': 'https://api.qa.v1.openconceptlab.org',
-    'qa-aws': 'https://api.qa.aws.openconceptlab.org',
     'dev': 'https://api.dev.openconceptlab.org',
     'staging': 'https://api.staging.openconceptlab.org',
-    'staging-v1': 'https://api.staging.v1.openconceptlab.org',
-    'staging-aws': 'https://api.staging.aws.openconceptlab.org',
     'production': 'https://api.openconceptlab.org',
-    'production-v1': 'https://api.v1.openconceptlab.org',
-    'production-aws': 'https://api.aws.openconceptlab.org',
     'demo': 'https://api.demo.openconceptlab.org',
-    'demo-v1': 'https://api.demo.v1.openconceptlab.org',
-    'demo-aws': 'https://api.demo.aws.openconceptlab.org',
 }
 
 
@@ -27,7 +19,7 @@ def ocl_environment(string):
     """ Return OCL environment URL for the specified enviroment key"""
     if string not in OCL_ENVIRONMENTS:
         raise argparse.ArgumentTypeError('Argument "env" must be %s' % (
-            ', '.join(OCL_ENVIRONMENTS.keys())))
+            ', '.join(list(OCL_ENVIRONMENTS.keys()))))
     return OCL_ENVIRONMENTS[string]
 
 
@@ -70,7 +62,7 @@ def get_imap_orgs(ocl_env_url, ocl_api_token, period_filter='', country_code_fil
     url_all_orgs = '%s/orgs/' % ocl_env_url
     response = requests.get(url_all_orgs, headers=ocl_api_headers, params=request_params)
     if verbose:
-        print response.url
+        print(response.url)
     response.raise_for_status()
     ocl_all_orgs = response.json()
     return ocl_all_orgs

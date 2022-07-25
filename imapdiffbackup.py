@@ -4,12 +4,11 @@ Perform diff on an IMAP stored in OCL and one stored in a JSON or CSV file
 EXAMPLE:
 python imapdiffbackup.py --env=production-aws -t=2925899a86b7601de02b7b0f22cafda494ad2a5e -v1 imap-samples/production-v1-imap-backup-20210405.json
 """
-import json
 import argparse
-import datim.datimimap
-import datim.datimimaptests
-import common
+import json
 
+import common
+from datim import datimimap, datimimaptests
 
 # Script argument parser
 parser = argparse.ArgumentParser(
@@ -50,12 +49,12 @@ for imap_backup in all_imap_backups:
 
 # Display debug info
 if args.verbosity:
-    print args
-    print 'ocl_env_url=%s' % ocl_env_url
-    print 'country_codes=%s' % country_code_filter
-    print 'periods=%s' % period_filter
-    print '%s IMAPs (after filter) of %s IMAP backups loaded' % (
-        len(imap_backups), len(all_imap_backups))
+    print(args)
+    print('ocl_env_url=%s' % ocl_env_url)
+    print('country_codes=%s' % country_code_filter)
+    print('periods=%s' % period_filter)
+    print('%s IMAPs (after filter) of %s IMAP backups loaded' % (
+        len(imap_backups), len(all_imap_backups)))
 
 # Loop through each and import
 current_num = 0
@@ -65,18 +64,18 @@ for imap_backup in imap_backups:
     # Display debug info for the current IMAP org
     if args.verbosity:
         if args.verbosity > 1:
-            print '\n\n' + '*' * 100
-        print '** [IMAP %s of %s] Org: %s, Country Code: %s, Country Name: %s, Period: %s' % (
+            print('\n\n' + '*' * 100)
+        print('** [IMAP %s of %s] Org: %s, Country Code: %s, Country Name: %s, Period: %s' % (
             current_num, len(imap_backups), imap_backup['country_org'],
-            imap_backup['country_code'], imap_backup['country_name'], imap_backup['period'])
+            imap_backup['country_code'], imap_backup['country_name'], imap_backup['period']))
         if args.verbosity > 1:
-            print '*' * 100
+            print('*' * 100)
 
     # Load into IMAP object
     if imap_backup['status'] != 'Success':
-        print 'WARNING: Invalid IMAP backup:', json.dumps(imap_backup)
+        print('WARNING: Invalid IMAP backup:', json.dumps(imap_backup))
         continue
-    imap_input = datim.datimimap.DatimImap(
+    imap_input = datimimap.DatimImap(
         imap_data=imap_backup['imap'],
         period=imap_backup['period'],
         country_org=imap_backup['country_org'],
@@ -86,7 +85,7 @@ for imap_backup in imap_backups:
         imap_input.display(sort=True, exclude_empty_maps=True)
         # print 'INFO: IMAP import file "%s" loaded successfully' % args.file.name
     elif not imap_input:
-        print 'ERROR: Unable to load IMAP import file "%s"' % args.file.name
+        print('ERROR: Unable to load IMAP import file "%s"' % args.file.name)
         exit(1)
 
     # Run the diff
@@ -95,23 +94,23 @@ for imap_backup in imap_backups:
             "test_id": "imap-diff",
             "is_active": True,
             "test_description": "Compare IMAP from backup to an IMAP in OCL",
-            "test_type": datim.datimimaptests.DatimImapTests.DATIM_OCL_TEST_TYPE_COMPARE,
-            "imap_a_type": datim.datimimaptests.DatimImapTests.IMAP_COMPARE_TYPE_VARIABLE,
+            "test_type": datimimaptests.DatimImapTests.DATIM_OCL_TEST_TYPE_COMPARE,
+            "imap_a_type": datimimaptests.DatimImapTests.IMAP_COMPARE_TYPE_VARIABLE,
             "imap_a_object": imap_input,
-            "imap_b_type": datim.datimimaptests.DatimImapTests.IMAP_COMPARE_TYPE_OCL,
+            "imap_b_type": datimimaptests.DatimImapTests.IMAP_COMPARE_TYPE_OCL,
             "imap_b_ocl_api_env": ocl_env_url,
             "imap_b_ocl_api_token": args.token,
             "imap_b_period": imap_backup['period'],
             "imap_b_country_org": imap_backup['country_org'],
             "imap_b_country_name": imap_backup['country_name'],
             "imap_b_country_code": imap_backup['country_code'],
-            "assert_result_type": datim.datimimap.DatimImapDiff,
+            "assert_result_type": datimimap.DatimImapDiff,
             "assert_num_diff": 0,
         }
     ]
 
     # Run the diff and display the results
-    datim.datimimaptests.DatimImapTests.display_test_summary(imap_test_batch)
-    imap_tester = datim.datimimaptests.DatimImapTests()
+    datimimaptests.DatimImapTests.display_test_summary(imap_test_batch)
+    imap_tester = datimimaptests.DatimImapTests()
     imap_tester.run_tests(imap_test_batch)
     imap_tester.display_test_results()

@@ -1,0 +1,17 @@
+DATIM_Indicator_Category,DATIM_Indicator_ID,DATIM_Disag_ID,DATIM_Disag_Name,Operation,MOH_Indicator_ID,MOH_Indicator_Name,MOH_Disag_ID,MOH_Disag_Name,Classification
+HTS_Contacts_Tested,HTS_INDEX_N_CS_Index_Age_Sex_Result,LokBv4egnfg,"<1, Newly Tested Positives, Male",ADD,hts_test_db_001,hts_test_db_001,hts_test_db_001_disag,hts_test_db_001_disag,fine
+HTS_Contacts_Tested,HTS_INDEX_N_CS_Index_Age_Sex_Result,LokBv4egnfg,"<1, Newly Tested Positives, Male",SUBTRACT,htstest_db_002,htstest_db_002,htstest_db_002disagg,htstest_db_002disagg,fine
+HTS_Contacts_Tested,HTS_INDEX_N_CS_Index_Age_Sex_Result,T7F0DwyrbBV,"10-14, Newly Tested Positives, Female",ADD,2322,Test101,jfdjfpfjs,10 -14 testedpostiviertemale,fine
+HTS_Contacts_Tested,HTS_INDEX_N_CS_Index_Age_Sex_Result,gWPhDYzmbw5,"<1, Newly Tested Positives, Female",ADD,htscontactstested1,htscontactstested1,,,fine
+HTS_Contacts_Tested,HTS_INDEX_N_CS_Index_Age_Sex_Result,gWPhDYzmbw5,"<1, Newly Tested Positives, Female",ADD,indicator_1_cs,moh indicator 1 CS,testing_a,testing_a,fine
+HTS_Contacts_Tested,HTS_INDEX_N_CS_Index_Age_Sex_Result,gWPhDYzmbw5,"<1, Newly Tested Positives, Female",ADD,test_indicator_cs,testing cs submission,,,fine
+HTS_Contacts_Tested,HTS_INDEX_N_CS_Index_Age_Sex_Result,gcWll55WCHc,"Unknown Age, New Negatives, Female",ADD,testindicator2,Testindicator2,,,fine
+HTS_Contacts_Tested,HTS_INDEX_N_CS_Index_Age_Sex_Result,hLjLWfjGWpK,"5-9, Newly Tested Positives, Female",ADD,htstest_db_003,htstest_db_003,htstest_db_002,htstest_db_002,fine
+HTS_Contacts_Tested,HTS_INDEX_N_CS_Index_Age_Sex_Result,rL9fEh5MSHf,"50+, New Negatives, Male",ADD,testdata1,testdata1,testdata2htsindex,testdata2htsindex,fine
+HTS_Contacts_Tested,HTS_INDEX_N_CS_Index_Age_Sex_Result,wem5QqoRkkh,"15-19, Newly Tested Positives, Female",ADD,testing3,testing3,,,fine
+HTS_ER_Ward,HTS_TST_N_CS_EW_Age_Sex_Result,PPg7Yzjq0oF,"<1, Female, Positive",ADD,another_test,another test for cs,test-cs-disag,test disaggregation,fine
+HTS_ER_Ward,HTS_TST_N_CS_EW_Age_Sex_Result,PPg7Yzjq0oF,"<1, Female, Positive",ADD,test_again,test again for cs,disag_id_again,another disag name,fine
+HTS_ER_Ward,HTS_TST_N_CS_EW_Age_Sex_Result,renXtk3VqTM,"<1, Male, Positive",ADD,test5,test5,,,fine
+TB_PREV,TB_PREV_N_MOH_Age_Agg_Sex_NewExistArt_HIVStatus,QKn9JHx79JO,"Positive, Male, Unknown Age, Life-long ART, Already",ADD,test1234,test1234,,,coarse
+TX_CURR,TX_CURR_N_CS_Age_Sex_HIVStatus,OMVFa98P0Yg,"<1, Female, Positive",ADD,TX_CURR_lt1_f_positive,TX_CURR_lt1_f_positive,,,fine
+TX_NEW,TX_NEW_N_CS_Age_Sex_HIVStatus,OMVFa98P0Yg,"<1, Female, Positive",ADD,TX_NEW_lt1_f_positive,TX_NEW_lt1_f_positive,,,fine

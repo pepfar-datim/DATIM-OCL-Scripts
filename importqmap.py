@@ -19,12 +19,13 @@ Example Output:
     "ocl_bulk_import_task_id": "efijfkfijdkdifjeijfjekifjej"
 }
 """
-import json
 import argparse
-import urllib3
-import common
-import datim.qmap
+import json
 
+import urllib3
+
+import common
+from datim import qmap
 
 # Suppress urllib error due to invalid SSL certificate
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -51,13 +52,13 @@ parser.add_argument('file', type=argparse.FileType('r'), help='QMAP JSON documen
 args = parser.parse_args()
 with args.file as qmap_file:
     qmap_json = json.load(qmap_file)
-    qmap = datim.qmap.Qmap(qmap_json=qmap_json)
+    qmap = qmap.Qmap(qmap_json=qmap_json)
 ocl_env_url = args.env if args.env else args.envurl
 
 # Display debug output
 if args.verbosity > 1:
-    print args
-    print qmap
+    print(args)
+    print(qmap)
 
 # Process the qmap import
 output_json = None
@@ -89,4 +90,4 @@ else:
                 args.qmap_api_root, args.domain, bulk_import_task_id)
 
 if output_json:
-    print json.dumps(output_json)
+    print(json.dumps(output_json))

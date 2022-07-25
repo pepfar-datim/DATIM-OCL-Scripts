@@ -14,7 +14,7 @@ def get_as_csv(rows, start_columns=None, include_columns=None, exclude_columns=N
     if include_columns:
         csv_columns = include_columns
     else:
-        csv_columns = rows[0].keys()
+        csv_columns = list(rows[0].keys())
         if 'extras' in csv_columns:
             csv_columns.remove('extras')
 
@@ -46,7 +46,7 @@ def get_as_csv(rows, start_columns=None, include_columns=None, exclude_columns=N
     # Generate the CSV output
     import csv
     import io
-    output_stream = io.BytesIO()
+    output_stream = io.StringIO()
     writer = csv.DictWriter(output_stream, fieldnames=csv_columns)
     writer.writeheader()
     for row in rows:

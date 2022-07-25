@@ -2,7 +2,7 @@
 Base class providing common functionality for DATIM indicator and
 country mapping synchronization and presentation.
 """
-from __future__ import with_statement
+
 import os
 import itertools
 import functools
@@ -12,9 +12,17 @@ import zipfile
 import time
 import datetime
 import json
-from StringIO import StringIO
-import requests
+from io import BytesIO
+
+# below is needed because of https://github.com/spyoungtech/grequests/issues/103
+from gevent import monkey
+def stub(*args, **kwargs):  # pylint: disable=unused-argument
+    pass
+monkey.patch_all = stub
+#########
+
 import grequests
+import requests
 import settings
 import ocldev.oclconstants
 from requests.adapters import HTTPAdapter
@@ -287,7 +295,7 @@ class DatimBase(object):
                 endpoint=self.OCL_DATASET_ENDPOINT,
                 key_field='external_id',
                 active_attr_name=self.REPO_ACTIVE_ATTR)
-            with open(self.attach_absolute_data_path(self.DATASET_REPOSITORIES_FILENAME), 'wb') as output_file:
+            with open(self.attach_absolute_data_path(self.DATASET_REPOSITORIES_FILENAME), 'w') as output_file:
                 output_file.write(json.dumps(self.ocl_dataset_repos))
             self.vlog(1, 'Repositories retrieved from OCL matching key "%s": %s' % (
                 self.REPO_ACTIVE_ATTR, len(self.ocl_dataset_repos)))
@@ -297,15 +305,15 @@ class DatimBase(object):
             # Load the files offline (from a local cache) if they exist
             self.vlog(1, 'OCL-OFFLINE: Loading repositories from "%s"' % (
                 self.DATASET_REPOSITORIES_FILENAME))
-            with open(self.attach_absolute_data_path(self.DATASET_REPOSITORIES_FILENAME), 'rb') as handle:
+            with open(self.attach_absolute_data_path(self.DATASET_REPOSITORIES_FILENAME), 'r') as handle:
                 self.ocl_dataset_repos = json.load(handle)
             self.vlog(
                 1, 'OCL-OFFLINE: Repositories successfully loaded:', len(self.ocl_dataset_repos))
 
         # Extract list of DHIS2 dataset IDs from the repository attributes
         if self.ocl_dataset_repos:
-            self.active_dataset_keys = self.ocl_dataset_repos.keys()
-            self.str_active_dataset_ids = ','.join(self.ocl_dataset_repos.keys())
+            self.active_dataset_keys = list(self.ocl_dataset_repos.keys())
+            self.str_active_dataset_ids = ','.join(list(self.ocl_dataset_repos.keys()))
             self.vlog(1, 'Dataset IDs returned from OCL:', self.str_active_dataset_ids)
         else:
             msg = 'ERROR: No dataset IDs returned from OCL. Exiting...'
@@ -326,7 +334,7 @@ class DatimBase(object):
                     return False  # different sizes therefore not equal
                 fp1_reader = functools.partial(fp1.read, 4096)
                 fp2_reader = functools.partial(fp2.read, 4096)
-                cmp_pairs = itertools.izip(iter(fp1_reader, ''), iter(fp2_reader, ''))
+                cmp_pairs = zip(iter(fp1_reader, ''), iter(fp2_reader, ''))
                 inequalities = itertools.starmap(operator.ne, cmp_pairs)
                 return not any(inequalities)
         except:
@@ -342,7 +350,7 @@ class DatimBase(object):
         """
         dt = datetime.datetime.utcnow()
         cnt = 0
-        for ocl_export_key, ocl_export_def in self.OCL_EXPORT_DEFS.iteritems():
+        for ocl_export_key, ocl_export_def in self.OCL_EXPORT_DEFS.items():
             cnt += 1
 
             # First check if any changes were made to the repository
@@ -391,7 +399,7 @@ class DatimBase(object):
         self.vlog(1, '%s repositories returned for endpoint "%s"' % (
             len(country_collections), endpoint))
         export_urls = []
-        for collection_id, collection in country_collections.items():
+        for collection_id, collection in list(country_collections.items()):
             url_ocl_export = '%s%s%s/export/' % (
                 self.oclenv, collection['url'], country_version_id)
             self.vlog(1, 'Export URL:', url_ocl_export)
@@ -399,7 +407,7 @@ class DatimBase(object):
 
         # Define exception handler for async requests
         def export_exception_handler(request, exception):
-            print('Request failed:', str(request), str(exception))
+            print(('Request failed:', str(request), str(exception)))
 
         # Submit sync export requests with auto-retry in case of connection pooling errors
         s = requests.Session()
@@ -444,7 +452,7 @@ class DatimBase(object):
             if export_response.status_code == 200:
                 # Cached export successfully retrieved for this repository version
                 self.vlog(2, '[%s FOUND] %s' % (export_response.status_code, original_export_url))
-                export_string_handle = StringIO(export_response.content)
+                export_string_handle = BytesIO(export_response.content)
                 zipref = zipfile.ZipFile(export_string_handle, "r")
                 if 'export.json' in zipref.namelist():
                     collection_results[original_export_url] = json.loads(zipref.read('export.json'))

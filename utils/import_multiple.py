@@ -3,11 +3,12 @@ Utility script to easily import CSV files for multiple countries in one go.
 Provides an option to delete one or multiple existing orgs in the case of a clean import.
 Be super careful with the org delete option!
 """
-import requests
-import settings
 import time
-import datim.datimimap
-import datim.datimimapimport
+
+import requests
+
+import settings
+from datim import datimimap, datimimapimport
 
 # Import Script Settings
 period = 'FY18'
@@ -68,7 +69,7 @@ if do_delete_datim_country_orgs or do_delete_orgs_remove_list:
         if ((do_delete_datim_country_orgs and org['id'][:10] == 'DATIM-MOH-') or (
                     do_delete_orgs_remove_list and org['id'] in org_remove_list)):
             org_url = ocl_env + org['url']
-            print('*** DELETE ORG:', org['id'], org_url)
+            print(('*** DELETE ORG:', org['id'], org_url))
             if test_mode:
                 print('    Skipping because test_mode=True')
             else:
@@ -83,23 +84,23 @@ for country_code in country_codes:
     country_name = country_codes[country_code]
     csv_filename = 'csv/%s-%s.csv' % (country_code, period)
     country_org = 'DATIM-MOH-%s%s' % (country_code, country_code_postfix)
-    print('\n\n' + '*' * 100)
-    print('** [IMPORT %s of %s] DATIM Country Code: %s, IMAP Country Code: %s, Org: %s, Period: %s, CSV: %s' % (
-        str(i), str(len(country_codes)), country_code, imap_country_code, country_org, period, csv_filename))
-    print('*' * 100)
+    print(('\n\n' + '*' * 100))
+    print(('** [IMPORT %s of %s] DATIM Country Code: %s, IMAP Country Code: %s, Org: %s, Period: %s, CSV: %s' % (
+        str(i), str(len(country_codes)), country_code, imap_country_code, country_org, period, csv_filename)))
+    print(('*' * 100))
 
     # Load i-map from CSV file
     try:
-        imap_input = datim.datimimap.DatimImapFactory.load_imap_from_csv(
+        imap_input = datimimap.DatimImapFactory.load_imap_from_csv(
             csv_filename=csv_filename, period=period,
             country_org=country_org, country_name=country_name, country_code=imap_country_code)
         imap_input.display(sort=True, exclude_empty_maps=True)
     except IOError:
-        print('No such file or directory: "%s". Skipping...' % csv_filename)
+        print(('No such file or directory: "%s". Skipping...' % csv_filename))
         continue
 
     # Run the import
-    imap_import = datim.datimimapimport.DatimImapImport(
+    imap_import = datimimapimport.DatimImapImport(
         oclenv=ocl_env, oclapitoken=oclapitoken, verbosity=2, test_mode=test_mode)
     imap_import.import_imap(imap_input=imap_input)
     time.sleep(5) # short delay before the next one begins

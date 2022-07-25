@@ -13,13 +13,15 @@ The import script creates OCL-formatted JSON consisting of:
     References for each concept and mapping added to each collection
 """
 import json
-import datimbase
-import datimimap
-import ocldev.oclfleximporter
-import ocldev.oclexport
+
 import ocldev.oclconstants
+import ocldev.oclexport
+import ocldev.oclfleximporter
 import ocldev.oclresourcelist
-import utils.timer
+
+from . import datimbase
+from . import datimimap
+from utils import timer
 
 
 class ImapCountryLockedForPeriodError(Exception):
@@ -66,7 +68,7 @@ class DatimImapImport(datimbase.DatimBase):
             raise Exception(msg)
 
         # STEP 1 of 5: Make sure an import for same country+period is not underway
-        imap_timer = utils.timer.Timer()
+        imap_timer = timer.Timer()
         imap_timer.start()
         self.vlog(1, '**** STEP 1 of 5: Make sure an import for same country+period is not underway')
         status_filter = ['PENDING', 'STARTED']
@@ -135,7 +137,7 @@ class DatimImapImport(datimbase.DatimBase):
             imap_input=imap_input, verbose=bool(self.verbosity)))
         if self.verbosity >= 2:
             for resource in import_list:
-                print json.dumps(resource)
+                print(json.dumps(resource))
         imap_timer.lap(label='STEP 4: Generate IMAP import script')
 
         # STEP 5 of 5: Bulk import into OCL

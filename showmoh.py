@@ -10,13 +10,13 @@ This script fetches an export from OCL for the latest released version of the sp
 collection. If it seems like you're looking at old data, check the collection version first.
 """
 import argparse
-import requests
 import json
-import iol
-import datim.datimshow
-import datim.datimshowmoh
-import common
 
+import requests
+
+import common
+import iol
+from datim import datimshowmoh
 
 # Script argument parser
 parser = argparse.ArgumentParser("moh", description="Export MOH data from OCL")
@@ -34,7 +34,7 @@ ocl_env_url = args.env if args.env else args.env_url
 
 if args.period:
     # Create Show object and run -- returns a single codelist
-    datim_show = datim.datimshowmoh.DatimShowMoh(
+    datim_show = datimshowmoh.DatimShowMoh(
         oclenv=ocl_env_url, oclapitoken=args.token, verbosity=args.verbosity)
     datim_show.get(period=args.period, export_format=args.format)
 else:
@@ -48,15 +48,15 @@ else:
     ocl_moh_sources = response.json()
     output_format = args.format.lower()
     if output_format == 'csv':
-        print iol.get_as_csv(
+        print(iol.get_as_csv(
             ocl_moh_sources, start_columns=['attr:Period', 'id'],
-            include_columns=['attr:Period', 'id', 'url'])
+            include_columns=['attr:Period', 'id', 'url']))
     elif output_format == 'text':
         for ocl_moh_source in ocl_moh_sources:
             datim_moh_period = None
             if 'extras' in ocl_moh_source and ocl_moh_source['extras']:
                 datim_moh_period = ocl_moh_source['extras'].get('Period')
-            print '%s: %s' % (
-                datim_moh_period, ocl_moh_source['id'])
+            print('%s: %s' % (
+                datim_moh_period, ocl_moh_source['id']))
     else:
-        print json.dumps(ocl_moh_sources, indent=4)
+        print(json.dumps(ocl_moh_sources, indent=4))

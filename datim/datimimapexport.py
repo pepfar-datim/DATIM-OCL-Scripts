@@ -18,12 +18,14 @@ period (e.g. FY17). Export follows the format of the country mapping CSV templat
 1. Implement long-term method for populating the indicator category column (currently manually set a custom attribute)
 """
 import json
-import datimbase
-import datimimap
-import datimimapimport
-import datimsyncmohhelper
-import utils.timer
+
 import ocldev.oclfleximporter
+
+from . import datimbase
+from . import datimimap
+from . import datimimapimport
+from . import datimsyncmohhelper
+from utils import timer
 
 
 class DatimUnknownCountryPeriodError(Exception):
@@ -117,7 +119,7 @@ class DatimImapExport(datimbase.DatimBase):
             raise Exception(msg)
 
         # STEP 1 of 8: Make sure an import for same country+period is not underway
-        imap_timer = utils.timer.Timer()
+        imap_timer = timer.Timer()
         imap_timer.start()
         self.vlog(1, '**** STEP 1 of 8: Make sure an import for same country+period is not underway')
         status_filter = ['PENDING', 'STARTED']
@@ -247,7 +249,7 @@ class DatimImapExport(datimbase.DatimBase):
         # STEP 7 of 8: Process one country collection at a time
         self.vlog(1, '**** STEP 7 of 8: Process one country collection at a time')
         datim_moh_null_disag_endpoint = datimbase.DatimBase.get_datim_moh_null_disag_endpoint(period)
-        for collection_version_export_url, collection_version in country_collections.items():
+        for collection_version_export_url, collection_version in list(country_collections.items()):
             collection_id = collection_version['collection']['id']
             operations = []
             datim_indicator_url = None
@@ -313,7 +315,7 @@ class DatimImapExport(datimbase.DatimBase):
             from_concept_name_field = 'from_concept_name_resolved'
             to_concept_name_field = 'to_concept_name_resolved'
         rows = []
-        for indicator_id, indicator in indicators.items():
+        for indicator_id, indicator in list(indicators.items()):
             for mapping in indicator['mappings']:
                 row_base = {
                     datimimap.DatimImap.IMAP_FIELD_DATIM_INDICATOR_CATEGORY: '',

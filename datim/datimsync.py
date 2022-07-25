@@ -14,16 +14,17 @@ Import batches should be structured as follows:
 }
 """
 import json
-import requests
 import os
 import sys
-import time
-from requests.auth import HTTPBasicAuth
 from shutil import copyfile
+
 import deepdiff
-import datimbase
 import ocldev.oclconstants
 import ocldev.oclfleximporter
+import requests
+from requests.auth import HTTPBasicAuth
+
+from . import datimbase
 import utils.timer
 
 
@@ -118,7 +119,7 @@ class DatimSync(datimbase.DatimBase):
         """
         cnt = 0
         num_total = len(self.OCL_EXPORT_DEFS)
-        for ocl_export_def_key, export_def in self.OCL_EXPORT_DEFS.iteritems():
+        for ocl_export_def_key, export_def in self.OCL_EXPORT_DEFS.items():
             cnt += 1
             self.vlog(1, '** [OCL Export %s of %s] %s:' % (cnt, num_total, ocl_export_def_key))
             cleaning_method_name = export_def.get('cleaning_method', self.DEFAULT_OCL_EXPORT_CLEANING_METHOD)
@@ -311,7 +312,7 @@ class DatimSync(datimbase.DatimBase):
         :return: None
         """
         cnt = 0
-        for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
+        for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.items():
             cnt += 1
             self.vlog(1, '** [DHIS2 Export %s of %s] %s:' % (cnt, len(self.DHIS2_QUERIES), dhis2_query_key))
             getattr(self, dhis2_query_def['conversion_method'])(dhis2_query_def, conversion_attr=conversion_attr)
@@ -363,7 +364,7 @@ class DatimSync(datimbase.DatimBase):
 
                     # Remove resources retired in OCL from the diff results - because no action is needed
                     if resource_type in retirable_resources and 'dictionary_item_removed' in resource_specific_diff:
-                        keys = resource_specific_diff['dictionary_item_removed'].keys()
+                        keys = list(resource_specific_diff['dictionary_item_removed'].keys())
                         for key in keys:
                             if 'retired' in resource_specific_diff['dictionary_item_removed'][key] and resource_specific_diff['dictionary_item_removed'][key]['retired']:
                                 del(resource_specific_diff['dictionary_item_removed'][key])
@@ -396,7 +397,7 @@ class DatimSync(datimbase.DatimBase):
                     consolidated_concept_refs = {}
                     consolidated_mapping_refs = {}
                     if 'dictionary_item_added' in diff[import_batch][resource_type]:
-                        for k, r in diff[import_batch][resource_type]['dictionary_item_added'].iteritems():
+                        for k, r in diff[import_batch][resource_type]['dictionary_item_added'].items():
                             if resource_type == ocldev.oclconstants.OclConstants.RESOURCE_TYPE_COLLECTION and r['type'] == ocldev.oclconstants.OclConstants.RESOURCE_TYPE_COLLECTION:
                                 output_file.write(json.dumps(r))
                                 output_file.write('\n')
@@ -483,8 +484,8 @@ class DatimSync(datimbase.DatimBase):
             mapping_url = mapping_url[:self.find_nth(mapping_url, '/', 7)+1]
 
         # Find the related mapping from the full collection export
-        mapping_from_export = (item for item in full_collection_export_dict['mappings'] if str(
-            item["versioned_object_url"]) == str(mapping_url)).next()
+        mapping_from_export = next((item for item in full_collection_export_dict['mappings'] if str(
+            item["versioned_object_url"]) == str(mapping_url)))
         if not mapping_from_export:
             self.log('something really wrong happened here...')
             sys.exit(1)
@@ -572,7 +573,7 @@ class DatimSync(datimbase.DatimBase):
     def load_dhis2_exports(self):
         """ Fetch DHIS2 exports based on DHIS2_QUERIES configuration and save to temp data folder """
         cnt = 0
-        for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
+        for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.items():
             cnt += 1
             self.vlog(1, '** [DHIS2 Export %s of %s] %s:' % (cnt, len(self.DHIS2_QUERIES), dhis2_query_key))
             dhis2filename_export_new = datimbase.DatimBase.dhis2filename_export_new(dhis2_query_def['id'])
@@ -649,7 +650,7 @@ class DatimSync(datimbase.DatimBase):
         complete_match = True
         if self.compare2previousexport and sync_mode != DatimSync.SYNC_MODE_DIFF_ONLY:
             # Compare files for each of the DHIS2 queries
-            for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.iteritems():
+            for dhis2_query_key, dhis2_query_def in self.DHIS2_QUERIES.items():
                 self.vlog(1, dhis2_query_key + ':')
                 dhis2filename_export_new = datimbase.DatimBase.dhis2filename_export_new(dhis2_query_def['id'])
                 dhis2filename_export_old = datimbase.DatimBase.dhis2filename_export_old(dhis2_query_def['id'])
@@ -844,7 +845,7 @@ class DatimSync(datimbase.DatimBase):
             self.log('** Sync time breakdown:\n', sync_timer)
             if ocl_importer and ocl_importer.import_results:
                 self.log('** Import summary:\n')
-                print(ocl_importer.import_results.get_detailed_summary())
+                print((ocl_importer.import_results.get_detailed_summary()))
 
         # Return the diff result (may return something else in the end)
         if self.diff_result:

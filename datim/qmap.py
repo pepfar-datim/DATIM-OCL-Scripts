@@ -2,14 +2,16 @@
 Script to import a QMAP into OCL. A QMAP is a JSON representation of a mapping between
 a point of service system (POS) to a FHIR Questionnaire.
 """
-import re
 import json
-import requests
+import re
+
 import ocldev.oclconstants
 import ocldev.oclexport
-import ocldev.oclvalidator
-import ocldev.oclresourcelist
 import ocldev.oclfleximporter
+import ocldev.oclresourcelist
+import ocldev.oclvalidator
+import requests
+
 import fhir
 
 
@@ -56,7 +58,7 @@ class Qmap(object):
         qmap_repo_url = '%s%s' % (ocl_env_url, ocldev.oclconstants.OclConstants.get_repository_url(
             owner_id=domain, repository_id=qmap_id, include_trailing_slash=True))
         if verbosity:
-            print 'Requesting export from: %s ' % qmap_repo_url
+            print('Requesting export from: %s ' % qmap_repo_url)
         qmap_export = ocldev.oclexport.OclExportFactory.load_latest_export(
             qmap_repo_url, oclapitoken=ocl_api_token, do_wait_for_export=True)
         if not qmap_export:
@@ -241,39 +243,39 @@ class Qmap(object):
 
         # Display debug output
         if verbosity:
-            print '\n**** QMAP Org and sources in OCL:'
+            print('\n**** QMAP Org and sources in OCL:')
 
             # Org
             if do_create_org:
-                print '  mAtches Domain org "%s" does not exist...will create' % domain
+                print('  mAtches Domain org "%s" does not exist...will create' % domain)
             else:
-                print '  mAtches Domain org "%s" already exists. No action required.' % domain
+                print('  mAtches Domain org "%s" already exists. No action required.' % domain)
 
             # QMAP source
             if does_source_exist:
-                print '  QMAP Source "%s" already exists. Will delete and recreate...' % self.uid
+                print('  QMAP Source "%s" already exists. Will delete and recreate...' % self.uid)
             else:
-                print '  QMAP Source "%s" does not exist...will create' % self.uid
+                print('  QMAP Source "%s" does not exist...will create' % self.uid)
 
             # Questionnaire Source
             if do_create_questionnaire_source:
-                print '  Questionnaire Source "%s" does not exist...will create' % (
-                    qmap_questionnaire.source)
+                print('  Questionnaire Source "%s" does not exist...will create' % (
+                    qmap_questionnaire.source))
             else:
-                print '  Questionnaire Source "%s" already exists. No action required.' % (
-                    qmap_questionnaire.source)
+                print('  Questionnaire Source "%s" already exists. No action required.' % (
+                    qmap_questionnaire.source))
 
-            print '\n**** CSV Resources:'
+            print('\n**** CSV Resources:')
             qmap_csv_resources.display_as_csv()
-            print '\n**** Converted JSON Resources:'
+            print('\n**** Converted JSON Resources:')
             for resource in qmap_json_resources:
-                print json.dumps(resource)
-            print ''
+                print(json.dumps(resource))
+            print('')
 
         # Exit now if in test mode
         if test_mode:
             if verbosity:
-                print "\nTEST MODE: Skipping import"
+                print("\nTEST MODE: Skipping import")
             return None
 
         # Submit the bulk import
@@ -315,7 +317,7 @@ class Qmap(object):
             ))
 
         # Build the Qmap CSV concepts with their mappings for Qmap headers
-        for qmap_key, qmap_item in self.headers.items():
+        for qmap_key, qmap_item in list(self.headers.items()):
             pos_header_concept = self._generate_pos_header_concept_and_mapping(
                 qmap_key=qmap_key, qmap_item=qmap_item, owner=domain, source=self.uid,
                 qmap_questionnaire=qmap_questionnaire,
@@ -331,7 +333,7 @@ class Qmap(object):
                 qmap_csv_resources.append(pos_header_choices)
 
         # Build concepts/mappings for Qmap constants
-        for qmap_key, qmap_item in self.constants.items():
+        for qmap_key, qmap_item in list(self.constants.items()):
             _pos_constant_concept = self._generate_pos_constant_concept_and_mapping(
                 qmap_key=qmap_key, qmap_item=qmap_item, owner=domain, source=self.uid,
                 qmap_questionnaire=qmap_questionnaire,
@@ -466,7 +468,7 @@ class Qmap(object):
             'attr:header_concept_id': Qmap._convert_to_pos_header_concept_id(qmap_key),
             'extmap_type[01]': 'Same As',
         }
-        for choice_pos_value, choice_questionnaire_value in qmap_item['choiceMap'].items():
+        for choice_pos_value, choice_questionnaire_value in list(qmap_item['choiceMap'].items()):
             choice_concept = base_row.copy()
             choice_concept['id'] = Qmap._convert_to_pos_choice_concept_id(
                 qmap_key, choice_pos_value)

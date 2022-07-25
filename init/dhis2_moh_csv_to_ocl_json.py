@@ -3,30 +3,33 @@ Converts a DSHI2 formatted CSV codelist to an OCL-formatted JSON bulk import scr
 This has been tested and used for DAA-FY21 and CS-FY21. This would likely work for other
 periods (eg FY20) as well with minimal modification.
 
-
-1. Save DHIS2 codelist to CSV file (eg dhis2_moh_fy21_daa.csv)
+1. Save DHIS2 codelist to CSV file (eg dhis2_moh_FY21_DAA.csv)
     CS-FY21: https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:u069j8gVYTA
     DAA-FY21: https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:U7qYX49krHK
-2. Update script settings
-3. Run the script and save the outputted OCL bulk import script to a json file:
+    DAA-FY22: https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:RGDmmG5taRt
+2. Create/update indicator mapping file, e.g. cs_fy21_indicator_maps.csv -- indicator code is
+   extracted from the first 2 segments of a data element code by default; use the mapping
+   file if the default setting is incorrect for a data element
+3. Update script settings for the codelist
+4. Run the script and save the outputted OCL bulk import script to a json file:
     python dhis2_moh_csv_to_ocl_json.py > datim_moh_fy21_daa.json
-4. Update importinit.py and run it to load the codelist into the target OCL environment
+5. To load the codelist into an OCL environment, update and run importinit.py:
     python importinit.py
 """
-import unicodecsv as csv
+# import unicodecsv as csv
+import csv
 import json
 import ocldev.oclresourcelist
 
 
 # Script settings
-modality = 'DAA'  # Central Support or DAA
-fy_only = 'FY21'
-period = "DAA-FY21"
-csv_filename = 'dhis2_moh_fy21_daa.csv'
-# FILENAME_MAP_DE_CODE_TO_INDICATOR_CATEGORY = 'cs_fy21_indicator_maps.csv'
-FILENAME_MAP_DE_CODE_TO_INDICATOR_CATEGORY = ''
-owner = 'PEPFAR'
-owner_type = 'Organization'
+modality = 'DAA'  # e.g. CS or DAA
+fy_only = 'FY22Q1'  # e.g. FY21 or FY22Q1
+period = "DAA-FY22"  # e.g. DAA-FY22Q1, CS-FY21
+csv_filename = 'dhis2_moh_FY22_DAA.csv'  # e.g. dhis2_moh_FY22_DAA.csv
+FILENAME_MAP_DE_CODE_TO_INDICATOR_CATEGORY = ''  # e.g. cs_fy21_indicator_maps.csv
+owner = 'PEPFAR'  # e.g. PEPFAR
+owner_type = 'Organization'  # e.g. Organization or User
 debug = False
 
 
@@ -55,7 +58,11 @@ null_disag_concept = {
     "id": "null-disag",
     "datatype": "None",
     "concept_class": "Disaggregate",
-    "names": [{"locale": "en", "locale_preferred": "True", "name": "Null Disaggregate Option", "name_type": "Fully Specified"}],
+    "names": [{
+        "locale": "en",
+        "locale_preferred": "True",
+        "name": "Null Disaggregate Option",
+        "name_type": "Fully Specified"}],
     "source": datim_moh_source['id'],
     "owner": datim_moh_source['owner'],
     "owner_type": datim_moh_source['owner_type']
@@ -108,11 +115,11 @@ def row_to_de_concept(row, datim_moh_source, map_de_code_to_indicator_category, 
     if row['code'] in map_de_code_to_indicator_category:
         indicator_category_code = map_de_code_to_indicator_category[row['code']]
         if debug:
-            print row['code'], indicator_category_code
+            print(row['code'], indicator_category_code)
     else:
         indicator_category_code = row['code'][:find_nth(row['code'], '_', 2)]
         if debug:
-            print '***', row['code'], indicator_category_code
+            print('***', row['code'], indicator_category_code)
     concept = {
         "type": "Concept",
         "id": row['code'],
@@ -186,8 +193,8 @@ de_codes = {}
 missing = []
 found = []
 if debug:
-    print 'LIST OF UNIQUE DATA ELEMENT CODES MAPPED TO INDICATOR CODES:'
-    print 'de_name,indicator_code'
+    print('LIST OF UNIQUE DATA ELEMENT CODES MAPPED TO INDICATOR CODES:')
+    print('de_name,indicator_code')
 with open(csv_filename) as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
@@ -214,8 +221,8 @@ moh_resources += de_coc_mappings
 moh_resources += source_version
 
 if debug:
-    print '\n\nCODELIST AS OCL-FORMATTED JSON:'
+    print('\n\nCODELIST AS OCL-FORMATTED JSON:')
 
 # Output
 for resource in moh_resources:
-    print json.dumps(resource)
+    print(json.dumps(resource))

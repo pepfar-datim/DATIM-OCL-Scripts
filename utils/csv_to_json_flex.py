@@ -88,7 +88,7 @@ class ocl_csv_to_json_flex:
             is_skip_row = handler(csv_resource_def, csv_row)
         if is_skip_row:
             if self.verbose:
-                print ('SKIPPING: '), csv_resource_def['definition_name']
+                print(('SKIPPING: '), csv_resource_def['definition_name'])
             return
 
         # Set the resource type
@@ -181,7 +181,7 @@ class ocl_csv_to_json_flex:
             output_file.write(json.dumps(ocl_resource))
             output_file.write('\n')
         else:
-            print (json.dumps(ocl_resource))
+            print((json.dumps(ocl_resource)))
 
 
     def process_reference(self, csv_row, field_def):

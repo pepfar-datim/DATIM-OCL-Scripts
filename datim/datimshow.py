@@ -2,12 +2,13 @@
 Shared class for custom presentations (i.e. shows) of DATIM metadata
 """
 import csv
-import sys
 import json
+import sys
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import SubElement
 from xml.etree.ElementTree import tostring
-import datimbase
+
+from . import datimbase
 
 
 class DatimShow(datimbase.DatimBase):
@@ -77,7 +78,7 @@ class DatimShow(datimbase.DatimBase):
                     concept['mappings'] = [mapping for mapping in raw_mappings if str(
                         mapping["from_concept_url"]) == concept['url']]
 
-                concepts_with_mappings = raw_concepts_dict.values()
+                concepts_with_mappings = list(raw_concepts_dict.values())
 
         elif isinstance(concepts_with_mappings, list):
             # These are already in the correct format
@@ -165,7 +166,7 @@ class DatimShow(datimbase.DatimBase):
     def xml_dict_clean(self, intermediate_data):
         """ Cleans data for XML export """
         new_dict = {}
-        for key, value in intermediate_data.iteritems():
+        for key, value in intermediate_data.items():
             if isinstance(value, bool):
                 if value:
                     value = "true"
@@ -192,7 +193,7 @@ class DatimShow(datimbase.DatimBase):
             for field_name in row_values:
                 field = SubElement(row, 'field')
                 field.text = row_values[field_name]
-        print tostring(top)
+        print(tostring(top))
 
     def transform_to_csv(self, content):
         """ Transform intermediate export to CSV """
@@ -252,7 +253,7 @@ class DatimShow(datimbase.DatimBase):
         if not repo_title:
             repo_title = repo_id
         if not show_headers_key:
-            show_headers_key = self.headers.items()[0][0]
+            show_headers_key = list(self.headers.items())[0][0]
 
         # STEP 1 of 4: Fetch latest version of relevant OCL repository export
         self.vlog(1, '**** STEP 1 of 4: Fetch latest version of relevant OCL repository export')
@@ -277,7 +278,7 @@ class DatimShow(datimbase.DatimBase):
         self.vlog(1, '**** STEP 3 of 4: Cache the intermediate output')
         if self.cache_intermediate:
             filename = self.endpoint2filename_ocl_export_intermediate_json(repo_endpoint)
-            with open(self.attach_absolute_data_path(filename), 'wb') as output_file:
+            with open(self.attach_absolute_data_path(filename), 'w') as output_file:
                 output_file.write(json.dumps(intermediate))
                 self.vlog(1, 'Processed OCL export saved to "%s"' % filename)
         else:

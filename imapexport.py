@@ -11,13 +11,12 @@ Example Usage:
 * To see all options:
     python imapexport.py -h
 """
-import sys
-import json
 import argparse
-import datim.datimimap
-import datim.datimimapexport
-import common
+import json
+import sys
 
+import common
+from datim import datimimap, datimimapexport
 
 # Script argument parser
 parser = argparse.ArgumentParser("imap-export", description="Export IMAP from OCL")
@@ -31,7 +30,7 @@ parser.add_argument('-p', '--period', help='Period, eg "FY18"', required=True)
 parser.add_argument('-t', '--token', help='OCL API token', required=False, default='')
 parser.add_argument(
     '-f', '--format', help='Format of the export: CSV (default), JSON, XML, HTML',
-    default=datim.datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV, required=False)
+    default=datimimap.DatimImap.DATIM_IMAP_FORMAT_CSV, required=False)
 parser.add_argument(
     '-v', '--verbosity', help='Verbosity level: 0 (default), 1, or 2', default=0, type=int)
 parser.add_argument(
@@ -51,15 +50,15 @@ country_org = 'DATIM-MOH-%s-%s' % (args.country_code, args.period)
 # Display debug output
 if args.verbosity:
     if args.verbosity > 1:
-        print args
-    print '\n\n' + '*' * 100
-    print '** [EXPORT] Country Code: %s, Org: %s, Format: %s, Period: %s, Version: %s, Exclude Empty Maps: %s, Verbosity: %s, OCL Env: %s' % (
+        print(args)
+    print('\n\n' + '*' * 100)
+    print('** [EXPORT] Country Code: %s, Org: %s, Format: %s, Period: %s, Version: %s, Exclude Empty Maps: %s, Verbosity: %s, OCL Env: %s' % (
         args.country_code, country_org, args.format, args.period, args.country_version,
-        str(args.exclude_empty_maps), str(args.verbosity), ocl_env_url)
-    print '*' * 100
+        str(args.exclude_empty_maps), str(args.verbosity), ocl_env_url))
+    print('*' * 100)
 
 # Generate the IMAP export
-datim_imap_export = datim.datimimapexport.DatimImapExport(
+datim_imap_export = datimimapexport.DatimImapExport(
     oclenv=ocl_env_url, oclapitoken=args.token, verbosity=args.verbosity,
     run_ocl_offline=args.run_ocl_offline)
 try:
@@ -72,7 +71,7 @@ except Exception as err:
         'type': err.__class__.__name__,
         'message': str(err)
     }
-    print json.dumps(output)
+    print(json.dumps(output))
     sys.exit(1)
 else:
     imap.display(fmt=args.format, sort=True, exclude_empty_maps=args.exclude_empty_maps,

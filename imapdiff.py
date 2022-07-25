@@ -5,10 +5,9 @@ EXAMPLE:
 python imapdiff.py --env=staging -t=token -c=BI -pFY19 imap-samples/BI-FY19-baseline.csv
 """
 import argparse
-import datim.datimimap
-import datim.datimimaptests
-import common
 
+import common
+from datim import datimimap, datimimaptests
 
 # Script argument parser
 parser = argparse.ArgumentParser("imap-diff", description="Diff 2 IMAPs")
@@ -28,7 +27,7 @@ args = parser.parse_args()
 # Pre-process input parameters
 ocl_env_url = args.env if args.env else args.envurl
 imap_filename = args.file.name
-country_org = 'DATIM-MOH-%s-%s' % (args.country_code, args.period)
+country_org = f'DATIM-MOH-{args.country_code}-{args.period}'
 
 # Test batch definition
 imap_test_batch = [
@@ -36,27 +35,27 @@ imap_test_batch = [
         "test_id": "imap-diff",
         "is_active": True,
         "test_description": "Compare IMAP in OCL with an IMAP file",
-        "test_type": datim.datimimaptests.DatimImapTests.DATIM_OCL_TEST_TYPE_COMPARE,
-        "imap_a_type": datim.datimimaptests.DatimImapTests.IMAP_COMPARE_TYPE_OCL,
+        "test_type": datimimaptests.DatimImapTests.DATIM_OCL_TEST_TYPE_COMPARE,
+        "imap_a_type": datimimaptests.DatimImapTests.IMAP_COMPARE_TYPE_OCL,
         "imap_a_ocl_api_env": ocl_env_url,
         "imap_a_ocl_api_token": args.token,
         "imap_a_period": args.period,
         "imap_a_country_org": country_org,
         "imap_a_country_name": args.country_code,
         "imap_a_country_code": args.country_code,
-        "imap_b_type": datim.datimimaptests.DatimImapTests.IMAP_COMPARE_TYPE_FILE,
+        "imap_b_type": datimimaptests.DatimImapTests.IMAP_COMPARE_TYPE_FILE,
         "imap_b_filename": imap_filename,
         "imap_b_period": args.period,
         "imap_b_country_org": country_org,
         "imap_b_country_name": args.country_code,
         "imap_b_country_code": args.country_code,
-        "assert_result_type": datim.datimimap.DatimImapDiff,
+        "assert_result_type": datimimap.DatimImapDiff,
         "assert_num_diff": 0,
     }
 ]
 
 # Run the tests and display the results
-datim.datimimaptests.DatimImapTests.display_test_summary(imap_test_batch)
-imap_tester = datim.datimimaptests.DatimImapTests()
+datimimaptests.DatimImapTests.display_test_summary(imap_test_batch)
+imap_tester = datimimaptests.DatimImapTests()
 imap_tester.run_tests(imap_test_batch)
 imap_tester.display_test_results()

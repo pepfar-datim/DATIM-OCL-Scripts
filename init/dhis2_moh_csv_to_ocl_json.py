@@ -3,20 +3,21 @@ Converts a DSHI2 formatted CSV codelist to an OCL-formatted JSON bulk import scr
 This has been tested and used for DAA-FY21 and CS-FY21. This would likely work for other
 periods (eg FY20) as well with minimal modification.
 
-1. Save DHIS2 codelist to CSV file (eg dhis2_moh_FY21_DAA.csv)
+1. Save DHIS2 codelist to CSV file (eg dhis2_moh_FY21_DAA.csv), eg:
     CS-FY21: https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:u069j8gVYTA
     DAA-FY21: https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:U7qYX49krHK
     DAA-FY22: https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:RGDmmG5taRt
-2. Create/update indicator mapping file, e.g. cs_fy21_indicator_maps.csv -- indicator code is
-   extracted from the first 2 segments of a data element code by default; use the mapping
-   file if the default setting is incorrect for a data element
-3. Update script settings for the codelist
+2. (Optional) Create/update indicator mapping file to link data elements to standardized indicator codes
+   For an example, see `cs_fy21_indicator_maps.csv`. By default (i.e. if there is no mapping defined for a
+   data element), the indicator code is extracted from the first 2 segments of a data element code. Therefore,
+   for the data element "HTS_TST_N_MOH_Age_Agg_Sex_Result", the indicator code is set to "HTS_TST". Use the
+   mapping file if the default behavior is incorrect for a data element.
+3. Update Script Settings for the codelist (modality, fy_only, period, csv_filename, etc.)
 4. Run the script and save the outputted OCL bulk import script to a json file:
     python dhis2_moh_csv_to_ocl_json.py > datim_moh_fy21_daa.json
 5. To load the codelist into an OCL environment, update and run importinit.py:
     python importinit.py
 """
-# import unicodecsv as csv
 import csv
 import json
 import ocldev.oclresourcelist

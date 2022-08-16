@@ -24,7 +24,7 @@ kombu==4.3.0
 lazy-object-proxy==1.7.1
 mccabe==0.6.1
 monotonic==1.5
-ocldev==0.1.88
+ocldev==0.1.91
 pathlib2==2.3.5
 platformdirs==2.5.2
 pylint==2.14.1

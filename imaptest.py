@@ -13,7 +13,6 @@ COUNTRY_TEST_CODE = 'BENCHMARK'
 COUNTRY_TEST_NAME = COUNTRY_TEST_CODE
 COUNTRY_TEST_ORG = f'DATIM-MOH-{COUNTRY_TEST_CODE}-{PERIOD}'
 
-OCL_API_ROOT_TOKEN = settings.api_token_staging_root
 IMAP_TEST_V1_IMPORT_FILENAME = 'csv/MW-FY19-v1.csv'
 DO_DROP_WHEN_COMPLETE = True
 
@@ -61,7 +60,7 @@ imap_test_batch = [
         "test_type": datimimaptests.DatimImapTests.DATIM_OCL_TEST_TYPE_DROP_ORG,
         "country_org": COUNTRY_TEST_ORG,
         "ocl_api_env": OCL_API_ENV,
-        "ocl_api_token": OCL_API_ROOT_TOKEN,
+        "ocl_api_token": OCL_API_TOKEN,
         "assert_result_type": bool,
         "assert_result_value": False,
     },
@@ -176,7 +175,7 @@ imap_test_batch = [
         "test_type": datimimaptests.DatimImapTests.DATIM_OCL_TEST_TYPE_DROP_ORG,
         "country_org": COUNTRY_TEST_ORG,
         "ocl_api_env": OCL_API_ENV,
-        "ocl_api_token": OCL_API_ROOT_TOKEN,
+        "ocl_api_token": OCL_API_TOKEN,
         "assert_result_type": bool,
         "assert_result_value": True,
     },

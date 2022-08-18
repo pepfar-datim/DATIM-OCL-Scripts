@@ -6,7 +6,6 @@ from datim import datimimap, datimimaptests
 period = 'FY19'
 ocl_api_env = settings.ocl_api_url_production
 ocl_api_token = settings.api_token_production_datim_admin
-ocl_api_root_token = settings.api_token_production_root
 imap_compare_csv_filename = 'csv/HT-FY19-v2.csv'
 imap_compare_country_code = 'TEST-HT2'
 imap_compare_country_name = 'TEST-HT2'

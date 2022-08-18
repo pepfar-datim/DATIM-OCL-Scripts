@@ -22,11 +22,11 @@ import settings
 # Edit this list to import the files that you need
 
 IMPORT_FILENAMES_ALL = [
-    'init/pepfar_org.json',
-    'init/datim_moh_fy19.json',
-    'init/datim_moh_fy20.json',
-    'init/datim_moh_fy21_cs.json',
-    'init/datim_moh_fy21_daa.json',
+    # 'init/pepfar_org.json',
+    # 'init/datim_moh_fy19.json',
+    # 'init/datim_moh_fy20.json',
+    # 'init/datim_moh_fy21_cs.json',
+    # 'init/datim_moh_fy21_daa.json',
     'init/datim_moh_fy22_daa.json',
     'init/datim_moh_fy22q1_daa.json',
 ]
@@ -35,7 +35,7 @@ IMPORT_FILENAMES = IMPORT_FILENAMES_ALL
 # OCL Settings
 VERBOSE = False
 DO_BULK_IMPORT = True
-DO_WAIT_UNTIL_IMPORT_COMPLETE = True
+DO_WAIT_UNTIL_IMPORT_COMPLETE = False
 OCL_API_URL_ROOT = settings.ocl_api_url_staging
 OCL_API_TOKEN = settings.api_token_staging_datim_admin
 

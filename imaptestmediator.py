@@ -4,7 +4,6 @@ from datim import datimimap, datimimaptests
 # Settings
 ocl_api_env = settings.ocl_api_url_staging
 ocl_api_token = settings.api_token_staging_datim_admin
-ocl_api_root_token = settings.api_token_staging_root
 imap_mediator_env = settings.imap_mediator_url_test
 # imap_mediator_env = settings.imap_mediator_url_production
 period = 'FY19'

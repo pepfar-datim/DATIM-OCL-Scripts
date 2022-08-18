@@ -943,7 +943,7 @@ class DatimImapFactory(object):
                 imap_org['extras']['datim_moh_object']):
             return True
         elif verbose:
-            print(('WARNING: Org "%s" exixts but is not an IMAP org.' % org_id))
+            print(('WARNING: Org "%s" exists but is not an IMAP org.' % org_id))
         return False
 
     @staticmethod

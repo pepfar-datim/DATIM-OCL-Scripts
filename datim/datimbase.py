@@ -511,7 +511,7 @@ class DatimBase(object):
         elif r.status_code == 208:
             # Export is already being processed, so just wait for it
             r = self.wait_for_repository_version_export(
-                repo_export_url=repo_export_url, delay_seconds=delay_seconds,
+                repo_export_url=url_ocl_export, delay_seconds=delay_seconds,
                 max_wait_seconds=max_wait_seconds)
         else:
             msg = 'ERROR: Unrecognized response from OCL: %s' % str(r.status_code)

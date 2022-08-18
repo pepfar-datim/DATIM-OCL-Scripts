@@ -13,9 +13,7 @@ period (e.g. FY17). Export follows the format of the country mapping CSV templat
     MOH_Disag_ID - Females
     MOH_Disag_Name - Adults (14+) initiated ART
     Classification - course
-
-** Issues:
-1. Implement long-term method for populating the indicator category column (currently manually set a custom attribute)
+    indicator_category_code - HTS_TST
 """
 import json
 

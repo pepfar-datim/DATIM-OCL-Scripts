@@ -36,8 +36,8 @@ IMPORT_FILENAMES = IMPORT_FILENAMES_ALL
 VERBOSE = False
 DO_BULK_IMPORT = True
 DO_WAIT_UNTIL_IMPORT_COMPLETE = False
-OCL_API_URL_ROOT = settings.ocl_api_url_staging
-OCL_API_TOKEN = settings.api_token_staging_datim_admin
+OCL_API_URL_ROOT = settings.ocl_api_url_production
+OCL_API_TOKEN = settings.api_token_production_datim_admin
 
 # Build a combined resource list
 resource_list = ocldev.oclresourcelist.OclJsonResourceList()

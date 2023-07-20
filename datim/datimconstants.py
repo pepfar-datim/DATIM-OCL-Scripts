@@ -7,6 +7,8 @@ class DatimConstants(object):
     """ Static class of constants for the DATIM-OCL project """
 
     # NOT IN USE: First iteration of new method for defining ETL
+    '''
+    #JP:2023-07-20 -- removing if not needed
     OCL_ETL_DEFINITIONS = {
         'MER-MSP': {
             'id': 'MER-MSP',
@@ -33,20 +35,30 @@ class DatimConstants(object):
             }
         }
     }
+    '''
 
+    '''
+    #JP:2023-07-20 - removing if not used
     # Import batch IDs
     IMPORT_BATCH_MOH = 'MOH'  # don't use this one! switching to independent configuration each year
     IMPORT_BATCH_MOH_FY17 = 'MOH-FY17'
     IMPORT_BATCH_MOH_FY18 = 'MOH-FY18'
     IMPORT_BATCH_MOH_FY19 = 'MOH-FY19'
     IMPORT_BATCH_MOH_FY20 = 'MOH-FY20'
+    '''
+
+    '''
+    #JP:2023-07-20 - removing if not needed
     IMPORT_BATCH_MER = 'MER'
     IMPORT_BATCH_MER_MSP = 'MER-MSP'
     IMPORT_BATCH_SIMS = 'SIMS'
     IMPORT_BATCH_MECHANISMS = 'Mechanisms'
     IMPORT_BATCH_TIERED_SUPPORT = 'Tiered-Support'  # Tiered Support is imported with init scripts, not a sync script
+    '''
 
     # List of content categories
+    '''
+    #JP:2023-07-20 - removing if not needed
     SYNC_RESOURCE_TYPES = [
         IMPORT_BATCH_MOH,
         IMPORT_BATCH_MOH_FY17,
@@ -59,27 +71,34 @@ class DatimConstants(object):
         IMPORT_BATCH_MECHANISMS,
         IMPORT_BATCH_TIERED_SUPPORT
     ]
+    '''
 
     # OpenHIM Endpoints
-    OPENHIM_ENDPOINT_MOH = 'datim-moh'  # Don't use this! Switching to independent configurations for each year
-    OPENHIM_ENDPOINT_MOH_FY17 = 'datim-moh'
-    OPENHIM_ENDPOINT_MOH_FY18 = 'datim-moh'
-    OPENHIM_ENDPOINT_MOH_FY19 = 'datim-moh'
-    OPENHIM_ENDPOINT_MOH_FY20 = 'datim-moh'
+    OPENHIM_ENDPOINT_MOH = 'datim-moh'
+    #OPENHIM_ENDPOINT_MOH_FY17 = 'datim-moh'
+    #OPENHIM_ENDPOINT_MOH_FY18 = 'datim-moh'
+    #OPENHIM_ENDPOINT_MOH_FY19 = 'datim-moh'
+    #OPENHIM_ENDPOINT_MOH_FY20 = 'datim-moh'
+
+    '''
+    #JP:2023-07-20 - removing if not needed
     OPENHIM_ENDPOINT_MER = 'datim-mer'
     OPENHIM_ENDPOINT_MER_MSP = 'datim-mer'
     OPENHIM_ENDPOINT_SIMS = 'datim-sims'
     OPENHIM_ENDPOINT_MECHANISMS = 'datim-mechanisms'
     OPENHIM_ENDPOINT_TIERED_SUPPORT = 'datim-tiered-support'
+    '''
 
     # OCL Dataset Endpoints
-    OCL_DATASET_ENDPOINT_MER = '/orgs/PEPFAR/collections/?verbose=true&limit=200'
-    OCL_DATASET_ENDPOINT_MER_MSP = '/orgs/PEPFAR/collections/?verbose=true&limit=200'
+    #OCL_DATASET_ENDPOINT_MER = '/orgs/PEPFAR/collections/?verbose=true&limit=200'
+    #OCL_DATASET_ENDPOINT_MER_MSP = '/orgs/PEPFAR/collections/?verbose=true&limit=200'
     #OCL_DATASET_ENDPOINT_MECHANISMS = ''
-    OCL_DATASET_ENDPOINT_SIMS = '/orgs/PEPFAR/collections/?q=SIMS&verbose=true&limit=200'
+    #OCL_DATASET_ENDPOINT_SIMS = '/orgs/PEPFAR/collections/?q=SIMS&verbose=true&limit=200'
     OCL_DATASET_ENDPOINT_MOH = '/orgs/PEPFAR/collections/?verbose=true&limit=200'
 
     # OCL repository active attribute (must be set to True in OCL)
+    '''
+    #JP:2023-07-20 - removing if not needed
     REPO_ACTIVE_ATTR_MER = 'datim_sync_mer'
     REPO_ACTIVE_ATTR_MER_MSP = 'datim_sync_mer_msp'
     REPO_ACTIVE_ATTR_MECHANISMS = 'datim_sync_mechanisms'
@@ -88,14 +107,15 @@ class DatimConstants(object):
     REPO_ACTIVE_ATTR_MOH_FY18 = 'datim_sync_moh_fy18'
     REPO_ACTIVE_ATTR_MOH_FY19 = 'datim_sync_moh_fy19'
     REPO_ACTIVE_ATTR_MOH_FY20 = 'datim_sync_moh_fy20'
+    '''
 
     # DHIS2 Presentation URLs
-    DHIS2_PRESENTATION_URL_MOH_FY18 = 'https://test.geoalign.datim.org/api/sqlViews/jxuvedhz3S3/data.{{format}}?var=dataSets:sfk9cyQSUyi'
-    DHIS2_PRESENTATION_URL_MOH_FY19 = 'https://vshioshvili.datim.org/api/sqlViews/ioG5uxOYnZe/data.{{format}}?var=dataSets:OBhi1PUW3OL'
-    DHIS2_PRESENTATION_URL_MOH_FY20 = 'https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.{{format}}?var=dataSets:QSodwF4YG9a'
+    #DHIS2_PRESENTATION_URL_MOH_FY18 = 'https://test.geoalign.datim.org/api/sqlViews/jxuvedhz3S3/data.{{format}}?var=dataSets:sfk9cyQSUyi'
+    #DHIS2_PRESENTATION_URL_MOH_FY19 = 'https://vshioshvili.datim.org/api/sqlViews/ioG5uxOYnZe/data.{{format}}?var=dataSets:OBhi1PUW3OL'
+    #DHIS2_PRESENTATION_URL_MOH_FY20 = 'https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.{{format}}?var=dataSets:QSodwF4YG9a'
     DHIS2_PRESENTATION_URL_MOH = 'https://www.datim.org/api/sqlViews/DotdxKrNZxG/data.{{format}}?var=dataSets:{{dataset}}'
-    DHIS2_PRESENTATION_URL_MER = 'https://www.datim.org/api/sqlViews/DotdxKrNZxG/data.{{format}}?var=dataSets:{{dataset}}'
-    DHIS2_PRESENTATION_URL_MER_MSP = ''
+    #DHIS2_PRESENTATION_URL_MER = 'https://www.datim.org/api/sqlViews/DotdxKrNZxG/data.{{format}}?var=dataSets:{{dataset}}'
+    #DHIS2_PRESENTATION_URL_MER_MSP = ''
     DHIS2_PRESENTATION_URL_DEFAULT = 'https://dev-de.datim.org/api/sqlViews/{{sqlview}}/data.{{format}}'
 
     # SORT Column for exports
@@ -103,9 +123,9 @@ class DatimConstants(object):
     MOH_FY18_PRESENTATION_SORT_COLUMN = 4
     MOH_FY19_PRESENTATION_SORT_COLUMN = 4
     MOH_FY20_PRESENTATION_SORT_COLUMN = 4
-    MER_PRESENTATION_SORT_COLUMN = 4
-    MER_MSP_PRESENTATION_SORT_COLUMN = 4
-    SIMS_PRESENTATION_SORT_COLUMN = 2
+    #MER_PRESENTATION_SORT_COLUMN = 4
+    #MER_MSP_PRESENTATION_SORT_COLUMN = 4
+    #SIMS_PRESENTATION_SORT_COLUMN = 2
 
     # Classifications for disags (categoryOptionCombos) for MOH Alignment
     DISAG_CLASSIFICATION_COARSE = 'coarse'
@@ -123,6 +143,8 @@ class DatimConstants(object):
         DISAG_CLASSIFICATION_INVALID
     ]
 
+    '''
+    #JP:2023-07-20 - removing if not needed
     # SIMS DHIS2 Queries
     SIMS_DHIS2_QUERIES = {
         'SimsAssessmentTypes': {
@@ -140,7 +162,10 @@ class DatimConstants(object):
             'conversion_method': 'dhis2diff_sims_option_sets'
         }
     }
+    '''
 
+    '''
+    #JP:2023-07-20 - removing if not used
     # MER DHIS2 Queries
     MER_DHIS2_QUERIES = {
         'MER': {
@@ -154,6 +179,7 @@ class DatimConstants(object):
             'conversion_method': 'dhis2diff_mer'
         }
     }
+    '''
 
     # MER-MSP DHIS2 Queries
     MER_MSP_DHIS2_QUERIES = {
@@ -218,6 +244,8 @@ class DatimConstants(object):
         }
     }
 
+    '''
+    #JP:2023-07-20 - removing if not used
     # MOH-FY18 DHIS2 Queries
     MOH_FY18_DHIS2_QUERIES = {
         'MOH-FY18': {
@@ -271,108 +299,129 @@ class DatimConstants(object):
             'conversion_method': 'dhis2diff_mechanisms'
         }
     }
+    '''
 
     # MOH OCL Export Definitions
     # TODO: Verify that the 'MOH' definition is not used and remove
     # TODO: Is DatimConstants.MOH_OCL_EXPORT_DEFS used at all?
     MOH_OCL_EXPORT_DEFS = {
         'MOH': {
-            'import_batch': IMPORT_BATCH_MOH,
+            #'import_batch': IMPORT_BATCH_MOH,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH/'},
         'FY18': {
             'title': 'MER Results: MOH Facility Based FY18',
-            'import_batch': IMPORT_BATCH_MOH_FY18,
+            #'import_batch': IMPORT_BATCH_MOH_FY18,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-FY18/'},
         'FY19': {
             'title': 'MER Results: MOH Facility Based FY19',
-            'import_batch': IMPORT_BATCH_MOH_FY19,
+            #'import_batch': IMPORT_BATCH_MOH_FY19,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-FY19/'},
         'FY20': {
             'title': 'MER Results: MOH Facility Based FY20',
-            'import_batch': IMPORT_BATCH_MOH_FY20,
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-FY20/'},
         'CS-FY21': {
             'title': 'MER Results: CS Facility Based FY21',
-            'import_batch': IMPORT_BATCH_MOH_FY20,
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-CS-FY21/'},
         'DAA-FY21': {
             'title': 'MER Results: MOH Facility Based FY21',
-            'import_batch': IMPORT_BATCH_MOH_FY20,
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY21/'},
         'DAA-FY22': {
             'title': 'MER Results: MOH Facility Based FY22',
-            'import_batch': IMPORT_BATCH_MOH_FY20,
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY22/'},
         'DAA-FY22Q1': {
             'title': 'MER Results: MOH Facility Based FY22Q1',
-            'import_batch': IMPORT_BATCH_MOH_FY20,
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY22Q1/'},
         'DAA-FY22Q2': {
             'title': 'MER Results: MOH Facility Based FY22Q2',
-            'import_batch': IMPORT_BATCH_MOH_FY20,
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY22Q2/'},
         'DAA-FY22Q3': {
             'title': 'MER Results: MOH Facility Based FY22Q3',
-            'import_batch': IMPORT_BATCH_MOH_FY20,
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY22Q3/'},
         'DAA-FY22Q4': {
             'title': 'MER Results: MOH Facility Based FY22Q4',
-            'import_batch': IMPORT_BATCH_MOH_FY20,
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY22Q4/'},
         'CS-FY22': {
             'title': 'MER Results: CS Facility Based FY22',
-            'import_batch': IMPORT_BATCH_MOH_FY20,
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-CS-FY22/'},
         'CS-FY22Q1': {
             'title': 'MER Results: CS Facility Based FY22Q1',
-            'import_batch': IMPORT_BATCH_MOH_FY20,
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-CS-FY22Q1/'},
         'CS-FY22Q2': {
             'title': 'MER Results: CS Facility Based FY22Q2',
-            'import_batch': IMPORT_BATCH_MOH_FY20,
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-CS-FY22Q2/'},
         'CS-FY22Q3': {
             'title': 'MER Results: CS Facility Based FY22Q3',
-            'import_batch': IMPORT_BATCH_MOH_FY20,
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-CS-FY22Q3/'},
         'CS-FY22Q4': {
             'title': 'MER Results: CS Facility Based FY22Q4',
-            'import_batch': IMPORT_BATCH_MOH_FY20,
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
             'show_build_row_method': 'build_moh_indicator_output',
             'show_headers_key': 'moh',
             'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-CS-FY22Q4/'},
+        'DAA-FY23': {  # Added by JP 2023-07-20
+            'title': 'MER Results: MOH Facility Based FY23',
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY23/'},
+        'DAA-FY24': {  # Added by JP 2023-07-20
+            'title': 'MER Results: MOH Facility Based FY24',
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY24/'},
+        'DAA-FY25': {  # Added by JP 2023-07-20
+            'title': 'MER Results: MOH Facility Based FY25',
+            #'import_batch': IMPORT_BATCH_MOH_FY20,
+            'show_build_row_method': 'build_moh_indicator_output',
+            'show_headers_key': 'moh',
+            'endpoint': '/orgs/PEPFAR/sources/DATIM-MOH-DAA-FY25/'},
     }
 
+    '''
+    #JP:2023-07-20 - removing if not used
     # MOH FY18 OCL Export Definitions
     # TODO: Verify that this is not used and remove
     MOH_FY18_OCL_EXPORT_DEFS = {
@@ -411,8 +460,11 @@ class DatimConstants(object):
             'show_headers_key': 'mer_msp',
             'endpoint': '/orgs/PEPFAR/sources/MER-MSP/'},
         }
+    '''
 
     # MER OCL Export Definitions
+    '''
+    #JP:2023-07-20 - removing if not used; codelist definitions now pulled from OCL
     MER_OCL_EXPORT_DEFS = {
         'MER': {
             'import_batch': IMPORT_BATCH_MER,
@@ -780,8 +832,11 @@ class DatimConstants(object):
             'show_headers_key': 'mer',
             'endpoint': '/orgs/PEPFAR/collections/MER-R-Facility-FY16Q1Q2Q3/'},
     }
+    '''
 
     # SIMS OCL Export Definitions
+    '''
+    #JP:2023-07-20 - removing if not used
     SIMS_OCL_EXPORT_DEFS = {
         'SIMS-Source': {
             'import_batch': IMPORT_BATCH_SIMS,
@@ -858,3 +913,4 @@ class DatimConstants(object):
             'endpoint': '/orgs/PEPFAR/sources/Tiered-Site-Support/',
             'dhis2_sqlview_id': 'ELFCPUHushX'},
     }
+    '''

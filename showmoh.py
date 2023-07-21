@@ -43,6 +43,8 @@ else:
     ocl_api_headers = {'Content-Type': 'application/json'}
     if args.token:
         ocl_api_headers['Authorization'] = 'Token %s' % args.token
+    if args.verbosity:
+        print(url_sources)
     response = requests.get(url_sources, headers=ocl_api_headers)
     response.raise_for_status()
     ocl_moh_sources = response.json()

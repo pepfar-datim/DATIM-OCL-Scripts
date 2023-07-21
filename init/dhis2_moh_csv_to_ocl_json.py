@@ -1,25 +1,32 @@
 """
-Converts a DSHI2 formatted CSV codelist to an OCL-formatted JSON bulk import script.
-This script was developed for DAA-FY21 and CS-FY21, and also used for DAA-FY22.
-This would likely work for earlier periods (eg FY20) as well with minimal modification.
+Converts a DHIS2-formatted CSV codelist to an OCL-formatted JSON bulk import script.
+This script was used for DAA-FY21, CS-FY21, DAA-FY22, and DAA-FY23, and it would
+likely work for earlier periods (eg FY20) or non-DAA codelists with minimal modification.
 
-DAA-FY22 introduced a new column for "indicator_category_code" in the DHIS2 codelist CSV.
-If this field is defined, it is automatically used to define the indicator_category_code
+Columns expected in the DHIS2-formatted CSV codelist: dataset, dataelement, shortname,
+code, dataelementuid, dataelementdesc, categoryoptioncombo, categoryoptioncombocode,
+categoryoptioncombouid, classification, indicator_category_code (Optional). Any additional
+columns are ignored.
+
+DAA-FY22 introduced a new optional column for "indicator_category_code" in the DHIS2 codelist
+CSV. If this column is defined, it is automatically used to define the indicator_category_code
 value for each data element. If it is not available, then an optional mapping file may be
-used (see step 2 below for more details). Otherwise, the indicator_category_code is extracted
-from the first 2 segments of a data element code. Therefore, for the data element
-"HTS_TST_N_MOH_Age_Agg_Sex_Result", the indicator code is set to "HTS_TST".
+used (see step 2 below for more details). Otherwise, the indicator_category_code is
+automatically extracted from the first 2 segments of a data element code. For example, for
+the data element "HTS_TST_N_MOH_Age_Agg_Sex_Result", the indicator code is set to "HTS_TST".
+In most cases, the default behavior of automatically extracting the indicator code is all that
+is necessary. Use the mapping file only if the default behavior is incorrect for a data element.
 
 1. Save DHIS2 codelist to CSV file (eg dhis2_moh_FY21_DAA.csv), eg:
     CS-FY21: https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:u069j8gVYTA
     DAA-FY21: https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:U7qYX49krHK
     DAA-FY22: https://test.geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:RGDmmG5taRt
+    DAA-FY23: https://geoalign.datim.org/api/sqlViews/ioG5uxOYnZe/data.html+css?var=dataSets:nPEPnHrNsnP
 2. (Optional) Create/update indicator mapping file to link data elements to standardized
    indicator codes. For an example, see `cs_fy21_indicator_maps.csv`. By default, the
    indicator code is extracted from the first 2 segments of a data element code.
    Therefore, for the data element "HTS_TST_N_MOH_Age_Agg_Sex_Result", the indicator
-   code is set to "HTS_TST". Use the mapping file if the default behavior is incorrect
-   for a data element.
+   code is set to "HTS_TST".
 3. Update Script Settings for the codelist (MODALITY, FY_ONLY, PERIOD, CSV_FILENAME, etc.)
 4. Run the script and save the outputted OCL bulk import script to a json file:
     python dhis2_moh_csv_to_ocl_json.py > datim_moh_fy21_daa.json
@@ -31,16 +38,18 @@ import json
 import ocldev.oclresourcelist
 
 
-# Script settings
+# Script settings - Update these settings every time
 MODALITY = 'DAA'  # e.g. CS or DAA
-FY_ONLY = 'FY22Q1'  # e.g. FY21 or FY22Q1
-PERIOD = "DAA-FY22Q1"  # e.g. DAA-FY21, DAA-FY22Q1, CS-FY21
-CSV_FILENAME = 'dhis2_moh_FY22_DAA_v2.csv'  # e.g. dhis2_moh_FY22_DAA.csv
+FY_ONLY = 'FY23'  # e.g. FY21 or FY22Q1
+PERIOD = "DAA-FY23"  # e.g. DAA-FY21, DAA-FY22Q1, CS-FY21
+CSV_FILENAME = 'dhis2_moh_fy23_daa.csv'  # e.g. dhis2_moh_FY22_DAA.csv
 FILENAME_MAP_DE_CODE_TO_INDICATOR_CATEGORY = ''  # e.g. cs_fy21_indicator_maps.csv
 OWNER = 'PEPFAR'  # e.g. PEPFAR
 OWNER_TYPE = 'Organization'  # e.g. Organization or User
 DEBUG = False
 
+
+# DO NOT EDIT BELOW THIS LINE
 
 # Source, null disag, and source version configuration
 datim_moh_source = {

@@ -27,6 +27,9 @@ python imapimport.py --help
 python imapexport.py --help
 python showmoh.py --help
 python getimaporgs.py --help
+python imapdiff.py --help
+python imapbackup.py --help
+python imaprestore.py --help
 ```
 ### Examples
 ```
@@ -47,15 +50,25 @@ python imapexport.py -c=TEST -p=DAA-FY21 --env=qa -t=[your-ocl-api-token-here] -
 
 # Compare an imported country IMAP with the original file
 python imapdiff.py --env=qa -c=TEST -p=DAA-FY21 -t=[your-ocl-api-token-here] imap-samples/DEMO-DAA-FY21.json
+
+# Backup all IMAPs in a target OCL environment
+python imapbackup.py --env=qa -t=[your-ocl-api-token-here] > my-imap-backup-file.json
+
+# Restore IMAPs to a target OCL environment (note this will overwrite existing IMAPs)
+python imaprestore.py --env=qa -t=[your-ocl-api-token-here] my-imap-backup-file.json
 ```
 
 ## Scripts
 ### Configuration
 * `settings.py` - Configure environment variables here
+* `settings.blank.py` - A blank settings file if you're starting from scratch
+* `requirements.txt` - Required python packages
 
 ### New OCL environment or codelist setup
 * `importinit.py` - Use to load content, e.g. a codelist for a new reporting cycle
-* `init/*` - Sample scripts
+* `init/dhis2_moh_csv_to_ocl_json.py` - Script to transform a DHIS2 CSV codelist to an
+  OCL-formatted JSON. This needs to be used for each reporting cycle.
+* `init/*` - Sample JSON to start a project (e.g. DAA-FY22 codelist: datim_moh_fy22_daa.json)
 
 ### Command-line scripts
 * IMAP Import and Export
@@ -64,28 +77,22 @@ python imapdiff.py --env=qa -c=TEST -p=DAA-FY21 -t=[your-ocl-api-token-here] ima
 * Helper functions
     * `showmoh.py` - Get a PEPFAR MOH Alignment codelist (e.g. DAA-FY22)
     * `getimaporgs.py` - Get a list of countries and or a list of IMAPs
+    * `imapdiff.py` - Generate a diff between 2 IMAPs
+* Backup and restore (to work with multiple IMAPs)
     * `imapbackup.py` - Backup a set of IMAPs into a single file from a target OCL environment
     * `imaprestore.py` - Restore a saved IMAP backup file to a target OCL environment
-    * `imapdiff.py` - Generate a diff between 2 IMAPs
     * `imapdiffbackup.py` - Generate a diff between 2 IMAP backup files
 
+### Sample IMAPs
+* `imap-samples/*` - Sample IMAP JSON and CSV files
+
 ### Test scripts:
-* `imaptest.py` - 
-* `imaptestcompareocl2csv.py` - 
-* `imaptestmediator.py` - 
+* `imaptest.py` - A generic script to easily run a batch of tests on IMAP resources
+* `imaptestcompareocl2csv.py` - Test script to compare IMAP from OCL to an IMAP stored in a file
+* `imaptestmediator.py` - Test script to export an IMAP using a mediator
 
 ### Supporting code
-* `common.py` - 
-* `datim/*` - 
-* `requirements.txt` - 
-* `settings.py` and `settings.blank.py` - 
-
-### Sample IMAPs
-* `imap-samples/*`
-
-### Not sure if these are still used
-* status_util.py
-* iol.py
-* oclPassThroughReqeusts.py
-* status_util.py
-* utils/*
+* `datim/*` - Business logic for working with IMAPs
+* `common.py` - A few shared functions used by all of the command-line scripts
+* `utils/*` - A few utility scripts if you need to work directly with an environment
+* A few other old scripts: `status_util.py`, `iol.py`, `oclPassThroughReqeusts.py`, `status_util.py`

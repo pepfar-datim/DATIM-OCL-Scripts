@@ -30,22 +30,22 @@ python getimaporgs.py --help
 ```
 ### Examples
 ```
-# Get list of available codelists
+# Get list of available PEPFAR DAA codelists (e.g. one per reporting cycle)
 python showmoh.py --env=qa
 
-# Get details of a specific codelist: DAA-FY21
+# Get details of a specific codelist, e.g. DAA-FY21
 python showmoh.py --env=qa -p=DAA-FY21
 
-# Get list of IMAPs loaded in the target OCL environment
+# Get list of country IMAPs loaded in the target OCL environment
 python getimaporgs.py --env=qa -t=[your-ocl-api-token-here]
 
-# Import a codelist
+# Import a country IMAP
 python imapimport.py -c=TEST -p=DAA-FY21 --env=qa -t=[your-ocl-api-token-here] -v2 imap-samples/DEMO-DAA-FY21.json
 
-# Export a codelist
+# Export a country IMAP
 python imapexport.py -c=TEST -p=DAA-FY21 --env=qa -t=[your-ocl-api-token-here] -v2
 
-# Compare the imported IMAP with the original file
+# Compare an imported country IMAP with the original file
 python imapdiff.py --env=qa -c=TEST -p=DAA-FY21 -t=[your-ocl-api-token-here] imap-samples/DEMO-DAA-FY21.json
 ```
 

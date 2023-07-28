@@ -5,9 +5,9 @@ though JSON format is also supported.
 
 Example Usage:
 * To request an export as CSV:
-    python imapexport.py -c="BI" --env=staging -p=FY19 -t="my-token-here" -v0 -f=CSV
+    python imapexport.py -c="BDI" --env=staging -p="DAA-FY22" -t="my-token-here" -v0 -f=CSV
 * To request an export as JSON:
-    python imapexport.py -c="BI" --env=staging -p=FY19 -t="my-token-here" -v0 -f=JSON
+    python imapexport.py -c="BDI" --env=staging -p="DAA-FY22" -t="my-token-here" -v0 -f=JSON
 * To see all options:
     python imapexport.py -h
 """
@@ -20,13 +20,13 @@ from datim import datimimap, datimimapexport
 
 # Script argument parser
 parser = argparse.ArgumentParser("imap-export", description="Export IMAP from OCL")
-parser.add_argument('-c', '--country_code', help='Country code, eg "UG", "BI"', required=True)
+parser.add_argument('-c', '--country_code', help='Country code, eg "UGA", "BDI"', required=True)
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument(
     '--env', help='Name of the OCL API environment: production, staging, demo, qa',
     type=common.ocl_environment)
 group.add_argument('--envurl', help='URL of the OCL API environment')
-parser.add_argument('-p', '--period', help='Period, eg "FY18"', required=True)
+parser.add_argument('-p', '--period', help='Period, eg "DAA-FY22"', required=True)
 parser.add_argument('-t', '--token', help='OCL API token', required=False, default='')
 parser.add_argument(
     '-f', '--format', help='Format of the export: CSV (default), JSON, XML, HTML',

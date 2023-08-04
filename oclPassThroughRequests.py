@@ -2,8 +2,7 @@
 Script to retrieve QMAP status from OCL and return as JSON.
 Designed to work with PEPFAR IMAP and QMAP resources.
 
-python bulkImportStatus.py --env=staging -t="my-api-token-here"
-    --bulkImportId=d6ac3dd2-e565-455c-b29a-f7d859fd1fe8-datim-admin
+python oclPassThroughRequests.py --env=staging -t="{token_here}" --bulkImportId="{bulkimportid}" --requestType="bulkImportStatus"
 """
 import argparse
 import json

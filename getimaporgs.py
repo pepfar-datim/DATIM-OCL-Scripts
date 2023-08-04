@@ -15,7 +15,7 @@ Example Usage:
 - Filter list of IMAP orgs by period:
     python getimaporgs.py --env=staging -t="your-token-here" --format=text --period=FY18,FY19
 - Filter list of IMAP orgs by country code:
-    python getimaporgs.py --env=staging -t="your-token-here" --format=text --country_code=BI
+    python getimaporgs.py --env=staging -t="your-token-here" --format=text --country_code=BDI
 
 Arguments:
   -h, --help            show this help message and exit

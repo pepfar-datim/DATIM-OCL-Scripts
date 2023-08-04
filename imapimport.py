@@ -5,13 +5,14 @@ mapping template.
 
 Example Usage:
 - Import IMAP:
-    python imapimport.py --env=staging -c=BI --country_name=Burundi -p=FY19 -v2
-        -t="your-token-here" csv/BI-FY19.csv
+    python imapimport.py --env=staging -t="your-token-here" -c="BDI" --country_name="Burundi" -p="DAA-FY21" imap-samples/DEMO-DAA-FY21.csv
 - Use test mode (produces import script but does not submit):
-    python imapimport.py --env=staging -c=BI --country_name=Burundi -p=FY19 -v2
-        -t="your-token-here" --test_mode csv/BI-FY19.csv
+    python imapimport.py --env=staging -t="your-token-here" -c="BDI" --country_name="Burundi" -p="DAA-FY21" --test_mode imap-samples/DEMO-DAA-FY21.json
+
 
 """
+
+
 import argparse
 import json
 

@@ -522,7 +522,7 @@ class DatimBase(object):
         with open(self.attach_absolute_data_path(zipfilename), 'wb') as handle:
             for block in r.iter_content(1024):
                 handle.write(block)
-        self.vlog(1, '%s bytes saved to "%s"' % (r.headers['Content-Length'], zipfilename))
+        self.vlog(1, 'Compressed export saved to: %s' % (zipfilename))
 
         # Decompress the export file and rename
         zipref = zipfile.ZipFile(self.attach_absolute_data_path(zipfilename))

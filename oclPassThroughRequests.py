@@ -11,14 +11,10 @@ import requests
 
 import common
 
-
 # Checks OCL bulk import status
 def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
                              import_result_format=''):
     """ Return bulk import status ID """
-    import_result_formats = ['report', 'json', 'summary']
-    if import_result_format not in import_result_formats:
-        import_result_format = 'summary'
     ocl_api_headers = {'Content-Type': 'application/json'}
     if ocl_api_token:
         ocl_api_headers['Authorization'] = 'Token ' + ocl_api_token
@@ -26,33 +22,19 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
                          f"&result={import_result_format}")
     response = requests.get(import_status_url, headers=ocl_api_headers)
     response.raise_for_status()
-    is_json = True
     try:
-        json_content = response.text
-        if json_content.startswith('"') and json_content.endswith('"'):
-            json_content = json_content[1:-1]
-        json_object = json.loads(json_content)
-    except ValueError as e:
-        is_json = False
-    if import_result_format == 'summary':
-        if response.status_code == 200 and not is_json:
-            message_text = response.text
-            if message_text.startswith('"') and message_text .endswith('"'):
-                message_text = message_text[1:-1]
-            output_json = {
-                "status": "Completed",
-                "status_code": response.status_code,
-                "message": message_text}
-        elif (response.status_code == 200 or response.status_code == 202) and is_json:
-            output_json = {
-                "status": "Pending",
-                "status_code": 202}
-        else:
-            output_json = {
-                "status": "Failure",
-                "status_code": response.status_code,
-                "message": response.text}
+        output_json = response.json()
+        output_json["status_code"] = response.status_code
+        output_json["status"] = output_json["state"].capitalize()
+        if output_json["status"] == 'Started':
+            output_json["status"] = 'Pending'
+    except Exception as e:
+        output_json = {
+            "status": "Failure",
+            "status_code": response.status_code,
+            "message": response.text}
     return json.dumps(output_json)
+
 
 
 def getQMAPDomainDetails(ocl_env_url='', domain=''):

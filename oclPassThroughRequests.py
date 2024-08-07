@@ -28,6 +28,8 @@ def check_bulk_import_status(bulkImportId='', ocl_env_url='', ocl_api_token='',
         output_json["status"] = output_json["state"].capitalize()
         if output_json["status"] == 'Started':
             output_json["status"] = 'Pending'
+        elif output_json["status"] == 'Success':
+            output_json["status"] = 'Completed'
     except Exception as e:
         output_json = {
             "status": "Failure",

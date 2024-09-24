@@ -3,7 +3,8 @@ Sripts to import/export a country Indicator Mapping (IMAP) into/from OCL.
 
 ## Installation
 
-Please run `pip install -r requirements.txt` to install the required dependencies
+Run `pip install -r requirements.txt` to install the required dependencies. Even though installing dependencies in global environment works, it's always advisable to create a virtual environment and install the required dependencies there to avoid potential package conflicts. 
+Note that if using a virtual environment, openhim imap mediator (https://github.com/pepfar-datim/openhim-mediator-imap-import/blob/master/src/index.js) needs to use the created virtual environment.
 
 ### Environment setup
 1. Create a `data/` folder (in the root of the project folder) that the python scripts have write access to
